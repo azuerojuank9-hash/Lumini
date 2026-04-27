@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="padding:20px 16px 40px;">
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;flex-wrap:wrap;">
+    <a href="{{ url_for('archivados', slug=slug) }}"
+       style="padding:7px 14px;border-radius:8px;background:#ffffff08;color:#aaa;
+              font-size:13px;text-decoration:none;">← Volver</a>
+    <div>
+      <h2 style="margin:0;font-size:1.3rem;color:#e8e8f0;">🔄 Transferir notas entre profesores</h2>
+      <p style="margin:4px 0 0;font-size:13px;color:#7a7a90;">
+        Pasa todas las actividades, notas y evaluaciones de un profesor a otro sin perder información.
+      </p>
+    </div>
+  </div>
+
+  <!-- ALERTA ÉXITO -->
+  {% if exito %}
+  <div style="background:#1a3a2a;border:1px solid #2ecc7133;border-radius:10px;
+              padding:14px 18px;margin-bottom:20px;color:#2ecc71;font-size:14px;">
+    {{ exito|safe }}
+  </div>
+  {% endif %}
+
+  <!-- ALERTA ERROR -->
+  {% if error %}
+  <div style="background:#3a1a1a;border:1px solid #e74c3c44;border-radius:10px;
+              padding:14px 18px;margin-bottom:20px;color:#e74c3c;font-size:14px;">
+    ⚠️ {{ error }}
+  </div>
+  {% endif %}
+
+  <!-- EXPLICACIÓN -->
+  <div style="background:#17171e;border:1px solid #f39c1222;border-radius:12px;
+              padding:16px 20px;margin-bottom:24px;">
+    <p style="margin:0 0 8px;font-size:13px;color:#f39c12;font-weight:600;">⚠️ ¿Cuándo usar esto?</p>
+    <ul style="margin:0;padding-left:18px;color:#aaa;font-size:13px;line-height:1.8;">
+      <li>Un profesor se va del colegio y llega uno nuevo a la misma materia.</li>
+      <li>Quieres que el nuevo profesor vea el historial completo del curso.</li>
+      <li>El profesor origen queda <b>archivado automáticamente</b> al transferir.</li>
+      <li>Se transfieren: actividades, notas, evaluaciones, observaciones y cursos asignados.</li>
+    </ul>
+  </div>
+
+  <!-- FORMULARIO -->
+  <div style="background:#17171e;border:1px solid #ffffff10;border-radius:14px;padding:28px 24px;max-width:560px;">
+
+    <form method="POST" onsubmit="return confirmarTransferencia()">
+
+      <!-- PROFESOR ORIGEN -->
+      <div style="margin-bottom:20px;">
+        <label style="display:block;font-size:12px;color:#7a7a90;margin-bottom:8px;font-weight:600;">
+          👤 Profesor que SE VA (origen)
+        </label>
+        <select name="prof_origen" id="sel-origen" required onchange="actualizarInfo()"
+                style="width:100%;padding:10px 14px;border-radius:8px;background:#0f0f1a;
+                       border:1px solid #ffffff18;color:#e8e8f0;font-size:14px;outline:none;">
+          <option value="">— Selecciona el profesor —</option>
+          {% for p in todos_profesores %}
+          <option value="{{ p.id }}"
+                  data-materia="{{ p.materia }}"
+                  data-activo="{{ p.activo }}"
+                  style="color:{% if not p.activo %}#e74c3c{% else %}#e8e8f0{% endif %};">
+            {{ p.nombre }} — {{ p.materia }}
+            {% if not p.activo %}(archivado){% endif %}
+          </option>
+          {% endfor %}
+        </select>
+        <div id="info-origen" style="margin-top:6px;font-size:12px;color:#555;"></div>
+      </div>
+
+      <!-- FLECHA -->
+      <div style="text-align:center;font-size:22px;color:#6c63ff;margin:4px 0 16px;">↓</div>
+
+      <!-- PROFESOR DESTINO -->
+      <div style="margin-bottom:28px;">
+        <label style="display:block;font-size:12px;color:#7a7a90;margin-bottom:8px;font-weight:600;">
+          👤 Profesor que LLEGA (destino)
+        </label>
+        <select name="prof_destino" id="sel-destino" required onchange="actualizarInfo()"
+                style="width:100%;padding:10px 14px;border-radius:8px;background:#0f0f1a;
+                       border:1px solid #ffffff18;color:#e8e8f0;font-size:14px;outline:none;">
+          <option value="">— Selecciona el profesor —</option>
+          {% for p in todos_profesores %}
+          {% if p.activo %}
+          <option value="{{ p.id }}" data-materia="{{ p.materia }}">
+            {{ p.nombre }} — {{ p.materia }}
+          </option>
+          {% endif %}
+          {% endfor %}
+        </select>
+        <div id="info-destino" style="margin-top:6px;font-size:12px;color:#555;"></div>
+      </div>
+
+      <!-- ADVERTENCIA MATERIAS DISTINTAS -->
+      <div id="aviso-materia"
+           style="display:none;background:#2a2a1a;border:1px solid #f39c1233;border-radius:8px;
+                  padding:10px 14px;margin-bottom:18px;color:#f39c12;font-size:12px;">
+        ⚠️ Los profesores son de materias distintas. Las notas se transferirán igual,
+        pero quedarán bajo la materia del profesor destino. Asegúrate de que es correcto.
+      </div>
+
+      <button type="submit"
+              style="width:100%;padding:12px;border-radius:8px;border:none;
+                     background:linear-gradient(135deg,#f39c12,#e67e22);
+                     color:white;font-size:14px;font-weight:700;cursor:pointer;">
+        🔄 Transferir todo y archivar al profesor origen
+      </button>
+    </form>
+
+  </div>
+
+  <!-- QUÉ SE TRANSFIERE -->
+  <div style="max-width:560px;margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    {% for item in [
+      ('📝','Actividades y tareas','Todas las actividades creadas por el origen'),
+      ('🔢','Notas de estudiantes','Todas las calificaciones registradas'),
+      ('📊','Evaluaciones','Notas de evaluación y autoevaluación'),
+      ('💬','Observaciones','Observaciones escritas sobre estudiantes'),
+      ('🏫','Cursos asignados','Los cursos del origen pasan al destino'),
+      ('📁','Archivo automático','El profesor origen queda archivado'),
+    ] %}
+    <div style="background:#17171e;border:1px solid #ffffff08;border-radius:10px;padding:12px 14px;">
+      <div style="font-size:18px;margin-bottom:4px;">{{ item[0] }}</div>
+      <div style="font-size:12px;font-weight:600;color:#e8e8f0;">{{ item[1] }}</div>
+      <div style="font-size:11px;color:#555;margin-top:2px;">{{ item[2] }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+<script>
+function actualizarInfo() {
+  const origen  = document.getElementById('sel-origen');
+  const destino = document.getElementById('sel-destino');
+  const aviso   = document.getElementById('aviso-materia');
+
+  const oOpt = origen.options[origen.selectedIndex];
+  const dOpt = destino.options[destino.selectedIndex];
+
+  const oMat = oOpt ? oOpt.getAttribute('data-materia') : '';
+  const dMat = dOpt ? dOpt.getAttribute('data-materia') : '';
+
+  if (oMat && dMat && oMat !== dMat) {
+    aviso.style.display = 'block';
+  } else {
+    aviso.style.display = 'none';
+  }
+}
+
+function confirmarTransferencia() {
+  const origen  = document.getElementById('sel-origen');
+  const destino = document.getElementById('sel-destino');
+  const oNom = origen.options[origen.selectedIndex]?.text  || '?';
+  const dNom = destino.options[destino.selectedIndex]?.text || '?';
+
+  if (origen.value === destino.value) {
+    alert('El origen y el destino no pueden ser el mismo.');
+    return false;
+  }
+
+  return confirm(
+    `¿Confirmas la transferencia?\n\n` +
+    `DE: ${oNom}\n` +
+    `A:  ${dNom}\n\n` +
+    `El profesor origen quedará archivado automáticamente.\n` +
+    `Esta acción no se puede deshacer.`
+  );
+}
+</script>
+
+{% endblock %}

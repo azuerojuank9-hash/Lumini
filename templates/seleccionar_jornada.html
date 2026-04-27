@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleccionar jornada — Lumini</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%); min-height: 100vh; color: #e8e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+        .brand { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; background: linear-gradient(135deg, #fff 30%, #6c63ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; margin-bottom: 6px; }
+        .sub { font-size: 12px; color: #7a7a90; letter-spacing: 3px; text-transform: uppercase; text-align: center; margin-bottom: 28px; }
+        .card { background: #17171e; border: 1px solid #2a2a35; border-radius: 16px; padding: 32px 28px; width: 100%; max-width: 480px; }
+        .card-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+        .card-desc { font-size: 13px; color: #7a7a90; margin-bottom: 24px; }
+        .greeting { font-size: 13px; color: #9b95ff; margin-bottom: 20px; }
+        .opciones { display: flex; flex-direction: column; gap: 10px; }
+        .opcion-btn {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px; background: #0f0f13;
+            border: 1.5px solid #2a2a35; border-radius: 10px;
+            cursor: pointer; transition: all .2s; text-decoration: none; color: #e8e8f0;
+        }
+        .opcion-btn:hover { border-color: #6c63ff; background: rgba(108,99,255,.08); }
+        .opcion-left { display: flex; flex-direction: column; gap: 3px; }
+        .opcion-materia { font-size: 14px; font-weight: 600; }
+        .opcion-jornada { font-size: 11px; color: #7a7a90; }
+        .badge-jornada { padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+        .jornada-manana { background: rgba(243,156,18,.12); color: #f39c12; border: 1px solid rgba(243,156,18,.25); }
+        .jornada-nocturna { background: rgba(108,99,255,.12); color: #9b95ff; border: 1px solid rgba(108,99,255,.25); }
+        .alert-error { background: rgba(231,76,60,.12); border: 1px solid rgba(231,76,60,.25); color: #e74c3c; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+        .logout-link { display: block; text-align: center; margin-top: 20px; font-size: 12px; color: #7a7a90; text-decoration: none; }
+        .logout-link:hover { color: #e74c3c; }
+    </style>
+</head>
+<body>
+<div class="brand">LUMINI</div>
+<p class="sub">{{ colegio.nombre if colegio else slug }}</p>
+
+<div class="card">
+    <div class="card-title">👋 Bienvenido, {{ profesor.nombre }}</div>
+    <p class="card-desc">Selecciona con qué jornada y materia quieres trabajar hoy.</p>
+
+    {% if error %}
+    <div class="alert-error">⚠️ {{ error }}</div>
+    {% endif %}
+
+    <div class="opciones">
+        {% for mj in materias_jornadas %}
+        <form method="POST">
+            <input type="hidden" name="materia" value="{{ mj.materia }}">
+            <input type="hidden" name="jornada" value="{{ mj.jornada }}">
+            <button type="submit" class="opcion-btn" style="width:100%;text-align:left;">
+                <div class="opcion-left">
+                    <span class="opcion-materia">{{ mj.materia }}</span>
+                    <span class="opcion-jornada">Jornada {{ mj.jornada }}</span>
+                </div>
+                <span class="badge-jornada {% if mj.jornada == 'Mañana' %}jornada-manana{% else %}jornada-nocturna{% endif %}">
+                    {% if mj.jornada == 'Mañana' %}☀️{% else %}🌙{% endif %} {{ mj.jornada }}
+                </span>
+            </button>
+        </form>
+        {% endfor %}
+    </div>
+</div>
+
+<a href="/{{ slug }}/logout" class="logout-link">← Cerrar sesión</a>
+</body>
+</html>

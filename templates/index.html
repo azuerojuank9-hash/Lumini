@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<link rel="manifest" href="/static/manifest.json">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumini — {{ colegio.nombre if colegio else slug }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e28;--border:#2a2a35;--accent:#6c63ff;--accent2:#3498db;--text:#e8e8f0;--muted:#7a7a90;--green:#2ecc71;--red:#e74c3c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.navbar{position:fixed;top:0;left:0;width:100%;background:rgba(10,10,15,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 20px;z-index:1000;backdrop-filter:blur(10px);gap:10px;}
+.nav-left{display:flex;align-items:center;gap:10px;}
+.nav-logo{height:38px;width:38px;border-radius:50%;object-fit:cover;mix-blend-mode:screen;}
+.nav-brand{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-sub{font-size:10px;color:var(--muted);}
+.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.nbtn{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-block;}
+.nbtn-pri{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.nbtn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border);}
+.nbtn-red{background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.2);}
+.main{padding:76px 14px 40px;}
+.curso-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;}
+.ctab{padding:6px 14px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:12px;cursor:pointer;text-decoration:none;transition:all .2s;}
+.ctab:hover,.ctab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+.scard{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:12px 16px;flex:1;min-width:120px;}
+.slabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+.sval{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;margin-bottom:18px;overflow:hidden;}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.card-title{font-size:13px;font-weight:600;}
+.card-body{padding:14px 16px;}
+.finput{padding:8px 11px;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;}
+.finput:focus{outline:none;border-color:var(--accent);}
+.fi{display:flex;gap:7px;flex-wrap:wrap;}
+.bsm{padding:7px 13px;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.badd{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.bdel{background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.2);}
+.bdel:hover{background:rgba(231,76,60,.22);}
+.tw{overflow-x:auto;}
+table{border-collapse:collapse;min-width:100%;font-size:12px;}
+th{padding:8px 8px;text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg2);position:sticky;top:0;}
+th.tnombre{text-align:left;min-width:150px;}
+td{padding:6px 5px;border-bottom:1px solid rgba(42,42,53,.5);text-align:center;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(108,99,255,.04);}
+.tnum{color:var(--muted);font-size:11px;width:28px;}
+.tnombrecell{text-align:left;font-weight:500;cursor:pointer;}
+.tnombrecell:hover{color:var(--accent);}
+.ni{width:50px;padding:4px 5px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:12px;text-align:center;font-family:'DM Sans',sans-serif;}
+.ni:focus{outline:none;border-color:var(--accent);}
+.ni.guardado{border-color:var(--green);transition:border-color .4s;}
+.pc{font-weight:700;}
+.ph{color:var(--green);}.pm{color:#f39c12;}.pb{color:var(--red);}
+.abtn{padding:3px 7px;border:none;border-radius:4px;font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;margin:1px;}
+.ap{background:rgba(46,204,113,.15);color:var(--green);}
+.aa{background:rgba(231,76,60,.15);color:var(--red);}
+.at{background:rgba(243,156,18,.15);color:#f39c12;}
+.bp{background:rgba(46,204,113,.15);color:var(--green);padding:2px 6px;border-radius:8px;font-size:10px;}
+.ba{background:rgba(231,76,60,.15);color:var(--red);padding:2px 6px;border-radius:8px;font-size:10px;}
+.bt{background:rgba(243,156,18,.15);color:#f39c12;padding:2px 6px;border-radius:8px;font-size:10px;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:center;justify-content:center;padding:16px;}
+.overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px;width:100%;max-width:480px;max-height:82vh;overflow-y:auto;}
+.modal h3{font-size:14px;margin-bottom:14px;}
+.oitem{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 11px;margin-bottom:7px;font-size:12px;}
+.ometa{font-size:10px;color:var(--muted);margin-top:3px;}
+.oform{display:flex;gap:7px;margin-top:11px;}
+.oform input{flex:1;padding:8px 11px;background:var(--bg);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;}
+.oform input:focus{outline:none;border-color:var(--accent);}
+.agitem{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(42,42,53,.4);font-size:12px;gap:8px;}
+.agitem:last-child{border-bottom:none;}
+.agfecha{font-size:11px;color:var(--muted);white-space:nowrap;}
+.hmes{margin-bottom:8px;}
+.hmeslabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
+.hdias{display:flex;flex-wrap:wrap;gap:3px;}
+.hdia{padding:2px 6px;border-radius:5px;font-size:10px;}
+.toast{position:fixed;bottom:22px;right:22px;background:rgba(46,204,113,.95);color:#fff;padding:9px 16px;border-radius:9px;font-size:12px;font-weight:600;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+</style>
+<!-- Datadog RUM -->
+<script>
+(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM")
+window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})
+</script>
+
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        {% if colegio and colegio.logo %}
+        <img class="nav-logo" src="/static/logos/{{ colegio.logo }}" alt="">
+        {% endif %}
+        <div>
+            <div class="nav-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
+            <div class="nav-sub">{{ profesor.nombre }} · {{ materia }} · {{ jornada }}</div>
+        </div>
+    </div>
+    <div class="nav-right">
+        {% if materias_jornadas|length > 1 %}
+        <a href="/{{ slug }}/seleccionar" class="nbtn nbtn-ghost">🔄 Cambiar materia</a>
+        {% endif %}
+        <a href="/{{ slug }}/horarios" class="nbtn nbtn-ghost">🗓 Horario</a>
+        <a href="/{{ slug }}/archivados" class="nbtn nbtn-ghost">📦 Archivados</a>
+        <a href="/{{ slug }}/cambiar_password" class="nbtn nbtn-ghost">⚙️ Perfil</a>
+        <a href="/{{ slug }}/logout" class="nbtn nbtn-red">Salir</a>
+    </div>
+</nav>
+
+<div class="main">
+
+{% if mis_cursos %}
+<div class="curso-tabs">
+{% for c in mis_cursos %}
+<a href="/{{ slug }}?curso={{ c }}&periodo={{ periodo_sel }}" class="ctab {% if c==curso_sel %}active{% endif %}">{{ c }}</a>
+{% endfor %}
+</div>
+{% else %}
+<div style="background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.2);border-radius:9px;padding:14px;margin-bottom:16px;font-size:13px;">
+⚠️ No tienes cursos asignados. Ve a <a href="/{{ slug }}/cambiar_password" style="color:var(--accent)">Perfil</a> para agregar cursos.
+</div>
+{% endif %}
+
+{% if curso_sel %}
+
+<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+  <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Periodo:</span>
+  {% for p in range(1, (num_periodos or 4)+1) %}
+  <a href="/{{ slug }}?curso={{ curso_sel }}&periodo={{ p }}"
+     style="padding:5px 14px;border-radius:7px;border:1px solid var(--border);background:{% if p==periodo_sel %}var(--accent){% else %}var(--bg2){% endif %};color:{% if p==periodo_sel %}#fff{% else %}var(--muted){% endif %};font-size:12px;font-weight:600;text-decoration:none;">
+    {{ p }}° Periodo
+  </a>
+  {% endfor %}
+</div>
+
+<div class="stats">
+    <div class="scard"><div class="slabel">Curso</div><div class="sval">{{ curso_sel }}</div></div>
+    <div class="scard"><div class="slabel">Estudiantes</div><div class="sval">{{ estudiantes|length }}</div></div>
+    <div class="scard"><div class="slabel">Prom. grupo</div><div class="sval {% if prom_general>=3.5 %}ph{% elif prom_general>=3.0 %}pm{% else %}pb{% endif %}" id="promGrupo">{{ prom_general }}</div></div>
+    <div class="scard"><div class="slabel">Destacado</div><div class="sval" style="font-size:.9rem">{{ mejor.nombre }}</div></div>
+</div>
+
+<!-- Agregar estudiante -->
+<div class="card">
+    <div class="card-head"><span class="card-title">➕ Agregar estudiante</span></div>
+    <div class="card-body">
+        <form method="POST" action="/{{ slug }}/registrar">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="curso" value="{{ curso_sel }}">
+            <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
+            <div class="fi">
+                <input class="finput" type="text" name="nombre" placeholder="Nombre completo" required style="flex:1;min-width:180px;">
+                <button type="submit" class="bsm badd">Agregar</button>
+            </div>
+        </form>
+        <p style="font-size:11px;color:var(--muted);margin-top:5px;">Se ordenan alfabéticamente automáticamente.</p>
+    </div>
+</div>
+
+<!-- Agenda -->
+<div class="card">
+    <div class="card-head"><span class="card-title">📅 Agenda de trabajos — {{ curso_sel }}</span></div>
+    <div class="card-body">
+        <form method="POST" action="/{{ slug }}/nuevo_trabajo">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
+            <div class="fi" style="margin-bottom:12px;">
+                <input class="finput" type="text" name="titulo" placeholder="Título del trabajo/evaluación" required style="flex:1;min-width:150px;">
+                <input class="finput" type="date" name="fecha" required>
+                <button type="submit" class="bsm badd">Agregar</button>
+            </div>
+        </form>
+        {% if compromisos %}
+            {% for t in compromisos %}
+            <div class="agitem">
+                <div><span style="font-weight:500">{{ t.titulo }}</span><span style="font-size:10px;color:var(--muted);margin-left:7px">{{ t.materia }}</span></div>
+                <div style="display:flex;align-items:center;gap:7px;">
+                    <span class="agfecha">📆 {{ t.fecha }}</span>
+                    <a href="/{{ slug }}/borrar_trabajo/{{ t.id }}" class="bsm bdel" style="font-size:10px;text-decoration:none;padding:3px 8px;">🗑</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <p style="color:var(--muted);font-size:12px;">No hay trabajos registrados.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Tabla de notas -->
+<div class="card">
+    <div class="card-head">
+        <span class="card-title">📊 Notas — {{ curso_sel }} · {{ materia }}</span>
+        <form method="POST" action="/{{ slug }}/nueva_actividad" style="display:flex;gap:7px;">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
+            <input type="hidden" name="periodo_sel" value="{{ periodo_sel }}">
+            <input class="finput" type="text" name="nombre" placeholder="Nueva actividad..." style="width:170px;font-size:12px;padding:6px 10px;">
+            <button type="submit" class="bsm badd">+ Actividad</button>
+        </form>
+    </div>
+    <div class="tw">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:28px">#</th>
+                    <th class="tnombre">Estudiante</th>
+                    {% for act in actividades %}
+                    <th>{{ act.nombre }}<a href="/{{ slug }}/borrar_actividad/{{ act.id }}?curso={{ curso_sel }}" onclick="return confirm('¿Borrar actividad?')" style="color:var(--red);font-size:9px;margin-left:3px;text-decoration:none;">✕</a></th>
+                    {% endfor %}
+                    <th>Eval.</th>
+                    <th>Autoev.</th>
+                    <th>Prom.</th>
+                    <th>Asist.</th>
+                    <th>Obs.</th>
+                    <th>Del</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for e in estudiantes %}
+            <tr data-aid="{{ e.id }}">
+                <td class="tnum">{{ e.num_curso }}</td>
+                <td class="tnombrecell" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">{{ e.nombre }}</td>
+                {% for act in actividades %}
+                <td>
+                    {% set nota = e.notas_map.get(act.id) %}
+                    <input class="ni nota-input" type="number" min="0" max="5" step="0.1"
+                           value="{{ nota.val if nota else '' }}" placeholder="—"
+                           data-aid="{{ e.id }}" data-actid="{{ act.id }}"
+                           onchange="guardarNota(this)">
+                </td>
+                {% endfor %}
+                <td><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="evaluacion" onchange="guardarEval(this)"></td>
+                <td><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="autoevaluacion" onchange="guardarEval(this)"></td>
+                <td class="pc prom-cell" id="prom-{{ e.id }}">
+                    <span class="{% if e.promedio>=3.5 %}ph{% elif e.promedio>=3.0 %}pm{% elif e.promedio>0 %}pb{% endif %}">
+                        {{ e.promedio if e.promedio>0 else '—' }}
+                    </span>
+                </td>
+                <td>
+                    <span class="asist-badge" id="asist-{{ e.id }}">
+                        {% if e.asistencia=='P' %}<span class="bp">P</span>
+                        {% elif e.asistencia=='A' %}<span class="ba">A</span>
+                        {% elif e.asistencia=='T' %}<span class="bt">T</span>
+                        {% else %}<span style="color:var(--muted)">—</span>{% endif %}
+                    </span>
+                    <button onclick="marcarAsist({{ e.id }},'P')" class="abtn ap">P</button>
+                    <button onclick="marcarAsist({{ e.id }},'A')" class="abtn aa">A</button>
+                    <button onclick="marcarAsist({{ e.id }},'T')" class="abtn at">T</button>
+                </td>
+                <td><button class="bsm badd" style="font-size:10px;padding:4px 9px;" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">📋 {{ e.observaciones|length }}</button></td>
+                <td><a href="/{{ slug }}/archivar_alumno/{{ e.id }}?curso={{ curso_sel }}" onclick="return confirm('¿Archivar a {{ e.nombre }}? Sus datos se conservan.')" class="bsm bdel" style="font-size:10px;text-decoration:none;">📦</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="20" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes todavía.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endif %}
+</div>
+
+<!-- MODAL OBSERVADOR -->
+<div class="overlay" id="modalObs" onclick="if(event.target===this)cerrarObs()">
+<div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 id="mNombre">Observador</h3>
+        <button onclick="cerrarObs()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;">✕</button>
+    </div>
+    <p style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Historial de asistencia</p>
+    <div id="mHistorial" style="margin-bottom:14px;"></div>
+    <p style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Observaciones</p>
+    <div id="mObsList"></div>
+    <div class="oform">
+        <input type="text" id="oTexto" placeholder="Escribir observación...">
+        <button class="bsm badd" onclick="guardarObs()">Guardar</button>
+    </div>
+</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Guardado</div>
+
+<!-- CSRF token oculto global para uso en JS -->
+<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
+
+<script>
+const slug = "{{ slug }}";
+const cursoSel = "{{ curso_sel }}";
+const periodoSel = {{ periodo_sel }};
+
+// Token CSRF global accesible desde cualquier función
+function getCsrf(){
+    return document.getElementById('csrf-global').value;
+}
+
+// ── Mostrar toast ──────────────────────────────────────────────────────────
+function showToast(msg){
+    msg = msg || '✅ Guardado';
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 1800);
+}
+
+// ── Calcular y mostrar promedio de una fila en tiempo real ─────────────────
+function recalcularProm(aid){
+    const row = document.querySelector('tr[data-aid="'+aid+'"]');
+    if(!row) return;
+    const vals = [];
+    row.querySelectorAll('.nota-input, .eval-input').forEach(function(inp){
+        const v = parseFloat(inp.value);
+        if(!isNaN(v)) vals.push(v);
+    });
+    const cell = document.getElementById('prom-' + aid);
+    if(!cell) return;
+    if(vals.length === 0){
+        cell.innerHTML = '<span style="color:var(--muted)">—</span>';
+        return;
+    }
+    const prom = (vals.reduce(function(a,b){return a+b;},0) / vals.length).toFixed(2);
+    const cls = prom >= 3.5 ? 'ph' : prom >= 3.0 ? 'pm' : 'pb';
+    cell.innerHTML = '<span class="'+cls+'">'+prom+'</span>';
+}
+
+// ── Guardar nota ───────────────────────────────────────────────────────────
+function guardarNota(inp){
+    const val = inp.value;
+    if(val === '') return;
+    const aid   = inp.dataset.aid;
+    const actId = inp.dataset.actid;
+    const f = new FormData();
+    f.append('aid', aid);
+    f.append('actividad_id', actId);
+    f.append('val', val);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/guardar_nota', {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                inp.classList.add('guardado');
+                setTimeout(function(){ inp.classList.remove('guardado'); }, 1000);
+                showToast('✅ Nota guardada');
+                recalcularProm(aid);
+            } else {
+                showToast('❌ Error al guardar nota');
+            }
+        })
+        .catch(function(){ showToast('❌ Error de conexión'); });
+}
+
+// ── Guardar evaluación / autoevaluación ────────────────────────────────────
+function guardarEval(inp){
+    const val   = inp.value;
+    if(val === '') return;
+    const aid   = inp.dataset.aid;
+    const campo = inp.dataset.campo;
+    const f = new FormData();
+    f.append('aid', aid);
+    f.append(campo, val);
+    f.append('periodo', periodoSel);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/guardar_evaluacion', {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                inp.classList.add('guardado');
+                setTimeout(function(){ inp.classList.remove('guardado'); }, 1000);
+                showToast('✅ Guardado');
+                recalcularProm(aid);
+            } else {
+                showToast('❌ Error al guardar');
+            }
+        })
+        .catch(function(){ showToast('❌ Error de conexión'); });
+}
+
+// ── Marcar asistencia ─────────────────────────────────────────────────────
+function marcarAsist(aid, estado){
+    const f = new FormData();
+    f.append('aid', aid);
+    f.append('estado', estado);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/marcar_asistencia', {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                const cls = estado==='P'?'bp':estado==='A'?'ba':'bt';
+                document.getElementById('asist-'+aid).innerHTML = '<span class="'+cls+'">'+estado+'</span>';
+                showToast('✅ Asistencia guardada');
+            } else {
+                showToast('❌ Error al guardar asistencia');
+            }
+        })
+        .catch(function(){ showToast('❌ Error de conexión'); });
+}
+
+// ── Datos para modal observaciones ────────────────────────────────────────
+const ED = {};
+{% for e in estudiantes %}
+ED[{{ e.id }}] = {
+    nombre: {{ e.nombre|tojson }},
+    historial: {{ e.historial_meses|tojson }},
+    observaciones: {{ e.observaciones|tojson }}
+};
+{% endfor %}
+
+let _aidObs = null;
+
+function abrirObs(aid, nombre){
+    _aidObs = aid;
+    document.getElementById('mNombre').textContent = '📋 ' + nombre;
+    document.getElementById('oTexto').value = '';
+    const d = ED[aid];
+    // Historial
+    const hd = document.getElementById('mHistorial');
+    hd.innerHTML = '';
+    const meses = Object.keys(d.historial);
+    if(!meses.length){
+        hd.innerHTML = '<p style="font-size:12px;color:var(--muted)">Sin registros.</p>';
+    } else {
+        meses.forEach(function(m){
+            const div = document.createElement('div');
+            div.className = 'hmes';
+            const dias = d.historial[m].map(function(h){
+                const cls = h.estado==='P'?'bp':h.estado==='A'?'ba':'bt';
+                return '<span class="hdia '+cls+'">'+h.fecha.slice(8)+' '+h.estado+'</span>';
+            }).join('');
+            div.innerHTML = '<div class="hmeslabel">'+m+'</div><div class="hdias">'+dias+'</div>';
+            hd.appendChild(div);
+        });
+    }
+    renderObs(aid);
+    document.getElementById('modalObs').classList.add('open');
+}
+
+function renderObs(aid){
+    const ol = document.getElementById('mObsList');
+    ol.innerHTML = '';
+    const obs = ED[aid].observaciones;
+    if(!obs.length){
+        ol.innerHTML = '<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Sin observaciones.</p>';
+    } else {
+        obs.forEach(function(o){
+            const div = document.createElement('div');
+            div.className = 'oitem';
+            div.innerHTML = '<div>'+o.texto+'</div><div class="ometa">'+o.materia+' · '+o.fecha+
+                ' <button onclick="borrarObs('+aid+','+o.id+',this)" style="background:none;border:none;color:var(--red);margin-left:6px;font-size:10px;cursor:pointer;">Borrar</button></div>';
+            ol.appendChild(div);
+        });
+    }
+}
+
+function guardarObs(){
+    const inp = document.getElementById('oTexto');
+    const texto = inp.value.trim();
+    if(!texto || !_aidObs) return;
+    const f = new FormData();
+    f.append('aid', _aidObs);
+    f.append('texto', texto);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/agregar_observacion', {method:'POST', body:f})
+        .then(function(r){
+            if(!r.ok){ showToast('❌ Error al guardar'); return null; }
+            return r.json();
+        })
+        .then(function(o){
+            if(!o) return;
+            ED[_aidObs].observaciones.unshift(o);
+            inp.value = '';
+            renderObs(_aidObs);
+            // Actualizar contador en la tabla
+            const btns = document.querySelectorAll('tr[data-aid="'+_aidObs+'"] button');
+            btns.forEach(function(b){
+                if(b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('abrirObs') === 0){
+                    b.textContent = '📋 '+ED[_aidObs].observaciones.length;
+                }
+            });
+            showToast('✅ Observación guardada');
+        })
+        .catch(function(){ showToast('❌ Error de conexión'); });
+}
+
+function borrarObs(aid, obsId, btn){
+    if(!confirm('¿Borrar esta observación?')) return;
+    const f = new FormData();
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/borrar_observacion/'+obsId, {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                ED[aid].observaciones = ED[aid].observaciones.filter(function(o){ return o.id !== obsId; });
+                renderObs(aid);
+                const btns = document.querySelectorAll('tr[data-aid="'+aid+'"] button');
+                btns.forEach(function(b){
+                    if(b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('abrirObs') === 0){
+                        b.textContent = '📋 '+ED[aid].observaciones.length;
+                    }
+                });
+                showToast('✅ Observación borrada');
+            } else {
+                showToast('❌ Error al borrar');
+            }
+        })
+        .catch(function(){ showToast('❌ Error de conexión'); });
+}
+
+function cerrarObs(){
+    document.getElementById('modalObs').classList.remove('open');
+    _aidObs = null;
+}
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
+</body>
+</html>

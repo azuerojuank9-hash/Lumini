@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumini — Transferir Curso</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e28;--border:#2a2a35;--accent:#6c63ff;--accent2:#3498db;--text:#e8e8f0;--muted:#7a7a90;--green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.navbar{position:fixed;top:0;left:0;width:100%;background:rgba(10,10,15,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 20px;z-index:1000;backdrop-filter:blur(10px);gap:10px;}
+.nav-left{display:flex;align-items:center;gap:10px;}
+.nav-left a{display:flex;align-items:center;gap:10px;text-decoration:none;transition:opacity .2s;}
+.nav-left a:hover{opacity:.8;}
+.nav-logo{height:38px;width:38px;border-radius:50%;object-fit:cover;mix-blend-mode:screen;}
+.nav-brand{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-sub{font-size:10px;color:var(--muted);}
+.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.nbtn{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-block;}
+.nbtn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border);}
+.nbtn-red{background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.2);}
+.main{padding:86px 16px 48px;max-width:620px;margin:0 auto;}
+.page-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:4px;}
+.page-sub{font-size:12px;color:var(--muted);margin-bottom:24px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.card-title{font-size:13px;font-weight:600;}
+.card-body{padding:18px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;}
+.field select{width:100%;padding:11px 14px;background:#0f0f13;border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s;}
+.field select:focus{outline:none;border-color:var(--accent);}
+.field select option{background:#1a1a2e;}
+.periodos-grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+.periodo-check{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;padding:9px 14px;cursor:pointer;transition:all .2s;user-select:none;}
+.periodo-check:hover{border-color:var(--accent);}
+.periodo-check input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;}
+.periodo-check span{font-size:13px;font-weight:500;}
+.periodo-check.checked{border-color:var(--accent);background:rgba(108,99,255,.08);}
+.btn-submit{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .15s;margin-top:4px;}
+.btn-submit:hover{opacity:.88;transform:translateY(-1px);}
+.btn-archive{width:100%;padding:13px;background:rgba(243,156,18,.1);color:var(--yellow);border:1.5px solid rgba(243,156,18,.3);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:8px;}
+.btn-archive:hover{background:rgba(243,156,18,.2);}
+.btn-back{display:block;width:100%;padding:11px;background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;text-align:center;text-decoration:none;margin-top:10px;transition:background .2s;}
+.btn-back:hover{background:rgba(255,255,255,.08);}
+.alert{padding:12px 16px;border-radius:9px;font-size:13px;margin-bottom:18px;line-height:1.5;}
+.alert-error{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.22);color:var(--red);}
+.alert-success{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.22);color:var(--green);}
+.alert-warn{background:rgba(243,156,18,.08);border:1px solid rgba(243,156,18,.2);color:var(--yellow);}
+.alert-info{background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.2);color:#9b95ff;}
+.info-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);color:#9b95ff;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:500;margin-bottom:18px;}
+.step{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;}
+.step-num{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:12px;color:var(--muted);line-height:1.6;}
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--muted);font-size:11px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.no-prof-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px;}
+.no-prof-title{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--yellow);}
+.no-prof-text{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="/{{ slug }}">
+            {% if colegio and colegio.logo %}
+            <img class="nav-logo" src="/static/logos/{{ colegio.logo }}" alt="">
+            {% endif %}
+            <div>
+                <div class="nav-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
+                <div class="nav-sub">{{ profesor.nombre }} · {{ materia }} · {{ jornada }}</div>
+            </div>
+        </a>
+    </div>
+    <div class="nav-right">
+        <a href="/{{ slug }}" class="nbtn nbtn-ghost">🏠 Inicio</a>
+        <a href="/{{ slug }}/cambiar_password" class="nbtn nbtn-ghost">⚙️ Perfil</a>
+        <a href="/{{ slug }}/logout" class="nbtn nbtn-red">Salir</a>
+    </div>
+</nav>
+
+<div class="main">
+
+    <div class="page-title">🔄 Transferir Curso</div>
+    <p class="page-sub">Pasa el historial completo de un curso a otro profesor de la misma materia</p>
+
+    {% if error %}
+        {% if '✅' in error %}
+        <div class="alert alert-success">{{ error }}</div>
+        {% else %}
+        <div class="alert alert-error">⚠️ {{ error }}</div>
+        {% endif %}
+    {% endif %}
+    {% if exito %}
+    <div class="alert alert-success">{{ exito }}</div>
+    {% endif %}
+
+    <div class="info-badge">
+        📚 Materia: <strong>{{ materia }}</strong> &nbsp;·&nbsp; 🕐 Jornada: <strong>{{ jornada }}</strong>
+    </div>
+
+    {% if not mis_cursos %}
+    <div class="card">
+        <div class="card-body">
+            <div style="text-align:center;padding:24px;color:var(--muted);">
+                <div style="font-size:2rem;margin-bottom:10px;">📂</div>
+                <p style="font-size:13px;">No tienes cursos asignados en <strong>{{ materia }}</strong> · <strong>{{ jornada }}</strong>.</p>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+
+    <!-- Cómo funciona -->
+    <div class="card">
+        <div class="card-head"><span class="card-title">ℹ️ ¿Cómo funciona?</span></div>
+        <div class="card-body">
+            <div class="step"><div class="step-num">1</div><div class="step-text">Selecciona el <strong>curso</strong> y los <strong>periodos</strong> a transferir.</div></div>
+            <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Opción A:</strong> Transferir a otro profesor activo de la misma materia.</div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Opción B:</strong> Si no hay otro profesor, puedes <strong>archivar el curso</strong> para que el historial quede guardado sin asignarse.</div></div>
+        </div>
+    </div>
+
+    <!-- Formulario principal -->
+    <div class="card">
+        <div class="card-head"><span class="card-title">📋 Selecciona el curso y periodos</span></div>
+        <div class="card-body">
+
+            <!-- Selector de curso -->
+            <div class="field">
+                <label>Curso a transferir / archivar</label>
+                <select id="selectCurso" onchange="actualizarResumen()">
+                    <option value="" disabled selected>Selecciona un curso...</option>
+                    {% for c in mis_cursos %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Periodos -->
+            <div class="field">
+                <label>Periodos</label>
+                <div class="periodos-grid">
+                    {% for i in range(1, num_periodos+1) %}
+                    <label class="periodo-check checked" id="label-p{{ i }}">
+                        <input type="checkbox" name="periodos_check" value="{{ i }}" checked
+                               onchange="toggleChecked(this,'label-p{{ i }}');actualizarResumen()">
+                        <span>{{ i }}°</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <p style="font-size:11px;color:var(--muted);margin-top:8px;">Desmarca los periodos que NO quieres incluir.</p>
+            </div>
+
+            <!-- Resumen -->
+            <div id="resumen" style="display:none;margin-bottom:4px;">
+                <div class="alert alert-info" id="resumenTexto"></div>
+            </div>
+
+            {% if profesores_destino %}
+            <!-- OPCIÓN A: transferir a otro profesor -->
+            <div class="divider">Opción A — Transferir a otro profesor</div>
+            <form method="POST" id="formTransferir">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="accion" value="transferir">
+                <input type="hidden" name="curso" id="hidden-curso-a">
+                <input type="hidden" name="periodos" id="hidden-periodos-a">
+
+                <div class="field">
+                    <label>Profesor destino</label>
+                    <select name="profesor_destino_id" id="selectProf" onchange="actualizarResumen()">
+                        <option value="" disabled selected>Selecciona un profesor...</option>
+                        {% for p in profesores_destino %}
+                        <option value="{{ p['id'] }}">{{ p['nombre'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="alert alert-warn" style="margin-bottom:14px;">
+                    ⚠️ Esta acción <strong>no se puede deshacer</strong>. El curso pasará al nuevo profesor con todo su historial.
+                </div>
+
+                <button type="submit" class="btn-submit" onclick="return prepararYConfirmar('transferir')">
+                    🔄 Transferir a este profesor
+                </button>
+            </form>
+            {% endif %}
+
+            <!-- OPCIÓN B: archivar el curso -->
+            <div class="divider">{% if profesores_destino %}Opción B — {% endif %}Archivar el curso</div>
+
+            <div class="no-prof-box">
+                <div class="no-prof-title">📦 Archivar historial del curso</div>
+                <div class="no-prof-text">
+                    El curso se <strong>desasignará de ti</strong> pero todas las actividades, notas y evaluaciones
+                    quedarán guardadas en la base de datos. Cuando llegue el nuevo profesor y se registre,
+                    podrá ver el historial desde el panel de directora.
+                    {% if not profesores_destino %}
+                    <br><br>
+                    <strong>Nota:</strong> No hay otro profesor de {{ materia }} registrado aún. Cuando se registre el nuevo profesor con esta materia, el historial estará disponible.
+                    {% endif %}
+                </div>
+
+                <form method="POST" id="formArchivar">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="accion" value="archivar_curso">
+                    <input type="hidden" name="curso" id="hidden-curso-b">
+                    <input type="hidden" name="periodos" id="hidden-periodos-b">
+
+                    <button type="submit" class="btn-archive" onclick="return prepararYConfirmar('archivar')">
+                        📦 Archivar este curso (conservar historial)
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    {% endif %}
+
+    <a href="/{{ slug }}" class="btn-back">← Volver al inicio</a>
+
+</div>
+
+<script>
+function toggleChecked(checkbox, labelId){
+    const label = document.getElementById(labelId);
+    if(label) label.classList.toggle('checked', checkbox.checked);
+}
+
+function getPeriodosSeleccionados(){
+    return [...document.querySelectorAll('input[name=periodos_check]:checked')].map(c=>c.value);
+}
+
+function actualizarResumen(){
+    const curso = document.getElementById('selectCurso').value;
+    const periodos = getPeriodosSeleccionados();
+    const resumen  = document.getElementById('resumen');
+    const resumenT = document.getElementById('resumenTexto');
+    if(curso && periodos.length){
+        resumenT.innerHTML = `Curso <strong>${curso}</strong> · Periodos: ${periodos.map(p=>p+'°').join(', ')}`;
+        resumen.style.display = 'block';
+    } else {
+        resumen.style.display = 'none';
+    }
+}
+
+function prepararYConfirmar(tipo){
+    const curso = document.getElementById('selectCurso').value;
+    const periodos = getPeriodosSeleccionados();
+
+    if(!curso){
+        alert('Por favor selecciona un curso.');
+        return false;
+    }
+    if(!periodos.length){
+        alert('Por favor selecciona al menos un periodo.');
+        return false;
+    }
+
+    if(tipo === 'transferir'){
+        const prof = document.getElementById('selectProf');
+        const profNombre = prof.options[prof.selectedIndex]?.text || '';
+        if(!prof.value){
+            alert('Por favor selecciona un profesor destino.');
+            return false;
+        }
+        document.getElementById('hidden-curso-a').value = curso;
+        document.getElementById('hidden-periodos-a').value = periodos.join(',');
+        return confirm(`¿Confirmas transferir el curso ${curso} (periodos ${periodos.map(p=>p+'°').join(', ')}) a ${profNombre}?\n\nEsta acción no se puede deshacer.`);
+    }
+
+    if(tipo === 'archivar'){
+        document.getElementById('hidden-curso-b').value = curso;
+        document.getElementById('hidden-periodos-b').value = periodos.join(',');
+        return confirm(`¿Confirmas archivar el curso ${curso}?\n\nEl historial se conservará pero el curso dejará de aparecer en tu lista.`);
+    }
+
+    return false;
+}
+</script>
+</body>
+</html>

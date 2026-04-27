@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horarios — {{ colegio.nombre if colegio else slug }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f0f1a; --bg2:#17171e; --bg3:#1e1e2a;
+  --border:#2a2a35; --accent:#6c63ff; --accent2:#3498db;
+  --text:#e8e8f0; --muted:#7a7a90; --danger:#e74c3c;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+.navbar{position:fixed;top:0;left:0;width:100%;background:rgba(10,10,15,.97);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:10px 24px;z-index:1000;backdrop-filter:blur(10px);}
+.navbar-left{display:flex;align-items:center;gap:12px;}
+.navbar-logo{height:38px;width:38px;border-radius:50%;object-fit:cover;mix-blend-mode:screen;}
+.brand-name{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;letter-spacing:4px;
+  background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.brand-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.nav-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;
+  border:none;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.06);color:var(--text);}
+
+.main{margin-top:72px;padding:24px;max-width:1300px;margin-left:auto;margin-right:auto;}
+h1{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:6px;}
+.subtitle{color:var(--muted);font-size:13px;margin-bottom:20px;}
+
+.curso-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.curso-tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;
+  background:var(--bg2);border:1px solid var(--border);color:var(--muted);transition:all .2s;}
+.curso-tab.active,.curso-tab:hover{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-color:transparent;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.tabla-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{padding:10px 8px;text-align:center;background:var(--bg3);border:1px solid var(--border);
+  font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;}
+th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:2px;}
+th .ht{font-size:10px;color:var(--muted);}
+td{border:1px solid var(--border);vertical-align:middle;}
+td.dia-col{padding:10px 14px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;
+  font-weight:800;color:var(--accent);background:var(--bg2);white-space:nowrap;min-width:55px;}
+td.des-col{background:rgba(108,99,255,.06);text-align:center;padding:12px 8px;
+  color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+td.edit-col{cursor:pointer;transition:background .15s;}
+td.edit-col:hover{background:rgba(108,99,255,.1);}
+
+.celda{padding:10px 8px;min-height:68px;text-align:center;}
+.c-num{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.c-mat{font-weight:700;font-size:14px;color:var(--text);margin-bottom:3px;line-height:1.3;}
+.c-prof{font-size:11px;color:var(--muted);}
+.c-empty{color:rgba(108,99,255,.25);font-size:24px;padding-top:10px;}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:380px;}
+.modal h3{font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.inp{width:100%;padding:10px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;}
+.inp:focus{outline:none;border-color:var(--accent);}
+.btn-row{display:flex;gap:8px;margin-top:16px;}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex:1;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--text);}
+.btn-clear{background:rgba(231,76,60,.12);color:var(--danger);border:1px solid rgba(231,76,60,.2);flex:0;padding:10px 14px;}
+
+.toast{position:fixed;bottom:24px;right:24px;background:rgba(46,204,113,.95);color:white;
+  padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:3000;
+  opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.hint{font-size:11px;color:var(--muted);margin-top:12px;text-align:center;}
+</style>
+<!-- Datadog RUM -->
+<script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-left">
+    {% if colegio and colegio.logo_url %}
+    <img class="navbar-logo" src="{{ colegio.logo_url }}" alt="Logo">
+    {% else %}
+    <img class="navbar-logo" src="/static/logo.png" alt="Lumini">
+    {% endif %}
+    <div>
+      <div class="brand-name">LUMINI</div>
+      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div>
+    </div>
+  </div>
+  <a href="/{{ slug }}/" class="nav-btn">← Volver</a>
+</nav>
+
+<div class="main">
+  <h1>🗓 Horarios</h1>
+  <p class="subtitle">Haz clic en cualquier celda para editar · Se guarda automáticamente</p>
+
+  <div class="curso-tabs">
+    {% for c in mis_cursos %}
+    <a href="?curso={{ c }}" class="curso-tab {% if c == curso_sel %}active{% endif %}">{{ c }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <div class="tabla-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th><span class="hl">1a Hora</span><span class="ht">6:10 – 7:05</span></th>
+            <th><span class="hl">2a Hora</span><span class="ht">7:05 – 8:00</span></th>
+            <th><span class="hl">3a Hora</span><span class="ht">8:00 – 8:55</span></th>
+            <th><span class="hl">4a Hora</span><span class="ht">8:55 – 9:50</span></th>
+            <th><span class="hl">Descanso</span><span class="ht">9:50 – 10:20</span></th>
+            <th><span class="hl">5a Hora</span><span class="ht">10:20 – 11:10</span></th>
+            <th><span class="hl">6a Hora</span><span class="ht">11:10 – 12:00</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','Miércoles'),('Ju','Jueves'),('Vi','Viernes')] %}
+          {% for ds, df in dias_list %}
+          <tr>
+            <td class="dia-col">{{ ds }}</td>
+            {# Horas 1-4 #}
+            {% for f in ['1','2','3','4'] %}
+              {% set k = df ~ '_' ~ f %}
+              {% set e = horario_map.get(k, {}) %}
+              <td class="edit-col"
+                  data-dia="{{ df }}"
+                  data-franja="{{ f }}"
+                  data-num="{{ e.get('num','') }}"
+                  data-mat="{{ e.get('materia','') }}"
+                  data-prof="{{ e.get('profesor','') }}"
+                  onclick="abrirDesde(this)">
+                <div class="celda">
+                  {% if e.get('materia') %}
+                    {% if e.get('num') %}<div class="c-num">{{ e.num }}</div>{% endif %}
+                    <div class="c-mat">{{ e.materia }}</div>
+                    <div class="c-prof">{{ e.profesor }}</div>
+                  {% else %}
+                    <div class="c-empty">+</div>
+                  {% endif %}
+                </div>
+              </td>
+            {% endfor %}
+            {# Descanso #}
+            <td class="des-col">☕ Descanso</td>
+            {# Horas 5-6 #}
+            {% for f in ['5','6'] %}
+              {% set k = df ~ '_' ~ f %}
+              {% set e = horario_map.get(k, {}) %}
+              <td class="edit-col"
+                  data-dia="{{ df }}"
+                  data-franja="{{ f }}"
+                  data-num="{{ e.get('num','') }}"
+                  data-mat="{{ e.get('materia','') }}"
+                  data-prof="{{ e.get('profesor','') }}"
+                  onclick="abrirDesde(this)">
+                <div class="celda">
+                  {% if e.get('materia') %}
+                    {% if e.get('num') %}<div class="c-num">{{ e.num }}</div>{% endif %}
+                    <div class="c-mat">{{ e.materia }}</div>
+                    <div class="c-prof">{{ e.profesor }}</div>
+                  {% else %}
+                    <div class="c-empty">+</div>
+                  {% endif %}
+                </div>
+              </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">Clic en + para agregar · Clic en celda para editar</p>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalCelda">
+  <div class="modal">
+    <h3 id="mTitulo">Editar</h3>
+    <p class="modal-sub" id="mSub"></p>
+    <div class="field">
+      <label>Número / Código</label>
+      <input class="inp" type="text" id="iNum" placeholder="ej: 31">
+    </div>
+    <div class="field">
+      <label>Materia</label>
+      <input class="inp" type="text" id="iMat" placeholder="ej: Matemáticas">
+    </div>
+    <div class="field">
+      <label>Profesor</label>
+      <input class="inp" type="text" id="iProf" placeholder="ej: Alberth">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-clear" onclick="limpiar()" title="Borrar">🗑</button>
+      <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ Guardado</div>
+
+<script>
+const SLUG = "{{ slug }}";
+const CURSO = "{{ curso_sel }}";
+const HORAS = {
+  '1':'1a Hora · 6:10-7:05', '2':'2a Hora · 7:05-8:00',
+  '3':'3a Hora · 8:00-8:55', '4':'4a Hora · 8:55-9:50',
+  '5':'5a Hora · 10:20-11:10', '6':'6a Hora · 11:10-12:00'
+};
+let _dia='', _franja='';
+
+function showToast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+function abrirDesde(td) {
+  _dia    = td.dataset.dia;
+  _franja = td.dataset.franja;
+  document.getElementById('mTitulo').textContent = _dia;
+  document.getElementById('mSub').textContent    = HORAS[_franja] || '';
+  document.getElementById('iNum').value  = td.dataset.num  || '';
+  document.getElementById('iMat').value  = td.dataset.mat  || '';
+  document.getElementById('iProf').value = td.dataset.prof || '';
+  document.getElementById('modalCelda').classList.add('open');
+  setTimeout(()=>document.getElementById('iMat').focus(), 80);
+}
+
+function cerrar(){
+  document.getElementById('modalCelda').classList.remove('open');
+}
+
+function guardar(){
+  _send(
+    document.getElementById('iNum').value.trim(),
+    document.getElementById('iMat').value.trim(),
+    document.getElementById('iProf').value.trim()
+  );
+}
+
+function limpiar(){
+  if(!confirm('¿Borrar esta celda?')) return;
+  _send('','','');
+}
+
+function _send(num, mat, prof){
+  const fd = new FormData();
+  fd.append('dia',      _dia);
+  fd.append('franja',   _franja);
+  fd.append('num',      num);
+  fd.append('materia',  mat);
+  fd.append('profesor', prof);
+  fd.append('curso',    CURSO);
+  fetch('/'+SLUG+'/horarios', {method:'POST', body:fd})
+    .then(()=>{ cerrar(); showToast('✅ Guardado'); setTimeout(()=>location.reload(), 700); });
+}
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') cerrar();
+  if(e.key==='Enter' && document.getElementById('modalCelda').classList.contains('open')) guardar();
+});
+</script>
+</body>
+</html>

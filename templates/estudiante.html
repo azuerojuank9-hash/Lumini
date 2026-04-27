@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Boletín — {{ alumno.nombre }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e2a;--border:#2a2a35;--accent:#6c63ff;--accent2:#3498db;--text:#e8e8f0;--muted:#7a7a90;--ok:#2ecc71;--warn:#f39c12;--danger:#e74c3c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.navbar{position:fixed;top:0;left:0;width:100%;background:rgba(10,10,15,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 24px;z-index:1000;backdrop-filter:blur(10px);}
+.navbar-left{display:flex;align-items:center;gap:12px;}
+.navbar-logo{height:38px;width:38px;border-radius:50%;object-fit:cover;mix-blend-mode:screen;}
+.brand-name{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.brand-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.nav-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;background:rgba(255,255,255,.06);color:var(--text);border:none;}
+.main{margin-top:72px;padding:24px;max-width:900px;margin-left:auto;margin-right:auto;}
+
+.est-header{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.est-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:white;flex-shrink:0;}
+.est-info{flex:1;}
+.est-nombre{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:4px;}
+.est-meta{font-size:13px;color:var(--muted);}
+.est-prom{text-align:right;}
+.est-prom .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.est-prom .valor{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;}
+.card-title{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
+
+.ag-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(42,42,53,.4);font-size:13px;gap:8px;}
+.ag-item:last-child{border-bottom:none;}
+.ag-materia{font-size:11px;color:var(--accent);background:rgba(108,99,255,.1);padding:2px 8px;border-radius:5px;margin-left:7px;}
+.ag-fecha{font-size:11px;color:var(--muted);white-space:nowrap;}
+
+.materia-card{background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:10px;}
+.materia-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;}
+.materia-nombre{font-weight:700;font-size:14px;}
+.prom-badge{padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;}
+.prom-ok{background:rgba(46,204,113,.15);color:var(--ok);}
+.prom-warn{background:rgba(243,156,18,.15);color:var(--warn);}
+.prom-bad{background:rgba(231,76,60,.15);color:var(--danger);}
+.notas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;margin-bottom:8px;}
+.nota-item{background:var(--bg2);border-radius:7px;padding:9px 11px;}
+.nota-act{font-size:11px;color:var(--muted);margin-bottom:3px;}
+.nota-val{font-size:1.1rem;font-weight:700;}
+.ok{color:var(--ok);}.warn{color:var(--warn);}.bad{color:var(--danger);}
+.eval-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.eval-item{background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);border-radius:7px;padding:8px 12px;font-size:12px;flex:1;min-width:110px;}
+.eval-label{color:var(--muted);margin-bottom:3px;font-size:11px;}
+.eval-val{font-weight:700;font-size:1rem;color:var(--accent);}
+
+/* ASISTENCIA MEJORADA */
+.asist-resumen{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.asist-stat-card{background:var(--bg3);border-radius:10px;padding:12px 18px;text-align:center;flex:1;min-width:70px;}
+.asist-stat-card .num{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:2px;line-height:1;}
+.asist-stat-card .lbl{font-size:11px;color:var(--muted);}
+.asist-stat-card.st-ok .num{color:var(--ok);}
+.asist-stat-card.st-bad .num{color:var(--danger);}
+.asist-stat-card.st-warn .num{color:var(--warn);}
+
+.mes-bloque{margin-bottom:18px;}
+.mes-label{font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid rgba(108,99,255,.2);}
+.dias-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.dia-chip{display:flex;flex-direction:column;align-items:center;padding:10px 12px;border-radius:9px;min-width:56px;gap:4px;}
+.dia-chip .dc-num{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;line-height:1;}
+.dia-chip .dc-estado{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.dia-P{background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.3);}
+.dia-P .dc-num,.dia-P .dc-estado{color:var(--ok);}
+.dia-A{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);}
+.dia-A .dc-num,.dia-A .dc-estado{color:var(--danger);}
+.dia-T{background:rgba(243,156,18,.15);border:1px solid rgba(243,156,18,.3);}
+.dia-T .dc-num,.dia-T .dc-estado{color:var(--warn);}
+
+/* OBSERVACIONES por materia */
+.obs-materia-bloque{margin-bottom:14px;}
+.obs-materia-titulo{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.obs-materia-badge{background:rgba(108,99,255,.12);color:var(--accent);border:1px solid rgba(108,99,255,.25);border-radius:5px;font-size:11px;font-weight:700;padding:3px 10px;}
+.obs-item{padding:11px;background:var(--bg3);border-radius:8px;margin-bottom:6px;}
+.obs-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;}
+.obs-texto{font-size:13px;line-height:1.5;}
+
+.tabla-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{padding:8px;text-align:center;background:var(--bg3);border:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);white-space:nowrap;}
+th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:1px;}
+th .ht{font-size:10px;color:var(--muted);}
+td{border:1px solid var(--border);vertical-align:middle;text-align:center;}
+td.dia-col{padding:8px 12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--accent);background:var(--bg2);white-space:nowrap;}
+td.des-col{background:rgba(108,99,255,.06);text-align:center;padding:10px 6px;color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.celda{padding:8px 6px;min-height:58px;text-align:center;}
+.c-mat{font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px;}
+.c-prof{font-size:11px;color:var(--muted);}
+.c-empty{color:rgba(108,99,255,.2);font-size:20px;padding-top:8px;}
+.empty{text-align:center;padding:20px;color:var(--muted);font-size:13px;}
+@media(max-width:600px){.est-header{flex-direction:column;text-align:center;}.est-prom{text-align:center;}.notas-grid{grid-template-columns:repeat(2,1fr);}.dias-grid{gap:5px;}.dia-chip{min-width:48px;padding:8px 8px;}}
+</style>
+<!-- Datadog RUM -->
+<script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-left">
+    {% if colegio and colegio.logo %}
+    <img class="navbar-logo" src="/static/logos/{{ colegio.logo }}" alt="Logo">
+    {% else %}
+    <img class="navbar-logo" src="/static/logo.png" alt="Lumini">
+    {% endif %}
+    <div>
+      <div class="brand-name">LUMINI</div>
+      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div>
+    </div>
+  </div>
+  <a href="/{{ slug }}/logout" class="nav-btn">🚪 Salir</a>
+</nav>
+
+<div class="main">
+
+  <div class="est-header">
+    <div class="est-avatar">{{ alumno.nombre[0] }}</div>
+    <div class="est-info">
+      <div class="est-nombre">{{ alumno.nombre }}</div>
+      <div class="est-meta">Curso {{ alumno.curso }} · {{ alumno.jornada }} · {{ colegio.nombre if colegio else slug }}</div>
+    </div>
+    <div class="est-prom">
+      <div class="label">Promedio general</div>
+      <div class="valor {% if promedio_general >= 3.5 %}ok{% elif promedio_general >= 3.0 %}warn{% else %}bad{% endif %}">
+        {{ promedio_general if promedio_general > 0 else '—' }}
+      </div>
+    </div>
+  </div>
+
+  <a href="/{{ slug }}/directora/boletin_pdf?aid={{ alumno.id }}"
+     style="display:inline-block;margin-bottom:20px;padding:10px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;">
+      📥 Descargar boletín PDF
+  </a>
+
+  <!-- Agenda -->
+  <div class="card">
+    <div class="card-title">📅 Agenda de trabajos</div>
+    {% if agenda %}
+      {% for t in agenda %}
+      <div class="ag-item">
+        <div>
+          <span style="font-weight:500">{{ t.titulo }}</span>
+          <span class="ag-materia">{{ t.materia }}</span>
+        </div>
+        <span class="ag-fecha">📆 {{ t.fecha }}</span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty">No hay trabajos registrados.</p>
+    {% endif %}
+  </div>
+
+  <!-- Notas por materia -->
+  <div class="card">
+    <div class="card-title">📊 Notas por materia</div>
+    {% if notas_por_materia %}
+      {% for materia, notas in notas_por_materia.items() %}
+      {% set ev = evals_map.get(materia, {}) %}
+      {% set vals = notas | map(attribute='val') | list %}
+      {% if ev.get('evaluacion') is not none %}{% set _ = vals.append(ev.evaluacion) %}{% endif %}
+      {% if ev.get('autoevaluacion') is not none %}{% set _ = vals.append(ev.autoevaluacion) %}{% endif %}
+      {% set prom = (vals | sum / vals | length) | round(2) if vals else 0 %}
+      <div class="materia-card">
+        <div class="materia-header">
+          <div class="materia-nombre">{{ materia }}</div>
+          <span class="prom-badge {% if prom >= 3.5 %}prom-ok{% elif prom >= 3.0 %}prom-warn{% else %}prom-bad{% endif %}">
+            {{ prom if prom > 0 else '—' }}
+          </span>
+        </div>
+        {% if notas %}
+        <div class="notas-grid">
+          {% for n in notas %}
+          <div class="nota-item">
+            <div class="nota-act">{{ n.actividad }}</div>
+            <div class="nota-val {% if n.val >= 3.5 %}ok{% elif n.val >= 3.0 %}warn{% else %}bad{% endif %}">{{ n.val }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if ev.get('evaluacion') is not none or ev.get('autoevaluacion') is not none %}
+        <div class="eval-row">
+          {% if ev.get('evaluacion') is not none %}
+          <div class="eval-item"><div class="eval-label">Evaluación docente</div><div class="eval-val">{{ ev.evaluacion }}</div></div>
+          {% endif %}
+          {% if ev.get('autoevaluacion') is not none %}
+          <div class="eval-item"><div class="eval-label">Autoevaluación</div><div class="eval-val">{{ ev.autoevaluacion }}</div></div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty">No hay notas registradas.</p>
+    {% endif %}
+  </div>
+
+  <!-- Asistencia mejorada -->
+  <div class="card">
+    <div class="card-title">📆 Asistencia</div>
+    <div class="asist-resumen">
+      <div class="asist-stat-card st-ok">
+        <div class="num">{{ asist_stats.P }}</div>
+        <div class="lbl">Presente</div>
+      </div>
+      <div class="asist-stat-card st-bad">
+        <div class="num">{{ asist_stats.A }}</div>
+        <div class="lbl">Ausente</div>
+      </div>
+      <div class="asist-stat-card st-warn">
+        <div class="num">{{ asist_stats.T }}</div>
+        <div class="lbl">Tarde</div>
+      </div>
+      <div class="asist-stat-card">
+        <div class="num" style="color:var(--text)">{{ asist_stats.total }}</div>
+        <div class="lbl">Total días</div>
+      </div>
+    </div>
+    {% if historial_meses %}
+      {% for mes, dias in historial_meses.items() %}
+      <div class="mes-bloque">
+        <div class="mes-label">{{ mes }}</div>
+        <div class="dias-grid">
+          {% for d in dias %}
+          {% set label = 'Presente' if d.estado == 'P' else ('Ausente' if d.estado == 'A' else 'Tarde') %}
+          <div class="dia-chip dia-{{ d.estado }}">
+            <span class="dc-num">{{ d.fecha.split('-')[2] }}</span>
+            <span class="dc-estado">{{ label }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty">Sin registros de asistencia.</p>
+    {% endif %}
+  </div>
+
+  <!-- Observaciones agrupadas por materia (solo lectura) -->
+  {% if observaciones %}
+  <div class="card">
+    <div class="card-title">📝 Observaciones</div>
+    {% set materias_obs = observaciones | map(attribute='materia') | unique | list %}
+    {% for mat in materias_obs %}
+    <div class="obs-materia-bloque">
+      <div class="obs-materia-titulo">
+        <span class="obs-materia-badge">{{ mat }}</span>
+      </div>
+      {% for o in observaciones if o.materia == mat %}
+      <div class="obs-item">
+        <div class="obs-meta"><span>{{ o.fecha }}</span></div>
+        <div class="obs-texto">{{ o.texto }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Horario -->
+  <div class="card">
+    <div class="card-title">🗓 Horario — Curso {{ alumno.curso }}</div>
+    <div class="tabla-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th><span class="hl">1a Hora</span><span class="ht">6:10–7:05</span></th>
+            <th><span class="hl">2a Hora</span><span class="ht">7:05–8:00</span></th>
+            <th><span class="hl">3a Hora</span><span class="ht">8:00–8:55</span></th>
+            <th><span class="hl">4a Hora</span><span class="ht">8:55–9:50</span></th>
+            <th><span class="hl">Descanso</span><span class="ht">9:50–10:20</span></th>
+            <th><span class="hl">5a Hora</span><span class="ht">10:20–11:10</span></th>
+            <th><span class="hl">6a Hora</span><span class="ht">11:10–12:00</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','Miércoles'),('Ju','Jueves'),('Vi','Viernes')] %}
+          {% for ds, df in dias_list %}
+          <tr>
+            <td class="dia-col">{{ ds }}</td>
+            {% for f in ['1','2','3','4'] %}
+              {% set k = df ~ '_' ~ f %}
+              {% set e = horario_map.get(k, {}) %}
+              <td><div class="celda">
+                {% if e.get('materia') %}<div class="c-mat">{{ e.materia }}</div><div class="c-prof">{{ e.profesor }}</div>
+                {% else %}<div class="c-empty">·</div>{% endif %}
+              </div></td>
+            {% endfor %}
+            <td class="des-col">☕</td>
+            {% for f in ['5','6'] %}
+              {% set k = df ~ '_' ~ f %}
+              {% set e = horario_map.get(k, {}) %}
+              <td><div class="celda">
+                {% if e.get('materia') %}<div class="c-mat">{{ e.materia }}</div><div class="c-prof">{{ e.profesor }}</div>
+                {% else %}<div class="c-empty">·</div>{% endif %}
+              </div></td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

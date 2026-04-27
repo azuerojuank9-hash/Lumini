@@ -1,0 +1,27 @@
+# Secretos — NUNCA subir a Git
+.env
+
+# Bases de datos
+*.db
+*.db-shm
+*.db-wal
+*.bak
+colegios_db/
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+env/
+venv/
+.venv/
+
+# Uploads
+static/logos/
+
+# IDEs
+.vscode/
+.idea/

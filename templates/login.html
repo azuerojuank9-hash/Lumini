@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumini — {{ colegio.nombre if colegio else slug }}</title><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%); min-height: 100vh; color: #e8e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+        .logo-wrap { margin-bottom: 10px; text-align: center; }
+        .logo-wrap img { height: 130px; width: 130px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px rgba(108,99,255,.6), 0 6px 30px rgba(108,99,255,.3); transition: transform .3s; }
+        .logo-wrap img:hover { transform: scale(1.06) rotate(-3deg); }
+        .brand { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; background: linear-gradient(135deg, #fff 30%, #6c63ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; }
+        .colegio-nombre { font-size: 12px; color: #7a7a90; letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; margin-bottom: 28px; text-align: center; }
+        .tabs { display: flex; background: rgba(255,255,255,.04); border: 1px solid #2a2a35; border-radius: 12px; padding: 4px; margin-bottom: 20px; width: 100%; max-width: 500px; }
+        .tab-btn { flex: 1; padding: 9px 4px; background: none; border: none; border-radius: 8px; color: #7a7a90; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; cursor: pointer; transition: all .2s; white-space: nowrap; }
+        .tab-btn.active { background: linear-gradient(135deg, #6c63ff, #3498db); color: white; }
+        .card { background: #17171e; border: 1px solid #2a2a35; border-radius: 16px; padding: 28px; width: 100%; max-width: 500px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .field { margin-bottom: 14px; }
+        .field label { display: block; font-size: 11px; color: #7a7a90; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+        .field input, .field select { width: 100%; padding: 11px 14px; background: #0f0f13; border: 1.5px solid #2a2a35; border-radius: 8px; color: #e8e8f0; font-family: 'DM Sans', sans-serif; font-size: 14px; transition: border-color .2s; }
+        .field input:focus, .field select:focus { outline: none; border-color: #6c63ff; }
+        .field input::placeholder { color: #444; }
+        .field select option { background: #1a1a2e; }
+        .btn-submit { width: 100%; padding: 12px; background: linear-gradient(135deg, #6c63ff, #3498db); color: white; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; transition: opacity .2s, transform .15s; }
+        .btn-submit:hover { opacity: .88; transform: translateY(-1px); }
+        .alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+        .alert-error { background: rgba(231,76,60,.12); border: 1px solid rgba(231,76,60,.25); color: #e74c3c; }
+        .alert-success { background: rgba(46,204,113,.12); border: 1px solid rgba(46,204,113,.25); color: #2ecc71; }
+        .forgot-link { display: block; text-align: right; margin-top: 10px; font-size: 12px; color: #6c63ff; text-decoration: none; opacity: 0.8; }
+        .forgot-link:hover { opacity: 1; text-decoration: underline; }
+        .hint { font-size: 11px; color: #444; margin-top: 8px; }
+        .divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: #333; font-size: 11px; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #2a2a35; }
+        .materia-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .materia-row select { flex: 1; padding: 9px 12px; background: #0f0f13; border: 1.5px solid #2a2a35; border-radius: 8px; color: #e8e8f0; font-family: 'DM Sans', sans-serif; font-size: 13px; }
+        .materia-row select:focus { outline: none; border-color: #6c63ff; }
+        .btn-remove { background: rgba(231,76,60,.1); color: #e74c3c; border: 1px solid rgba(231,76,60,.2); border-radius: 6px; padding: 8px 10px; cursor: pointer; font-size: 13px; flex-shrink: 0; }
+        .btn-add-mat { background: rgba(108,99,255,.1); color: #9b95ff; border: 1px solid rgba(108,99,255,.2); border-radius: 7px; padding: 8px 14px; cursor: pointer; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 600; width: 100%; margin-top: 4px; }
+        .btn-add-mat:hover { background: rgba(108,99,255,.2); }
+        .pass-wrapper { position: relative; }
+        .pass-wrapper input { padding-right: 2.5rem; width: 100%; }
+        .toggle-pass { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); cursor: pointer; background: none; border: none; color: #888; font-size: 1.1rem; }
+        /* Hint del código de invitación */
+        .codigo-hint { font-size: 11px; color: #5a5a70; margin-top: 5px; display: flex; align-items: center; gap: 5px; }
+        .codigo-hint span { color: #6c63ff; }
+    </style><!-- Datadog RUM -->
+<script>
+  (function(h,o,u,n,d) {
+    h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}}
+    d=o.createElement(u);d.async=1;d.src=n
+    n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)
+  })(window,document,'script','https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js','DD_RUM')
+  window.DD_RUM.onReady(function() {
+    window.DD_RUM.init({
+      applicationId: '270e5b0e-989e-42c7-aac0-aa32c5fa73d9',
+      clientToken: 'pub9783645017fb5532ad36678372bc8fab',
+      site: 'us3.datadoghq.com',
+      service: 'lumini',
+      env: 'production',
+      version: '1.0.0',
+      sessionSampleRate: 100,
+      sessionReplaySampleRate: 20,
+      trackResources: true,
+      trackUserInteractions: true,
+      trackLongTasks: true
+    });
+  })
+</script>
+</head>
+<body>
+
+<div class="logo-wrap">
+    {% if colegio and colegio.logo %}
+    <img src="/static/logos/{{ colegio.logo }}" alt="Logo {{ colegio.nombre }}">
+    {% else %}
+    <img src="/static/lumini_logo.png" alt="Lumini">
+    {% endif %}
+</div>
+<div class="brand">LUMINI</div>
+<p class="colegio-nombre">{{ colegio.nombre if colegio else slug }}</p>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('profesor',this)">👨‍🏫 Profesor</button>
+    <button class="tab-btn" onclick="switchTab('registro',this)">📝 Registrarse</button>
+    <button class="tab-btn" onclick="switchTab('estudiante',this)">🎓 Estudiante</button>
+    <button class="tab-btn" onclick="switchTab('directora',this)">👩‍💼 Directora</button>
+</div>
+
+<div class="card">
+    {% if error %}
+        {% if '✅' in error %}
+        <div class="alert alert-success">{{ error }}</div>
+        {% else %}
+        <div class="alert alert-error">⚠️ {{ error }}</div>
+        {% endif %}
+    {% endif %}
+
+    <!-- LOGIN PROFESOR -->
+    <div id="tab-profesor" class="section active">
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="accion" value="profesor_login">
+            <div class="field">
+                <label>Usuario</label>
+                <input type="text" name="usuario" placeholder="ej: prof_matematicas" required autocomplete="username">
+            </div>
+            <div class="field">
+                <label>Contraseña</label>
+                <div class="pass-wrapper">
+                    <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Entrar</button>
+        </form>
+        <a href="/{{ slug }}/recuperar" class="forgot-link">¿Olvidaste tu contraseña?</a>
+    </div>
+
+    <!-- REGISTRO PROFESOR -->
+    <div id="tab-registro" class="section">
+        <form method="POST" id="formRegistro">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="accion" value="profesor_registro">
+            <div class="field">
+                <label>Nombre completo</label>
+                <input type="text" name="nombre" placeholder="Tu nombre" required>
+            </div>
+            <div class="field">
+                <label>Usuario</label>
+                <input type="text" name="reg_usuario" placeholder="ej: prof_matematicas" required autocomplete="username">
+            </div>
+            <div class="field">
+                <label>Contraseña</label>
+                <div class="pass-wrapper">
+                    <input type="password" name="reg_password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" minlength="6">
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                </div>
+            </div>
+            <div class="field">
+                <label>Correo electrónico</label>
+                <input type="email" name="email_prof" placeholder="tu@correo.com" required autocomplete="email">
+            </div>
+            <div class="field">
+                <label>Confirmar contraseña</label>
+                <div class="pass-wrapper">
+                    <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                </div>
+            </div>
+            <div class="field">
+                <label>Código de invitación</label>
+                <input type="text" name="codigo_registro" placeholder="Código dado por el administrador" required autocomplete="off" style="text-transform:uppercase;letter-spacing:2px;">
+                <p class="codigo-hint">🔑 Solicita el código al administrador del colegio.</p>
+            </div>
+            <div class="divider">Materias y jornadas</div>
+            <div id="materias-container">
+                <div class="materia-row" id="mat-row-0">
+                    <select name="materias_sel" required>
+                        <option value="" disabled selected>Materia</option>
+                        {% for m in materias %}
+                        <option value="{{ m }}">{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="jornadas_sel" required>
+                        <option value="" disabled selected>Jornada</option>
+                        {% for j in jornadas %}
+                        <option value="{{ j }}">{{ j }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="button" class="btn-add-mat" onclick="agregarMateria()">+ Agregar otra materia/jornada</button>
+            <div class="divider" style="margin-top:14px;">Pregunta secreta</div>
+            <div class="field">
+                <label>Pregunta</label>
+                <select name="pregunta_secreta" required>
+                    <option value="" disabled selected>Selecciona una pregunta</option>
+                    {% for p in preguntas %}
+                    <option value="{{ p }}">{{ p }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>Respuesta</label>
+                <input type="text" name="respuesta_secreta" placeholder="Tu respuesta secreta" required autocomplete="off">
+            </div>
+            <button type="submit" class="btn-submit">Registrarme</button>
+        </form>
+    </div>
+
+    <!-- LOGIN ESTUDIANTE -->
+    <div id="tab-estudiante" class="section">
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="accion" value="estudiante">
+            <div class="field">
+                <label>Tu nombre completo</label>
+                <input type="text" name="nombre_est" placeholder="Escribe tu nombre" required autocomplete="name">
+            </div>
+            <div class="field">
+                <label>Jornada</label>
+                <select name="jornada_est" required>
+                    <option value="" disabled selected>Selecciona tu jornada</option>
+                    {% for j in jornadas %}
+                    <option value="{{ j }}">{{ j }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-submit">Ver mis notas</button>
+        </form>
+        <p class="hint">Escribe tu nombre exactamente como aparece en el sistema.</p>
+    </div>
+
+    <!-- DIRECTORA -->
+    <div id="tab-directora" class="section">
+        <div style="display:flex;background:rgba(255,255,255,.04);border:1px solid #2a2a35;border-radius:8px;padding:3px;margin-bottom:16px;">
+            <button type="button" class="tab-btn active" id="dir-btn-login" onclick="switchDirTab('dir-login',this)" style="flex:1;font-size:11px;">🔐 Ingresar</button>
+            <button type="button" class="tab-btn" id="dir-btn-reg" onclick="switchDirTab('dir-registro',this)" style="flex:1;font-size:11px;">📝 Registrarse</button>
+        </div>
+        <div id="tab-dir-login">
+            <form method="POST">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="accion" value="directora_login">
+                <div class="field">
+                    <label>Usuario</label>
+                    <input type="text" name="dir_usuario" placeholder="ej: directora_10a" autocomplete="username">
+                </div>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="dir_password" placeholder="••••••••" autocomplete="current-password">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Entrar al panel →</button>
+            </form>
+            <a href="/{{ slug }}/recuperar" class="forgot-link">¿Olvidaste tu contraseña?</a>
+        </div>
+        <div id="tab-dir-registro" style="display:none;">
+            <p class="hint" style="margin-bottom:12px;">Regístrate como directora/o de curso.</p>
+            <form method="POST" action="/{{ slug }}/directora/registrar_directo">
+                <div class="field">
+                    <label>Nombre completo</label>
+                    <input type="text" name="nombre" placeholder="Tu nombre" required>
+                </div>
+                <div class="field">
+                    <label>Usuario</label>
+                    <input type="text" name="usuario" placeholder="ej: directora_10a" required>
+                </div>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Curso que diriges</label>
+                    <input type="text" name="curso" placeholder="ej: 10A, 9B..." required>
+                </div>
+                <div class="field">
+                    <label>Jornada</label>
+                    <select name="jornada" required>
+                        <option value="" disabled selected>Selecciona</option>
+                        {% for j in jornadas %}
+                        <option value="{{ j }}">{{ j }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Correo (opcional)</label>
+                    <input type="email" name="email" placeholder="tu@correo.com">
+                </div>
+                <div class="field">
+                    <label>Confirmar contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Código de invitación</label>
+                    <input type="text" name="codigo_registro_dir" placeholder="Código dado por el administrador" required autocomplete="off" style="text-transform:uppercase;letter-spacing:2px;">
+                    <p class="codigo-hint">🔑 Solicita el código al administrador del colegio.</p>
+                </div>
+                <button type="submit" class="btn-submit">Crear cuenta →</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const MATERIAS = {{ materias | tojson }};
+const JORNADAS = {{ jornadas | tojson }};
+let matCount = 1;
+
+function switchTab(tab, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    btn.classList.add('active');
+}
+function switchDirTab(tab, btn) {
+    document.getElementById('tab-dir-login').style.display = 'none';
+    document.getElementById('tab-dir-registro').style.display = 'none';
+    document.getElementById('tab-' + tab).style.display = 'block';
+    document.getElementById('dir-btn-login').classList.remove('active');
+    document.getElementById('dir-btn-reg').classList.remove('active');
+    btn.classList.add('active');
+}
+function agregarMateria() {
+    const container = document.getElementById('materias-container');
+    const div = document.createElement('div');
+    div.className = 'materia-row';
+    div.id = `mat-row-${matCount}`;
+    const idx = matCount;
+    div.innerHTML = `
+        <select name="materias_sel" required>
+            <option value="" disabled selected>Materia</option>
+            ${MATERIAS.map(m => `<option value="${m}">${m}</option>`).join('')}
+        </select>
+        <select name="jornadas_sel" required>
+            <option value="" disabled selected>Jornada</option>
+            ${JORNADAS.map(j => `<option value="${j}">${j}</option>`).join('')}
+        </select>
+        <button type="button" class="btn-remove" onclick="document.getElementById('mat-row-${idx}').remove()">✕</button>
+    `;
+    container.appendChild(div);
+    matCount++;
+}
+function togglePass(btn) {
+    const input = btn.previousElementSibling;
+    if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+    else { input.type = 'password'; btn.textContent = '👁️'; }
+}
+
+// Auto-convertir a mayúsculas los campos de código
+document.querySelectorAll('input[name="codigo_registro"], input[name="codigo_registro_dir"]').forEach(el => {
+    el.addEventListener('input', () => { el.value = el.value.toUpperCase(); });
+});
+
+{% if error %}
+{% set e = error %}
+{% if 'Registro' in e or 'usuario ya existe' in e or 'Completa' in e or 'caracteres' in e or 'materia' in e or 'pregunta' in e %}
+document.querySelectorAll('.tabs .tab-btn')[1].click();
+{% elif 'estudiante' in e %}
+document.querySelectorAll('.tabs .tab-btn')[2].click();
+{% endif %}
+{% endif %}
+</script>
+</body>
+</html>
