@@ -128,7 +128,9 @@ def init_master_db():
         creado TEXT DEFAULT (date('now')),
         vencimiento TEXT DEFAULT NULL,
         num_periodos INTEGER DEFAULT 4,
-        codigo_registro TEXT DEFAULT ''
+        codigo_registro TEXT DEFAULT '',
+        primary_color TEXT DEFAULT '#6c63ff',
+        secondary_color TEXT DEFAULT '#3498db'
     )''')
     # Migraciones de columnas nuevas
     for col in [
@@ -136,6 +138,8 @@ def init_master_db():
         'vencimiento TEXT DEFAULT NULL',
         'num_periodos INTEGER DEFAULT 4',
         'codigo_registro TEXT DEFAULT ""',
+        'primary_color TEXT DEFAULT "#6c63ff"',
+        'secondary_color TEXT DEFAULT "#3498db"',
     ]:
         try: conn.execute(f'ALTER TABLE colegios ADD COLUMN {col}')
         except: pass
@@ -285,6 +289,11 @@ def migrar_db(slug):
             conn.execute('DROP TABLE horarios_curso_old')
             conn.commit()
 
+        tablas_actuales = [r[0] for r in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'"
+        ).fetchall()]
+        if 'profesores' not in tablas_actuales:
+            return
         profs = conn.execute('SELECT id FROM profesores').fetchall()
         for p in profs:
             combos = conn.execute(
@@ -425,13 +434,21 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
     doc = SimpleDocTemplate(buf, pagesize=A4,
                             topMargin=1.5*cm, bottomMargin=1.5*cm,
                             leftMargin=2*cm, rightMargin=2*cm)
+    try:
+        pri_color = colors.HexColor(colegio['primary_color']) if colegio and colegio['primary_color'] else colors.HexColor('#6c63ff')
+    except (KeyError, AttributeError, TypeError):
+        pri_color = colors.HexColor('#6c63ff')
+    try:
+        sec_color = colors.HexColor(colegio['secondary_color']) if colegio and colegio['secondary_color'] else colors.HexColor('#3498db')
+    except (KeyError, AttributeError, TypeError):
+        sec_color = colors.HexColor('#3498db')
     styles = getSampleStyleSheet()
     titulo_style = ParagraphStyle('t', fontSize=16, fontName='Helvetica-Bold',
-                                  textColor=colors.HexColor('#6c63ff'), spaceAfter=4)
+                                  textColor=pri_color, spaceAfter=4)
     sub_style    = ParagraphStyle('s', fontSize=10, fontName='Helvetica',
                                   textColor=colors.grey, spaceAfter=10)
     mat_style    = ParagraphStyle('m', fontSize=11, fontName='Helvetica-Bold',
-                                  textColor=colors.HexColor('#6c63ff'), spaceBefore=10, spaceAfter=4)
+                                  textColor=pri_color, spaceBefore=10, spaceAfter=4)
     story = []
     story.append(Paragraph('LUMINI', titulo_style))
     story.append(Paragraph(
@@ -473,7 +490,7 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
                  str(final)    if final    is not None else '—']]
         t = Table(data, colWidths=[4*cm, 3.5*cm, 3.5*cm, 3*cm])
         t.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6c63ff')),
+            ('BACKGROUND', (0, 0), (-1, 0), pri_color),
             ('TEXTCOLOR',  (0, 0), (-1, 0), colors.white),
             ('FONTNAME',   (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE',   (0, 0), (-1, -1), 9),
@@ -492,7 +509,7 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
     )
     resumen.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, -1),
-         colors.HexColor('#6c63ff') if prom_general >= 3.0 else colors.HexColor('#e74c3c')),
+         pri_color if prom_general >= 3.0 else colors.HexColor('#e74c3c')),
         ('TEXTCOLOR',  (0, 0), (-1, -1), colors.white),
         ('FONTNAME',   (0, 0), (-1, -1), 'Helvetica-Bold'),
         ('FONTSIZE',   (0, 0), (-1, -1), 11),
@@ -557,6 +574,8 @@ def admin():
             num_p    = request.form.get('num_periodos', 4, type=int)
             venc     = request.form.get('vencimiento', '').strip() or None
             codigo   = request.form.get('codigo_registro', '').strip()
+            pri_col  = request.form.get('primary_color', '#6c63ff').strip()
+            sec_col  = request.form.get('secondary_color', '#3498db').strip()
             if not nombre or not slug:
                 error = 'Nombre y slug son obligatorios.'
             elif not slug.replace('-', '').isalnum():
@@ -578,8 +597,8 @@ def admin():
                     try:
                         cm = conectar_master()
                         cm.execute(
-                            'INSERT INTO colegios (slug,nombre,logo,num_periodos,vencimiento,codigo_registro) VALUES (?,?,?,?,?,?)',
-                            (slug, nombre, logo_filename, num_p, venc, codigo))
+                            'INSERT INTO colegios (slug,nombre,logo,num_periodos,vencimiento,codigo_registro,primary_color,secondary_color) VALUES (?,?,?,?,?,?,?,?)',
+                            (slug, nombre, logo_filename, num_p, venc, codigo, pri_col, sec_col))
                         cm.commit(); cm.close()
                         init_db(slug)
                         exito = f'Colegio "{nombre}" creado. URL: /{slug}/login · Código: {codigo}'
@@ -604,9 +623,11 @@ def admin():
             num_p   = request.form.get('num_periodos', 4, type=int)
             venc    = request.form.get('vencimiento', '').strip() or None
             codigo  = request.form.get('codigo_registro', '').strip()
+            pri_col = request.form.get('primary_color', '#6c63ff').strip()
+            sec_col = request.form.get('secondary_color', '#3498db').strip()
             cm = conectar_master()
-            cm.execute('UPDATE colegios SET nombre=?, num_periodos=?, vencimiento=?, codigo_registro=? WHERE slug=?',
-                       (nombre, num_p, venc, codigo, slug_e))
+            cm.execute('UPDATE colegios SET nombre=?, num_periodos=?, vencimiento=?, codigo_registro=?, primary_color=?, secondary_color=? WHERE slug=?',
+                       (nombre, num_p, venc, codigo, pri_col, sec_col, slug_e))
             cm.commit()
             if 'logo' in request.files:
                 f = request.files['logo']
@@ -743,7 +764,7 @@ def directora_cambiar_password_recuperar(slug):
 @app.route('/<slug>/login', methods=['GET', 'POST'])
 def login(slug):
     require_colegio(slug)
-    migrar_db(slug)
+    init_db(slug)
     colegio = get_colegio(slug)
     error = None
     ip = request.remote_addr
@@ -1080,11 +1101,18 @@ def guardar_evaluacion(slug):
     periodo = request.form.get('periodo', 1, type=int)
     if aid is None: return ('', 400)
     conn = conectar(slug)
+    existing = conn.execute(
+        '''SELECT evaluacion, autoevaluacion FROM evaluaciones
+           WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
+        (aid, prof['id'], materia, jornada, periodo)
+    ).fetchone()
+    ev_final = ev if ev is not None else (existing['evaluacion'] if existing else None)
+    au_final = au if au is not None else (existing['autoevaluacion'] if existing else None)
     conn.execute(
         '''INSERT OR REPLACE INTO evaluaciones
            (aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
            VALUES (?,?,?,?,?,?,?)''',
-        (aid, prof['id'], materia, jornada, ev, au, periodo))
+        (aid, prof['id'], materia, jornada, ev_final, au_final, periodo))
     conn.commit(); conn.close()
     return ('', 204)
 
@@ -1525,6 +1553,8 @@ def horarios(slug):
     prof    = get_profesor(slug)
     colegio = get_colegio(slug)
     jornada, materia = get_sesion_jornada_materia(slug)
+    if prof and (not jornada or not materia):
+        return redirect(url_for('seleccionar_jornada', slug=slug))
     mis_cursos = get_cursos_profesor(slug, prof['id'], materia, jornada) if prof else []
     curso_sel  = request.args.get('curso', mis_cursos[0] if mis_cursos else None)
     c = conectar(slug)
@@ -1658,7 +1688,7 @@ def directora_login(slug):
 @app.route('/<slug>/directora/registrar_directo', methods=['POST'])
 def directora_registrar_directo(slug):
     require_colegio(slug)
-    migrar_db(slug)
+    init_db(slug)
     colegio   = get_colegio(slug)
     error = exito = None
     nombre    = request.form.get('nombre', '').strip()
@@ -1724,7 +1754,7 @@ def directora_panel(slug):
             AND COALESCE(a.periodo,1)=?) as cnt
            FROM profesores p
            JOIN asignaciones_curso ac ON ac.profesor_id=p.id
-           JOIN asignaciones_materia am ON am.profesor_id=p.id AND am.jornada=ac.jornada
+           JOIN asignaciones_materia am ON am.profesor_id=p.id AND am.jornada=ac.jornada AND am.materia=ac.materia
            WHERE ac.curso=? AND ac.jornada=? AND p.activo=1''',
         (curso, jornada, periodo, curso, jornada)).fetchall()
     materias_enviadas = set()
@@ -1830,6 +1860,8 @@ def directora_enviar_correos(slug):
     directora = get_directora(slug)
     if not directora: return jsonify({'ok': False, 'mensaje': 'No autorizado'})
     if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
+    if not SENDGRID_API_KEY:
+        return jsonify({'ok': False, 'mensaje': 'Envío de correos no configurado (falta SENDGRID_API_KEY).'})
     import base64
     colegio  = get_colegio(slug)
     curso    = directora['curso']
@@ -1855,6 +1887,10 @@ def directora_enviar_correos(slug):
             logger.error(f'Error generando PDF para {alumno["nombre"]}: {e}')
             fallidos += 1; continue
         try:
+            pri_hex = colegio['primary_color'] if colegio and colegio['primary_color'] else '#6c63ff'
+        except (KeyError, AttributeError, TypeError):
+            pri_hex = '#6c63ff'
+        try:
             import sendgrid
             from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
             sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
@@ -1863,7 +1899,7 @@ def directora_enviar_correos(slug):
                 to_emails=email_dest,
                 subject=f'Boletín de Notas — {alumno["nombre"]} · Periodo {periodo}',
                 html_content=f'''<div style="font-family:sans-serif;max-width:500px;margin:0 auto;">
-                    <h2 style="color:#6c63ff;">LUMINI — Boletín de Notas</h2>
+                    <h2 style="color:{pri_hex};">LUMINI — Boletín de Notas</h2>
                     <p>Estimado acudiente,</p>
                     <p>Adjunto encontrará el boletín de notas de <strong>{alumno["nombre"]}</strong>
                        correspondiente al <strong>Periodo {periodo}</strong>.</p>
@@ -1943,9 +1979,6 @@ def index():
     colegios = conn.execute("SELECT slug, nombre, logo FROM colegios WHERE activo=1 ORDER BY nombre").fetchall()
     conn.close()
     return render_template("index_root.html", colegios=colegios)
-    colegios = conn.execute("SELECT slug, nombre, logo FROM colegios WHERE activo=1 ORDER BY nombre").fetchall()
-    conn.close()
-    return render_template("index_root.html", colegios=colegios)
 
 @app.errorhandler(404)
 def not_found(e):
@@ -1971,11 +2004,22 @@ def dias_restantes(fecha_str):
     except:
         return None
 
+@app.template_filter('hex_to_rgb')
+def hex_to_rgb(hex_color):
+    """Converts #RRGGBB to 'r,g,b' string for use in rgba()."""
+    h = hex_color.lstrip('#')
+    if len(h) != 6:
+        return '108,99,255'
+    return f'{int(h[0:2], 16)},{int(h[2:4], 16)},{int(h[4:6], 16)}'
+
 # ── API PROFESORES PARA ADMIN ─────────────────────────────────────────────────
 @app.route('/admin/profesores/<slug>')
 def admin_ver_profesores(slug):
     if not session.get('admin_auth'):
         return jsonify({'error': 'No autorizado'}), 403
+    if not get_colegio(slug):
+        return jsonify({'error': 'Colegio no encontrado'}), 404
+    init_db(slug)
     conn = conectar(slug)
     profs = conn.execute(
         'SELECT id, nombre, usuario, activo FROM profesores ORDER BY nombre').fetchall()

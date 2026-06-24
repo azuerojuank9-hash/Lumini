@@ -9,17 +9,19 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+:root{--accent:#6c63ff;--accent-rgb:108,99,255}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#16213e);min-height:100vh;color:#e8e8f0;display:flex;flex-direction:column;align-items:center;padding:40px 20px}
-.logo{height:100px;width:100px;border-radius:50%;object-fit:cover;margin-bottom:10px;box-shadow:0 0 0 3px rgba(108,99,255,.6)}
-.brand{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:6px;background:linear-gradient(135deg,#fff 30%,#6c63ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.logo{height:100px;width:100px;border-radius:50%;object-fit:cover;margin-bottom:10px;box-shadow:0 0 0 3px rgba(var(--accent-rgb),.6)}
+.brand{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:6px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
 .sub{color:#7a7a90;font-size:13px;margin-bottom:30px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;width:100%;max-width:800px}
 .card{background:#17171e;border:1px solid #2a2a35;border-radius:14px;padding:20px;text-decoration:none;color:#e8e8f0;transition:all .2s;display:flex;align-items:center;gap:14px}
-.card:hover{border-color:#6c63ff;transform:translateY(-2px)}
+.card:hover{transform:translateY(-2px)}
 .card img{height:50px;width:50px;border-radius:50%;object-fit:cover}
 .card .name{font-weight:600;font-size:15px}
 .card .slug{color:#7a7a90;font-size:12px}
+.color-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
 .empty{color:#7a7a90;text-align:center;padding:40px}
 </style>
 </head>
@@ -30,9 +32,16 @@ body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#0f0f1a,
 <div class="grid">
 {% if colegios %}
   {% for c in colegios %}
-  <a href="/{{ c.slug }}/login" class="card">
+  {% set pri = c.primary_color if c.primary_color else '#6c63ff' %}
+  {% set sec = c.secondary_color if c.secondary_color else '#3498db' %}
+  <a href="/{{ c.slug }}/login" class="card" style="border-left:4px solid {{ pri }};">
     {% if c.logo %}<img src="/static/logos/{{ c.logo }}" alt="">{% else %}<img src="/static/lumini_logo.png" alt="">{% endif %}
-    <div><div class="name">{{ c.nombre }}</div><div class="slug">{{ c.slug }}</div></div>
+    <div>
+      <div class="name">
+        <span class="color-dot" style="background:{{ pri }};"></span>{{ c.nombre }}
+      </div>
+      <div class="slug">{{ c.slug }}</div>
+    </div>
   </a>
   {% endfor %}
 {% else %}

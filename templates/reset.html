@@ -6,6 +6,12 @@
     <title>Nueva contraseña — Lumini</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --accent: {{ colegio.primary_color if colegio and colegio.primary_color else '#6c63ff' }};
+            --accent2: {{ colegio.secondary_color if colegio and colegio.secondary_color else '#3498db' }};
+            --accent-rgb: {{ (colegio.primary_color if colegio and colegio.primary_color else '#6c63ff') | hex_to_rgb }};
+            --accent2-rgb: {{ (colegio.secondary_color if colegio and colegio.secondary_color else '#3498db') | hex_to_rgb }};
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'DM Sans', sans-serif;
@@ -16,11 +22,11 @@
         body::before {
             content: ''; position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
             width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(108,99,255,.1) 0%, transparent 70%); pointer-events: none;
+            background: radial-gradient(circle, rgba(var(--accent-rgb),.1) 0%, transparent 70%); pointer-events: none;
         }
         .logo-wrap { margin-bottom: 16px; animation: fadeDown .6s ease both; text-align: center; }
-        .logo-wrap img { height: 60px; width: 60px; border-radius: 50%; object-fit: cover; mix-blend-mode: screen; filter: drop-shadow(0 0 14px rgba(108,99,255,.4)); }
-        .brand { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; background: linear-gradient(135deg, #fff 30%, #6c63ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: fadeDown .6s .1s ease both; text-align: center; }
+        .logo-wrap img { height: 60px; width: 60px; border-radius: 50%; object-fit: cover; mix-blend-mode: screen; filter: drop-shadow(0 0 14px rgba(var(--accent-rgb),.4)); }
+        .brand { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; background: linear-gradient(135deg, #fff 30%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: fadeDown .6s .1s ease both; text-align: center; }
         .colegio-nombre { font-size: 12px; color: #7a7a90; letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; margin-bottom: 28px; animation: fadeDown .6s .15s ease both; text-align: center; }
         .card { background: #17171e; border: 1px solid #2a2a35; border-radius: 16px; padding: 32px 28px; width: 100%; max-width: 440px; animation: fadeUp .6s .2s ease both; }
         .card-icon { font-size: 2.2rem; text-align: center; margin-bottom: 10px; }
@@ -29,15 +35,15 @@
         .field { margin-bottom: 16px; }
         .field label { display: block; font-size: 11px; color: #7a7a90; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px; }
         .field input { width: 100%; padding: 11px 14px; background: #0f0f13; border: 1.5px solid #2a2a35; border-radius: 8px; color: #e8e8f0; font-family: 'DM Sans', sans-serif; font-size: 14px; transition: border-color .2s; }
-        .field input:focus { outline: none; border-color: #6c63ff; }
+        .field input:focus { outline: none; border-color: var(--accent); }
         .field input::placeholder { color: #444; }
-        .btn-submit { width: 100%; padding: 12px; background: linear-gradient(135deg, #6c63ff, #3498db); color: white; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: opacity .2s, transform .15s; }
+        .btn-submit { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: opacity .2s, transform .15s; }
         .btn-submit:hover { opacity: .88; transform: translateY(-1px); }
         .alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
         .alert-error   { background: rgba(231,76,60,.12); border: 1px solid rgba(231,76,60,.25); color: #e74c3c; }
         .alert-success { background: rgba(46,204,113,.12); border: 1px solid rgba(46,204,113,.25); color: #2ecc71; }
         .back-link { display: block; text-align: center; margin-top: 18px; font-size: 13px; color: #7a7a90; text-decoration: none; transition: color .2s; }
-        .back-link:hover { color: #6c63ff; }
+        .back-link:hover { color: var(--accent); }
         @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeUp   { from { opacity: 0; transform: translateY(16px);  } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 480px) { .card { padding: 24px 16px; } }

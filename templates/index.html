@@ -7,7 +7,7 @@
 <title>Lumini — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e28;--border:#2a2a35;--accent:#6c63ff;--accent2:#3498db;--text:#e8e8f0;--muted:#7a7a90;--green:#2ecc71;--red:#e74c3c;}
+:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e28;--border:#2a2a35;--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#6c63ff' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#3498db' }};--text:#e8e8f0;--muted:#7a7a90;--green:#2ecc71;--red:#e74c3c;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 .navbar{position:fixed;top:0;left:0;width:100%;background:rgba(10,10,15,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 20px;z-index:1000;backdrop-filter:blur(10px);gap:10px;}
@@ -45,7 +45,7 @@ th{padding:8px 8px;text-align:center;color:var(--muted);font-size:10px;text-tran
 th.tnombre{text-align:left;min-width:150px;}
 td{padding:6px 5px;border-bottom:1px solid rgba(42,42,53,.5);text-align:center;vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:rgba(108,99,255,.04);}
+tr:hover td{background:color-mix(in srgb, var(--accent) 4%, transparent);}
 .tnum{color:var(--muted);font-size:11px;width:28px;}
 .tnombrecell{text-align:left;font-weight:500;cursor:pointer;}
 .tnombrecell:hover{color:var(--accent);}
@@ -54,13 +54,26 @@ tr:hover td{background:rgba(108,99,255,.04);}
 .ni.guardado{border-color:var(--green);transition:border-color .4s;}
 .pc{font-weight:700;}
 .ph{color:var(--green);}.pm{color:#f39c12;}.pb{color:var(--red);}
-.abtn{padding:3px 7px;border:none;border-radius:4px;font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;margin:1px;}
-.ap{background:rgba(46,204,113,.15);color:var(--green);}
-.aa{background:rgba(231,76,60,.15);color:var(--red);}
-.at{background:rgba(243,156,18,.15);color:#f39c12;}
-.bp{background:rgba(46,204,113,.15);color:var(--green);padding:2px 6px;border-radius:8px;font-size:10px;}
-.ba{background:rgba(231,76,60,.15);color:var(--red);padding:2px 6px;border-radius:8px;font-size:10px;}
-.bt{background:rgba(243,156,18,.15);color:#f39c12;padding:2px 6px;border-radius:8px;font-size:10px;}
+/* ── ASISTENCIA MEJORADA ── */
+.asist-wrap{display:flex;align-items:center;justify-content:center;gap:6px;}
+.asist-badge{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 12px;border-radius:20px;font-size:13px;font-weight:800;transition:all .25s;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.asist-badge.bp{background:var(--green);color:#fff;box-shadow:0 2px 12px rgba(46,204,113,.4);}
+.asist-badge.ba{background:var(--red);color:#fff;box-shadow:0 2px 12px rgba(231,76,60,.4);}
+.asist-badge.bt{background:#f39c12;color:#fff;box-shadow:0 2px 12px rgba(243,156,18,.4);}
+.asist-badge.bn{background:var(--bg3);color:var(--muted);border:1px dashed var(--border);box-shadow:none;font-size:11px;}
+.asist-group{display:inline-flex;gap:3px;background:var(--bg3);padding:3px;border-radius:12px;border:1px solid var(--border);}
+.abtn{padding:5px 13px;border:none;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;letter-spacing:.02em;position:relative;}
+.abtn:hover{transform:scale(1.06);filter:brightness(1.15);}
+.abtn:active{transform:scale(.93);}
+.abtn.ap{background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.2);}
+.abtn.ap:hover{background:var(--green);color:#fff;box-shadow:0 2px 10px rgba(46,204,113,.35);}
+.abtn.aa{background:rgba(231,76,60,.12);color:var(--red);border:1px solid rgba(231,76,60,.2);}
+.abtn.aa:hover{background:var(--red);color:#fff;box-shadow:0 2px 10px rgba(231,76,60,.35);}
+.abtn.at{background:rgba(243,156,18,.12);color:#f39c12;border:1px solid rgba(243,156,18,.2);}
+.abtn.at:hover{background:#f39c12;color:#fff;box-shadow:0 2px 10px rgba(243,156,18,.35);}
+.abtn.active.ap{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 2px 10px rgba(46,204,113,.35);}
+.abtn.active.aa{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 2px 10px rgba(231,76,60,.35);}
+.abtn.active.at{background:#f39c12;color:#fff;border-color:#f39c12;box-shadow:0 2px 10px rgba(243,156,18,.35);}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:center;justify-content:center;padding:16px;}
 .overlay.open{display:flex;}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px;width:100%;max-width:480px;max-height:82vh;overflow-y:auto;}
@@ -77,6 +90,10 @@ tr:hover td{background:rgba(108,99,255,.04);}
 .hmeslabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
 .hdias{display:flex;flex-wrap:wrap;gap:3px;}
 .hdia{padding:2px 6px;border-radius:5px;font-size:10px;}
+/* historial badges en modal */
+.bp{background:rgba(46,204,113,.15);color:var(--green);}
+.ba{background:rgba(231,76,60,.15);color:var(--red);}
+.bt{background:rgba(243,156,18,.15);color:#f39c12;}
 .toast{position:fixed;bottom:22px;right:22px;background:rgba(46,204,113,.95);color:#fff;padding:9px 16px;border-radius:9px;font-size:12px;font-weight:600;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);}
 </style>
@@ -240,15 +257,16 @@ window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989
                     </span>
                 </td>
                 <td>
-                    <span class="asist-badge" id="asist-{{ e.id }}">
-                        {% if e.asistencia=='P' %}<span class="bp">P</span>
-                        {% elif e.asistencia=='A' %}<span class="ba">A</span>
-                        {% elif e.asistencia=='T' %}<span class="bt">T</span>
-                        {% else %}<span style="color:var(--muted)">—</span>{% endif %}
-                    </span>
-                    <button onclick="marcarAsist({{ e.id }},'P')" class="abtn ap">P</button>
-                    <button onclick="marcarAsist({{ e.id }},'A')" class="abtn aa">A</button>
-                    <button onclick="marcarAsist({{ e.id }},'T')" class="abtn at">T</button>
+                    <div class="asist-wrap">
+                        <span class="asist-badge {% if e.asistencia=='P' %}bp{% elif e.asistencia=='A' %}ba{% elif e.asistencia=='T' %}bt{% else %}bn{% endif %}" id="asist-{{ e.id }}">
+                            {% if e.asistencia=='P' %}P{% elif e.asistencia=='A' %}A{% elif e.asistencia=='T' %}T{% else %}—{% endif %}
+                        </span>
+                        <div class="asist-group">
+                            <button onclick="marcarAsist({{ e.id }},'P')" class="abtn ap {% if e.asistencia=='P' %}active{% endif %}">P</button>
+                            <button onclick="marcarAsist({{ e.id }},'A')" class="abtn aa {% if e.asistencia=='A' %}active{% endif %}">A</button>
+                            <button onclick="marcarAsist({{ e.id }},'T')" class="abtn at {% if e.asistencia=='T' %}active{% endif %}">T</button>
+                        </div>
+                    </div>
                 </td>
                 <td><button class="bsm badd" style="font-size:10px;padding:4px 9px;" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">📋 {{ e.observaciones|length }}</button></td>
                 <td><a href="/{{ slug }}/archivar_alumno/{{ e.id }}?curso={{ curso_sel }}" onclick="return confirm('¿Archivar a {{ e.nombre }}? Sus datos se conservan.')" class="bsm bdel" style="font-size:10px;text-decoration:none;">📦</a></td>
@@ -387,7 +405,14 @@ function marcarAsist(aid, estado){
         .then(function(r){
             if(r.ok){
                 const cls = estado==='P'?'bp':estado==='A'?'ba':'bt';
-                document.getElementById('asist-'+aid).innerHTML = '<span class="'+cls+'">'+estado+'</span>';
+                const badge = document.getElementById('asist-'+aid);
+                badge.className = 'asist-badge '+cls;
+                badge.textContent = estado;
+                const row = document.querySelector('tr[data-aid="'+aid+'"]');
+                row.querySelectorAll('.abtn').forEach(function(b){
+                    b.classList.remove('active');
+                    if(b.textContent === estado) b.classList.add('active');
+                });
                 showToast('✅ Asistencia guardada');
             } else {
                 showToast('❌ Error al guardar asistencia');

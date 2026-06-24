@@ -6,7 +6,7 @@
 <title>Mi Boletín — {{ alumno.nombre }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e2a;--border:#2a2a35;--accent:#6c63ff;--accent2:#3498db;--text:#e8e8f0;--muted:#7a7a90;--ok:#2ecc71;--warn:#f39c12;--danger:#e74c3c;}
+:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e2a;--border:#2a2a35;--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#6c63ff' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#3498db' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#6c63ff') | hex_to_rgb }};--accent2-rgb:{{ (colegio.secondary_color if colegio and colegio.secondary_color else '#3498db') | hex_to_rgb }};--text:#e8e8f0;--muted:#7a7a90;--ok:#2ecc71;--warn:#f39c12;--danger:#e74c3c;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 .navbar{position:fixed;top:0;left:0;width:100%;background:rgba(10,10,15,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 24px;z-index:1000;backdrop-filter:blur(10px);}
@@ -31,7 +31,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 .ag-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(42,42,53,.4);font-size:13px;gap:8px;}
 .ag-item:last-child{border-bottom:none;}
-.ag-materia{font-size:11px;color:var(--accent);background:rgba(108,99,255,.1);padding:2px 8px;border-radius:5px;margin-left:7px;}
+.ag-materia{font-size:11px;color:var(--accent);background:rgba(var(--accent-rgb),.1);padding:2px 8px;border-radius:5px;margin-left:7px;}
 .ag-fecha{font-size:11px;color:var(--muted);white-space:nowrap;}
 
 .materia-card{background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:10px;}
@@ -47,7 +47,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .nota-val{font-size:1.1rem;font-weight:700;}
 .ok{color:var(--ok);}.warn{color:var(--warn);}.bad{color:var(--danger);}
 .eval-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
-.eval-item{background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);border-radius:7px;padding:8px 12px;font-size:12px;flex:1;min-width:110px;}
+.eval-item{background:rgba(var(--accent-rgb),.1);border:1px solid rgba(var(--accent-rgb),.2);border-radius:7px;padding:8px 12px;font-size:12px;flex:1;min-width:110px;}
 .eval-label{color:var(--muted);margin-bottom:3px;font-size:11px;}
 .eval-val{font-weight:700;font-size:1rem;color:var(--accent);}
 
@@ -61,7 +61,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .asist-stat-card.st-warn .num{color:var(--warn);}
 
 .mes-bloque{margin-bottom:18px;}
-.mes-label{font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid rgba(108,99,255,.2);}
+.mes-label{font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid rgba(var(--accent-rgb),.2);}
 .dias-grid{display:flex;flex-wrap:wrap;gap:8px;}
 .dia-chip{display:flex;flex-direction:column;align-items:center;padding:10px 12px;border-radius:9px;min-width:56px;gap:4px;}
 .dia-chip .dc-num{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;line-height:1;}
@@ -76,7 +76,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* OBSERVACIONES por materia */
 .obs-materia-bloque{margin-bottom:14px;}
 .obs-materia-titulo{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.obs-materia-badge{background:rgba(108,99,255,.12);color:var(--accent);border:1px solid rgba(108,99,255,.25);border-radius:5px;font-size:11px;font-weight:700;padding:3px 10px;}
+.obs-materia-badge{background:rgba(var(--accent-rgb),.12);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.25);border-radius:5px;font-size:11px;font-weight:700;padding:3px 10px;}
 .obs-item{padding:11px;background:var(--bg3);border-radius:8px;margin-bottom:6px;}
 .obs-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;}
 .obs-texto{font-size:13px;line-height:1.5;}
@@ -88,11 +88,11 @@ th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-tr
 th .ht{font-size:10px;color:var(--muted);}
 td{border:1px solid var(--border);vertical-align:middle;text-align:center;}
 td.dia-col{padding:8px 12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--accent);background:var(--bg2);white-space:nowrap;}
-td.des-col{background:rgba(108,99,255,.06);text-align:center;padding:10px 6px;color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+td.des-col{background:rgba(var(--accent-rgb),.06);text-align:center;padding:10px 6px;color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
 .celda{padding:8px 6px;min-height:58px;text-align:center;}
 .c-mat{font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px;}
 .c-prof{font-size:11px;color:var(--muted);}
-.c-empty{color:rgba(108,99,255,.2);font-size:20px;padding-top:8px;}
+.c-empty{color:rgba(var(--accent-rgb),.2);font-size:20px;padding-top:8px;}
 .empty{text-align:center;padding:20px;color:var(--muted);font-size:13px;}
 @media(max-width:600px){.est-header{flex-direction:column;text-align:center;}.est-prom{text-align:center;}.notas-grid{grid-template-columns:repeat(2,1fr);}.dias-grid{gap:5px;}.dia-chip{min-width:48px;padding:8px 8px;}}
 </style>

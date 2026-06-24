@@ -6,48 +6,54 @@
     <title>Directora — {{ colegio.nombre if colegio else slug }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --accent: {{ colegio.primary_color if colegio and colegio.primary_color else '#6c63ff' }};
+            --accent2: {{ colegio.secondary_color if colegio and colegio.secondary_color else '#3498db' }};
+            --accent-rgb: {{ (colegio.primary_color if colegio and colegio.primary_color else '#6c63ff') | hex_to_rgb }};
+            --accent2-rgb: {{ (colegio.secondary_color if colegio and colegio.secondary_color else '#3498db') | hex_to_rgb }};
+        }
         *{box-sizing:border-box;margin:0;padding:0;}
         body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 50%,#16213e 100%);min-height:100vh;color:#e8e8f0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
         .logo-wrap{margin-bottom:10px;text-align:center;}
-        .logo-wrap img{height:110px;width:110px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px rgba(108,99,255,.6),0 6px 30px rgba(108,99,255,.3);transition:transform .3s;}
+        .logo-wrap img{height:110px;width:110px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px rgba(var(--accent-rgb),.6),0 6px 30px rgba(var(--accent-rgb),.3);transition:transform .3s;}
         .logo-wrap img:hover{transform:scale(1.05);}
-        .brand{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:5px;background:linear-gradient(135deg,#fff 30%,#6c63ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
+        .brand{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:5px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
         .subtitle{font-size:12px;color:#7a7a90;letter-spacing:2px;text-transform:uppercase;margin-top:4px;margin-bottom:12px;text-align:center;}
-        .badge-dir{display:inline-flex;align-items:center;gap:6px;background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.25);border-radius:99px;padding:4px 14px;font-size:12px;color:#a09aff;margin-bottom:18px;}
+        .badge-dir{display:inline-flex;align-items:center;gap:6px;background:rgba(var(--accent-rgb),.12);border:1px solid rgba(var(--accent-rgb),.25);border-radius:99px;padding:4px 14px;font-size:12px;color:#a09aff;margin-bottom:18px;}
         .tabs{display:flex;background:rgba(255,255,255,.04);border:1px solid #2a2a35;border-radius:10px;padding:3px;margin-bottom:18px;width:100%;max-width:480px;}
         .tab-btn{flex:1;padding:8px 4px;background:none;border:none;border-radius:7px;color:#7a7a90;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap;}
-        .tab-btn.active{background:linear-gradient(135deg,#6c63ff,#3498db);color:white;}
+        .tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;}
         .card{background:#17171e;border:1px solid #2a2a35;border-radius:16px;padding:28px;width:100%;max-width:480px;}
         .section{display:none;}
         .section.active{display:block;}
         .field{margin-bottom:14px;}
         .field label{display:block;font-size:11px;color:#7a7a90;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
         .field input,.field select{width:100%;padding:11px 14px;background:#0f0f13;border:1.5px solid #2a2a35;border-radius:8px;color:#e8e8f0;font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s;}
-        .field input:focus,.field select:focus{outline:none;border-color:#6c63ff;}
+        .field input:focus,.field select:focus{outline:none;border-color:var(--accent);}
         .field input::placeholder{color:#444;}
         .field select option{background:#1a1a2e;}
         .pass-wrapper{position:relative;}
         .pass-wrapper input{padding-right:2.5rem;width:100%;}
         .toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:#888;font-size:1.1rem;}
-        .btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,#6c63ff,#3498db);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;transition:opacity .2s,transform .15s;}
+        .btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;transition:opacity .2s,transform .15s;}
         .btn-submit:hover{opacity:.88;transform:translateY(-1px);}
         .alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;}
         .alert-error{background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.25);color:#e74c3c;}
         .alert-success{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.25);color:#2ecc71;}
-        .forgot-link{display:block;text-align:right;margin-top:10px;font-size:12px;color:#6c63ff;text-decoration:none;opacity:.8;cursor:pointer;}
+        .forgot-link{display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--accent);text-decoration:none;opacity:.8;cursor:pointer;}
         .forgot-link:hover{opacity:1;text-decoration:underline;}
         .back-link{display:block;text-align:center;margin-top:20px;font-size:12px;color:#7a7a90;text-decoration:none;}
-        .back-link:hover{color:#6c63ff;}
+        .back-link:hover{color:var(--accent);}
         .divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#333;font-size:11px;}
         .divider::before,.divider::after{content:'';flex:1;height:1px;background:#2a2a35;}
-        .pregunta-box{background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);border-radius:7px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:#b8b8d0;line-height:1.5;}
+        .pregunta-box{background:rgba(var(--accent-rgb),.1);border:1px solid rgba(var(--accent-rgb),.2);border-radius:7px;padding:10px 12px;margin-bottom:14px;font-size:13px;color:#b8b8d0;line-height:1.5;}
         .msg-error{display:none;margin-top:10px;padding:9px 12px;background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.25);color:#e74c3c;border-radius:7px;font-size:12px;}
         .msg-ok{display:none;margin-top:10px;padding:9px 12px;background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.25);color:#2ecc71;border-radius:7px;font-size:12px;}
         /* Código de invitación destacado */
-        .codigo-field{background:rgba(108,99,255,.07);border:1.5px solid rgba(108,99,255,.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+        .codigo-field{background:rgba(var(--accent-rgb),.07);border:1.5px solid rgba(var(--accent-rgb),.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;}
         .codigo-field label{display:block;font-size:11px;color:#9b95ff;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
-        .codigo-field input{width:100%;padding:11px 14px;background:#0f0f13;border:1.5px solid rgba(108,99,255,.35);border-radius:8px;color:#e8e8f0;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;}
-        .codigo-field input:focus{outline:none;border-color:#6c63ff;}
+        .codigo-field input{width:100%;padding:11px 14px;background:#0f0f13;border:1.5px solid rgba(var(--accent-rgb),.35);border-radius:8px;color:#e8e8f0;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;}
+        .codigo-field input:focus{outline:none;border-color:var(--accent);}
         .codigo-field .hint{font-size:11px;color:#5a5a70;margin-top:6px;}
         /* Indicador de fortaleza de contraseña */
         .pwd-strength{height:3px;border-radius:2px;margin-top:5px;transition:all .3s;background:#2a2a35;}

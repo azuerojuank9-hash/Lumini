@@ -6,13 +6,13 @@
 <title>Panel Directora — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e28;--border:#2a2a35;--accent:#6c63ff;--accent2:#3498db;--text:#e8e8f0;--muted:#7a7a90;--green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;}
+:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e28;--border:#2a2a35;--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#6c63ff' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#3498db' }};--text:#e8e8f0;--muted:#7a7a90;--green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 .navbar{position:fixed;top:0;left:0;width:100%;background:rgba(10,10,15,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 20px;z-index:1000;backdrop-filter:blur(10px);gap:10px;flex-wrap:wrap;}
 .nav-left{display:flex;align-items:center;gap:10px;}
 /* ── LOGO NAVBAR: 46px, circular, sin mix-blend-mode ── */
-.nav-logo{height:46px;width:46px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(108,99,255,.4);flex-shrink:0;}
+.nav-logo{height:46px;width:46px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent);flex-shrink:0;}
 .nav-brand{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .nav-sub{font-size:10px;color:var(--muted);}
 .nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
@@ -228,9 +228,15 @@ tr:hover td{background:rgba(108,99,255,.04);}
 
 <div class="toast" id="toast"></div>
 
+<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
+
 <script>
 const SLUG = "{{ slug }}";
 const PERIODO = {{ periodo }};
+
+function getCsrf(){
+    return document.getElementById('csrf-global').value;
+}
 
 function showToast(msg, ok=true){
     const t=document.getElementById('toast'); t.textContent=msg;
@@ -239,7 +245,7 @@ function showToast(msg, ok=true){
 }
 function guardarEmail(aid){
     const inp=document.getElementById('email-'+aid);
-    const f=new FormData(); f.append('aid',aid); f.append('email',inp.value.trim());
+    const f=new FormData(); f.append('aid',aid); f.append('email',inp.value.trim()); f.append('_csrf_token', getCsrf());
     fetch(`/${SLUG}/directora/guardar_email`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{
         if(d.ok){inp.classList.add('saved');setTimeout(()=>inp.classList.remove('saved'),1500);showToast('✅ Correo guardado');}
     }).catch(()=>showToast('❌ Error al guardar.',false));
@@ -247,7 +253,7 @@ function guardarEmail(aid){
 function enviarCorreosTodos(){
     if(!confirm('¿Enviar boletines a todos los estudiantes con correo registrado?')) return;
     const btn=event.target; btn.disabled=true; btn.textContent='⏳ Enviando...';
-    const f=new FormData(); f.append('periodo',PERIODO);
+    const f=new FormData(); f.append('periodo',PERIODO); f.append('_csrf_token', getCsrf());
     fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{
         showToast(d.mensaje,d.ok); btn.disabled=false; btn.textContent='📧 Enviar boletines por correo (todos)';
     }).catch(()=>{showToast('❌ Error al enviar.',false);btn.disabled=false;btn.textContent='📧 Enviar boletines por correo (todos)';});
@@ -257,7 +263,7 @@ function enviarCorreoUno(aid,nombre){
     const email=emailInp?emailInp.value.trim():'';
     if(!email){showToast('⚠️ Primero guarda el correo del acudiente.',false);emailInp&&emailInp.focus();return;}
     if(!confirm(`¿Enviar boletín de ${nombre} a ${email}?`)) return;
-    const f=new FormData(); f.append('periodo',PERIODO); f.append('aid',aid);
+    const f=new FormData(); f.append('periodo',PERIODO); f.append('aid',aid); f.append('_csrf_token', getCsrf());
     fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>showToast(d.mensaje,d.ok)).catch(()=>showToast('❌ Error al enviar.',false));
 }
 function abrirModalRegistro(){
@@ -277,7 +283,7 @@ function crearDirectora(){
     errDiv.style.display=okDiv.style.display='none';
     if(!nombre||!usuario||!password||!curso){errDiv.textContent='⚠️ Completa todos los campos.';errDiv.style.display='block';return;}
     if(password.length<6){errDiv.textContent='⚠️ Mínimo 6 caracteres.';errDiv.style.display='block';return;}
-    const f=new FormData(); f.append('nombre',nombre);f.append('usuario',usuario);f.append('password',password);f.append('curso',curso);f.append('email',email);
+    const f=new FormData(); f.append('nombre',nombre);f.append('usuario',usuario);f.append('password',password);f.append('curso',curso);f.append('email',email);f.append('_csrf_token', getCsrf());
     fetch(`/${SLUG}/directora/crear_desde_panel`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{
         if(d.ok){okDiv.textContent=`✅ ${d.mensaje}`;okDiv.style.display='block';['reg-nombre','reg-usuario','reg-password','reg-curso','reg-email'].forEach(id=>document.getElementById(id).value='');}
         else{errDiv.textContent=`⚠️ ${d.mensaje}`;errDiv.style.display='block';}

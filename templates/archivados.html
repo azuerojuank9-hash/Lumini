@@ -6,7 +6,7 @@
 <title>Archivados — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e2a;--border:#2a2a35;--accent:#6c63ff;--accent2:#3498db;--text:#e8e8f0;--muted:#7a7a90;--green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;}
+:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e2a;--border:#2a2a35;--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#6c63ff' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#3498db' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#6c63ff') | hex_to_rgb }};--accent2-rgb:{{ (colegio.secondary_color if colegio and colegio.secondary_color else '#3498db') | hex_to_rgb }};--text:#e8e8f0;--muted:#7a7a90;--green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 .navbar{position:fixed;top:0;left:0;width:100%;background:rgba(10,10,15,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 20px;z-index:1000;backdrop-filter:blur(10px);gap:10px;}
@@ -30,7 +30,7 @@ table{border-collapse:collapse;width:100%;font-size:13px;}
 th{padding:9px 12px;text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);background:var(--bg2);}
 td{padding:10px 12px;border-bottom:1px solid rgba(42,42,53,.4);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:rgba(108,99,255,.04);}
+tr:hover td{background:rgba(var(--accent-rgb),.04);}
 .bsm{padding:6px 12px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-block;}
 .breact{background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.25);}
 .breact:hover{background:rgba(46,204,113,.25);}
@@ -39,7 +39,7 @@ tr:hover td{background:rgba(108,99,255,.04);}
 .barch{background:rgba(243,156,18,.1);color:var(--yellow);border:1px solid rgba(243,156,18,.2);}
 .barch:hover{background:rgba(243,156,18,.22);}
 .empty{text-align:center;padding:28px;color:var(--muted);font-size:13px;}
-.badge-mat{background:rgba(108,99,255,.1);color:#9b95ff;padding:2px 8px;border-radius:5px;font-size:11px;margin:2px;}
+.badge-mat{background:rgba(var(--accent-rgb),.1);color:#9b95ff;padding:2px 8px;border-radius:5px;font-size:11px;margin:2px;}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;}
 .overlay.open{display:flex;}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;}

@@ -169,11 +169,25 @@ tr:hover td{background:rgba(108,99,255,.03);}
                 </div>
                 <p class="hint">Este código lo deben ingresar los profesores y directores al registrarse. Guárdalo bien — solo el admin lo conoce.</p>
             </div>
-            <div class="field">
-                <label>Logo (opcional)</label>
-                <input type="file" name="logo" accept="image/*" style="color:var(--muted)">
+            <div class="grid-2">
+                <div class="field">
+                    <label>Logo (opcional)</label>
+                    <input type="file" name="logo" accept="image/*" style="color:var(--muted)">
+                </div>
+                <div class="field">
+                    <label>Color primario</label>
+                    <input type="color" name="primary_color" value="#6c63ff" style="height:42px;width:100%;background:#0f0f13;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;">
+                </div>
             </div>
-            <button type="submit" class="btn btn-pri">Crear colegio →</button>
+            <div class="grid-2">
+                <div class="field">
+                    <label>Color secundario</label>
+                    <input type="color" name="secondary_color" value="#3498db" style="height:42px;width:100%;background:#0f0f13;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;">
+                </div>
+                <div class="field" style="display:flex;align-items:flex-end;padding-bottom:4px;">
+                    <button type="submit" class="btn btn-pri" style="width:100%;">Crear colegio →</button>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -193,6 +207,7 @@ tr:hover td{background:rgba(108,99,255,.03);}
                 <th>Nombre</th>
                 <th>Slug / URL</th>
                 <th style="text-align:center;">Periodos</th>
+                <th>Colores</th>
                 <th>Código invitación</th>
                 <th>Vencimiento</th>
                 <th>Creado</th>
@@ -219,6 +234,10 @@ tr:hover td{background:rgba(108,99,255,.03);}
             </td>
             <td style="text-align:center;">
                 <span style="font-weight:700;color:var(--accent);font-size:14px;">{{ c.num_periodos or 4 }}</span>
+            </td>
+            <td>
+                <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:{{ c.primary_color or '#6c63ff' }};border:2px solid var(--border);vertical-align:middle;" title="Primario: {{ c.primary_color or '#6c63ff' }}"></span>
+                <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:{{ c.secondary_color or '#3498db' }};border:2px solid var(--border);vertical-align:middle;margin-left:4px;" title="Secundario: {{ c.secondary_color or '#3498db' }}"></span>
             </td>
             <td>
                 {% if c.codigo_registro %}
@@ -259,7 +278,7 @@ tr:hover td{background:rgba(108,99,255,.03);}
                         </button>
                     </form>
                     <button class="btn btn-ghost btn-sm"
-                        onclick="abrirEditar('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}',{{ c.num_periodos or 4 }},'{{ c.vencimiento or "" }}','{{ c.codigo_registro or "" }}')">
+                        onclick="abrirEditar('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}',{{ c.num_periodos or 4 }},'{{ c.vencimiento or "" }}','{{ c.codigo_registro or "" }}','{{ c.primary_color or "#6c63ff" }}','{{ c.secondary_color or "#3498db" }}')">
                         ✏️ Editar
                     </button>
                     <button class="btn btn-yellow btn-sm" onclick="verProfesores('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}')">
@@ -327,9 +346,22 @@ tr:hover td{background:rgba(108,99,255,.03);}
                 </div>
                 <p class="hint">Cambia el código si lo quieres renovar. Los profesores y directores ya registrados no se ven afectados.</p>
             </div>
-            <div class="field">
-                <label>Cambiar logo (opcional)</label>
-                <input type="file" name="logo" accept="image/*" style="color:var(--muted)">
+            <div class="grid-2">
+                <div class="field">
+                    <label>Cambiar logo (opcional)</label>
+                    <input type="file" name="logo" accept="image/*" style="color:var(--muted)">
+                </div>
+                <div class="field">
+                    <label>Color primario</label>
+                    <input type="color" name="primary_color" id="edit-primary" value="#6c63ff" style="height:42px;width:100%;background:#0f0f13;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="field">
+                    <label>Color secundario</label>
+                    <input type="color" name="secondary_color" id="edit-secondary" value="#3498db" style="height:42px;width:100%;background:#0f0f13;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;">
+                </div>
+                <div></div>
             </div>
             <div style="display:flex;gap:10px;margin-top:8px;">
                 <button type="submit" class="btn btn-pri" style="flex:1;">Guardar cambios</button>
@@ -355,12 +387,14 @@ tr:hover td{background:rgba(108,99,255,.03);}
 <div class="toast" id="toast"></div>
 
 <script>
-function abrirEditar(slug, nombre, periodos, vencimiento, codigo) {
+function abrirEditar(slug, nombre, periodos, vencimiento, codigo, primary, secondary) {
     document.getElementById('edit-slug').value = slug;
     document.getElementById('edit-nombre').value = nombre;
     document.getElementById('edit-periodos').value = String(periodos);
     document.getElementById('edit-vencimiento').value = vencimiento;
     document.getElementById('edit-codigo').value = codigo;
+    document.getElementById('edit-primary').value = primary || '#6c63ff';
+    document.getElementById('edit-secondary').value = secondary || '#3498db';
     document.getElementById('modalEditar').classList.add('open');
 }
 function cerrarEditar() { document.getElementById('modalEditar').classList.remove('open'); }

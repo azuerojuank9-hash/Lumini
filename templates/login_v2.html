@@ -8,49 +8,53 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+          --accent: {{ colegio.primary_color if colegio and colegio.primary_color else '#6c63ff' }};
+          --accent2: {{ colegio.secondary_color if colegio and colegio.secondary_color else '#3498db' }};
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%); min-height: 100vh; color: #e8e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
         .logo-wrap { margin-bottom: 10px; text-align: center; }
-        .logo-wrap img { height: 130px; width: 130px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px rgba(108,99,255,.6), 0 6px 30px rgba(108,99,255,.3); transition: transform .3s; }
+        .logo-wrap img { height: 130px; width: 130px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 60%, transparent), 0 6px 30px color-mix(in srgb, var(--accent) 30%, transparent); transition: transform .3s; }
         .logo-wrap img:hover { transform: scale(1.06) rotate(-3deg); }
-        .brand { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; background: linear-gradient(135deg, #fff 30%, #6c63ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; }
+        .brand { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; letter-spacing: 6px; background: linear-gradient(135deg, #fff 30%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; }
         .colegio-nombre { font-size: 12px; color: #7a7a90; letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; margin-bottom: 28px; text-align: center; }
         .tabs { display: flex; background: rgba(255,255,255,.04); border: 1px solid #2a2a35; border-radius: 12px; padding: 4px; margin-bottom: 20px; width: 100%; max-width: 500px; }
         .tab-btn { flex: 1; padding: 9px 4px; background: none; border: none; border-radius: 8px; color: #7a7a90; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; cursor: pointer; transition: all .2s; white-space: nowrap; }
-        .tab-btn.active { background: linear-gradient(135deg, #6c63ff, #3498db); color: white; }
+        .tab-btn.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
         .card { background: #17171e; border: 1px solid #2a2a35; border-radius: 16px; padding: 28px; width: 100%; max-width: 500px; }
         .section { display: none; }
         .section.active { display: block; }
         .field { margin-bottom: 14px; }
         .field label { display: block; font-size: 11px; color: #7a7a90; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
         .field input, .field select { width: 100%; padding: 11px 14px; background: #0f0f13; border: 1.5px solid #2a2a35; border-radius: 8px; color: #e8e8f0; font-family: 'DM Sans', sans-serif; font-size: 14px; transition: border-color .2s; }
-        .field input:focus, .field select:focus { outline: none; border-color: #6c63ff; }
+        .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
         .field input::placeholder { color: #444; }
         .field select option { background: #1a1a2e; }
-        .btn-submit { width: 100%; padding: 12px; background: linear-gradient(135deg, #6c63ff, #3498db); color: white; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; transition: opacity .2s, transform .15s; }
+        .btn-submit { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; transition: opacity .2s, transform .15s; }
         .btn-submit:hover { opacity: .88; transform: translateY(-1px); }
         .alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
         .alert-error { background: rgba(231,76,60,.12); border: 1px solid rgba(231,76,60,.25); color: #e74c3c; }
         .alert-success { background: rgba(46,204,113,.12); border: 1px solid rgba(46,204,113,.25); color: #2ecc71; }
-        .forgot-link { display: block; text-align: right; margin-top: 10px; font-size: 12px; color: #6c63ff; text-decoration: none; opacity: 0.8; }
+        .forgot-link { display: block; text-align: right; margin-top: 10px; font-size: 12px; color: var(--accent); text-decoration: none; opacity: 0.8; }
         .forgot-link:hover { opacity: 1; text-decoration: underline; }
         .hint { font-size: 11px; color: #444; margin-top: 8px; }
         .divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: #333; font-size: 11px; }
         .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #2a2a35; }
         .materia-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
         .materia-row select { flex: 1; padding: 9px 12px; background: #0f0f13; border: 1.5px solid #2a2a35; border-radius: 8px; color: #e8e8f0; font-family: 'DM Sans', sans-serif; font-size: 13px; }
-        .materia-row select:focus { outline: none; border-color: #6c63ff; }
+        .materia-row select:focus { outline: none; border-color: var(--accent); }
         .btn-remove { background: rgba(231,76,60,.1); color: #e74c3c; border: 1px solid rgba(231,76,60,.2); border-radius: 6px; padding: 8px 10px; cursor: pointer; font-size: 13px; flex-shrink: 0; }
-        .btn-add-mat { background: rgba(108,99,255,.1); color: #9b95ff; border: 1px solid rgba(108,99,255,.2); border-radius: 7px; padding: 8px 14px; cursor: pointer; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 600; width: 100%; margin-top: 4px; }
-        .btn-add-mat:hover { background: rgba(108,99,255,.2); }
+        .btn-add-mat { background: color-mix(in srgb, var(--accent) 10%, transparent); color: color-mix(in srgb, var(--accent) 70%, white); border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); border-radius: 7px; padding: 8px 14px; cursor: pointer; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 600; width: 100%; margin-top: 4px; }
+        .btn-add-mat:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
         .pass-wrapper { position: relative; }
         .pass-wrapper input { padding-right: 2.5rem; width: 100%; }
         .toggle-pass { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); cursor: pointer; background: none; border: none; color: #888; font-size: 1.1rem; }
         /* código de invitación destacado */
-        .codigo-field { background: rgba(108,99,255,.07); border: 1.5px solid rgba(108,99,255,.25); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
-        .codigo-field label { display: block; font-size: 11px; color: #9b95ff; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; font-weight: 700; }
-        .codigo-field input { width: 100%; padding: 11px 14px; background: #0f0f13; border: 1.5px solid rgba(108,99,255,.35); border-radius: 8px; color: #e8e8f0; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1px; }
-        .codigo-field input:focus { outline: none; border-color: #6c63ff; }
+        .codigo-field { background: color-mix(in srgb, var(--accent) 7%, transparent); border: 1.5px solid color-mix(in srgb, var(--accent) 25%, transparent); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
+        .codigo-field label { display: block; font-size: 11px; color: color-mix(in srgb, var(--accent) 70%, white); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; font-weight: 700; }
+        .codigo-field input { width: 100%; padding: 11px 14px; background: #0f0f13; border: 1.5px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 8px; color: #e8e8f0; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1px; }
+        .codigo-field input:focus { outline: none; border-color: var(--accent); }
         .codigo-field .hint { font-size: 11px; color: #5a5a70; margin-top: 6px; }
     </style><!-- Datadog RUM -->
 <script>
