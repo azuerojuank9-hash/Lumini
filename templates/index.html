@@ -55,25 +55,42 @@ tr:hover td{background:color-mix(in srgb, var(--accent) 4%, transparent);}
 .pc{font-weight:700;}
 .ph{color:var(--green);}.pm{color:#f39c12;}.pb{color:var(--red);}
 /* ── ASISTENCIA MEJORADA ── */
-.asist-wrap{display:flex;align-items:center;justify-content:center;gap:6px;}
-.asist-badge{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 12px;border-radius:20px;font-size:13px;font-weight:800;transition:all .25s;box-shadow:0 2px 8px rgba(0,0,0,.2);}
-.asist-badge.bp{background:var(--green);color:#fff;box-shadow:0 2px 12px rgba(46,204,113,.4);}
-.asist-badge.ba{background:var(--red);color:#fff;box-shadow:0 2px 12px rgba(231,76,60,.4);}
-.asist-badge.bt{background:#f39c12;color:#fff;box-shadow:0 2px 12px rgba(243,156,18,.4);}
+.asist-wrap{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;}
+.asist-badge{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:800;transition:all .3s cubic-bezier(.4,0,.2,1);}
+.asist-badge.bp{background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;box-shadow:0 3px 14px rgba(46,204,113,.45);}
+.asist-badge.ba{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;box-shadow:0 3px 14px rgba(231,76,60,.45);}
+.asist-badge.bt{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;box-shadow:0 3px 14px rgba(243,156,18,.45);}
 .asist-badge.bn{background:var(--bg3);color:var(--muted);border:1px dashed var(--border);box-shadow:none;font-size:11px;}
-.asist-group{display:inline-flex;gap:3px;background:var(--bg3);padding:3px;border-radius:12px;border:1px solid var(--border);}
-.abtn{padding:5px 13px;border:none;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;letter-spacing:.02em;position:relative;}
-.abtn:hover{transform:scale(1.06);filter:brightness(1.15);}
-.abtn:active{transform:scale(.93);}
-.abtn.ap{background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.2);}
-.abtn.ap:hover{background:var(--green);color:#fff;box-shadow:0 2px 10px rgba(46,204,113,.35);}
-.abtn.aa{background:rgba(231,76,60,.12);color:var(--red);border:1px solid rgba(231,76,60,.2);}
-.abtn.aa:hover{background:var(--red);color:#fff;box-shadow:0 2px 10px rgba(231,76,60,.35);}
-.abtn.at{background:rgba(243,156,18,.12);color:#f39c12;border:1px solid rgba(243,156,18,.2);}
-.abtn.at:hover{background:#f39c12;color:#fff;box-shadow:0 2px 10px rgba(243,156,18,.35);}
-.abtn.active.ap{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 2px 10px rgba(46,204,113,.35);}
-.abtn.active.aa{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 2px 10px rgba(231,76,60,.35);}
-.abtn.active.at{background:#f39c12;color:#fff;border-color:#f39c12;box-shadow:0 2px 10px rgba(243,156,18,.35);}
+.asist-group{display:inline-flex;gap:4px;background:var(--bg3);padding:4px;border-radius:14px;border:1px solid var(--border);}
+.abtn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:6px 14px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .25s cubic-bezier(.4,0,.2,1);letter-spacing:.02em;position:relative;overflow:hidden;min-height:32px;}
+.abtn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.14),transparent 60%);opacity:0;transition:opacity .25s;}
+.abtn:hover::before{opacity:1;}
+.abtn:active{transform:scale(.92);}
+.abtn.ap{background:rgba(46,204,113,.10);color:#2ecc71;border:1px solid rgba(46,204,113,.18);}
+.abtn.ap svg{fill:#2ecc71;opacity:.7;transition:fill .25s;}
+.abtn.ap:hover{background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;border-color:transparent;transform:translateY(-1px);box-shadow:0 6px 20px rgba(46,204,113,.35);}
+.abtn.ap:hover svg{fill:#fff;opacity:1;}
+.abtn.aa{background:rgba(231,76,60,.10);color:#e74c3c;border:1px solid rgba(231,76,60,.18);}
+.abtn.aa svg{fill:#e74c3c;opacity:.7;transition:fill .25s;}
+.abtn.aa:hover{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;border-color:transparent;transform:translateY(-1px);box-shadow:0 6px 20px rgba(231,76,60,.35);}
+.abtn.aa:hover svg{fill:#fff;opacity:1;}
+.abtn.at{background:rgba(243,156,18,.10);color:#f39c12;border:1px solid rgba(243,156,18,.18);}
+.abtn.at svg{fill:#f39c12;opacity:.7;transition:fill .25s;}
+.abtn.at:hover{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;border-color:transparent;transform:translateY(-1px);box-shadow:0 6px 20px rgba(243,156,18,.35);}
+.abtn.at:hover svg{fill:#fff;opacity:1;}
+.abtn.active.ap{background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(46,204,113,.4),inset 0 1px 0 rgba(255,255,255,.15);}
+.abtn.active.ap svg{fill:#fff;opacity:1;}
+.abtn.active.aa{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(231,76,60,.4),inset 0 1px 0 rgba(255,255,255,.15);}
+.abtn.active.aa svg{fill:#fff;opacity:1;}
+.abtn.active.at{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(243,156,18,.4),inset 0 1px 0 rgba(255,255,255,.15);}
+.abtn.active.at svg{fill:#fff;opacity:1;}
+@media(max-width:600px){
+  .asist-wrap{flex-direction:column;gap:4px;}
+  .asist-badge{min-width:28px;height:28px;font-size:11px;padding:0 8px;}
+  .asist-group{gap:3px;padding:3px;border-radius:10px;}
+  .abtn{gap:4px;padding:5px 10px;font-size:10px;border-radius:8px;min-height:28px;}
+  .abtn svg{width:12px;height:12px;}
+}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:center;justify-content:center;padding:16px;}
 .overlay.open{display:flex;}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px;width:100%;max-width:480px;max-height:82vh;overflow-y:auto;}
@@ -262,9 +279,9 @@ window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989
                             {% if e.asistencia=='P' %}P{% elif e.asistencia=='A' %}A{% elif e.asistencia=='T' %}T{% else %}—{% endif %}
                         </span>
                         <div class="asist-group">
-                            <button onclick="marcarAsist({{ e.id }},'P')" class="abtn ap {% if e.asistencia=='P' %}active{% endif %}">P</button>
-                            <button onclick="marcarAsist({{ e.id }},'A')" class="abtn aa {% if e.asistencia=='A' %}active{% endif %}">A</button>
-                            <button onclick="marcarAsist({{ e.id }},'T')" class="abtn at {% if e.asistencia=='T' %}active{% endif %}">T</button>
+                            <button onclick="marcarAsist({{ e.id }},'P')" class="abtn ap {% if e.asistencia=='P' %}active{% endif %}" aria-label="Presente"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span>P</span></button>
+                            <button onclick="marcarAsist({{ e.id }},'A')" class="abtn aa {% if e.asistencia=='A' %}active{% endif %}" aria-label="Ausente"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M18.3 5.71L12 12l6.3 6.29-1.42 1.42L12 13.41l-5.88 5.88-1.42-1.42L10.59 12 4.7 5.71 6.12 4.29 12 10.59l5.88-5.88z"/></svg><span>A</span></button>
+                            <button onclick="marcarAsist({{ e.id }},'T')" class="abtn at {% if e.asistencia=='T' %}active{% endif %}" aria-label="Tardanza"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span>T</span></button>
                         </div>
                     </div>
                 </td>
