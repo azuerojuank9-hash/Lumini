@@ -7,211 +7,35 @@
     <title>Lumini — Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root{--accent:#6c63ff;--accent2:#3498db;--accent-rgb:108,99,255;--bg:#08080f;--bg2:#11111e;--border:rgba(255,255,255,.06);--text:#f0f0f8;--muted:#8080a0;--sub:#55557a;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);}
         *{box-sizing:border-box;margin:0;padding:0;}
-
-        body{
-            font-family:'DM Sans',sans-serif;
-            min-height:100vh;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:20px;
-            background:#0b0b14;
-            overflow:hidden;
-            position:relative;
-        }
-
-        /* ── Fondo animado ── */
-        .bg-orb{
-            position:fixed;
-            border-radius:50%;
-            filter:blur(80px);
-            opacity:.18;
-            animation:float 8s ease-in-out infinite;
-            pointer-events:none;
-        }
-        .orb1{width:420px;height:420px;background:#6c63ff;top:-80px;left:-100px;animation-delay:0s;}
-        .orb2{width:300px;height:300px;background:#3498db;bottom:-60px;right:-60px;animation-delay:3s;}
-        .orb3{width:200px;height:200px;background:#9b59b6;top:50%;left:60%;animation-delay:5s;}
-
-        @keyframes float{
-            0%,100%{transform:translateY(0) scale(1);}
-            50%{transform:translateY(-30px) scale(1.05);}
-        }
-
-        /* ── Grid de puntos ── */
-        body::before{
-            content:'';
-            position:fixed;
-            inset:0;
-            background-image:radial-gradient(circle,rgba(108,99,255,.12) 1px,transparent 1px);
-            background-size:32px 32px;
-            pointer-events:none;
-        }
-
-        /* ── Caja principal ── */
-        .box{
-            background:rgba(20,20,30,.85);
-            border:1px solid rgba(108,99,255,.2);
-            border-radius:22px;
-            padding:44px 40px 40px;
-            width:100%;
-            max-width:400px;
-            text-align:center;
-            backdrop-filter:blur(20px);
-            box-shadow:0 0 0 1px rgba(255,255,255,.04),
-                       0 24px 60px rgba(0,0,0,.5),
-                       0 0 80px rgba(108,99,255,.08);
-            position:relative;
-            z-index:1;
-            animation:slideUp .5s cubic-bezier(.16,1,.3,1) both;
-        }
-
-        @keyframes slideUp{
-            from{opacity:0;transform:translateY(28px);}
-            to{opacity:1;transform:translateY(0);}
-        }
-
-        /* ── Icono escudo ── */
-        .shield{
-            width:58px;height:58px;
-            background:linear-gradient(135deg,rgba(108,99,255,.2),rgba(52,152,219,.15));
-            border:1px solid rgba(108,99,255,.3);
-            border-radius:16px;
-            display:flex;align-items:center;justify-content:center;
-            margin:0 auto 18px;
-            font-size:26px;
-        }
-
-        .logo{
-            font-family:'Syne',sans-serif;
-            font-size:1.9rem;
-            font-weight:800;
-            letter-spacing:7px;
-            background:linear-gradient(135deg,#fff 30%,#6c63ff);
-            -webkit-background-clip:text;
-            -webkit-text-fill-color:transparent;
-            background-clip:text;
-            margin-bottom:6px;
-        }
-
-        .sub{
-            color:#5a5a75;
-            font-size:11px;
-            letter-spacing:3px;
-            text-transform:uppercase;
-            margin-bottom:34px;
-        }
-
-        /* ── Alerta error ── */
-        .error{
-            display:flex;align-items:center;gap:8px;
-            background:rgba(231,76,60,.1);
-            border:1px solid rgba(231,76,60,.25);
-            color:#e74c3c;
-            padding:11px 14px;
-            border-radius:10px;
-            font-size:13px;
-            margin-bottom:20px;
-            text-align:left;
-            animation:shake .4s ease;
-        }
-
-        @keyframes shake{
-            0%,100%{transform:translateX(0);}
-            20%{transform:translateX(-6px);}
-            40%{transform:translateX(6px);}
-            60%{transform:translateX(-4px);}
-            80%{transform:translateX(4px);}
-        }
-
-        /* ── Input contraseña ── */
-        .input-wrap{
-            position:relative;
-            margin-bottom:16px;
-        }
-
-        .input-wrap input{
-            width:100%;
-            padding:13px 44px 13px 16px;
-            background:#0d0d18;
-            border:1.5px solid #2a2a38;
-            border-radius:10px;
-            color:#e8e8f0;
-            font-family:'DM Sans',sans-serif;
-            font-size:15px;
-            letter-spacing:3px;
-            transition:border-color .2s, box-shadow .2s;
-        }
-
-        .input-wrap input:focus{
-            outline:none;
-            border-color:#6c63ff;
-            box-shadow:0 0 0 3px rgba(108,99,255,.15);
-        }
-
-        .input-wrap input::placeholder{
-            letter-spacing:2px;
-            color:#3a3a50;
-        }
-
-        .eye-btn{
-            position:absolute;
-            right:13px;top:50%;
-            transform:translateY(-50%);
-            background:none;border:none;
-            color:#5a5a75;font-size:16px;
-            cursor:pointer;padding:4px;
-            transition:color .2s;
-        }
-        .eye-btn:hover{color:#9b95ff;}
-
-        /* ── Botón ingresar ── */
-        .btn{
-            width:100%;
-            padding:13px;
-            background:linear-gradient(135deg,#6c63ff,#3498db);
-            color:#fff;
-            border:none;
-            border-radius:10px;
-            font-family:'DM Sans',sans-serif;
-            font-size:14px;
-            font-weight:600;
-            cursor:pointer;
-            letter-spacing:.5px;
-            transition:opacity .2s, transform .15s, box-shadow .2s;
-            box-shadow:0 4px 20px rgba(108,99,255,.3);
-            position:relative;
-            overflow:hidden;
-        }
-
-        .btn:hover{
-            opacity:.92;
-            transform:translateY(-1px);
-            box-shadow:0 6px 28px rgba(108,99,255,.4);
-        }
-
+        body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg);overflow:hidden;position:relative;}
+        .bg-orb{position:fixed;border-radius:50%;filter:blur(100px);opacity:.12;animation:float 10s ease-in-out infinite;pointer-events:none;}
+        .orb1{width:450px;height:450px;background:var(--accent);top:-100px;left:-120px;animation-delay:0s;}
+        .orb2{width:300px;height:300px;background:var(--accent2);bottom:-80px;right:-80px;animation-delay:4s;}
+        .orb3{width:200px;height:200px;background:#9b59b6;top:55%;left:60%;animation-delay:7s;}
+        @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-28px) scale(1.04);}}
+        body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.1) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
+        .box{background:rgba(17,17,30,.88);border:1px solid rgba(var(--accent-rgb),.2);border-radius:22px;padding:44px 40px 40px;width:100%;max-width:400px;text-align:center;backdrop-filter:blur(20px);box-shadow:0 0 0 1px rgba(255,255,255,.04),0 24px 60px rgba(0,0,0,.5),0 0 80px rgba(var(--accent-rgb),.06);position:relative;z-index:1;animation:slideUp .5s cubic-bezier(.16,1,.3,1) both;}
+        @keyframes slideUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+        .shield{width:58px;height:58px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.2),rgba(52,152,219,.15));border:1px solid rgba(var(--accent-rgb),.3);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px;}
+        .logo{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:7px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+        .sub{color:var(--sub);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:34px;}
+        .error{display:flex;align-items:center;gap:8px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.25);color:#e74c3c;padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:20px;text-align:left;animation:shake .4s ease;}
+        @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
+        .input-wrap{position:relative;margin-bottom:16px;}
+        .input-wrap input{width:100%;padding:13px 44px 13px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rmd);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;letter-spacing:3px;transition:border-color var(--tr),box-shadow var(--tr);}
+        .input-wrap input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.15);}
+        .input-wrap input::placeholder{letter-spacing:2px;color:var(--sub);}
+        .eye-btn{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--sub);font-size:16px;cursor:pointer;padding:4px;transition:color var(--tr);}
+        .eye-btn:hover{color:var(--accent);}
+        .btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rmd);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:all var(--tr);box-shadow:0 4px 20px rgba(var(--accent-rgb),.3);position:relative;overflow:hidden;}
+        .btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(var(--accent-rgb),.4);}
         .btn:active{transform:translateY(0);}
-
-        /* Shimmer en el botón */
-        .btn::after{
-            content:'';
-            position:absolute;
-            inset:0;
-            background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
-            transform:translateX(-100%);
-            transition:transform .5s;
-        }
+        .btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .5s;}
         .btn:hover::after{transform:translateX(100%);}
-
-        /* ── Pie ── */
-        .footer{
-            margin-top:24px;
-            font-size:11px;
-            color:#333340;
-        }
-
-        .footer span{color:#4a4a60;}
+        .footer{margin-top:24px;font-size:11px;color:var(--sub);}
+        .footer span{color:var(--muted);}
     </style>
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>

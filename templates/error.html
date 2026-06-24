@@ -6,15 +6,26 @@
     <title>Lumini — Error {{ codigo }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', sans-serif; background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #e8e8f0; text-align: center; padding: 20px; }
-        .num { font-family: 'Syne', sans-serif; font-size: 6rem; font-weight: 800; background: linear-gradient(135deg, #fff 30%, #6c63ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
-        .msg { color: #7a7a90; margin-top: 12px; font-size: 15px; }
-        .brand { font-family: 'Syne', sans-serif; font-size: 1.1rem; letter-spacing: 5px; margin-bottom: 32px; background: linear-gradient(135deg, #fff 30%, #6c63ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        :root{--bg:#08080f;--accent:#6c63ff;--accent-rgb:108,99,255;--text:#f0f0f8;--muted:#8080a0;}
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--text);text-align:center;padding:20px;position:relative;overflow-x:hidden;}
+        body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(108,99,255,.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
+        .bg-orb{position:fixed;border-radius:50%;filter:blur(120px);opacity:.12;animation:float 10s ease-in-out infinite;pointer-events:none;}
+        .orb1{width:400px;height:400px;background:var(--accent);top:-100px;right:-100px;animation-delay:0s;}
+        .orb2{width:300px;height:300px;background:#3498db;bottom:-80px;left:-80px;animation-delay:5s;}
+        @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-20px) scale(1.03);}}
+        .wrap{position:relative;z-index:1;}
+        .num{font-family:'Syne',sans-serif;font-size:6rem;font-weight:800;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+        .msg{color:var(--muted);margin-top:12px;font-size:15px;}
+        .brand{font-family:'Syne',sans-serif;font-size:1.1rem;letter-spacing:5px;margin-bottom:32px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .back{display:inline-block;margin-top:24px;padding:10px 24px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:var(--muted);text-decoration:none;font-size:13px;transition:all .2s;}
+        .back:hover{background:rgba(255,255,255,.08);color:var(--text);}
     </style>
 </head>
 <body>
-<div>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="wrap">
     <div class="brand">LUMINI</div>
     <div class="num">{{ codigo }}</div>
     <div class="msg">{{ mensaje }}</div>
