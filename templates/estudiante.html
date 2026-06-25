@@ -1,15 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mi Boletín — {{ alumno.nombre }}</title>
+<title>Mi BoletÃ­n â€” {{ alumno.nombre }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#7C3AED' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#6D28D9' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#7C3AED') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--ok:#10B981;--warn:#F59E0B;--danger:#EF4444;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);}
 [data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
 .navbar{position:fixed;top:0;left:0;width:100%;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 24px;z-index:1000;backdrop-filter:blur(16px);}
 .navbar-left{display:flex;align-items:center;gap:12px;}
@@ -76,7 +76,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .obs-item{padding:11px;background:#0F172A;border-radius:var(--rsm);margin-bottom:6px;border:1px solid #1E293B;}
 .obs-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;}
 .obs-texto{font-size:13px;line-height:1.5;}
-.tabla-wrap{overflow-x:auto;}
+.tabla-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
 th{padding:8px;text-align:center;background:#0F172A;border:1px solid #1E293B;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;}
 th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:1px;}
@@ -96,7 +96,9 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 .mobile-nav a{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all var(--tr);}
 .mobile-nav a:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
 .mobile-nav a.logout{color:var(--red);}
-@media(max-width:600px){.hamburger{display:flex;}.est-header{flex-direction:column;text-align:center;}.est-prom{text-align:center;}.notas-grid{grid-template-columns:repeat(2,1fr);}.dias-grid{gap:5px;}.dia-chip{min-width:48px;padding:8px 8px;}.tabla-wrap{overflow-x:auto;}.celda{min-height:56px;padding:6px 4px;}.c-mat{font-size:13px;}}
+@media(max-width:600px){.hamburger{display:flex;}.est-header{flex-direction:column;text-align:center;}.est-prom{text-align:center;}.notas-grid{grid-template-columns:repeat(2,1fr);}.dias-grid{gap:5px;}.dia-chip{min-width:48px;padding:8px 8px;}.tabla-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}.celda{min-height:56px;padding:6px 4px;}.c-mat{font-size:13px;}}
+@media(max-width:480px){.est-prom .valor{font-size:1.6rem;}.brand-name{font-size:.85rem;letter-spacing:2px;}.brand-sub{font-size:8px;}.notas-grid{gap:5px;}}
+@media(max-width:375px){.navbar{padding:10px 12px;gap:6px;}.navbar-left{gap:8px;}.navbar-logo{width:32px;height:32px;}.brand-name{font-size:.75rem;letter-spacing:1px;}.brand-sub{display:none;}.nav-btn{font-size:12px;padding:6px 10px;min-height:36px;}.hamburger{width:36px;height:36px;}.notas-grid{grid-template-columns:1fr 1fr;gap:4px;}.eval-item{min-width:80px;}.nota-item{min-width:0;}.est-prom .valor{font-size:1.4rem;}.est-avatar{width:48px;height:48px;font-size:1.2rem;}.main{padding:16px 12px;}}
 </style>
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
@@ -118,15 +120,15 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
   </div>
   </a>
   <div style="display:flex;align-items:center;gap:8px;">
-    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menú" style="position:static;">☰</button>
-    <a href="/{{ slug }}/logout" class="nav-btn" id="logoutBtn">🚪 Salir</a>
-    <button onclick="toggleTheme()" style="margin-left:auto;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;" aria-label="Cambiar tema">🌙</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="MenÃº" style="position:static;">â˜°</button>
+    <a href="/{{ slug }}/logout" class="nav-btn" id="logoutBtn">ðŸšª Salir</a>
+    <button onclick="toggleTheme()" style="margin-left:auto;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;" aria-label="Cambiar tema">ðŸŒ™</button>
   </div>
 </nav>
 
 <nav class="mobile-nav" id="mobileNav">
-  <a href="/{{ slug }}/estudiante">📊 Mi Boletín</a>
-  <a href="/{{ slug }}/logout" class="logout">🚪 Cerrar sesión</a>
+  <a href="/{{ slug }}/estudiante">ðŸ“Š Mi BoletÃ­n</a>
+  <a href="/{{ slug }}/logout" class="logout">ðŸšª Cerrar sesiÃ³n</a>
 </nav>
 
 <div class="main">
@@ -135,23 +137,23 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
     <div class="est-avatar">{{ alumno.nombre[0] }}</div>
     <div class="est-info">
       <div class="est-nombre">{{ alumno.nombre }}</div>
-      <div class="est-meta">Curso {{ alumno.curso }} · {{ alumno.jornada }} · {{ colegio.nombre if colegio else slug }}</div>
+      <div class="est-meta">Curso {{ alumno.curso }} Â· {{ alumno.jornada }} Â· {{ colegio.nombre if colegio else slug }}</div>
     </div>
     <div class="est-prom">
       <div class="label">Promedio general</div>
       <div class="valor {% if promedio_general >= 3.5 %}ok{% elif promedio_general >= 3.0 %}warn{% else %}bad{% endif %}">
-        {{ promedio_general if promedio_general > 0 else '—' }}
+        {{ promedio_general if promedio_general > 0 else 'â€”' }}
       </div>
     </div>
   </div>
 
   <a href="/{{ slug }}/directora/boletin_pdf?aid={{ alumno.id }}"
      style="display:inline-block;margin-bottom:20px;padding:10px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-radius:var(--rsm);text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);transition:all var(--tr);">
-      📥 Descargar boletín PDF
+      ðŸ“¥ Descargar boletÃ­n PDF
   </a>
 
   <div class="card">
-    <div class="card-title">📅 Agenda de trabajos</div>
+    <div class="card-title">ðŸ“… Agenda de trabajos</div>
     {% if agenda %}
       {% for t in agenda %}
       <div class="ag-item">
@@ -159,7 +161,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
           <span style="font-weight:500">{{ t.titulo }}</span>
           <span class="ag-materia">{{ t.materia }}</span>
         </div>
-        <span class="ag-fecha">📆 {{ t.fecha }}</span>
+        <span class="ag-fecha">ðŸ“† {{ t.fecha }}</span>
       </div>
       {% endfor %}
     {% else %}
@@ -168,7 +170,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
   </div>
 
   <div class="card">
-    <div class="card-title">📊 Notas por materia</div>
+    <div class="card-title">ðŸ“Š Notas por materia</div>
     {% if notas_por_materia %}
       {% for materia, notas in notas_por_materia.items() %}
       {% set ev = evals_map.get(materia, {}) %}
@@ -180,7 +182,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
         <div class="materia-header">
           <div class="materia-nombre">{{ materia }}</div>
           <span class="prom-badge {% if prom >= 3.5 %}prom-ok{% elif prom >= 3.0 %}prom-warn{% else %}prom-bad{% endif %}">
-            {{ prom if prom > 0 else '—' }}
+            {{ prom if prom > 0 else 'â€”' }}
           </span>
         </div>
         {% if notas %}
@@ -196,10 +198,10 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
         {% if ev.get('evaluacion') is not none or ev.get('autoevaluacion') is not none %}
         <div class="eval-row">
           {% if ev.get('evaluacion') is not none %}
-          <div class="eval-item"><div class="eval-label">Evaluación docente</div><div class="eval-val">{{ ev.evaluacion }}</div></div>
+          <div class="eval-item"><div class="eval-label">EvaluaciÃ³n docente</div><div class="eval-val">{{ ev.evaluacion }}</div></div>
           {% endif %}
           {% if ev.get('autoevaluacion') is not none %}
-          <div class="eval-item"><div class="eval-label">Autoevaluación</div><div class="eval-val">{{ ev.autoevaluacion }}</div></div>
+          <div class="eval-item"><div class="eval-label">AutoevaluaciÃ³n</div><div class="eval-val">{{ ev.autoevaluacion }}</div></div>
           {% endif %}
         </div>
         {% endif %}
@@ -211,7 +213,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
   </div>
 
   <div class="card">
-    <div class="card-title">📆 Asistencia</div>
+    <div class="card-title">ðŸ“† Asistencia</div>
     <div class="asist-resumen">
       <div class="asist-stat-card st-ok">
         <div class="num">{{ asist_stats.P }}</div>
@@ -227,7 +229,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
       </div>
       <div class="asist-stat-card">
         <div class="num" style="color:var(--text)">{{ asist_stats.total }}</div>
-        <div class="lbl">Total días</div>
+        <div class="lbl">Total dÃ­as</div>
       </div>
     </div>
     {% if historial_meses %}
@@ -252,7 +254,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
   {% if observaciones %}
   <div class="card">
-    <div class="card-title">📝 Observaciones</div>
+    <div class="card-title">ðŸ“ Observaciones</div>
     {% set materias_obs = observaciones | map(attribute='materia') | unique | list %}
     {% for mat in materias_obs %}
     <div class="obs-materia-bloque">
@@ -271,23 +273,23 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
   {% endif %}
 
   <div class="card">
-    <div class="card-title">🗓 Horario — Curso {{ alumno.curso }}</div>
+    <div class="card-title">ðŸ—“ Horario â€” Curso {{ alumno.curso }}</div>
     <div class="tabla-wrap">
       <table>
         <thead>
           <tr>
             <th></th>
-            <th><span class="hl">1a Hora</span><span class="ht">6:10–7:05</span></th>
-            <th><span class="hl">2a Hora</span><span class="ht">7:05–8:00</span></th>
-            <th><span class="hl">3a Hora</span><span class="ht">8:00–8:55</span></th>
-            <th><span class="hl">4a Hora</span><span class="ht">8:55–9:50</span></th>
-            <th><span class="hl">Descanso</span><span class="ht">9:50–10:20</span></th>
-            <th><span class="hl">5a Hora</span><span class="ht">10:20–11:10</span></th>
-            <th><span class="hl">6a Hora</span><span class="ht">11:10–12:00</span></th>
+            <th><span class="hl">1a Hora</span><span class="ht">6:10â€“7:05</span></th>
+            <th><span class="hl">2a Hora</span><span class="ht">7:05â€“8:00</span></th>
+            <th><span class="hl">3a Hora</span><span class="ht">8:00â€“8:55</span></th>
+            <th><span class="hl">4a Hora</span><span class="ht">8:55â€“9:50</span></th>
+            <th><span class="hl">Descanso</span><span class="ht">9:50â€“10:20</span></th>
+            <th><span class="hl">5a Hora</span><span class="ht">10:20â€“11:10</span></th>
+            <th><span class="hl">6a Hora</span><span class="ht">11:10â€“12:00</span></th>
           </tr>
         </thead>
         <tbody>
-          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','Miércoles'),('Ju','Jueves'),('Vi','Viernes')] %}
+          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','MiÃ©rcoles'),('Ju','Jueves'),('Vi','Viernes')] %}
           {% for ds, df in dias_list %}
           <tr>
             <td class="dia-col">{{ ds }}</td>
@@ -296,16 +298,16 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
               {% set e = horario_map.get(k, {}) %}
               <td><div class="celda">
                 {% if e.get('materia') %}<div class="c-mat">{{ e.materia }}</div><div class="c-prof">{{ e.profesor }}</div>
-                {% else %}<div class="c-empty">·</div>{% endif %}
+                {% else %}<div class="c-empty">Â·</div>{% endif %}
               </div></td>
             {% endfor %}
-            <td class="des-col">☕</td>
+            <td class="des-col">â˜•</td>
             {% for f in ['5','6'] %}
               {% set k = df ~ '_' ~ f %}
               {% set e = horario_map.get(k, {}) %}
               <td><div class="celda">
                 {% if e.get('materia') %}<div class="c-mat">{{ e.materia }}</div><div class="c-prof">{{ e.profesor }}</div>
-                {% else %}<div class="c-empty">·</div>{% endif %}
+                {% else %}<div class="c-empty">Â·</div>{% endif %}
               </div></td>
             {% endfor %}
           </tr>

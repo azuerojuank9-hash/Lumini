@@ -1,17 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel Directora — {{ colegio.nombre if colegio else slug }}</title>
+<title>Panel Directora â€” {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#7C3AED' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#6D28D9' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#7C3AED') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);--sidebar:240px;}
 [data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .sidebar-logo{padding:20px 18px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
 .sidebar-logo img{height:38px;width:38px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
 .sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -42,7 +42,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .nbtn-ghost:hover{background:rgba(255,255,255,.08);}
 .nbtn-red{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);}
 .nbtn-green{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);}
-.tw{overflow-x:auto;}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 table{border-collapse:collapse;min-width:100%;font-size:12px;}
 th{padding:8px 8px;text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #1E293B;white-space:nowrap;background:#0F172A;position:sticky;top:0;}
 th.tnombre{text-align:left;min-width:150px;}
@@ -64,7 +64,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 .email-save-btn:hover{background:rgba(var(--accent-rgb),.35);}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
 .overlay.open{display:flex;}
-.modal{background:rgba(15,23,42,.96);border:1px solid var(--border);border-radius:var(--rlg);padding:26px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto;backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
+.modal{background:rgba(15,23,42,.96);border:1px solid var(--border);border-radius:var(--rlg);padding:26px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .flabel{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;margin-top:12px;}
 .finput{padding:9px 12px;background:#0F172A;border:1.5px solid #1E293B;border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;width:100%;transition:border-color var(--tr);}
@@ -90,7 +90,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
   .email-wrap{flex-wrap:wrap;}
   tr:hover td{background:none;}
 }
-</style>
+@media(max-width:375px){.main{padding:16px 8px;}.page-title{font-size:1.1rem;}.card-head{padding:10px 12px;}.card-title{font-size:12px;}.card-body{padding:12px;}.nbtn{font-size:12px;min-height:40px;padding:8px 12px;}.periodo-tabs{gap:4px;}.periodo-tab{font-size:11px;padding:4px 10px;}.hamburger{width:36px;height:36px;}.email-input{font-size:15px;padding:8px 10px;}.finput{font-size:15px;padding:8px 10px;}.stats{gap:6px;}}
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
 </head>
@@ -108,36 +108,36 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
         {% endif %}
         <div>
             <div class="sidebar-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
-            <div class="sidebar-brand-sub">👩‍💼 {{ directora.nombre }} · Curso {{ curso }} · {{ jornada }}</div>
+            <div class="sidebar-brand-sub">ðŸ‘©â€ðŸ’¼ {{ directora.nombre }} Â· Curso {{ curso }} Â· {{ jornada }}</div>
         </div>
     </div>
     </a>
     <nav class="sidebar-nav">
-        <a href="{{ url_for('directora_panel', slug=slug) }}" class="sidebar-link active"><span class="icon">📊</span> Dashboard</a>
-        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="sidebar-link"><span class="icon">📄</span> Boletín PDF</a>
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema">🌙 Cambiar tema</button>
-        <a href="{{ url_for('directora_logout', slug=slug) }}" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon">🚪</span> Cerrar sesión</a>
+        <a href="{{ url_for('directora_panel', slug=slug) }}" class="sidebar-link active"><span class="icon">ðŸ“Š</span> Dashboard</a>
+        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="sidebar-link"><span class="icon">ðŸ“„</span> BoletÃ­n PDF</a>
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema">ðŸŒ™ Cambiar tema</button>
+        <a href="{{ url_for('directora_logout', slug=slug) }}" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon">ðŸšª</span> Cerrar sesiÃ³n</a>
     </nav>
     <div class="sidebar-footer" style="display:flex;gap:6px;flex-wrap:wrap;">
-        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="nbtn nbtn-pri" style="flex:1;text-align:center;justify-content:center;">📄 PDF todos</a>
-        <button onclick="abrirModalRegistro()" class="nbtn nbtn-ghost" style="flex:1;text-align:center;justify-content:center;">➕ Crear directora</button>
+        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="nbtn nbtn-pri" style="flex:1;text-align:center;justify-content:center;">ðŸ“„ PDF todos</a>
+        <button onclick="abrirModalRegistro()" class="nbtn nbtn-ghost" style="flex:1;text-align:center;justify-content:center;">âž• Crear directora</button>
     </div>
 </aside>
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
 
     <div class="periodo-tabs">
         <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Periodo:</span>
         {% for p in range(1, num_periodos+1) %}
-        <a href="?periodo={{ p }}" class="ptab {% if p==periodo %}active{% endif %}">{{ p }}° Periodo</a>
+        <a href="?periodo={{ p }}" class="ptab {% if p==periodo %}active{% endif %}">{{ p }}Â° Periodo</a>
         {% endfor %}
     </div>
 
     <div class="card">
         <div class="card-head">
-            <span class="card-title">📋 Estado de notas — Periodo {{ periodo }}</span>
+            <span class="card-title">ðŸ“‹ Estado de notas â€” Periodo {{ periodo }}</span>
             <span style="font-size:11px;color:var(--muted);">{{ profesores|selectattr('enviado')|list|length }}/{{ profesores|length }} profesores enviaron notas</span>
         </div>
         <div class="card-body">
@@ -145,26 +145,26 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
             <div class="prof-chips">
                 {% for p in profesores %}
                 <span class="pchip {% if p.enviado %}pchip-ok{% else %}pchip-pend{% endif %}">
-                    {% if p.enviado %}✅{% else %}⏳{% endif %} {{ p.materia }} · {{ p.nombre }}
+                    {% if p.enviado %}âœ…{% else %}â³{% endif %} {{ p.materia }} Â· {{ p.nombre }}
                 </span>
                 {% endfor %}
             </div>
             {% else %}
-            <p style="color:var(--muted);font-size:13px;">Ningún profesor ha registrado actividades en el periodo {{ periodo }}.</p>
+            <p style="color:var(--muted);font-size:13px;">NingÃºn profesor ha registrado actividades en el periodo {{ periodo }}.</p>
             {% endif %}
         </div>
     </div>
 
     <div class="actions">
-        <button onclick="enviarCorreosTodos()" class="nbtn nbtn-green">📧 Enviar boletines por correo (todos)</button>
-        <span style="font-size:11px;color:var(--muted);">Solo se envía a estudiantes con correo registrado.</span>
+        <button onclick="enviarCorreosTodos()" class="nbtn nbtn-green">ðŸ“§ Enviar boletines por correo (todos)</button>
+        <span style="font-size:11px;color:var(--muted);">Solo se envÃ­a a estudiantes con correo registrado.</span>
     </div>
 
     <div class="card">
         <div class="card-head">
-            <span class="card-title">📊 Notas consolidadas — {{ curso }} · {{ jornada }} · Periodo {{ periodo }}</span>
+            <span class="card-title">ðŸ“Š Notas consolidadas â€” {{ curso }} Â· {{ jornada }} Â· Periodo {{ periodo }}</span>
             <div style="display:flex;gap:8px;font-size:11px;">
-                <span class="tag-apr">≥ 3.0 Aprobado</span>
+                <span class="tag-apr">â‰¥ 3.0 Aprobado</span>
                 <span class="tag-rep">&lt; 3.0 Reprobado</span>
             </div>
         </div>
@@ -175,7 +175,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                         <th class="tnombre">Estudiante</th>
                         {% for mat in lista_materias %}
                         <th colspan="4" style="color:var(--accent);border-left:2px solid rgba(var(--accent-rgb),.2);">
-                            {{ mat }}{% if mat not in materias_enviadas %} <span style="color:var(--yellow);font-size:9px;">⏳</span>{% endif %}
+                            {{ mat }}{% if mat not in materias_enviadas %} <span style="color:var(--yellow);font-size:9px;">â³</span>{% endif %}
                         </th>
                         {% endfor %}
                         <th>Prom.</th><th>Estado</th>
@@ -186,8 +186,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                         <th></th>
                         {% for mat in lista_materias %}
                         <th style="font-size:9px;color:#64748B;border-left:2px solid rgba(var(--accent-rgb),.15);" title="Actividades 65%">Act</th>
-                        <th style="font-size:9px;color:#64748B;" title="Evaluación 25%">Eval</th>
-                        <th style="font-size:9px;color:#64748B;" title="Autoevaluación 10%">Auto</th>
+                        <th style="font-size:9px;color:#64748B;" title="EvaluaciÃ³n 25%">Eval</th>
+                        <th style="font-size:9px;color:#64748B;" title="AutoevaluaciÃ³n 10%">Auto</th>
                         <th style="font-size:9px;color:var(--muted);font-weight:700;" title="Nota final">Final</th>
                         {% endfor %}
                         <th></th><th></th><th></th><th></th>
@@ -199,28 +199,28 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                     <td class="tnomcell">{{ fila.nombre }}</td>
                     {% for mat in lista_materias %}
                     {% set d = fila.materias.get(mat, {}) %}
-                    <td style="border-left:2px solid rgba(var(--accent-rgb),.1);" class="nota-none">{{ d.act if d.act is not none else '—' }}</td>
-                    <td class="nota-none">{{ d.eval if d.eval is not none else '—' }}</td>
-                    <td class="nota-none">{{ d.auto if d.auto is not none else '—' }}</td>
-                    <td class="{% if d.final is not none %}{% if d.final >= 3.0 %}nota-ok{% else %}nota-mal{% endif %}{% else %}nota-none{% endif %}">{{ d.final if d.final is not none else '—' }}</td>
+                    <td style="border-left:2px solid rgba(var(--accent-rgb),.1);" class="nota-none">{{ d.act if d.act is not none else 'â€”' }}</td>
+                    <td class="nota-none">{{ d.eval if d.eval is not none else 'â€”' }}</td>
+                    <td class="nota-none">{{ d.auto if d.auto is not none else 'â€”' }}</td>
+                    <td class="{% if d.final is not none %}{% if d.final >= 3.0 %}nota-ok{% else %}nota-mal{% endif %}{% else %}nota-none{% endif %}">{{ d.final if d.final is not none else 'â€”' }}</td>
                     {% endfor %}
                     <td class="prom-cell {% if fila.promedio is not none %}{% if fila.promedio >= 3.0 %}nota-ok{% else %}nota-mal{% endif %}{% else %}nota-none{% endif %}">
-                        {{ fila.promedio if fila.promedio is not none else '—' }}
+                        {{ fila.promedio if fila.promedio is not none else 'â€”' }}
                     </td>
                     <td>
                         {% if fila.promedio is not none %}
                         <span class="{% if fila.promedio >= 3.0 %}tag-apr{% else %}tag-rep{% endif %}">{% if fila.promedio >= 3.0 %}Aprobado{% else %}Reprobado{% endif %}</span>
-                        {% else %}<span style="color:#64748B;font-size:11px;">—</span>{% endif %}
+                        {% else %}<span style="color:#64748B;font-size:11px;">â€”</span>{% endif %}
                     </td>
                     <td>
                         <div class="email-wrap">
                             <input class="email-input" type="email" id="email-{{ fila.id }}" value="{{ fila.email }}" placeholder="correo@acudiente.com" onkeydown="if(event.key==='Enter')guardarEmail({{ fila.id }})">
-                            <button class="email-save-btn" onclick="guardarEmail({{ fila.id }})">💾</button>
+                            <button class="email-save-btn" onclick="guardarEmail({{ fila.id }})">ðŸ’¾</button>
                         </div>
                     </td>
                     <td style="white-space:nowrap;">
-                        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo, aid=fila.id) }}" title="Descargar PDF" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(var(--accent-rgb),.15);color:var(--accent);text-decoration:none;font-weight:600;margin-right:4px;">📄</a>
-                        <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre }}')" title="Enviar boletín" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);cursor:pointer;font-weight:600;">📧</button>
+                        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo, aid=fila.id) }}" title="Descargar PDF" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(var(--accent-rgb),.15);color:var(--accent);text-decoration:none;font-weight:600;margin-right:4px;">ðŸ“„</a>
+                        <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre }}')" title="Enviar boletÃ­n" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);cursor:pointer;font-weight:600;">ðŸ“§</button>
                     </td>
                 </tr>
                 {% else %}
@@ -230,10 +230,10 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
             </table>
         </div>
         <div style="font-size:11px;color:#64748B;padding:12px 16px;">
-            <strong style="color:var(--muted);">Ponderación:</strong>
-            Act = Actividades <strong style="color:var(--accent);">65%</strong> ·
-            Eval = Evaluación docente <strong style="color:var(--accent);">25%</strong> ·
-            Auto = Autoevaluación <strong style="color:var(--accent);">10%</strong>
+            <strong style="color:var(--muted);">PonderaciÃ³n:</strong>
+            Act = Actividades <strong style="color:var(--accent);">65%</strong> Â·
+            Eval = EvaluaciÃ³n docente <strong style="color:var(--accent);">25%</strong> Â·
+            Auto = AutoevaluaciÃ³n <strong style="color:var(--accent);">10%</strong>
         </div>
     </div>
 </div>
@@ -241,8 +241,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 <div class="overlay" id="modalRegistro" onclick="if(event.target===this)cerrarModalRegistro()">
     <div class="modal">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-            <h3 style="font-size:15px;">👩‍💼 Crear cuenta de directora</h3>
-            <button onclick="cerrarModalRegistro()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
+            <h3 style="font-size:15px;">ðŸ‘©â€ðŸ’¼ Crear cuenta de directora</h3>
+            <button onclick="cerrarModalRegistro()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">âœ•</button>
         </div>
         <div id="reg-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#EF4444;padding:9px 12px;border-radius:7px;font-size:12px;margin-bottom:10px;"></div>
         <div id="reg-ok"    style="display:none;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);color:#10B981;padding:9px 12px;border-radius:7px;font-size:12px;margin-bottom:10px;"></div>
@@ -250,19 +250,19 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
         <input class="finput" type="text"     id="reg-nombre"   placeholder="Nombre de la directora">
         <label class="flabel">Usuario</label>
         <input class="finput" type="text"     id="reg-usuario"  placeholder="ej: directora_10a">
-        <label class="flabel">Contraseña</label>
-        <input class="finput" type="password" id="reg-password" placeholder="Mínimo 6 caracteres">
+        <label class="flabel">ContraseÃ±a</label>
+        <input class="finput" type="password" id="reg-password" placeholder="MÃ­nimo 6 caracteres">
         <label class="flabel">Curso asignado</label>
         <input class="finput" type="text"     id="reg-curso"    placeholder="ej: 1103, 10B, 11C...">
         <label class="flabel">Correo (opcional)</label>
         <input class="finput" type="email"    id="reg-email"    placeholder="correo@ejemplo.com" style="margin-bottom:18px;">
         <button onclick="crearDirectora()" style="width:100%;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);">
-            Crear cuenta →
+            Crear cuenta â†’
         </button>
     </div>
 </div>
 
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">â†‘</button>
 <div class="toast" id="toast"></div>
 
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
@@ -288,24 +288,24 @@ function guardarEmail(aid){
     const inp=document.getElementById('email-'+aid);
     const f=new FormData(); f.append('aid',aid); f.append('email',inp.value.trim()); f.append('_csrf_token', getCsrf());
     fetch(`/${SLUG}/directora/guardar_email`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{
-        if(d.ok){inp.classList.add('saved');setTimeout(()=>inp.classList.remove('saved'),1500);showToast('✅ Correo guardado');}
-    }).catch(()=>showToast('❌ Error al guardar.',false));
+        if(d.ok){inp.classList.add('saved');setTimeout(()=>inp.classList.remove('saved'),1500);showToast('âœ… Correo guardado');}
+    }).catch(()=>showToast('âŒ Error al guardar.',false));
 }
 function enviarCorreosTodos(){
-    if(!confirm('¿Enviar boletines a todos los estudiantes con correo registrado?')) return;
-    const btn=event.target; btn.disabled=true; btn.textContent='⏳ Enviando...';
+    if(!confirm('Â¿Enviar boletines a todos los estudiantes con correo registrado?')) return;
+    const btn=event.target; btn.disabled=true; btn.textContent='â³ Enviando...';
     const f=new FormData(); f.append('periodo',PERIODO); f.append('_csrf_token', getCsrf());
     fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{
-        showToast(d.mensaje,d.ok); btn.disabled=false; btn.textContent='📧 Enviar boletines por correo (todos)';
-    }).catch(()=>{showToast('❌ Error al enviar.',false);btn.disabled=false;btn.textContent='📧 Enviar boletines por correo (todos)';});
+        showToast(d.mensaje,d.ok); btn.disabled=false; btn.textContent='ðŸ“§ Enviar boletines por correo (todos)';
+    }).catch(()=>{showToast('âŒ Error al enviar.',false);btn.disabled=false;btn.textContent='ðŸ“§ Enviar boletines por correo (todos)';});
 }
 function enviarCorreoUno(aid,nombre){
     const emailInp=document.getElementById('email-'+aid);
     const email=emailInp?emailInp.value.trim():'';
-    if(!email){showToast('⚠️ Primero guarda el correo del acudiente.',false);emailInp&&emailInp.focus();return;}
-    if(!confirm(`¿Enviar boletín de ${nombre} a ${email}?`)) return;
+    if(!email){showToast('âš ï¸ Primero guarda el correo del acudiente.',false);emailInp&&emailInp.focus();return;}
+    if(!confirm(`Â¿Enviar boletÃ­n de ${nombre} a ${email}?`)) return;
     const f=new FormData(); f.append('periodo',PERIODO); f.append('aid',aid); f.append('_csrf_token', getCsrf());
-    fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>showToast(d.mensaje,d.ok)).catch(()=>showToast('❌ Error al enviar.',false));
+    fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>showToast(d.mensaje,d.ok)).catch(()=>showToast('âŒ Error al enviar.',false));
 }
 function abrirModalRegistro(){
     document.getElementById('modalRegistro').classList.add('open');
@@ -322,13 +322,13 @@ function crearDirectora(){
     const email=document.getElementById('reg-email').value.trim();
     const errDiv=document.getElementById('reg-error'); const okDiv=document.getElementById('reg-ok');
     errDiv.style.display=okDiv.style.display='none';
-    if(!nombre||!usuario||!password||!curso){errDiv.textContent='⚠️ Completa todos los campos.';errDiv.style.display='block';return;}
-    if(password.length<6){errDiv.textContent='⚠️ Mínimo 6 caracteres.';errDiv.style.display='block';return;}
+    if(!nombre||!usuario||!password||!curso){errDiv.textContent='âš ï¸ Completa todos los campos.';errDiv.style.display='block';return;}
+    if(password.length<6){errDiv.textContent='âš ï¸ MÃ­nimo 6 caracteres.';errDiv.style.display='block';return;}
     const f=new FormData(); f.append('nombre',nombre);f.append('usuario',usuario);f.append('password',password);f.append('curso',curso);f.append('email',email);f.append('_csrf_token', getCsrf());
     fetch(`/${SLUG}/directora/crear_desde_panel`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{
-        if(d.ok){okDiv.textContent=`✅ ${d.mensaje}`;okDiv.style.display='block';['reg-nombre','reg-usuario','reg-password','reg-curso','reg-email'].forEach(id=>document.getElementById(id).value='');}
-        else{errDiv.textContent=`⚠️ ${d.mensaje}`;errDiv.style.display='block';}
-    }).catch(()=>{errDiv.textContent='⚠️ Error de conexión.';errDiv.style.display='block';});
+        if(d.ok){okDiv.textContent=`âœ… ${d.mensaje}`;okDiv.style.display='block';['reg-nombre','reg-usuario','reg-password','reg-curso','reg-email'].forEach(id=>document.getElementById(id).value='');}
+        else{errDiv.textContent=`âš ï¸ ${d.mensaje}`;errDiv.style.display='block';}
+    }).catch(()=>{errDiv.textContent='âš ï¸ Error de conexiÃ³n.';errDiv.style.display='block';});
 }
 function addDataLabels(){
     document.querySelectorAll('table').forEach(function(t){

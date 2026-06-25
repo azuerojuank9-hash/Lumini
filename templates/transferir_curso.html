@@ -1,17 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — Transferir Curso</title>
+<title>Lumini â€” Transferir Curso</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:240px;--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);}
 [data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .sidebar-logo{padding:20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
 .sidebar-logo img{height:38px;width:38px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
 .sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -59,6 +59,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .hamburger:hover{background:var(--bg3);border-color:var(--accent);}
 .sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);}
 @media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 12px;}}
+@media(max-width:480px){.card-body{padding:14px 12px;}.card-head{padding:12px 14px;}.field select,.field input{font-size:15px;padding:10px 12px;}.btn-submit{font-size:14px;min-height:44px;padding:11px;}.periodo-check{padding:7px 10px;}.periodo-check span{font-size:12px;}.main{padding:16px 10px;}.page-title{font-size:1.1rem;}}
+@media(max-width:375px){.card-body{padding:12px 10px;}.field label{font-size:9px;}.field select,.field input{font-size:14px;padding:8px 10px;}.btn-submit{font-size:13px;min-height:42px;padding:10px;}.btn-back{font-size:13px;padding:10px;}}
 </style>
 </head>
 <body>
@@ -75,34 +77,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         {% endif %}
         <div>
             <div class="sidebar-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
-            <div class="sidebar-brand-sub">{{ profesor.nombre }} · {{ materia }}</div>
+            <div class="sidebar-brand-sub">{{ profesor.nombre }} Â· {{ materia }}</div>
         </div>
     </div>
     </a>
     <nav class="sidebar-nav">
-        <a href="/{{ slug }}/" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
-        <a href="/{{ slug }}/horarios" class="sidebar-link"><span class="icon">🗓</span> Horarios</a>
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon">⚙️</span> Mi Perfil</a>
-        <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon">📦</span> Archivados</a>
+        <a href="/{{ slug }}/" class="sidebar-link"><span class="icon">ðŸ“Š</span> Dashboard</a>
+        <a href="/{{ slug }}/horarios" class="sidebar-link"><span class="icon">ðŸ—“</span> Horarios</a>
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon">âš™ï¸</span> Mi Perfil</a>
+        <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon">ðŸ“¦</span> Archivados</a>
     </nav>
     <div class="sidebar-footer">
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema">🌙 Cambiar tema</button>
-        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon">🚪</span> Cerrar sesión</a>
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema">ðŸŒ™ Cambiar tema</button>
+        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon">ðŸšª</span> Cerrar sesiÃ³n</a>
     </div>
 </aside>
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
 
-    <div class="page-title">🔄 Transferir Curso</div>
+    <div class="page-title">ðŸ”„ Transferir Curso</div>
     <p class="page-sub">Pasa el historial completo de un curso a otro profesor de la misma materia</p>
 
     {% if error %}
-        {% if '✅' in error %}
+        {% if 'âœ…' in error %}
         <div class="alert alert-success">{{ error }}</div>
         {% else %}
-        <div class="alert alert-error">⚠️ {{ error }}</div>
+        <div class="alert alert-error">âš ï¸ {{ error }}</div>
         {% endif %}
     {% endif %}
     {% if exito %}
@@ -110,14 +112,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     {% endif %}
 
     <div class="info-badge">
-        📚 Materia: <strong>{{ materia }}</strong> &nbsp;·&nbsp; 🕐 Jornada: <strong>{{ jornada }}</strong>
+        ðŸ“š Materia: <strong>{{ materia }}</strong> &nbsp;Â·&nbsp; ðŸ• Jornada: <strong>{{ jornada }}</strong>
     </div>
 
     {% if not profesores_destino %}
     <div class="card">
         <div class="card-body">
             <div class="empty-state">
-                <div class="icon">👥</div>
+                <div class="icon">ðŸ‘¥</div>
                 <p>No hay otros profesores activos con la materia <strong>{{ materia }}</strong> en la jornada <strong>{{ jornada }}</strong> para recibir el curso.<br><br>El nuevo profesor debe registrarse primero y tener esta materia asignada.</p>
             </div>
         </div>
@@ -127,8 +129,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="card">
         <div class="card-body">
             <div class="empty-state">
-                <div class="icon">📂</div>
-                <p>No tienes cursos asignados en <strong>{{ materia }}</strong> · <strong>{{ jornada }}</strong>.</p>
+                <div class="icon">ðŸ“‚</div>
+                <p>No tienes cursos asignados en <strong>{{ materia }}</strong> Â· <strong>{{ jornada }}</strong>.</p>
             </div>
         </div>
     </div>
@@ -136,16 +138,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     {% else %}
 
     <div class="card">
-        <div class="card-head"><span class="card-title">ℹ️ ¿Cómo funciona?</span></div>
+        <div class="card-head"><span class="card-title">â„¹ï¸ Â¿CÃ³mo funciona?</span></div>
         <div class="card-body">
-            <div class="step"><div class="step-num">1</div><div class="step-text">Selecciona el <strong>curso</strong> que quieres transferir y el <strong>profesor</strong> que lo recibirá.</div></div>
+            <div class="step"><div class="step-num">1</div><div class="step-text">Selecciona el <strong>curso</strong> que quieres transferir y el <strong>profesor</strong> que lo recibirÃ¡.</div></div>
             <div class="step"><div class="step-num">2</div><div class="step-text">Elige los <strong>periodos</strong> cuyas actividades, notas y evaluaciones quieres pasar al nuevo profesor.</div></div>
-            <div class="step"><div class="step-num">3</div><div class="step-text">El nuevo profesor verá todo el historial como propio. El curso <strong>se quitará de tu lista</strong>.</div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-text">El nuevo profesor verÃ¡ todo el historial como propio. El curso <strong>se quitarÃ¡ de tu lista</strong>.</div></div>
         </div>
     </div>
 
     <div class="card">
-        <div class="card-head"><span class="card-title">📋 Datos de la transferencia</span></div>
+        <div class="card-head"><span class="card-title">ðŸ“‹ Datos de la transferencia</span></div>
         <div class="card-body">
             <form method="POST">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
@@ -177,7 +179,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
                         <label class="periodo-check checked" id="label-p{{ i }}">
                             <input type="checkbox" name="periodos" value="{{ i }}" checked
                                    onchange="toggleChecked(this,'label-p{{ i }}');actualizarResumen()">
-                            <span>{{ i }}° Periodo</span>
+                            <span>{{ i }}Â° Periodo</span>
                         </label>
                         {% endfor %}
                     </div>
@@ -189,14 +191,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
                 </div>
 
                 <div class="alert alert-warn" style="margin-bottom:16px;">
-                    ⚠️ Esta acción <strong>no se puede deshacer</strong>. Todas las actividades, notas y evaluaciones de los periodos seleccionados quedarán bajo el nuevo profesor.
+                    âš ï¸ Esta acciÃ³n <strong>no se puede deshacer</strong>. Todas las actividades, notas y evaluaciones de los periodos seleccionados quedarÃ¡n bajo el nuevo profesor.
                 </div>
 
                 <button type="submit" class="btn-submit" onclick="return confirmarTransferencia()">
-                    🔄 Transferir curso
+                    ðŸ”„ Transferir curso
                 </button>
             </form>
-            <a href="/{{ slug }}" class="btn-back">← Volver al inicio</a>
+            <a href="/{{ slug }}" class="btn-back">â† Volver al inicio</a>
         </div>
     </div>
     {% endif %}
@@ -217,11 +219,11 @@ function actualizarResumen(){
     const curso = document.getElementById('selectCurso').value;
     const prof  = document.getElementById('selectProf');
     const profNombre = prof.options[prof.selectedIndex]?.text || '';
-    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'°');
+    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'Â°');
     const resumen  = document.getElementById('resumen');
     const resumenT = document.getElementById('resumenTexto');
     if(curso && profNombre && periodos.length){
-        resumenT.innerHTML = `📋 Vas a transferir el curso <strong>${curso}</strong> (periodos ${periodos.join(', ')}) al profesor <strong>${profNombre}</strong>.`;
+        resumenT.innerHTML = `ðŸ“‹ Vas a transferir el curso <strong>${curso}</strong> (periodos ${periodos.join(', ')}) al profesor <strong>${profNombre}</strong>.`;
         resumen.style.display = 'block';
     } else {
         resumen.style.display = 'none';
@@ -232,12 +234,12 @@ function confirmarTransferencia(){
     const curso = document.getElementById('selectCurso').value;
     const prof  = document.getElementById('selectProf');
     const profNombre = prof.options[prof.selectedIndex]?.text || '';
-    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'°');
+    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'Â°');
     if(!curso || !profNombre || !periodos.length){
         alert('Por favor completa todos los campos y selecciona al menos un periodo.');
         return false;
     }
-    return confirm(`¿Confirmas transferir el curso ${curso} (periodos ${periodos.join(', ')}) a ${profNombre}?\n\nEsta acción no se puede deshacer.`);
+    return confirm(`Â¿Confirmas transferir el curso ${curso} (periodos ${periodos.join(', ')}) a ${profNombre}?\n\nEsta acciÃ³n no se puede deshacer.`);
 }
 </script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>

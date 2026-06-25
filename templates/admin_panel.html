@@ -1,17 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — Panel Admin</title>
+<title>Lumini â€” Panel Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);--sidebar:240px;}
 [data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .sidebar-logo{padding:20px 18px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
 .sidebar-logo img{height:38px;width:38px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
 .sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -61,10 +61,10 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 .stat-val{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;}
 .logo-preview{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #1E293B;}
 .actions-cell{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
-.tw{overflow-x:auto;}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
 .overlay.open{display:flex;}
-.modal{background:rgba(15,23,42,.96);border:1px solid var(--border);border-radius:var(--rlg);padding:24px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
+.modal{background:rgba(15,23,42,.96);border:1px solid var(--border);border-radius:var(--rlg);padding:24px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .modal-title{font-size:15px;font-weight:600;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
 .close-btn{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;}
@@ -89,6 +89,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
   .btn-sm{min-height:44px;font-size:13px;display:block;width:100%;}
   tr:hover td{background:none;}
 }
+@media(max-width:375px){.main{padding:16px 8px;}.section-title{font-size:14px;}.card{padding:10px;}.card-head{padding:10px 12px;}.card-title{font-size:12px;}.grid-2,.grid-3{gap:8px;}.field input,.field select{font-size:14px;padding:9px 10px;}.field label{font-size:9px;}.btn-sm{font-size:12px;min-height:40px;padding:8px 10px;}.hamburger{width:36px;height:36px;}.stats-row{gap:6px;}.stat{min-width:100px;padding:10px;}.stat .num{font-size:1.2rem;}.actions-cell{gap:3px;}}
 .venc-ok{color:var(--green);}
 .venc-warn{color:var(--yellow);}
 .venc-danger{color:var(--red);font-weight:700;}
@@ -121,23 +122,23 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
         <img src="/static/lumini_logo.png" alt="Lumini">
         <div>
             <div class="sidebar-brand">LUMINI</div>
-            <div class="sidebar-brand-sub">Panel de Administración</div>
+            <div class="sidebar-brand-sub">Panel de AdministraciÃ³n</div>
         </div>
     </div>
     </a>
     <nav class="sidebar-nav">
-        <a href="/admin" class="sidebar-link active"><span class="icon">📊</span> Dashboard</a>
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema">🌙 Cambiar tema</button>
-        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon">🚪</span> Cerrar sesión</a>
+        <a href="/admin" class="sidebar-link active"><span class="icon">ðŸ“Š</span> Dashboard</a>
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema">ðŸŒ™ Cambiar tema</button>
+        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon">ðŸšª</span> Cerrar sesiÃ³n</a>
     </nav>
 </aside>
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
 
-{% if error %}<div class="alert alert-error">⚠️ {{ error }}</div>{% endif %}
-{% if exito %}<div class="alert alert-success">✅ {{ exito }}</div>{% endif %}
+{% if error %}<div class="alert alert-error">âš ï¸ {{ error }}</div>{% endif %}
+{% if exito %}<div class="alert alert-success">âœ… {{ exito }}</div>{% endif %}
 
 {% set por_vencer = [] %}
 {% for c in colegios %}
@@ -151,7 +152,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 {% if por_vencer %}
 <div class="alert alert-warning">
-  ⚠️ <strong>Colegios por vencer pronto:</strong>
+  âš ï¸ <strong>Colegios por vencer pronto:</strong>
   {% for c in por_vencer %}
     <strong>{{ c.nombre }}</strong> vence el {{ c.vencimiento }}{% if not loop.last %}, {% endif %}
   {% endfor %}
@@ -165,7 +166,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
     <div class="stat"><div class="stat-label">Por vencer</div><div class="stat-val" style="color:var(--yellow);">{{ por_vencer|length }}</div></div>
 </div>
 
-<div class="section-title">➕ Crear nuevo colegio</div>
+<div class="section-title">âž• Crear nuevo colegio</div>
 <div class="card">
     <div class="card-body">
         <form method="POST" enctype="multipart/form-data">
@@ -174,7 +175,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
             <div class="grid-2">
                 <div class="field">
                     <label>Nombre del colegio</label>
-                    <input type="text" name="nombre" placeholder="Ej: Institución Educativa Compartir" required>
+                    <input type="text" name="nombre" placeholder="Ej: InstituciÃ³n Educativa Compartir" required>
                 </div>
                 <div class="field">
                     <label>Slug (URL)</label>
@@ -183,7 +184,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
             </div>
             <div class="grid-2">
                 <div class="field">
-                    <label>Número de periodos</label>
+                    <label>NÃºmero de periodos</label>
                     <select name="num_periodos">
                         <option value="3">3 periodos</option>
                         <option value="4" selected>4 periodos</option>
@@ -197,14 +198,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                 </div>
             </div>
             <div class="codigo-box">
-                <label>🔑 Código de invitación (obligatorio)</label>
+                <label>ðŸ”‘ CÃ³digo de invitaciÃ³n (obligatorio)</label>
                 <div class="pass-wrap">
                     <input type="text" name="codigo_registro" id="cod-crear"
-                           placeholder="Ej: profe2025 · directora2025 · lumini123"
+                           placeholder="Ej: profe2025 Â· directora2025 Â· lumini123"
                            required autocomplete="off">
-                    <button type="button" class="eye-btn" onclick="toggleCod('cod-crear',this)" aria-label="Mostrar/ocultar código">👁️</button>
+                    <button type="button" class="eye-btn" onclick="toggleCod('cod-crear',this)" aria-label="Mostrar/ocultar cÃ³digo">ðŸ‘ï¸</button>
                 </div>
-                <p class="hint">Este código lo deben ingresar los profesores y directores al registrarse. Guárdalo bien — solo el admin lo conoce.</p>
+                <p class="hint">Este cÃ³digo lo deben ingresar los profesores y directores al registrarse. GuÃ¡rdalo bien â€” solo el admin lo conoce.</p>
             </div>
             <div class="grid-2">
                 <div class="field">
@@ -222,14 +223,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                     <input type="color" name="secondary_color" value="#7C3AED" style="height:42px;width:100%;background:#0F172A;border:1.5px solid #1E293B;border-radius:7px;cursor:pointer;">
                 </div>
                 <div class="field" style="display:flex;align-items:flex-end;padding-bottom:4px;">
-                    <button type="submit" class="btn btn-pri" style="width:100%;">Crear colegio →</button>
+                    <button type="submit" class="btn btn-pri" style="width:100%;">Crear colegio â†’</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-<div class="section-title">🏫 Colegios registrados</div>
+<div class="section-title">ðŸ« Colegios registrados</div>
 <div class="card">
     <div class="card-head">
         <span class="card-title">{{ colegios|length }} colegio(s) registrado(s)</span>
@@ -244,7 +245,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                 <th>Slug / URL</th>
                 <th style="text-align:center;">Periodos</th>
                 <th>Colores</th>
-                <th>Código invitación</th>
+                <th>CÃ³digo invitaciÃ³n</th>
                 <th>Vencimiento</th>
                 <th>Creado</th>
                 <th style="text-align:center;">Estado</th>
@@ -278,30 +279,30 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
             <td>
                 {% if c.codigo_registro %}
                 <span class="codigo-badge" id="cod-{{ c.slug }}" style="display:none;">{{ c.codigo_registro }}</span>
-                <button onclick="verCodigo('{{ c.slug }}')" class="btn btn-ghost btn-sm" style="font-size:10px;" id="btn-cod-{{ c.slug }}">🔑 Ver código</button>
+                <button onclick="verCodigo('{{ c.slug }}')" class="btn btn-ghost btn-sm" style="font-size:10px;" id="btn-cod-{{ c.slug }}">ðŸ”‘ Ver cÃ³digo</button>
                 {% else %}
-                <span style="color:#64748B;font-size:11px;">Sin código</span>
+                <span style="color:#64748B;font-size:11px;">Sin cÃ³digo</span>
                 {% endif %}
             </td>
             <td style="font-size:11px;">
                 {% if c.vencimiento %}
                   {% if dias is not none and dias < 0 %}
-                    <span class="venc-danger">⛔ Vencido ({{ c.vencimiento }})</span>
+                    <span class="venc-danger">â›” Vencido ({{ c.vencimiento }})</span>
                   {% elif dias is not none and dias <= 7 %}
-                    <span class="venc-danger">🚨 {{ dias }}d — {{ c.vencimiento }}</span>
+                    <span class="venc-danger">ðŸš¨ {{ dias }}d â€” {{ c.vencimiento }}</span>
                   {% elif dias is not none and dias <= 30 %}
-                    <span class="venc-warn">⚠️ {{ dias }}d — {{ c.vencimiento }}</span>
+                    <span class="venc-warn">âš ï¸ {{ dias }}d â€” {{ c.vencimiento }}</span>
                   {% else %}
-                    <span class="venc-ok">📅 {{ c.vencimiento }}</span>
+                    <span class="venc-ok">ðŸ“… {{ c.vencimiento }}</span>
                   {% endif %}
                 {% else %}
-                <span style="color:#64748B;">Sin límite</span>
+                <span style="color:#64748B;">Sin lÃ­mite</span>
                 {% endif %}
             </td>
             <td style="font-size:11px;color:var(--muted);">{{ c.creado }}</td>
             <td style="text-align:center;">
                 <span class="badge {% if c.activo %}badge-ok{% else %}badge-off{% endif %}">
-                    {% if c.activo %}● Activo{% else %}○ Inactivo{% endif %}
+                    {% if c.activo %}â— Activo{% else %}â—‹ Inactivo{% endif %}
                 </span>
             </td>
             <td>
@@ -311,24 +312,24 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                         <input type="hidden" name="accion" value="toggle_colegio">
                         <input type="hidden" name="slug" value="{{ c.slug }}">
                         <button type="submit" class="btn btn-ghost btn-sm">
-                            {% if c.activo %}⏸ Desactivar{% else %}▶ Activar{% endif %}
+                            {% if c.activo %}â¸ Desactivar{% else %}â–¶ Activar{% endif %}
                         </button>
                     </form>
                     <button class="btn btn-ghost btn-sm"
                         onclick="abrirEditar('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}',{{ c.num_periodos or 4 }},'{{ c.vencimiento or "" }}','{{ c.codigo_registro or "" }}','{{ c.primary_color or "#7C3AED" }}','{{ c.secondary_color or "#7C3AED" }}')">
-                        ✏️ Editar
+                        âœï¸ Editar
                     </button>
                     <button class="btn btn-yellow btn-sm" onclick="verProfesores('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}')">
-                        👥 Profesores
+                        ðŸ‘¥ Profesores
                     </button>
-                    <a href="/{{ c.slug }}/directora/panel" target="_blank" class="btn btn-ghost btn-sm">📊 Panel</a>
-                    <a href="/{{ c.slug }}/login" target="_blank" class="btn btn-green btn-sm">🔗 Login</a>
+                    <a href="/{{ c.slug }}/directora/panel" target="_blank" class="btn btn-ghost btn-sm">ðŸ“Š Panel</a>
+                    <a href="/{{ c.slug }}/login" target="_blank" class="btn btn-green btn-sm">ðŸ”— Login</a>
                     <form method="POST" style="display:inline;"
-                          onsubmit="return confirm('¿Eliminar {{ c.nombre }}?\nEsta acción no se puede deshacer.')">
+                          onsubmit="return confirm('Â¿Eliminar {{ c.nombre }}?\nEsta acciÃ³n no se puede deshacer.')">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="accion" value="eliminar_colegio">
                         <input type="hidden" name="slug" value="{{ c.slug }}">
-                        <button type="submit" class="btn btn-red btn-sm">🗑 Eliminar</button>
+                        <button type="submit" class="btn btn-red btn-sm">ðŸ—‘ Eliminar</button>
                     </form>
                 </div>
             </td>
@@ -337,7 +338,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
         </tbody>
     </table>
     {% else %}
-    <p style="color:var(--muted);padding:28px;font-size:13px;text-align:center;">No hay colegios registrados aún. Crea el primero arriba.</p>
+    <p style="color:var(--muted);padding:28px;font-size:13px;text-align:center;">No hay colegios registrados aÃºn. Crea el primero arriba.</p>
     {% endif %}
     </div>
 </div>
@@ -347,8 +348,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 <div class="overlay" id="modalEditar" onclick="if(event.target===this)cerrarEditar()">
     <div class="modal">
         <div class="modal-title">
-            ✏️ Editar colegio
-            <button class="close-btn" onclick="cerrarEditar()">✕</button>
+            âœï¸ Editar colegio
+            <button class="close-btn" onclick="cerrarEditar()">âœ•</button>
         </div>
         <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
@@ -360,7 +361,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
             </div>
             <div class="grid-2">
                 <div class="field">
-                    <label>Número de periodos</label>
+                    <label>NÃºmero de periodos</label>
                     <select name="num_periodos" id="edit-periodos">
                         <option value="3">3 periodos</option>
                         <option value="4">4 periodos</option>
@@ -374,14 +375,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                 </div>
             </div>
             <div class="codigo-box">
-                <label>🔑 Código de invitación</label>
+                <label>ðŸ”‘ CÃ³digo de invitaciÃ³n</label>
                 <div class="pass-wrap">
                     <input type="text" name="codigo_registro" id="edit-codigo"
-                           placeholder="Código de invitación del colegio"
+                           placeholder="CÃ³digo de invitaciÃ³n del colegio"
                            autocomplete="off">
-                    <button type="button" class="eye-btn" onclick="toggleCod('edit-codigo',this)" aria-label="Mostrar/ocultar código">👁️</button>
+                    <button type="button" class="eye-btn" onclick="toggleCod('edit-codigo',this)" aria-label="Mostrar/ocultar cÃ³digo">ðŸ‘ï¸</button>
                 </div>
-                <p class="hint">Cambia el código si lo quieres renovar. Los profesores y directores ya registrados no se ven afectados.</p>
+                <p class="hint">Cambia el cÃ³digo si lo quieres renovar. Los profesores y directores ya registrados no se ven afectados.</p>
             </div>
             <div class="grid-2">
                 <div class="field">
@@ -411,8 +412,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 <div class="overlay" id="modalProfesores" onclick="if(event.target===this)cerrarProfesores()">
     <div class="modal">
         <div class="modal-title">
-            👥 Profesores — <span id="prof-colegio-nombre"></span>
-            <button class="close-btn" onclick="cerrarProfesores()">✕</button>
+            ðŸ‘¥ Profesores â€” <span id="prof-colegio-nombre"></span>
+            <button class="close-btn" onclick="cerrarProfesores()">âœ•</button>
         </div>
         <div id="prof-contenido">
             <p style="color:var(--muted);font-size:13px;">Cargando...</p>
@@ -420,7 +421,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
     </div>
 </div>
 
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">â†‘</button>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -456,17 +457,17 @@ function verCodigo(slug) {
     var btn   = document.getElementById('btn-cod-' + slug);
     if (badge.style.display === 'none') {
         badge.style.display = 'inline-block';
-        btn.textContent = '🙈 Ocultar';
+        btn.textContent = 'ðŸ™ˆ Ocultar';
     } else {
         badge.style.display = 'none';
-        btn.textContent = '🔑 Ver código';
+        btn.textContent = 'ðŸ”‘ Ver cÃ³digo';
     }
 }
 
 function toggleCod(id, btn) {
     var inp = document.getElementById(id);
-    if (inp.type === 'text') { inp.type = 'password'; btn.textContent = '👁️'; }
-    else { inp.type = 'text'; btn.textContent = '🙈'; }
+    if (inp.type === 'text') { inp.type = 'password'; btn.textContent = 'ðŸ‘ï¸'; }
+    else { inp.type = 'text'; btn.textContent = 'ðŸ™ˆ'; }
 }
 
 function verProfesores(slug, nombre) {
@@ -484,10 +485,10 @@ function verProfesores(slug, nombre) {
             var html = '<table><thead><tr><th>#</th><th>Nombre</th><th>Usuario</th><th>Materias</th><th style="text-align:center;">Estado</th></tr></thead><tbody>';
             data.profesores.forEach(function(p, i){
                 var badge = p.activo
-                    ? '<span class="badge badge-ok">● Activo</span>'
-                    : '<span class="badge badge-off">○ Inactivo</span>';
+                    ? '<span class="badge badge-ok">â— Activo</span>'
+                    : '<span class="badge badge-off">â—‹ Inactivo</span>';
                 var materias = p.materias.map(function(m){
-                    return '<span class="prof-chip">' + m.materia + ' · ' + m.jornada + '</span>';
+                    return '<span class="prof-chip">' + m.materia + ' Â· ' + m.jornada + '</span>';
                 }).join('');
                 html += '<tr><td style="color:var(--muted);">' + (i+1) + '</td>'
                     + '<td style="font-weight:600;">' + p.nombre + '</td>'

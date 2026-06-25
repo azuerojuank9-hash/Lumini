@@ -1,23 +1,23 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <link rel="manifest" href="/static/manifest.json">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — {{ colegio.nombre if colegio else slug }}</title>
+<title>Lumini â€” {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:220px;--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);}
 [data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
 .sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;padding:0;}
 .sidebar-header{padding:18px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
 .sidebar-logo{width:36px;height:36px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.3);flex-shrink:0;}
 .sidebar-brand{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .sidebar-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
-.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto;}
+.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .sidebar-section{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;padding:8px 12px 4px;font-weight:600;}
 .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all var(--tr);margin-bottom:2px;}
 .sidebar-item:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
@@ -53,7 +53,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .badd:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
 .bdel{background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.2);}
 .bdel:hover{background:rgba(239,68,68,.2);}
-.tw{overflow-x:auto;border-radius:0 0 var(--rmd) var(--rmd);}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0 0 var(--rmd) var(--rmd);}
 table{border-collapse:collapse;min-width:100%;font-size:12px;}
 th{padding:10px 8px;text-align:center;color:var(--muted);font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3);position:sticky;top:0;font-weight:600;}
 th.tnombre{text-align:left;min-width:155px;}
@@ -91,7 +91,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);animation:fadeIn .2s ease;}
 .overlay.open{display:flex;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .modal h3{font-size:14px;margin-bottom:14px;font-weight:600;}
 .oitem{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 13px;margin-bottom:8px;font-size:12px;}
@@ -126,8 +126,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
   td:last-child{border-bottom:none;}
   .asist-wrap{justify-content:flex-end;}
   .asist-group{padding:3px;}
-  .abtn{padding:5px 10px;min-height:30px;}
-  .ni{width:48px;}
+  .abtn{padding:7px 12px;min-height:38px;}.abtn svg{width:16px;height:16px;}
+  .ni{width:52px;}
   .stats{flex-direction:column;gap:8px;}
   .scard{padding:12px 14px;min-width:0;}
   .sval{font-size:1.2rem;}
@@ -146,6 +146,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
   tr:hover td:first-child{background:rgba(var(--accent-rgb),.04);}
   .tw{position:relative;}
 }
+@media(max-width:375px){.main{padding:12px 10px;}.topbar-left h1{font-size:15px;}.topbar-right{gap:6px;}.bsm{font-size:12px;padding:6px 10px;min-height:38px;}.abtn{padding:5px 8px;min-height:34px;}.abtn svg{width:14px;height:14px;}.finput{font-size:15px;padding:8px 10px;}.card-head{padding:8px 10px;}.card-body{padding:8px 10px;}.ctab{padding:5px 8px;font-size:10px;gap:4px;}.scard{padding:10px 12px;}.sval{font-size:1rem;}.stats{gap:6px;}.tw{-webkit-overflow-scrolling:touch;}}
 </style>
 </head>
 <body>
@@ -167,33 +168,33 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
   </div>
   </a>
   <div class="sidebar-nav">
-    <div class="sidebar-section">Navegación</div>
-    <a href="/{{ slug }}/" class="sidebar-item active"><span class="icon">📊</span><span>Notas</span></a>
-    <a href="/{{ slug }}/horarios" class="sidebar-item"><span class="icon">🗓</span><span>Horario</span></a>
-    <a href="/{{ slug }}/archivados" class="sidebar-item"><span class="icon">📦</span><span>Archivados</span></a>
-    <a href="/{{ slug }}/transferir_curso" class="sidebar-item"><span class="icon">🔄</span><span>Transferir</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
-    <a href="/{{ slug }}/cambiar_password" class="sidebar-item"><span class="icon">⚙️</span><span>Perfil</span></a>
+    <div class="sidebar-section">NavegaciÃ³n</div>
+    <a href="/{{ slug }}/" class="sidebar-item active"><span class="icon">ðŸ“Š</span><span>Notas</span></a>
+    <a href="/{{ slug }}/horarios" class="sidebar-item"><span class="icon">ðŸ—“</span><span>Horario</span></a>
+    <a href="/{{ slug }}/archivados" class="sidebar-item"><span class="icon">ðŸ“¦</span><span>Archivados</span></a>
+    <a href="/{{ slug }}/transferir_curso" class="sidebar-item"><span class="icon">ðŸ”„</span><span>Transferir</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">ConfiguraciÃ³n</div>
+    <a href="/{{ slug }}/cambiar_password" class="sidebar-item"><span class="icon">âš™ï¸</span><span>Perfil</span></a>
     {% if materias_jornadas|length > 1 %}
-    <a href="/{{ slug }}/seleccionar" class="sidebar-item"><span class="icon">🔄</span><span>Cambiar materia</span></a>
+    <a href="/{{ slug }}/seleccionar" class="sidebar-item"><span class="icon">ðŸ”„</span><span>Cambiar materia</span></a>
     {% endif %}
-    <a href="/{{ slug }}/logout" class="sidebar-item" style="color:var(--red);"><span class="icon">🚪</span><span>Salir</span></a>
+    <a href="/{{ slug }}/logout" class="sidebar-item" style="color:var(--red);"><span class="icon">ðŸšª</span><span>Salir</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ profesor.nombre }}</div>
-    <div class="role">{{ materia }} · {{ jornada }}</div>
+    <div class="role">{{ materia }} Â· {{ jornada }}</div>
   </div>
-  <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema">🌙 Cambiar tema</button>
+  <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema">ðŸŒ™ Cambiar tema</button>
 </nav>
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
 
 <div class="topbar">
   <div class="topbar-left">
     <h1>{{ materia }}</h1>
-    <div class="breadcrumb">{{ profesor.nombre }} · {{ jornada }} · {{ curso_sel if curso_sel else 'Sin curso' }}</div>
+    <div class="breadcrumb">{{ profesor.nombre }} Â· {{ jornada }} Â· {{ curso_sel if curso_sel else 'Sin curso' }}</div>
   </div>
 </div>
 
@@ -216,7 +217,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
   {% for p in range(1, (num_periodos or 4)+1) %}
   <a href="/{{ slug }}?curso={{ curso_sel }}&periodo={{ p }}"
      style="padding:5px 14px;border-radius:7px;border:1px solid var(--border);background:{% if p==periodo_sel %}linear-gradient(135deg,var(--accent),var(--accent2)){% else %}var(--bg2){% endif %};color:{% if p==periodo_sel %}#fff{% else %}var(--muted){% endif %};font-size:12px;font-weight:600;text-decoration:none;">
-    {{ p }}° P
+    {{ p }}Â° P
   </a>
   {% endfor %}
 </div>
@@ -236,22 +237,22 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
             <input type="hidden" name="curso" value="{{ curso_sel }}">
             <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
             <div class="fi">
-                <input class="finput" type="text" name="nombre" placeholder="Nombre completo" required style="flex:1;min-width:180px;">
+                <input class="finput" type="text" name="nombre" placeholder="Nombre completo" required style="flex:1;min-width:140px;">
                 <button type="submit" class="bsm badd">Agregar</button>
             </div>
         </form>
-        <p style="font-size:11px;color:var(--muted);margin-top:5px;">Se ordenan alfabéticamente automáticamente.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:5px;">Se ordenan alfabÃ©ticamente automÃ¡ticamente.</p>
     </div>
 </div>
 
 <div class="card">
-    <div class="card-head"><span class="card-title">Agenda de trabajos — {{ curso_sel }}</span></div>
+    <div class="card-head"><span class="card-title">Agenda de trabajos â€” {{ curso_sel }}</span></div>
     <div class="card-body">
         <form method="POST" action="/{{ slug }}/nuevo_trabajo">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
             <div class="fi" style="margin-bottom:12px;">
-                <input class="finput" type="text" name="titulo" placeholder="Título del trabajo/evaluación" required style="flex:1;min-width:150px;">
+                <input class="finput" type="text" name="titulo" placeholder="TÃ­tulo del trabajo/evaluaciÃ³n" required style="flex:1;min-width:150px;">
                 <input class="finput" type="date" name="fecha" required>
                 <button type="submit" class="bsm badd">Agregar</button>
             </div>
@@ -262,7 +263,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
                 <div><span style="font-weight:500">{{ t.titulo }}</span><span style="font-size:10px;color:var(--muted);margin-left:7px">{{ t.materia }}</span></div>
                 <div style="display:flex;align-items:center;gap:7px;">
                     <span class="agfecha">{{ t.fecha }}</span>
-                    <a href="/{{ slug }}/borrar_trabajo/{{ t.id }}" class="bsm bdel" style="font-size:10px;text-decoration:none;padding:3px 8px;">🗑</a>
+                    <a href="/{{ slug }}/borrar_trabajo/{{ t.id }}" class="bsm bdel" style="font-size:10px;text-decoration:none;padding:3px 8px;">ðŸ—‘</a>
                 </div>
             </div>
             {% endfor %}
@@ -274,7 +275,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
 <div class="card">
     <div class="card-head">
-        <span class="card-title">Notas — {{ curso_sel }} · {{ materia }}</span>
+        <span class="card-title">Notas â€” {{ curso_sel }} Â· {{ materia }}</span>
         <form method="POST" action="/{{ slug }}/nueva_actividad" style="display:flex;gap:7px;">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
@@ -290,7 +291,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
                     <th style="width:28px">#</th>
                     <th class="tnombre">Estudiante</th>
                     {% for act in actividades %}
-                    <th>{{ act.nombre }}<a href="/{{ slug }}/borrar_actividad/{{ act.id }}?curso={{ curso_sel }}" onclick="return confirm('¿Borrar actividad?')" style="color:var(--red);font-size:9px;margin-left:3px;text-decoration:none;">✕</a></th>
+                    <th>{{ act.nombre }}<a href="/{{ slug }}/borrar_actividad/{{ act.id }}?curso={{ curso_sel }}" onclick="return confirm('Â¿Borrar actividad?')" style="color:var(--red);font-size:9px;margin-left:3px;text-decoration:none;">âœ•</a></th>
                     {% endfor %}
                     <th>Eval.</th>
                     <th>Autoev.</th>
@@ -309,22 +310,22 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
                 <td>
                     {% set nota = e.notas_map.get(act.id) %}
                     <input class="ni nota-input" type="number" min="0" max="5" step="0.1"
-                           value="{{ nota.val if nota else '' }}" placeholder="—"
+                           value="{{ nota.val if nota else '' }}" placeholder="â€”"
                            data-aid="{{ e.id }}" data-actid="{{ act.id }}"
                            onchange="guardarNota(this)">
                 </td>
                 {% endfor %}
-                <td><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="evaluacion" onchange="guardarEval(this)"></td>
-                <td><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="autoevaluacion" onchange="guardarEval(this)"></td>
+                <td><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="â€”" data-aid="{{ e.id }}" data-campo="evaluacion" onchange="guardarEval(this)"></td>
+                <td><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="â€”" data-aid="{{ e.id }}" data-campo="autoevaluacion" onchange="guardarEval(this)"></td>
                 <td class="pc prom-cell" id="prom-{{ e.id }}">
                     <span class="{% if e.promedio>=3.5 %}ph{% elif e.promedio>=3.0 %}pm{% elif e.promedio>0 %}pb{% endif %}">
-                        {{ e.promedio if e.promedio>0 else '—' }}
+                        {{ e.promedio if e.promedio>0 else 'â€”' }}
                     </span>
                 </td>
                 <td>
                     <div class="asist-wrap">
                         <span class="asist-badge {% if e.asistencia=='P' %}bp{% elif e.asistencia=='A' %}ba{% elif e.asistencia=='T' %}bt{% else %}bn{% endif %}" id="asist-{{ e.id }}">
-                            {% if e.asistencia=='P' %}P{% elif e.asistencia=='A' %}A{% elif e.asistencia=='T' %}T{% else %}—{% endif %}
+                            {% if e.asistencia=='P' %}P{% elif e.asistencia=='A' %}A{% elif e.asistencia=='T' %}T{% else %}â€”{% endif %}
                         </span>
                         <div class="asist-group">
                             <button onclick="marcarAsist({{ e.id }},'P')" class="abtn ap {% if e.asistencia=='P' %}active{% endif %}" aria-label="Presente" data-estado="P"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></button>
@@ -334,10 +335,10 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
                     </div>
                 </td>
                 <td><button class="bsm badd" style="font-size:10px;padding:4px 9px;" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">{{ e.observaciones|length }}</button></td>
-                <td><a href="/{{ slug }}/archivar_alumno/{{ e.id }}?curso={{ curso_sel }}" onclick="return confirm('¿Archivar a {{ e.nombre }}? Sus datos se conservan.')" class="bsm bdel" style="font-size:10px;text-decoration:none;">📦</a></td>
+                <td><a href="/{{ slug }}/archivar_alumno/{{ e.id }}?curso={{ curso_sel }}" onclick="return confirm('Â¿Archivar a {{ e.nombre }}? Sus datos se conservan.')" class="bsm bdel" style="font-size:10px;text-decoration:none;">ðŸ“¦</a></td>
             </tr>
             {% else %}
-            <tr><td colspan="20" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes todavía.</td></tr>
+            <tr><td colspan="20" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes todavÃ­a.</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -351,21 +352,21 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <h3 id="mNombre">Observador</h3>
-        <button onclick="cerrarObs()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;">✕</button>
+        <button onclick="cerrarObs()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;">âœ•</button>
     </div>
     <p style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Historial de asistencia</p>
     <div id="mHistorial" style="margin-bottom:14px;"></div>
     <p style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Observaciones</p>
     <div id="mObsList"></div>
     <div class="oform">
-        <input type="text" id="oTexto" placeholder="Escribir observación...">
+        <input type="text" id="oTexto" placeholder="Escribir observaciÃ³n...">
         <button class="bsm badd" onclick="guardarObs()">Guardar</button>
     </div>
 </div>
 </div>
 
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
-<div class="toast" id="toast">✅ Guardado</div>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">â†‘</button>
+<div class="toast" id="toast">âœ… Guardado</div>
 
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
 
@@ -383,7 +384,7 @@ function getCsrf(){
 }
 
 function showToast(msg){
-    msg = msg || '✅ Guardado';
+    msg = msg || 'âœ… Guardado';
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
@@ -401,7 +402,7 @@ function recalcularProm(aid){
     const cell = document.getElementById('prom-' + aid);
     if(!cell) return;
     if(vals.length === 0){
-        cell.innerHTML = '<span style="color:var(--muted)">—</span>';
+        cell.innerHTML = '<span style="color:var(--muted)">â€”</span>';
         return;
     }
     const prom = (vals.reduce(function(a,b){return a+b;},0) / vals.length).toFixed(2);
@@ -424,13 +425,13 @@ function guardarNota(inp){
             if(r.ok){
                 inp.classList.add('guardado');
                 setTimeout(function(){ inp.classList.remove('guardado'); }, 1000);
-                showToast('✅ Nota guardada');
+                showToast('âœ… Nota guardada');
                 recalcularProm(aid);
             } else {
-                showToast('❌ Error al guardar nota');
+                showToast('âŒ Error al guardar nota');
             }
         })
-        .catch(function(){ showToast('❌ Error de conexión'); });
+        .catch(function(){ showToast('âŒ Error de conexiÃ³n'); });
 }
 
 function guardarEval(inp){
@@ -448,13 +449,13 @@ function guardarEval(inp){
             if(r.ok){
                 inp.classList.add('guardado');
                 setTimeout(function(){ inp.classList.remove('guardado'); }, 1000);
-                showToast('✅ Guardado');
+                showToast('âœ… Guardado');
                 recalcularProm(aid);
             } else {
-                showToast('❌ Error al guardar');
+                showToast('âŒ Error al guardar');
             }
         })
-        .catch(function(){ showToast('❌ Error de conexión'); });
+        .catch(function(){ showToast('âŒ Error de conexiÃ³n'); });
 }
 
 function marcarAsist(aid, estado){
@@ -474,12 +475,12 @@ function marcarAsist(aid, estado){
                     b.classList.remove('active');
                     if(b.getAttribute('data-estado') === estado) b.classList.add('active');
                 });
-                showToast('✅ Asistencia guardada');
+                showToast('âœ… Asistencia guardada');
             } else {
-                showToast('❌ Error al guardar asistencia');
+                showToast('âŒ Error al guardar asistencia');
             }
         })
-        .catch(function(){ showToast('❌ Error de conexión'); });
+        .catch(function(){ showToast('âŒ Error de conexiÃ³n'); });
 }
 
 const ED = {};
@@ -529,7 +530,7 @@ function renderObs(aid){
         obs.forEach(function(o){
             const div = document.createElement('div');
             div.className = 'oitem';
-            div.innerHTML = '<div>'+o.texto+'</div><div class="ometa">'+o.materia+' · '+o.fecha+
+            div.innerHTML = '<div>'+o.texto+'</div><div class="ometa">'+o.materia+' Â· '+o.fecha+
                 ' <button onclick="borrarObs('+aid+','+o.id+',this)" style="background:none;border:none;color:var(--red);margin-left:6px;font-size:10px;cursor:pointer;">Borrar</button></div>';
             ol.appendChild(div);
         });
@@ -546,7 +547,7 @@ function guardarObs(){
     f.append('_csrf_token', getCsrf());
     fetch('/'+slug+'/agregar_observacion', {method:'POST', body:f})
         .then(function(r){
-            if(!r.ok){ showToast('❌ Error al guardar'); return null; }
+            if(!r.ok){ showToast('âŒ Error al guardar'); return null; }
             return r.json();
         })
         .then(function(o){
@@ -560,13 +561,13 @@ function guardarObs(){
                     b.textContent = ED[_aidObs].observaciones.length;
                 }
             });
-            showToast('✅ Observación guardada');
+            showToast('âœ… ObservaciÃ³n guardada');
         })
-        .catch(function(){ showToast('❌ Error de conexión'); });
+        .catch(function(){ showToast('âŒ Error de conexiÃ³n'); });
 }
 
 function borrarObs(aid, obsId, btn){
-    if(!confirm('¿Borrar esta observación?')) return;
+    if(!confirm('Â¿Borrar esta observaciÃ³n?')) return;
     const f = new FormData();
     f.append('_csrf_token', getCsrf());
     fetch('/'+slug+'/borrar_observacion/'+obsId, {method:'POST', body:f})
@@ -580,12 +581,12 @@ function borrarObs(aid, obsId, btn){
                         b.textContent = ED[aid].observaciones.length;
                     }
                 });
-                showToast('✅ Observación borrada');
+                showToast('âœ… ObservaciÃ³n borrada');
             } else {
-                showToast('❌ Error al borrar');
+                showToast('âŒ Error al borrar');
             }
         })
-        .catch(function(){ showToast('❌ Error de conexión'); });
+        .catch(function(){ showToast('âŒ Error de conexiÃ³n'); });
 }
 
 function cerrarObs(){
@@ -597,7 +598,7 @@ function addDataLabels(){
         var ths = t.querySelectorAll('thead th');
         t.querySelectorAll('tbody tr').forEach(function(tr){
             tr.querySelectorAll('td').forEach(function(td,i){
-                if(ths[i]) td.setAttribute('data-label',ths[i].textContent.replace(/✕.*/,'').trim());
+                if(ths[i]) td.setAttribute('data-label',ths[i].textContent.replace(/âœ•.*/,'').trim());
             });
         });
     });
