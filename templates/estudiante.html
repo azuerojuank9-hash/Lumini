@@ -80,7 +80,7 @@ th{padding:8px;text-align:center;background:#0F172A;border:1px solid #1E293B;fon
 th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:1px;}
 th .ht{font-size:10px;color:var(--muted);}
 td{border:1px solid #1E293B;vertical-align:middle;text-align:center;}
-td.dia-col{padding:8px 12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--accent);background:rgba(15,23,42,.6);white-space:nowrap;}
+td.dia-col{padding:8px 12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--accent);background:rgba(15,23,42,.6);white-space:nowrap;position:sticky;left:0;z-index:2;}
 td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px 6px;color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
 .celda{padding:8px 6px;min-height:58px;text-align:center;}
 .c-mat{font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px;}
@@ -94,7 +94,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 .mobile-nav a{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all var(--tr);}
 .mobile-nav a:hover{background:rgba(37,99,235,.1);color:var(--text);}
 .mobile-nav a.logout{color:var(--red);}
-@media(max-width:600px){.hamburger{display:flex;}.est-header{flex-direction:column;text-align:center;}.est-prom{text-align:center;}.notas-grid{grid-template-columns:repeat(2,1fr);}.dias-grid{gap:5px;}.dia-chip{min-width:48px;padding:8px 8px;}}
+@media(max-width:600px){.hamburger{display:flex;}.est-header{flex-direction:column;text-align:center;}.est-prom{text-align:center;}.notas-grid{grid-template-columns:repeat(2,1fr);}.dias-grid{gap:5px;}.dia-chip{min-width:48px;padding:8px 8px;}.tabla-wrap{overflow-x:auto;}.celda{min-height:56px;padding:6px 4px;}.c-mat{font-size:13px;}}
 </style>
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>

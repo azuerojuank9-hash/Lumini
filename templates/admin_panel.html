@@ -68,12 +68,26 @@ tr:hover td{background:rgba(37,99,235,.03);}
 .modal-title{font-size:15px;font-weight:600;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
 .close-btn{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;}
 .close-btn:hover{color:var(--text);}
+.scroll-top{display:none;position:fixed;bottom:80px;right:16px;z-index:2000;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:50%;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.scroll-top.show{display:flex;}
 .toast{position:fixed;bottom:22px;right:22px;background:rgba(15,23,42,.95);border:1px solid rgba(37,99,235,.3);color:var(--text);padding:11px 18px;border-radius:10px;font-size:13px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;backdrop-filter:blur(20px);box-shadow:0 4px 20px rgba(0,0,0,.4);}
 .toast.show{opacity:1;transform:translateY(0);}
 .hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
 .hamburger:hover{background:var(--bg3);border-color:var(--accent);}
 .sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);}
 .prof-chip{display:inline-block;background:#1E293B;border:1px solid #1E293B;border-radius:6px;padding:3px 8px;font-size:11px;margin:2px;color:var(--muted);}
+@media(max-width:600px){
+  table,thead,tbody,tr,td,th{display:block;}
+  thead{display:none;}
+  tr{border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px;background:var(--bg2);}
+  td{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border:none;text-align:right;gap:6px;min-height:36px;border-bottom:1px solid rgba(255,255,255,.04);}
+  td::before{content:attr(data-label);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;flex-shrink:0;text-align:left;min-width:70px;}
+  td:last-child{border-bottom:none;}
+  .actions-cell{flex-direction:column;align-items:stretch;}
+  .actions-cell form{display:block;}
+  .btn-sm{min-height:44px;font-size:13px;display:block;width:100%;}
+  tr:hover td{background:none;}
+}
 .venc-ok{color:var(--green);}
 .venc-warn{color:var(--yellow);}
 .venc-danger{color:var(--red);font-weight:700;}
@@ -400,9 +414,25 @@ tr:hover td{background:rgba(37,99,235,.03);}
     </div>
 </div>
 
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
 <div class="toast" id="toast"></div>
 
 <script>
+function addDataLabels(){
+    document.querySelectorAll('table').forEach(function(t){
+        var ths = t.querySelectorAll('thead th');
+        t.querySelectorAll('tbody tr').forEach(function(tr){
+            tr.querySelectorAll('td').forEach(function(td,i){
+                if(ths[i]) td.setAttribute('data-label', ths[i].textContent.trim());
+            });
+        });
+    });
+}
+window.addEventListener('scroll',function(){
+    var st = document.getElementById('scrollTop');
+    if(st) st.classList.toggle('show', window.scrollY > 400);
+});
+addDataLabels();
 function abrirEditar(slug, nombre, periodos, vencimiento, codigo, primary, secondary) {
     document.getElementById('edit-slug').value = slug;
     document.getElementById('edit-nombre').value = nombre;

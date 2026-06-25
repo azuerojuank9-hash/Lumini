@@ -26,12 +26,12 @@
         .error{display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#EF4444;padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:20px;text-align:left;animation:shake .4s ease;}
         @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
         .input-wrap{position:relative;margin-bottom:16px;}
-        .input-wrap input{width:100%;padding:13px 44px 13px 16px;background:#0F172A;border:1.5px solid #1E293B;border-radius:var(--rmd);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;letter-spacing:3px;transition:border-color var(--tr),box-shadow var(--tr);}
+        .input-wrap input{width:100%;padding:13px 44px 13px 16px;background:#0F172A;border:1.5px solid #1E293B;border-radius:var(--rmd);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;letter-spacing:3px;transition:border-color var(--tr),box-shadow var(--tr);}
         .input-wrap input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.15);}
         .input-wrap input::placeholder{letter-spacing:2px;color:var(--sub);}
         .eye-btn{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--sub);font-size:16px;cursor:pointer;padding:4px;transition:color var(--tr);}
         .eye-btn:hover{color:var(--accent);}
-        .btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rmd);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:all var(--tr);box-shadow:0 4px 20px rgba(37,99,235,.3);position:relative;overflow:hidden;}
+        .btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rmd);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.5px;min-height:48px;transition:all var(--tr);box-shadow:0 4px 20px rgba(37,99,235,.3);position:relative;overflow:hidden;}
         .btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(37,99,235,.4);}
         .btn:active{transform:translateY(0);}
         .btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .5s;}

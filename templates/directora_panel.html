@@ -68,12 +68,26 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 .finput{padding:9px 12px;background:#0F172A;border:1.5px solid #1E293B;border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;width:100%;transition:border-color var(--tr);}
 .finput:focus{outline:none;border-color:var(--accent);}
 .finput::placeholder{color:#64748B;}
+.scroll-top{display:none;position:fixed;bottom:80px;right:16px;z-index:2000;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:50%;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.scroll-top.show{display:flex;}
 .toast{position:fixed;bottom:22px;right:22px;background:var(--bg2);border:1px solid rgba(37,99,235,.3);color:var(--text);padding:11px 18px;border-radius:var(--rmd);font-size:13px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 4px 20px #00000080;max-width:320px;backdrop-filter:blur(20px);}
 .toast.show{opacity:1;transform:translateY(0);}
 .hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
 .hamburger:hover{background:var(--bg3);border-color:var(--accent);}
 .sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);}
 @media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 10px;}}
+@media(max-width:600px){
+  table,thead,tbody,tr,td,th{display:block;}
+  thead tr{display:none;}
+  tr{border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px;background:var(--bg2);}
+  td{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border:none;text-align:right;gap:6px;min-height:36px;border-bottom:1px solid rgba(255,255,255,.04);}
+  td::before{content:attr(data-label);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;flex-shrink:0;text-align:left;min-width:70px;}
+  td:last-child{border-bottom:none;}
+  .nbtn{min-height:44px;font-size:13px;}
+  .email-input{font-size:16px;}
+  .email-wrap{flex-wrap:wrap;}
+  tr:hover td{background:none;}
+}
 </style>
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
@@ -245,6 +259,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
     </div>
 </div>
 
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
 <div class="toast" id="toast"></div>
 
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
@@ -312,6 +327,21 @@ function crearDirectora(){
         else{errDiv.textContent=`⚠️ ${d.mensaje}`;errDiv.style.display='block';}
     }).catch(()=>{errDiv.textContent='⚠️ Error de conexión.';errDiv.style.display='block';});
 }
+function addDataLabels(){
+    document.querySelectorAll('table').forEach(function(t){
+        var ths = t.querySelectorAll('thead th');
+        t.querySelectorAll('tbody tr').forEach(function(tr){
+            tr.querySelectorAll('td').forEach(function(td,i){
+                if(ths[i]) td.setAttribute('data-label', ths[i].textContent.trim());
+            });
+        });
+    });
+}
+window.addEventListener('scroll',function(){
+    var st = document.getElementById('scrollTop');
+    if(st) st.classList.toggle('show', window.scrollY > 400);
+});
+addDataLabels();
 </script>
 </body>
 </html>
