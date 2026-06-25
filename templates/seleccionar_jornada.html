@@ -1,8 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seleccionar jornada — Lumini</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -47,11 +49,11 @@
 </a>
 
 <div class="card">
-    <div class="card-title">👋 Bienvenido, {{ profesor.nombre }}</div>
+    <div class="card-title"><i class="fas fa-hand-wave"></i> Bienvenido, {{ profesor.nombre }}</div>
     <p class="card-desc">Selecciona con qué jornada y materia quieres trabajar hoy.</p>
 
     {% if error %}
-    <div class="alert-error">⚠️ {{ error }}</div>
+    <div class="alert-error"><i class="fas fa-exclamation-triangle"></i> {{ error }}</div>
     {% endif %}
 
     <div class="opciones">
@@ -65,7 +67,7 @@
                     <span class="opcion-jornada">Jornada {{ mj.jornada }}</span>
                 </div>
                 <span class="badge-jornada {% if mj.jornada == 'Mañana' %}jornada-manana{% elif mj.jornada == 'Tarde' %}jornada-tarde{% else %}jornada-nocturna{% endif %}">
-                    {% if mj.jornada == 'Mañana' %}☀️{% elif mj.jornada == 'Tarde' %}🌤{% else %}🌙{% endif %} {{ mj.jornada }}
+                    {% if mj.jornada == 'Mañana' %}<i class="fas fa-sun"></i>{% elif mj.jornada == 'Tarde' %}🌤{% else %}🌙{% endif %} {{ mj.jornada }}
                 </span>
             </button>
         </form>
@@ -73,8 +75,11 @@
     </div>
 </div>
 
-<a href="/{{ slug }}/logout" class="logout-link">← Cerrar sesión</a>
+<a href="/{{ slug }}/logout" class="logout-link"><i class="fas fa-arrow-left"></i> Cerrar sesión</a>
 <button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:20px;z-index:9999;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);" aria-label="Cambiar tema">🌙</button>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
 </body>
 </html>
+
+
+
