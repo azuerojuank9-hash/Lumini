@@ -1,38 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Horarios — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080B14;--bg2:rgba(15,23,42,0.8);--bg3:#1E293B;--bg4:#334155;--border:rgba(37,99,235,0.2);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#2563EB' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#7C3AED' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#2563EB') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--danger:#EF4444;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:240px;}
+:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--danger:#EF4444;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:240px;--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:#0F172A;border-right:1px solid #1E293B;display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
-.sidebar-logo{padding:20px 18px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
 .sidebar-logo img{height:38px;width:38px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
 .sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
 .sidebar-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px;}
 .sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all var(--tr);}
-.sidebar-link:hover{background:rgba(37,99,235,.1);color:var(--text);}
-.sidebar-link.active{background:rgba(37,99,235,.15);color:var(--accent);}
+.sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
+.sidebar-link.active{background:var(--accent);color:#fff;}
 .sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
-.sidebar-footer{padding:12px 10px;border-top:1px solid #1E293B;}
+.sidebar-footer{padding:12px 10px;border-top:1px solid var(--border);}
 .main{margin-left:var(--sidebar);padding:32px 28px;width:calc(100% - var(--sidebar));min-height:100vh;}
 h1{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:6px;}
 .subtitle{color:var(--muted);font-size:13px;margin-bottom:20px;}
 .curso-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
-.curso-tab{padding:7px 16px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;background:#0F172A;border:1px solid #1E293B;color:var(--muted);transition:all var(--tr);}
+.curso-tab{padding:7px 16px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;background:var(--bg2);border:1px solid var(--border);color:var(--muted);transition:all var(--tr);}
 .curso-tab.active,.curso-tab:hover{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;backdrop-filter:blur(20px);box-shadow:0 4px 20px rgba(0,0,0,.2);}
 .tabla-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
-th{padding:10px 8px;text-align:center;background:#0F172A;border:1px solid #1E293B;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;}
+th{padding:10px 8px;text-align:center;background:var(--bg2);border:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;}
 th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:2px;}
 th .ht{font-size:10px;color:var(--muted);}
-td{border:1px solid #1E293B;vertical-align:middle;}
+td{border:1px solid var(--border);vertical-align:middle;}
 td.dia-col{padding:10px 14px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--accent);background:rgba(15,23,42,.6);white-space:nowrap;min-width:55px;position:sticky;left:0;z-index:2;}
 td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:12px 8px;color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
 td.edit-col{cursor:pointer;transition:background var(--tr);}
@@ -51,14 +53,14 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
 .modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-weight:600;}
-.inp{width:100%;padding:10px 12px;background:#0F172A;border:1.5px solid #1E293B;border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
+.inp{width:100%;padding:10px 12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
 .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
 .btn-row{display:flex;gap:8px;margin-top:16px;}
 .btn{padding:10px 20px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex:1;transition:all var(--tr);}
 .btn:active{transform:scale(.97);}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
-.btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid #1E293B;}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border);}
 .btn-ghost:hover{background:rgba(255,255,255,.08);}
 .btn-clear{background:rgba(239,68,68,.08);color:var(--danger);border:1px solid rgba(239,68,68,.2);flex:0;padding:10px 14px;}
 .btn-clear:hover{background:rgba(239,68,68,.18);}
@@ -83,7 +85,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
         {% if colegio and colegio.logo_url %}
         <img src="{{ colegio.logo_url }}" alt="Logo">
         {% else %}
-        <img src="/static/logo.png" alt="Lumini">
+        <img src="/static/lumini_logo.png" alt="Lumini">
         {% endif %}
         <div>
             <div class="sidebar-brand">LUMINI</div>
@@ -98,6 +100,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
         <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon">📦</span> Archivados</a>
     </nav>
     <div class="sidebar-footer">
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema">🌙 Cambiar tema</button>
         <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon">🚪</span> Cerrar sesión</a>
     </div>
 </aside>
@@ -281,5 +284,6 @@ document.addEventListener('keydown', e=>{
   if(e.key==='Enter' && document.getElementById('modalCelda').classList.contains('open')) guardar();
 });
 </script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
 </body>
 </html>

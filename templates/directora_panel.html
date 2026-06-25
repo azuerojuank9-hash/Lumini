@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel Directora — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080B14;--bg2:rgba(15,23,42,0.85);--bg3:#1E293B;--bg4:#334155;--border:rgba(37,99,235,0.2);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#2563EB' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#7C3AED' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#2563EB') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--green:#10B981;--red:#EF4444;--yellow:#F59E0B;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:240px;}
+:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#7C3AED' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#6D28D9' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#7C3AED') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);--sidebar:240px;}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:#0F172A;border-right:1px solid #1E293B;display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
 .sidebar-logo{padding:20px 18px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
 .sidebar-logo img{height:38px;width:38px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
 .sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
 .sidebar-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px;}
 .sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all var(--tr);}
-.sidebar-link:hover{background:rgba(37,99,235,.1);color:var(--text);}
-.sidebar-link.active{background:rgba(37,99,235,.15);color:var(--accent);}
+.sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
+.sidebar-link.active{background:var(--accent);color:#fff;}
 .sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
 .sidebar-footer{padding:12px 10px;border-top:1px solid #1E293B;}
 .main{margin-left:var(--sidebar);padding:32px 28px;width:calc(100% - var(--sidebar));min-height:100vh;max-width:1300px;}
@@ -58,8 +60,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 .email-input{padding:4px 8px;background:#0F172A;border:1px solid #1E293B;border-radius:5px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:11px;width:100%;transition:border-color var(--tr);}
 .email-input:focus{outline:none;border-color:var(--accent);}
 .email-input.saved{border-color:var(--green);}
-.email-save-btn{padding:3px 7px;border-radius:5px;font-size:10px;background:rgba(37,99,235,.2);color:var(--accent);border:1px solid rgba(37,99,235,.3);cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;font-weight:600;}
-.email-save-btn:hover{background:rgba(37,99,235,.35);}
+.email-save-btn{padding:3px 7px;border-radius:5px;font-size:10px;background:rgba(var(--accent-rgb),.2);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.3);cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;font-weight:600;}
+.email-save-btn:hover{background:rgba(var(--accent-rgb),.35);}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
 .overlay.open{display:flex;}
 .modal{background:rgba(15,23,42,.96);border:1px solid var(--border);border-radius:var(--rlg);padding:26px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto;backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
@@ -70,7 +72,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 .finput::placeholder{color:#64748B;}
 .scroll-top{display:none;position:fixed;bottom:80px;right:16px;z-index:2000;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:50%;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);}
 .scroll-top.show{display:flex;}
-.toast{position:fixed;bottom:22px;right:22px;background:var(--bg2);border:1px solid rgba(37,99,235,.3);color:var(--text);padding:11px 18px;border-radius:var(--rmd);font-size:13px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 4px 20px #00000080;max-width:320px;backdrop-filter:blur(20px);}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--bg2);border:1px solid rgba(var(--accent-rgb),.3);color:var(--text);padding:11px 18px;border-radius:var(--rmd);font-size:13px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 4px 20px #00000080;max-width:320px;backdrop-filter:blur(20px);}
 .toast.show{opacity:1;transform:translateY(0);}
 .hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
 .hamburger:hover{background:var(--bg3);border-color:var(--accent);}
@@ -113,6 +115,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
     <nav class="sidebar-nav">
         <a href="{{ url_for('directora_panel', slug=slug) }}" class="sidebar-link active"><span class="icon">📊</span> Dashboard</a>
         <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="sidebar-link"><span class="icon">📄</span> Boletín PDF</a>
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema">🌙 Cambiar tema</button>
         <a href="{{ url_for('directora_logout', slug=slug) }}" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon">🚪</span> Cerrar sesión</a>
     </nav>
     <div class="sidebar-footer" style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -171,7 +174,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                     <tr>
                         <th class="tnombre">Estudiante</th>
                         {% for mat in lista_materias %}
-                        <th colspan="4" style="color:var(--accent);border-left:2px solid rgba(37,99,235,.2);">
+                        <th colspan="4" style="color:var(--accent);border-left:2px solid rgba(var(--accent-rgb),.2);">
                             {{ mat }}{% if mat not in materias_enviadas %} <span style="color:var(--yellow);font-size:9px;">⏳</span>{% endif %}
                         </th>
                         {% endfor %}
@@ -182,7 +185,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                     <tr style="background:#0F172A;">
                         <th></th>
                         {% for mat in lista_materias %}
-                        <th style="font-size:9px;color:#64748B;border-left:2px solid rgba(37,99,235,.15);" title="Actividades 65%">Act</th>
+                        <th style="font-size:9px;color:#64748B;border-left:2px solid rgba(var(--accent-rgb),.15);" title="Actividades 65%">Act</th>
                         <th style="font-size:9px;color:#64748B;" title="Evaluación 25%">Eval</th>
                         <th style="font-size:9px;color:#64748B;" title="Autoevaluación 10%">Auto</th>
                         <th style="font-size:9px;color:var(--muted);font-weight:700;" title="Nota final">Final</th>
@@ -196,7 +199,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                     <td class="tnomcell">{{ fila.nombre }}</td>
                     {% for mat in lista_materias %}
                     {% set d = fila.materias.get(mat, {}) %}
-                    <td style="border-left:2px solid rgba(37,99,235,.1);" class="nota-none">{{ d.act if d.act is not none else '—' }}</td>
+                    <td style="border-left:2px solid rgba(var(--accent-rgb),.1);" class="nota-none">{{ d.act if d.act is not none else '—' }}</td>
                     <td class="nota-none">{{ d.eval if d.eval is not none else '—' }}</td>
                     <td class="nota-none">{{ d.auto if d.auto is not none else '—' }}</td>
                     <td class="{% if d.final is not none %}{% if d.final >= 3.0 %}nota-ok{% else %}nota-mal{% endif %}{% else %}nota-none{% endif %}">{{ d.final if d.final is not none else '—' }}</td>
@@ -216,7 +219,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                         </div>
                     </td>
                     <td style="white-space:nowrap;">
-                        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo, aid=fila.id) }}" title="Descargar PDF" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(37,99,235,.15);color:var(--accent);text-decoration:none;font-weight:600;margin-right:4px;">📄</a>
+                        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo, aid=fila.id) }}" title="Descargar PDF" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(var(--accent-rgb),.15);color:var(--accent);text-decoration:none;font-weight:600;margin-right:4px;">📄</a>
                         <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre }}')" title="Enviar boletín" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);cursor:pointer;font-weight:600;">📧</button>
                     </td>
                 </tr>
@@ -343,5 +346,6 @@ window.addEventListener('scroll',function(){
 });
 addDataLabels();
 </script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <head>
 <link rel="manifest" href="/static/manifest.json">
 <meta charset="UTF-8">
@@ -7,7 +8,8 @@
 <title>Lumini — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#2563EB;--accent2:#7C3AED;--accent-rgb:37,99,235;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:220px;}
+:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:220px;--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
 .sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;padding:0;}
@@ -18,8 +20,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto;}
 .sidebar-section{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;padding:8px 12px 4px;font-weight:600;}
 .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all var(--tr);margin-bottom:2px;}
-.sidebar-item:hover{background:var(--bg3);color:var(--text);}
-.sidebar-item.active{background:rgba(var(--accent-rgb),.12);color:var(--accent);}
+.sidebar-item:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
+.sidebar-item.active{background:var(--accent);color:#fff;}
 .sidebar-item .icon{width:18px;text-align:center;font-size:14px;flex-shrink:0;}
 .sidebar-user{border-top:1px solid var(--border);padding:12px 16px;font-size:12px;}
 .sidebar-user .name{color:var(--text);font-weight:600;}
@@ -33,12 +35,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .ctab{padding:7px 16px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;transition:all var(--tr);}
 .ctab:hover,.ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(var(--accent-rgb),.25);}
 .stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
-.scard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rmd);padding:16px 20px;flex:1;min-width:130px;transition:all var(--tr);}
+.scard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rmd);padding:16px 20px;flex:1;min-width:130px;transition:all var(--tr);}
 .scard:hover{background:var(--bg3);border-color:rgba(255,255,255,.1);transform:translateY(-1px);}
 .slabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
 .sval{font-size:1.5rem;font-weight:700;letter-spacing:-.5px;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);margin-bottom:20px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:box-shadow var(--tr);}
-.card:hover{box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);margin-bottom:20px;overflow:hidden;box-shadow:var(--shadow);transition:box-shadow var(--tr);}
+.card:hover{box-shadow:var(--shadow-lg);}
 .card-head{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 .card-title{font-size:13px;font-weight:600;color:var(--text);}
 .card-body{padding:16px 20px;}
@@ -181,6 +183,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
     <div class="name">{{ profesor.nombre }}</div>
     <div class="role">{{ materia }} · {{ jornada }}</div>
   </div>
+  <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema">🌙 Cambiar tema</button>
 </nav>
 
 <div class="main">
@@ -201,7 +204,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 {% endfor %}
 </div>
 {% else %}
-<div style="background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:9px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--muted);">
+<div style="background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.2);border-radius:9px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--muted);">
   No tienes cursos asignados. Ve a <a href="/{{ slug }}/cambiar_password" style="color:var(--accent)">Perfil</a> para agregar cursos.
 </div>
 {% endif %}
@@ -607,5 +610,6 @@ window.addEventListener('scroll',function(){
 addDataLabels();
 </script>
 <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
 </body>
 </html>

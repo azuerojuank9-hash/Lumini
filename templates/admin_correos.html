@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumini — Centro de Correos</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        :root{--accent:#6c63ff;--accent2:#3498db;--accent-rgb:108,99,255;--bg:#08080f;--bg2:#11111e;--bg3:#191928;--border:rgba(255,255,255,.06);--text:#f0f0f8;--muted:#8080a0;--sub:#55557a;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--red:#e74c3c;--green:#2ecc71;}
+        :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
         *{box-sizing:border-box;margin:0;padding:0;}
         body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;padding-top:80px;color:var(--text);-webkit-font-smoothing:antialiased;}
         .navbar{position:fixed;top:0;left:0;width:100%;background:rgba(8,8,15,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 28px;z-index:1000;backdrop-filter:blur(16px);}
@@ -82,7 +84,7 @@
 
 <nav class="navbar">
     <div class="navbar-left">
-        <img src="/static/logo.png" alt="Lumini">
+        <img src="/static/lumini_logo.png" alt="Lumini">
         <div class="navbar-brand">
             <div class="name">LUMINI</div>
             <div class="tagline">Centro de correos</div>
@@ -91,6 +93,7 @@
     </div>
     <div class="navbar-right">
         <a href="/admin" class="nav-link">← Panel principal</a>
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;padding:6px 12px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;" aria-label="Cambiar tema">🌙</button>
         <a href="/admin/logout" class="logout-btn">🚪 Salir</a>
     </div>
 </nav>
@@ -107,7 +110,7 @@
     <!-- TABS -->
     <div class="tabs">
         <button class="tab-btn active" onclick="showTab('anuncios', this)">
-            <span class="tab-dot" style="background:#6c63ff"></span> 📢 Anuncios
+            <span class="tab-dot" style="background:var(--accent)"></span> 📢 Anuncios
         </button>
         <button class="tab-btn" onclick="showTab('pagos', this)">
             <span class="tab-dot" style="background:#f39c12"></span> 💳 Pagos
@@ -435,5 +438,6 @@ function cargarPlantilla(key) {
     document.querySelector('#panel-anuncios .card').scrollIntoView({ behavior: 'smooth' });
 }
 </script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
 </body>
 </html>
