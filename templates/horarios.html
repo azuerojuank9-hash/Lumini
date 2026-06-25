@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <head>
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Horarios — {{ colegio.nombre if colegio else slug }}</title>
@@ -269,6 +269,7 @@ function limpiar(){
 
 function _send(num, mat, prof){
   const fd = new FormData();
+  fd.append('_csrf_token', getCsrf());
   fd.append('dia',      _dia);
   fd.append('franja',   _franja);
   fd.append('num',      num);
@@ -276,7 +277,8 @@ function _send(num, mat, prof){
   fd.append('profesor', prof);
   fd.append('curso',    CURSO);
   fetch('/'+SLUG+'/horarios', {method:'POST', body:fd})
-    .then(()=>{ cerrar(); showToast('✅ Guardado'); setTimeout(()=>location.reload(), 700); });
+    .then(()=>{ cerrar(); showToast('✅ Guardado'); setTimeout(()=>location.reload(), 700); })
+    .catch(()=>{ showToast('❌ Error de conexión'); });
 }
 
 document.addEventListener('keydown', e=>{

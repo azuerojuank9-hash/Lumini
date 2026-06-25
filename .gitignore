@@ -1,5 +1,6 @@
 # Secretos — NUNCA subir a Git
 .env
+.env.*
 
 # Bases de datos
 *.db
@@ -18,6 +19,9 @@ __pycache__/
 env/
 venv/
 .venv/
+
+# Legacy / one-off scripts
+_legacy/
 
 # Uploads
 static/logos/

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <head>
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <link rel="manifest" href="/static/manifest.json">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -113,7 +113,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                 <label>Contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="password" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁</button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁</button>
                 </div>
             </div>
             <button type="submit" class="btn-submit">Entrar</button>
@@ -141,14 +141,14 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                 <label>Contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="reg_password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁</button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁</button>
                 </div>
             </div>
             <div class="field">
                 <label>Confirmar contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁</button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁</button>
                 </div>
             </div>
 
@@ -212,9 +212,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                     {% endfor %}
                 </select>
             </div>
+            <div class="field">
+                <label>PIN de acceso <span style="color:var(--sub);font-weight:400;">(opcional)</span></label>
+                <input type="password" name="pin_est" placeholder="Tu PIN (si tienes)" autocomplete="off" inputmode="numeric">
+            </div>
             <button type="submit" class="btn-submit">Ver mis notas</button>
         </form>
-        <p class="hint">Escribe tu nombre exactamente como aparece en el sistema.</p>
+        <p class="hint">Si tu colegio asignó un PIN, escríbelo. Si no, deja el campo vacío.</p>
     </div>
 
     <div id="tab-directora" class="section">
@@ -235,7 +239,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                     <label>Contraseña</label>
                     <div class="pass-wrapper">
                         <input type="password" name="dir_password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)">👁</button>
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁</button>
                     </div>
                 </div>
                 <button type="submit" class="btn-submit">Entrar al panel</button>
@@ -261,14 +265,14 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                     <label>Contraseña</label>
                     <div class="pass-wrapper">
                         <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)">👁</button>
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁</button>
                     </div>
                 </div>
                 <div class="field">
                     <label>Confirmar contraseña</label>
                     <div class="pass-wrapper">
                         <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)">👁</button>
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁</button>
                     </div>
                 </div>
                 <div class="field">

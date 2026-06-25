@@ -9,6 +9,10 @@ app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache 24 horas
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 app.permanent_session_lifetime = timedelta(hours=4)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+if not app.debug:
+    app.config['SESSION_COOKIE_SECURE'] = True
 
 # ── LOGGING ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -115,8 +119,10 @@ def necesita_rehash(guardada):
 
 # ── MASTER DB ─────────────────────────────────────────────────────────────────
 def conectar_master():
-    c = sqlite3.connect(MASTER_DB)
+    c = sqlite3.connect(MASTER_DB, timeout=30)
     c.row_factory = sqlite3.Row
+    c.execute('PRAGMA journal_mode=WAL')
+    c.execute('PRAGMA foreign_keys=ON')
     return c
 
 def init_master_db():
@@ -142,7 +148,7 @@ def init_master_db():
         'secondary_color TEXT DEFAULT "#3498db"',
     ]:
         try: conn.execute(f'ALTER TABLE colegios ADD COLUMN {col}')
-        except: pass
+        except Exception: pass
     conn.commit()
     conn.close()
 
@@ -167,8 +173,10 @@ def get_codigo_registro(slug):
 def db_path(slug): return os.path.join(DB_FOLDER, f'{slug}.db')
 
 def conectar(slug):
-    c = sqlite3.connect(db_path(slug))
+    c = sqlite3.connect(db_path(slug), timeout=30)
     c.row_factory = sqlite3.Row
+    c.execute('PRAGMA journal_mode=WAL')
+    c.execute('PRAGMA foreign_keys=ON')
     return c
 
 def migrar_db(slug):
@@ -210,6 +218,9 @@ def migrar_db(slug):
             conn.commit()
         if 'email_acudiente' not in cols_alum:
             conn.execute('ALTER TABLE alumnos ADD COLUMN email_acudiente TEXT DEFAULT ""')
+            conn.commit()
+        if 'pin' not in cols_alum:
+            conn.execute('ALTER TABLE alumnos ADD COLUMN pin TEXT DEFAULT ""')
             conn.commit()
 
         cols_act = [r[1] for r in conn.execute('PRAGMA table_info(actividades)').fetchall()]
@@ -277,7 +288,7 @@ def migrar_db(slug):
             conn.execute('INSERT OR IGNORE INTO horarios_curso (curso,jornada,dia,franja) VALUES ("__test__","__test__","__test__","__test__")')
             conn.execute('DELETE FROM horarios_curso WHERE curso="__test__"')
             conn.commit()
-        except:
+        except Exception:
             conn.execute('ALTER TABLE horarios_curso RENAME TO horarios_curso_old')
             conn.execute('''CREATE TABLE horarios_curso (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -335,7 +346,8 @@ def init_db(slug):
             nombre TEXT NOT NULL, curso TEXT NOT NULL,
             jornada TEXT NOT NULL DEFAULT "Mañana",
             num_curso INTEGER DEFAULT 0, activo INTEGER DEFAULT 1,
-            email_acudiente TEXT DEFAULT '')''',
+            email_acudiente TEXT DEFAULT '',
+            pin TEXT DEFAULT '')''',
         '''CREATE TABLE IF NOT EXISTS asistencia (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             aid INTEGER, fecha TEXT, estado TEXT)''',
@@ -379,6 +391,18 @@ def init_db(slug):
     ]
     for s in stmts:
         conn.execute(s)
+    indexes = [
+        'CREATE INDEX IF NOT EXISTS idx_notas_aid ON notas(aid)',
+        'CREATE INDEX IF NOT EXISTS idx_notas_actividad ON notas(actividad_id)',
+        'CREATE INDEX IF NOT EXISTS idx_asistencia_aid ON asistencia(aid)',
+        'CREATE INDEX IF NOT EXISTS idx_observaciones_aid ON observaciones(aid)',
+        'CREATE INDEX IF NOT EXISTS idx_evaluaciones_aid ON evaluaciones(aid)',
+        'CREATE INDEX IF NOT EXISTS idx_actividades_prof ON actividades(profesor_id,materia,curso,jornada,periodo)',
+        'CREATE INDEX IF NOT EXISTS idx_alumnos_nombre ON alumnos(nombre,jornada)',
+    ]
+    for idx in indexes:
+        try: conn.execute(idx)
+        except Exception: pass
     conn.commit()
     conn.close()
     migrar_db(slug)
@@ -566,6 +590,8 @@ def admin():
     conn.close()
 
     if request.method == 'POST':
+        if not validar_csrf():
+            return redirect(url_for('admin'))
         accion = request.form.get('accion')
 
         if accion == 'crear_colegio':
@@ -594,17 +620,20 @@ def admin():
                             logo_filename = f'{slug}.{ext}'
                             f.save(os.path.join(LOGO_FOLDER, logo_filename))
                 if not error:
+                    cm = conectar_master()
                     try:
-                        cm = conectar_master()
                         cm.execute(
                             'INSERT INTO colegios (slug,nombre,logo,num_periodos,vencimiento,codigo_registro,primary_color,secondary_color) VALUES (?,?,?,?,?,?,?,?)',
                             (slug, nombre, logo_filename, num_p, venc, codigo, pri_col, sec_col))
-                        cm.commit(); cm.close()
-                        init_db(slug)
-                        exito = f'Colegio "{nombre}" creado. URL: /{slug}/login · Código: {codigo}'
-                        logger.info(f'Colegio creado: {slug}')
+                        cm.commit()
                     except sqlite3.IntegrityError:
                         error = f'El slug "{slug}" ya existe.'
+                    finally:
+                        cm.close()
+                    if not error:
+                            init_db(slug)
+                            exito = f'Colegio "{nombre}" creado. URL: /{slug}/login · Código: {codigo}'
+                            logger.info(f'Colegio creado: {slug}')
 
         elif accion == 'toggle_colegio':
             slug_t = request.form.get('slug')
@@ -675,6 +704,9 @@ def recuperar_password(slug):
     paso = 1
 
     if request.method == 'POST':
+        if not validar_csrf():
+            error = 'Error de seguridad. Intenta de nuevo.'
+            paso = 1
         accion      = request.form.get('accion', '')
         usuario_val = request.form.get('usuario', '').strip()
 
@@ -849,13 +881,14 @@ def login(slug):
                                 conn.execute(
                                     'INSERT OR IGNORE INTO asignaciones_materia (profesor_id,materia,jornada) VALUES (?,?,?)',
                                     (pid, mat, jor))
-                            except: pass
+                            except Exception: pass
                     conn.commit(); conn.close()
                     error = '✅ Registro exitoso. Ya puedes ingresar.'
 
         elif accion == 'estudiante':
-            nombre  = request.form.get('nombre_est', '').strip().lower()
-            jornada = request.form.get('jornada_est', '').strip()
+            nombre     = request.form.get('nombre_est', '').strip().lower()
+            jornada    = request.form.get('jornada_est', '').strip()
+            pin_ingresado = request.form.get('pin_est', '').strip()
             conn = conectar(slug)
             if jornada:
                 alumno = conn.execute(
@@ -866,11 +899,15 @@ def login(slug):
                     'SELECT * FROM alumnos WHERE LOWER(nombre)=? AND activo=1', (nombre,)).fetchone()
             conn.close()
             if alumno:
-                session.permanent = True
-                session[f'rol_{slug}']       = 'estudiante'
-                session[f'alumno_id_{slug}'] = alumno['id']
-                return redirect(url_for('vista_estudiante', slug=slug))
-            error = 'No se encontró ese estudiante.'
+                if alumno['pin'] and pin_ingresado != alumno['pin']:
+                    error = 'PIN incorrecto.'
+                else:
+                    session.permanent = True
+                    session[f'rol_{slug}']       = 'estudiante'
+                    session[f'alumno_id_{slug}'] = alumno['id']
+                    return redirect(url_for('vista_estudiante', slug=slug))
+            else:
+                error = 'No se encontró ese estudiante.'
 
         elif accion == 'directora_login':
             u = request.form.get('dir_usuario', '').strip()
@@ -946,77 +983,79 @@ def home(slug):
     periodo_sel = request.args.get('periodo', 1, type=int)
 
     conn = conectar(slug)
-    alumnos = actividades = agenda = []
+    try:
+        alumnos = actividades = agenda = []
 
-    if curso_sel and curso_sel in mis_cursos:
-        alumnos = conn.execute(
-            'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
-            (curso_sel, jornada)).fetchall()
-        for i, a in enumerate(alumnos, 1):
-            conn.execute('UPDATE alumnos SET num_curso=? WHERE id=?', (i, a['id']))
-        conn.commit()
-        alumnos = conn.execute(
-            'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
-            (curso_sel, jornada)).fetchall()
-        actividades = conn.execute(
-            '''SELECT * FROM actividades
-               WHERE profesor_id=? AND materia=? AND jornada=? AND curso=?
-               AND COALESCE(periodo,1)=? ORDER BY orden''',
-            (prof['id'], materia, jornada, curso_sel, periodo_sel)).fetchall()
-        agenda = conn.execute(
-            'SELECT * FROM compromisos WHERE materia=? AND curso=? AND jornada=? ORDER BY fecha',
-            (materia, curso_sel, jornada)).fetchall()
+        if curso_sel and curso_sel in mis_cursos:
+            alumnos = conn.execute(
+                'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
+                (curso_sel, jornada)).fetchall()
+            for i, a in enumerate(alumnos, 1):
+                conn.execute('UPDATE alumnos SET num_curso=? WHERE id=?', (i, a['id']))
+            conn.commit()
+            alumnos = conn.execute(
+                'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
+                (curso_sel, jornada)).fetchall()
+            actividades = conn.execute(
+                '''SELECT * FROM actividades
+                   WHERE profesor_id=? AND materia=? AND jornada=? AND curso=?
+                   AND COALESCE(periodo,1)=? ORDER BY orden''',
+                (prof['id'], materia, jornada, curso_sel, periodo_sel)).fetchall()
+            agenda = conn.execute(
+                'SELECT * FROM compromisos WHERE materia=? AND curso=? AND jornada=? ORDER BY fecha',
+                (materia, curso_sel, jornada)).fetchall()
 
-    MESES = {'01': 'Ene', '02': 'Feb', '03': 'Mar', '04': 'Abr', '05': 'May', '06': 'Jun',
-             '07': 'Jul', '08': 'Ago', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dic'}
-    datos = []
-    for a in alumnos:
-        notas_raw = conn.execute(
-            '''SELECT n.actividad_id, n.val, n.id FROM notas n
-               JOIN actividades ac ON ac.id=n.actividad_id
-               WHERE n.aid=? AND ac.materia=? AND ac.jornada=? AND ac.curso=?
-               AND COALESCE(ac.periodo,1)=?''',
-            (a['id'], materia, jornada, curso_sel, periodo_sel)).fetchall()
-        notas_map = {nr['actividad_id']: {'val': nr['val'], 'id': nr['id']} for nr in notas_raw}
-        ev = conn.execute(
-            '''SELECT evaluacion, autoevaluacion FROM evaluaciones
-               WHERE aid=? AND profesor_id=? AND materia=? AND jornada=?
-               AND COALESCE(periodo,1)=?''',
-            (a['id'], prof['id'], materia, jornada, periodo_sel)).fetchone()
-        eval_v = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
-        auto_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
-        todas = [nr['val'] for nr in notas_raw]
-        if eval_v is not None: todas.append(eval_v)
-        if auto_v is not None: todas.append(auto_v)
-        prom = round(sum(todas) / len(todas), 2) if todas else 0
-        historial_raw = conn.execute(
-            'SELECT fecha, estado FROM asistencia WHERE aid=? ORDER BY fecha', (a['id'],)).fetchall()
-        hist_meses = {}
-        for h in historial_raw:
-            if h['fecha']:
-                p2 = h['fecha'].split('-')
-                if len(p2) >= 2:
-                    label = f"{MESES.get(p2[1], p2[1])} {p2[0]}"
-                    hist_meses.setdefault(label, []).append({'fecha': h['fecha'], 'estado': h['estado']})
-        asis = conn.execute(
-            'SELECT estado FROM asistencia WHERE aid=? ORDER BY id DESC LIMIT 1', (a['id'],)).fetchone()
-        obs = conn.execute(
-            'SELECT id, materia, texto, fecha FROM observaciones WHERE aid=? AND materia=? ORDER BY fecha DESC',
-            (a['id'], materia)).fetchall()
-        datos.append({
-            'id': a['id'], 'num_curso': a['num_curso'],
-            'nombre': a['nombre'], 'curso': a['curso'],
-            'promedio': prom, 'notas_map': notas_map,
-            'evaluacion':     eval_v if eval_v is not None else '',
-            'autoevaluacion': auto_v if auto_v is not None else '',
-            'asistencia': asis['estado'] if asis else '-',
-            'historial_meses': hist_meses,
-            'observaciones': [dict(o) for o in obs],
-        })
+        MESES = {'01': 'Ene', '02': 'Feb', '03': 'Mar', '04': 'Abr', '05': 'May', '06': 'Jun',
+                 '07': 'Jul', '08': 'Ago', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dic'}
+        datos = []
+        for a in alumnos:
+            notas_raw = conn.execute(
+                '''SELECT n.actividad_id, n.val, n.id FROM notas n
+                   JOIN actividades ac ON ac.id=n.actividad_id
+                   WHERE n.aid=? AND ac.materia=? AND ac.jornada=? AND ac.curso=?
+                   AND COALESCE(ac.periodo,1)=?''',
+                (a['id'], materia, jornada, curso_sel, periodo_sel)).fetchall()
+            notas_map = {nr['actividad_id']: {'val': nr['val'], 'id': nr['id']} for nr in notas_raw}
+            ev = conn.execute(
+                '''SELECT evaluacion, autoevaluacion FROM evaluaciones
+                   WHERE aid=? AND profesor_id=? AND materia=? AND jornada=?
+                   AND COALESCE(periodo,1)=?''',
+                (a['id'], prof['id'], materia, jornada, periodo_sel)).fetchone()
+            eval_v = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
+            auto_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
+            todas = [nr['val'] for nr in notas_raw]
+            if eval_v is not None: todas.append(eval_v)
+            if auto_v is not None: todas.append(auto_v)
+            prom = round(sum(todas) / len(todas), 2) if todas else 0
+            historial_raw = conn.execute(
+                'SELECT fecha, estado FROM asistencia WHERE aid=? ORDER BY fecha', (a['id'],)).fetchall()
+            hist_meses = {}
+            for h in historial_raw:
+                if h['fecha']:
+                    p2 = h['fecha'].split('-')
+                    if len(p2) >= 2:
+                        label = f"{MESES.get(p2[1], p2[1])} {p2[0]}"
+                        hist_meses.setdefault(label, []).append({'fecha': h['fecha'], 'estado': h['estado']})
+            asis = conn.execute(
+                'SELECT estado FROM asistencia WHERE aid=? ORDER BY id DESC LIMIT 1', (a['id'],)).fetchone()
+            obs = conn.execute(
+                'SELECT id, materia, texto, fecha FROM observaciones WHERE aid=? AND materia=? ORDER BY fecha DESC',
+                (a['id'], materia)).fetchall()
+            datos.append({
+                'id': a['id'], 'num_curso': a['num_curso'],
+                'nombre': a['nombre'], 'curso': a['curso'],
+                'promedio': prom, 'notas_map': notas_map,
+                'evaluacion':     eval_v if eval_v is not None else '',
+                'autoevaluacion': auto_v if auto_v is not None else '',
+                'asistencia': asis['estado'] if asis else '-',
+                'historial_meses': hist_meses,
+                'observaciones': [dict(o) for o in obs],
+            })
 
-    prom_gral = round(sum(d['promedio'] for d in datos) / len(datos), 2) if datos else 0
-    mejor     = max(datos, key=lambda x: x['promedio'], default={'nombre': 'N/A', 'promedio': 0})
-    conn.close()
+        prom_gral = round(sum(d['promedio'] for d in datos) / len(datos), 2) if datos else 0
+        mejor     = max(datos, key=lambda x: x['promedio'], default={'nombre': 'N/A', 'promedio': 0})
+    finally:
+        conn.close()
     num_periodos = int(colegio['num_periodos']) if colegio and colegio['num_periodos'] else 4
     return render_template('index.html',
                            profesor=prof, mis_cursos=mis_cursos, curso_sel=curso_sel,
@@ -1432,6 +1471,8 @@ def cambiar_password(slug):
 
 @app.route('/<slug>/agregar_cursos', methods=['POST'])
 def agregar_cursos(slug):
+    if not validar_csrf():
+        return 'Error de seguridad', 400
     require_colegio(slug)
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
@@ -1557,27 +1598,34 @@ def horarios(slug):
         return redirect(url_for('seleccionar_jornada', slug=slug))
     mis_cursos = get_cursos_profesor(slug, prof['id'], materia, jornada) if prof else []
     curso_sel  = request.args.get('curso', mis_cursos[0] if mis_cursos else None)
-    c = conectar(slug)
+
     if request.method == 'POST':
-        dia      = request.form.get('dia', '')
-        franja   = request.form.get('franja', '')
-        num      = request.form.get('num', '').strip()
-        mat      = request.form.get('materia', '').strip()
-        profesor = request.form.get('profesor', '').strip()
-        curso_p  = request.form.get('curso', curso_sel)
-        if mat or profesor:
-            c.execute(
-                '''INSERT INTO horarios_curso (curso,jornada,dia,franja,num,materia,profesor)
-                   VALUES (?,?,?,?,?,?,?)
-                   ON CONFLICT(curso,jornada,dia,franja) DO UPDATE SET
-                       num=excluded.num, materia=excluded.materia, profesor=excluded.profesor''',
-                (curso_p, jornada, dia, franja, num, mat, profesor))
-        else:
-            c.execute(
-                'DELETE FROM horarios_curso WHERE curso=? AND jornada=? AND dia=? AND franja=?',
-                (curso_p, jornada, dia, franja))
-        c.commit(); c.close()
+        if not validar_csrf():
+            return redirect(url_for('horarios', slug=slug))
+        c = conectar(slug)
+        try:
+            dia      = request.form.get('dia', '')
+            franja   = request.form.get('franja', '')
+            num      = request.form.get('num', '').strip()
+            mat      = request.form.get('materia', '').strip()
+            profesor = request.form.get('profesor', '').strip()
+            curso_p  = request.form.get('curso', curso_sel)
+            if mat or profesor:
+                c.execute(
+                    '''INSERT INTO horarios_curso (curso,jornada,dia,franja,num,materia,profesor)
+                       VALUES (?,?,?,?,?,?,?)
+                       ON CONFLICT(curso,jornada,dia,franja) DO UPDATE SET
+                           num=excluded.num, materia=excluded.materia, profesor=excluded.profesor''',
+                    (curso_p, jornada, dia, franja, num, mat, profesor))
+            else:
+                c.execute(
+                    'DELETE FROM horarios_curso WHERE curso=? AND jornada=? AND dia=? AND franja=?',
+                    (curso_p, jornada, dia, franja))
+            c.commit()
+        finally:
+            c.close()
         return ('', 204)
+    c = conectar(slug)
     filas = []
     if curso_sel:
         filas = c.execute(
@@ -1687,6 +1735,8 @@ def directora_login(slug):
 
 @app.route('/<slug>/directora/registrar_directo', methods=['POST'])
 def directora_registrar_directo(slug):
+    if not validar_csrf():
+        return 'Error de seguridad', 400
     require_colegio(slug)
     init_db(slug)
     colegio   = get_colegio(slug)
@@ -1992,6 +2042,12 @@ def forbidden(e):
 def too_large(e):
     return render_template('error.html', codigo=413,
                            mensaje='El archivo es demasiado grande. Máximo permitido: 2 MB.'), 413
+
+@app.errorhandler(500)
+def server_error(e):
+    logger.error(f'Error interno: {e}')
+    return render_template('error.html', codigo=500,
+                           mensaje='Error interno del servidor. Intenta de nuevo más tarde.'), 500
 
 # ── FILTRO DÍAS RESTANTES ─────────────────────────────────────────────────────
 from datetime import date as _date

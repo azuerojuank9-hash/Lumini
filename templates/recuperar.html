@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <head>
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar contraseña — Lumini</title>
@@ -76,6 +76,7 @@
     {% elif paso == 1 %}
         <p class="card-desc">Ingresa tu usuario para continuar.</p>
         <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="accion" value="buscar_usuario">
             <div class="field">
                 <label>Usuario</label>
@@ -87,8 +88,9 @@
     {% elif paso == 2 %}
         <p class="card-desc">Responde tu pregunta secreta y crea una nueva contraseña.</p>
         <div class="pregunta-box">🔑 {{ pregunta }}</div>
-        <form method="POST">
-            <input type="hidden" name="accion" value="cambiar_password">
+            <form method="POST">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="accion" value="cambiar_password">
             <input type="hidden" name="usuario" value="{{ usuario_val }}">
             <div class="field">
                 <label>Tu respuesta</label>
@@ -98,14 +100,14 @@
                 <label>Nueva contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="nueva" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁️</button>
                 </div>
             </div>
             <div class="field">
                 <label>Confirmar contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="confirmar" placeholder="Repite la contraseña" required minlength="6" autocomplete="new-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁️</button>
                 </div>
             </div>
             <button type="submit" class="btn-submit">Guardar nueva contraseña</button>

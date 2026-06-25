@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <head>
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mi Boletín — {{ alumno.nombre }}</title>
@@ -118,7 +118,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
   </div>
   </a>
   <div style="display:flex;align-items:center;gap:8px;">
-    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menú" style="position:static;display:flex;">☰</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menú" style="position:static;">☰</button>
     <a href="/{{ slug }}/logout" class="nav-btn" id="logoutBtn">🚪 Salir</a>
     <button onclick="toggleTheme()" style="margin-left:auto;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;" aria-label="Cambiar tema">🌙</button>
   </div>

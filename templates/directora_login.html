@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <head>
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Directora — {{ colegio.nombre if colegio else slug }}</title>
@@ -107,7 +107,7 @@
                 <label>Contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁️</button>
                 </div>
             </div>
             <button type="submit" class="btn-submit">Ingresar →</button>
@@ -117,6 +117,7 @@
 
     <div id="tab-registro" class="section">
         <form method="POST" action="/{{ slug }}/directora/registrar_directo" onsubmit="return validarRegistro()">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
             <div class="field">
                 <label>Nombre completo</label>
@@ -139,7 +140,7 @@
                     <input type="password" name="password" id="reg-pwd"
                            placeholder="Mínimo 6 caracteres" required minlength="6"
                            oninput="checkPwd(this)">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁️</button>
                 </div>
                 <div class="pwd-strength" id="pwd-bar"></div>
                 <div class="pwd-label" id="pwd-label"></div>
@@ -150,7 +151,7 @@
                 <div class="pass-wrapper">
                     <input type="password" name="confirmar_password" id="reg-pwd2"
                            placeholder="Repite tu contraseña" required minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁️</button>
                 </div>
             </div>
 
@@ -229,14 +230,14 @@
                 <label>Nueva contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" id="rec-nueva" placeholder="Mínimo 6 caracteres" minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁️</button>
                 </div>
             </div>
             <div class="field">
                 <label>Confirmar contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" id="rec-confirmar" placeholder="Repite la contraseña">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)">👁️</button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña">👁️</button>
                 </div>
             </div>
             <button type="button" class="btn-submit" onclick="recCambiar()">Guardar nueva contraseña</button>
