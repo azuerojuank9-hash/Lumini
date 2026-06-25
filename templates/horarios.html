@@ -4,32 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Horarios — {{ colegio.nombre if colegio else slug }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#08080f;--bg2:#11111e;--bg3:#191928;--bg4:#21213a;--border:rgba(255,255,255,.06);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#6c63ff' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#3498db' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#6c63ff') | hex_to_rgb }};--text:#f0f0f8;--muted:#8080a0;--sub:#55557a;--danger:#e74c3c;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);}
+:root{--bg:#080B14;--bg2:rgba(15,23,42,0.8);--bg3:#1E293B;--bg4:#334155;--border:rgba(37,99,235,0.2);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#2563EB' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#7C3AED' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#2563EB') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--danger:#EF4444;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:240px;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
-.navbar{position:fixed;top:0;left:0;width:100%;background:rgba(8,8,15,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 24px;z-index:1000;backdrop-filter:blur(16px);}
-.navbar-left{display:flex;align-items:center;gap:12px;}
-.navbar-logo{height:40px;width:40px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
-.brand-name{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.brand-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
-.nav-btn{padding:7px 14px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;border:none;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border);display:inline-flex;align-items:center;gap:5px;transition:background var(--tr);}
-.nav-btn:hover{background:rgba(255,255,255,.08);}
-.main{margin-top:72px;padding:24px;max-width:1300px;margin-left:auto;margin-right:auto;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:#0F172A;border-right:1px solid #1E293B;display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
+.sidebar-logo img{height:38px;width:38px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
+.sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
+.sidebar-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px;}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all var(--tr);}
+.sidebar-link:hover{background:rgba(37,99,235,.1);color:var(--text);}
+.sidebar-link.active{background:rgba(37,99,235,.15);color:var(--accent);}
+.sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-footer{padding:12px 10px;border-top:1px solid #1E293B;}
+.main{margin-left:var(--sidebar);padding:32px 28px;width:calc(100% - var(--sidebar));min-height:100vh;}
 h1{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:6px;}
 .subtitle{color:var(--muted);font-size:13px;margin-bottom:20px;}
 .curso-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
-.curso-tab{padding:7px 16px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;background:var(--bg2);border:1px solid var(--border);color:var(--muted);transition:all var(--tr);}
+.curso-tab{padding:7px 16px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;background:#0F172A;border:1px solid #1E293B;color:var(--muted);transition:all var(--tr);}
 .curso-tab.active,.curso-tab:hover{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;backdrop-filter:blur(20px);box-shadow:0 4px 20px rgba(0,0,0,.2);}
 .tabla-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
-th{padding:10px 8px;text-align:center;background:var(--bg3);border:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;}
+th{padding:10px 8px;text-align:center;background:#0F172A;border:1px solid #1E293B;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;}
 th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:2px;}
 th .ht{font-size:10px;color:var(--muted);}
-td{border:1px solid var(--border);vertical-align:middle;}
-td.dia-col{padding:10px 14px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--accent);background:var(--bg2);white-space:nowrap;min-width:55px;}
+td{border:1px solid #1E293B;vertical-align:middle;}
+td.dia-col{padding:10px 14px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--accent);background:rgba(15,23,42,.6);white-space:nowrap;min-width:55px;}
 td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:12px 8px;color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
 td.edit-col{cursor:pointer;transition:background var(--tr);}
 td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
@@ -40,48 +44,67 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
 .c-empty{color:rgba(var(--accent-rgb),.2);font-size:24px;padding-top:10px;}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;width:100%;max-width:380px;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
+.modal{background:rgba(15,23,42,.95);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;width:100%;max-width:380px;backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .modal h3{font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:4px;}
 .modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-weight:600;}
-.inp{width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
+.inp{width:100%;padding:10px 12px;background:#0F172A;border:1.5px solid #1E293B;border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
 .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
 .btn-row{display:flex;gap:8px;margin-top:16px;}
 .btn{padding:10px 20px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex:1;transition:all var(--tr);}
 .btn:active{transform:scale(.97);}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
-.btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border);}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid #1E293B;}
 .btn-ghost:hover{background:rgba(255,255,255,.08);}
-.btn-clear{background:rgba(231,76,60,.08);color:var(--danger);border:1px solid rgba(231,76,60,.2);flex:0;padding:10px 14px;}
-.btn-clear:hover{background:rgba(231,76,60,.18);}
-.toast{position:fixed;bottom:24px;right:24px;background:rgba(46,204,113,.95);color:#fff;padding:10px 18px;border-radius:var(--rmd);font-size:13px;font-weight:600;z-index:3000;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.btn-clear{background:rgba(239,68,68,.08);color:var(--danger);border:1px solid rgba(239,68,68,.2);flex:0;padding:10px 14px;}
+.btn-clear:hover{background:rgba(239,68,68,.18);}
+.toast{position:fixed;bottom:24px;right:24px;background:rgba(16,185,129,.95);color:#fff;padding:10px 18px;border-radius:var(--rmd);font-size:13px;font-weight:600;z-index:3000;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.3);}
 .toast.show{opacity:1;transform:translateY(0);}
 .hint{font-size:11px;color:var(--muted);margin-top:12px;text-align:center;}
+.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
+.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
+.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);}
+@media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 12px;}}
 </style>
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
 </head>
 <body>
 
-<nav class="navbar">
-  <div class="navbar-left">
-    {% if colegio and colegio.logo_url %}
-    <img class="navbar-logo" src="{{ colegio.logo_url }}" alt="Logo">
-    {% else %}
-    <img class="navbar-logo" src="/static/logo.png" alt="Lumini">
-    {% endif %}
-    <div>
-      <div class="brand-name">LUMINI</div>
-      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+    <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
+    <div class="sidebar-logo">
+        {% if colegio and colegio.logo_url %}
+        <img src="{{ colegio.logo_url }}" alt="Logo">
+        {% else %}
+        <img src="/static/logo.png" alt="Lumini">
+        {% endif %}
+        <div>
+            <div class="sidebar-brand">LUMINI</div>
+            <div class="sidebar-brand-sub">{{ colegio.nombre if colegio else slug }}</div>
+        </div>
     </div>
-  </div>
-  <a href="/{{ slug }}/" class="nav-btn">← Volver</a>
-</nav>
+    </a>
+    <nav class="sidebar-nav">
+        <a href="/{{ slug }}/" class="sidebar-link"><span class="icon">📊</span> Dashboard</a>
+        <a href="/{{ slug }}/horarios" class="sidebar-link active"><span class="icon">🗓</span> Horarios</a>
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon">⚙️</span> Mi Perfil</a>
+        <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon">📦</span> Archivados</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon">🚪</span> Cerrar sesión</a>
+    </div>
+</aside>
 
 <div class="main">
+
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+
   <h1>🗓 Horarios</h1>
   <p class="subtitle">Haz clic en cualquier celda para editar · Se guarda automáticamente</p>
 
@@ -111,7 +134,6 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
           {% for ds, df in dias_list %}
           <tr>
             <td class="dia-col">{{ ds }}</td>
-            {# Horas 1-4 #}
             {% for f in ['1','2','3','4'] %}
               {% set k = df ~ '_' ~ f %}
               {% set e = horario_map.get(k, {}) %}
@@ -135,7 +157,6 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
             {% endfor %}
             {# Descanso #}
             <td class="des-col">☕ Descanso</td>
-            {# Horas 5-6 #}
             {% for f in ['5','6'] %}
               {% set k = df ~ '_' ~ f %}
               {% set e = horario_map.get(k, {}) %}
@@ -194,6 +215,10 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
 <div class="toast" id="toast">✅ Guardado</div>
 
 <script>
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+}
 const SLUG = "{{ slug }}";
 const CURSO = "{{ curso_sel }}";
 const HORAS = {

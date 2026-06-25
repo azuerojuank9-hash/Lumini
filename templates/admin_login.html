@@ -7,30 +7,32 @@
     <title>Lumini — Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root{--accent:#6c63ff;--accent2:#3498db;--accent-rgb:108,99,255;--bg:#08080f;--bg2:#11111e;--border:rgba(255,255,255,.06);--text:#f0f0f8;--muted:#8080a0;--sub:#55557a;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);}
+        :root{--bg:#080B14;--bg2:rgba(15,23,42,0.85);--border:rgba(37,99,235,0.2);--accent:#2563EB;--accent2:#7C3AED;--accent-rgb:37,99,235;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);}
         *{box-sizing:border-box;margin:0;padding:0;}
         body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg);overflow:hidden;position:relative;}
         .bg-orb{position:fixed;border-radius:50%;filter:blur(100px);opacity:.12;animation:float 10s ease-in-out infinite;pointer-events:none;}
         .orb1{width:450px;height:450px;background:var(--accent);top:-100px;left:-120px;animation-delay:0s;}
         .orb2{width:300px;height:300px;background:var(--accent2);bottom:-80px;right:-80px;animation-delay:4s;}
-        .orb3{width:200px;height:200px;background:#9b59b6;top:55%;left:60%;animation-delay:7s;}
+        .orb3{width:200px;height:200px;background:#1D4ED8;top:55%;left:60%;animation-delay:7s;}
         @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-28px) scale(1.04);}}
-        body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.1) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
-        .box{background:rgba(17,17,30,.88);border:1px solid rgba(var(--accent-rgb),.2);border-radius:22px;padding:44px 40px 40px;width:100%;max-width:400px;text-align:center;backdrop-filter:blur(20px);box-shadow:0 0 0 1px rgba(255,255,255,.04),0 24px 60px rgba(0,0,0,.5),0 0 80px rgba(var(--accent-rgb),.06);position:relative;z-index:1;animation:slideUp .5s cubic-bezier(.16,1,.3,1) both;}
+        body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(37,99,235,.08) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
+        .box{background:var(--bg2);border:1px solid var(--border);border-radius:22px;padding:44px 40px 40px;width:100%;max-width:400px;text-align:center;backdrop-filter:blur(20px);box-shadow:0 0 0 1px rgba(255,255,255,.04),0 24px 60px rgba(0,0,0,.5),0 0 80px rgba(37,99,235,.06);position:relative;z-index:1;animation:slideUp .5s cubic-bezier(.16,1,.3,1) both;}
         @keyframes slideUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
-        .shield{width:58px;height:58px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.2),rgba(52,152,219,.15));border:1px solid rgba(var(--accent-rgb),.3);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px;}
-        .logo{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:7px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+        .shield{width:58px;height:58px;background:linear-gradient(135deg,rgba(37,99,235,.2),rgba(124,58,237,.15));border:1px solid rgba(37,99,235,.3);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px;}
+        .logo{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:7px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;}
+        .logo-link{text-decoration:none;color:inherit;display:inline-block;transition:opacity var(--tr);}
+        .logo-link:hover{opacity:.85;}
         .sub{color:var(--sub);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:34px;}
-        .error{display:flex;align-items:center;gap:8px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.25);color:#e74c3c;padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:20px;text-align:left;animation:shake .4s ease;}
+        .error{display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#EF4444;padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:20px;text-align:left;animation:shake .4s ease;}
         @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
         .input-wrap{position:relative;margin-bottom:16px;}
-        .input-wrap input{width:100%;padding:13px 44px 13px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rmd);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;letter-spacing:3px;transition:border-color var(--tr),box-shadow var(--tr);}
-        .input-wrap input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.15);}
+        .input-wrap input{width:100%;padding:13px 44px 13px 16px;background:#0F172A;border:1.5px solid #1E293B;border-radius:var(--rmd);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;letter-spacing:3px;transition:border-color var(--tr),box-shadow var(--tr);}
+        .input-wrap input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.15);}
         .input-wrap input::placeholder{letter-spacing:2px;color:var(--sub);}
         .eye-btn{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--sub);font-size:16px;cursor:pointer;padding:4px;transition:color var(--tr);}
         .eye-btn:hover{color:var(--accent);}
-        .btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rmd);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:all var(--tr);box-shadow:0 4px 20px rgba(var(--accent-rgb),.3);position:relative;overflow:hidden;}
-        .btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(var(--accent-rgb),.4);}
+        .btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rmd);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:all var(--tr);box-shadow:0 4px 20px rgba(37,99,235,.3);position:relative;overflow:hidden;}
+        .btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(37,99,235,.4);}
         .btn:active{transform:translateY(0);}
         .btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .5s;}
         .btn:hover::after{transform:translateX(100%);}
@@ -47,8 +49,10 @@
 <div class="bg-orb orb3"></div>
 
 <div class="box">
+    <a href="/admin" class="logo-link">
     <div class="shield">🛡️</div>
     <div class="logo">LUMINI</div>
+    </a>
     <div class="sub">Acceso administrativo</div>
 
     {% if error %}

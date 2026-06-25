@@ -6,7 +6,7 @@
     <title>Directora — {{ colegio.nombre if colegio else slug }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root{--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#6c63ff' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#3498db' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#6c63ff') | hex_to_rgb }};--bg:#08080f;--bg2:#11111e;--bg3:#191928;--border:rgba(255,255,255,.06);--text:#f0f0f8;--muted:#8080a0;--sub:#55557a;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);}
+        :root{--bg:#080B14;--bg2:rgba(15,23,42,0.85);--bg3:#1E293B;--border:rgba(37,99,235,0.2);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#2563EB' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#7C3AED' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#2563EB') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);}
         *{box-sizing:border-box;margin:0;padding:0;}
         body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow-x:hidden;}
         body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.08) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
@@ -15,24 +15,24 @@
         .orb2{width:300px;height:300px;background:var(--accent2);bottom:-80px;right:-80px;animation-delay:4s;}
         @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-25px) scale(1.03);}}
         .logo-wrap{margin-bottom:8px;text-align:center;}
-        .logo-wrap img{height:100px;width:100px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px rgba(var(--accent-rgb),.5),0 8px 40px rgba(var(--accent-rgb),.2);transition:transform var(--tr);}
+        .logo-wrap img{height:90px;width:90px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px rgba(var(--accent-rgb),.5),0 8px 40px rgba(var(--accent-rgb),.2);transition:transform var(--tr);}
         .logo-wrap img:hover{transform:scale(1.05);}
         .brand{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:5px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
         .subtitle{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;margin-bottom:10px;text-align:center;}
         .badge-dir{display:inline-flex;align-items:center;gap:6px;background:rgba(var(--accent-rgb),.1);border:1px solid rgba(var(--accent-rgb),.2);border-radius:99px;padding:5px 16px;font-size:12px;color:var(--accent);margin-bottom:18px;font-weight:500;}
-        .tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rmd);padding:4px;margin-bottom:18px;width:100%;max-width:480px;}
+        .tabs{display:flex;background:#0F172A;border:1px solid #1E293B;border-radius:var(--rmd);padding:4px;margin-bottom:18px;width:100%;max-width:480px;}
         .tab-btn{flex:1;padding:8px 4px;background:none;border:none;border-radius:var(--rsm);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all var(--tr);white-space:nowrap;}
         .tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.25);}
-        .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;width:100%;max-width:480px;box-shadow:0 1px 4px rgba(0,0,0,.2);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
+        .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;width:100%;max-width:480px;backdrop-filter:blur(20px);box-shadow:0 4px 30px rgba(0,0,0,.3);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
         @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
         .section{display:none;}
         .section.active{display:block;}
         .field{margin-bottom:14px;}
         .field label{display:block;font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:600;}
-        .field input,.field select{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
+        .field input,.field select{width:100%;padding:11px 14px;background:#0F172A;border:1.5px solid #1E293B;border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
         .field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
         .field input::placeholder{color:var(--sub);}
-        .field select option{background:var(--bg3);}
+        .field select option{background:#0F172A;}
         .pass-wrapper{position:relative;}
         .pass-wrapper input{padding-right:2.5rem;width:100%;}
         .toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:1.1rem;transition:color var(--tr);}
@@ -41,26 +41,26 @@
         .btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(var(--accent-rgb),.3);}
         .btn-submit:active{transform:scale(.98);}
         .alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
-        .alert-error{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.2);color:var(--red);}
-        .alert-success{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.2);color:var(--green);}
+        .alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;}
+        .alert-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10B981;}
         .forgot-link{display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--accent);text-decoration:none;transition:opacity var(--tr);cursor:pointer;}
         .forgot-link:hover{text-decoration:underline;opacity:.8;}
         .back-link{display:block;text-align:center;margin-top:20px;font-size:12px;color:var(--muted);text-decoration:none;transition:color var(--tr);}
         .back-link:hover{color:var(--accent);}
         .divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--sub);font-size:11px;}
-        .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+        .divider::before,.divider::after{content:'';flex:1;height:1px;background:#1E293B;}
         .pregunta-box{background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--rsm);padding:10px 13px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.5;}
-        .msg-error{display:none;margin-top:10px;padding:9px 12px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.2);color:var(--red);border-radius:var(--rsm);font-size:12px;}
-        .msg-ok{display:none;margin-top:10px;padding:9px 12px;background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.2);color:var(--green);border-radius:var(--rsm);font-size:12px;}
+        .msg-error{display:none;margin-top:10px;padding:9px 12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;border-radius:var(--rsm);font-size:12px;}
+        .msg-ok{display:none;margin-top:10px;padding:9px 12px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10B981;border-radius:var(--rsm);font-size:12px;}
         .codigo-field{background:rgba(var(--accent-rgb),.06);border:1.5px solid rgba(var(--accent-rgb),.2);border-radius:var(--rmd);padding:12px 14px;margin-bottom:14px;}
         .codigo-field label{display:block;font-size:10px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
-        .codigo-field input{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid rgba(var(--accent-rgb),.3);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;}
+        .codigo-field input{width:100%;padding:11px 14px;background:#0F172A;border:1.5px solid rgba(var(--accent-rgb),.3);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;}
         .codigo-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
         .codigo-field .hint{font-size:11px;color:var(--sub);margin-top:6px;}
-        .pwd-strength{height:3px;border-radius:2px;margin-top:5px;transition:all .3s;background:var(--border);}
-        .pwd-strength.weak{background:#e74c3c;width:33%;}
-        .pwd-strength.medium{background:#f39c12;width:66%;}
-        .pwd-strength.strong{background:#2ecc71;width:100%;}
+        .pwd-strength{height:3px;border-radius:2px;margin-top:5px;transition:all .3s;background:#1E293B;}
+        .pwd-strength.weak{background:#EF4444;width:33%;}
+        .pwd-strength.medium{background:#F59E0B;width:66%;}
+        .pwd-strength.strong{background:#10B981;width:100%;}
         .pwd-label{font-size:10px;color:var(--sub);margin-top:3px;}
         @media(max-width:480px){.card{padding:20px 16px;}.logo-wrap img{height:80px;width:80px;}.brand{font-size:1.2rem;}}
     </style>
@@ -69,6 +69,10 @@
 </head>
 <body>
 
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+
+<a href="/{{ slug }}/directora/login" style="text-decoration:none;color:inherit;display:block;">
 <div class="logo-wrap">
     {% if colegio and colegio.logo %}
     <img src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
@@ -77,6 +81,7 @@
     {% endif %}
 </div>
 <div class="brand">LUMINI</div>
+</a>
 <p class="subtitle">{{ colegio.nombre if colegio else slug }}</p>
 <div class="badge-dir">👩‍💼 Portal Directora de Curso</div>
 
@@ -90,7 +95,6 @@
     {% if error %}<div class="alert alert-error">⚠️ {{ error }}</div>{% endif %}
     {% if exito %}<div class="alert alert-success">{{ exito }}</div>{% endif %}
 
-    <!-- ── LOGIN ─────────────────────────────────────────────────────── -->
     <div id="tab-login" class="section active">
         <form method="POST" action="/{{ slug }}/directora/login">
             <div class="field">
@@ -109,7 +113,6 @@
         <a class="forgot-link" onclick="switchTabById('recuperar');return false;">¿Olvidaste tu contraseña?</a>
     </div>
 
-    <!-- ── REGISTRO ───────────────────────────────────────────────────── -->
     <div id="tab-registro" class="section">
         <form method="POST" action="/{{ slug }}/directora/registrar_directo" onsubmit="return validarRegistro()">
 
@@ -164,7 +167,6 @@
                 </select>
             </div>
 
-            <!-- CÓDIGO DE INVITACIÓN destacado -->
             <div class="codigo-field">
                 <label>🔑 Código de invitación</label>
                 <input type="text" name="codigo_registro_dir" id="reg-codigo"
@@ -195,20 +197,17 @@
                        placeholder="Tu respuesta (recuérdala bien)" required autocomplete="off">
             </div>
 
-            <!-- Error de validación cliente -->
             <div id="reg-err" class="msg-error"></div>
 
             <button type="submit" class="btn-submit" style="margin-top:8px;">Crear cuenta →</button>
         </form>
     </div>
 
-    <!-- ── RECUPERAR ──────────────────────────────────────────────────── -->
     <div id="tab-recuperar" class="section">
-        <p style="font-size:13px;color:#7a7a90;margin-bottom:18px;line-height:1.6;">
+        <p style="font-size:13px;color:#94A3B8;margin-bottom:18px;line-height:1.6;">
             Ingresa tu usuario, responde tu pregunta secreta y crea una nueva contraseña.
         </p>
 
-        <!-- Paso 1: buscar usuario -->
         <div id="rec-paso1">
             <div class="field">
                 <label>Tu usuario</label>
@@ -218,7 +217,6 @@
             <div id="rec-err1" class="msg-error"></div>
         </div>
 
-        <!-- Paso 2: responder y cambiar -->
         <div id="rec-paso2" style="display:none;">
             <div class="pregunta-box" id="rec-pregunta-txt">🔑 ...</div>
             <div class="field">
@@ -243,7 +241,7 @@
             <div id="rec-err2" class="msg-error"></div>
             <div id="rec-ok2"  class="msg-ok"></div>
             <button type="button" onclick="recReset()"
-                style="background:none;border:none;color:#7a7a90;font-size:12px;margin-top:12px;cursor:pointer;width:100%;text-align:center;">
+                style="background:none;border:none;color:#94A3B8;font-size:12px;margin-top:12px;cursor:pointer;width:100%;text-align:center;">
                 ← Volver
             </button>
         </div>
@@ -255,7 +253,6 @@
 <script>
 const SLUG = "{{ slug }}";
 
-/* ── Tabs ── */
 function switchTab(tab, btn){
     document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
     document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -264,14 +261,12 @@ function switchTab(tab, btn){
 }
 function switchTabById(tab){ switchTab(tab, document.getElementById('btn-'+tab)); }
 
-/* ── Toggle password ── */
 function togglePass(btn){
     var inp = btn.previousElementSibling;
     inp.type = inp.type==='password' ? 'text' : 'password';
     btn.textContent = inp.type==='password' ? '👁️' : '🙈';
 }
 
-/* ── Indicador fortaleza contraseña ── */
 function checkPwd(inp){
     var val = inp.value;
     var bar = document.getElementById('pwd-bar');
@@ -279,12 +274,11 @@ function checkPwd(inp){
     if(!val){ bar.className='pwd-strength'; lbl.textContent=''; return; }
     var strong = val.length>=8 && /[A-Z]/.test(val) && /[0-9]/.test(val);
     var medium = val.length>=6;
-    if(strong){ bar.className='pwd-strength strong'; lbl.textContent='Contraseña fuerte'; lbl.style.color='#2ecc71'; }
-    else if(medium){ bar.className='pwd-strength medium'; lbl.textContent='Contraseña aceptable'; lbl.style.color='#f39c12'; }
-    else{ bar.className='pwd-strength weak'; lbl.textContent='Contraseña débil'; lbl.style.color='#e74c3c'; }
+    if(strong){ bar.className='pwd-strength strong'; lbl.textContent='Contraseña fuerte'; lbl.style.color='#10B981'; }
+    else if(medium){ bar.className='pwd-strength medium'; lbl.textContent='Contraseña aceptable'; lbl.style.color='#F59E0B'; }
+    else{ bar.className='pwd-strength weak'; lbl.textContent='Contraseña débil'; lbl.style.color='#EF4444'; }
 }
 
-/* ── Validación del formulario de registro (lado cliente) ── */
 function validarRegistro(){
     var err = document.getElementById('reg-err');
     err.style.display = 'none';
@@ -308,8 +302,7 @@ function validarRegistro(){
     if(!codigo){ mostrarErr('Ingresa el código de invitación.'); return false; }
     if(!pregunta){ mostrarErr('Selecciona una pregunta secreta.'); return false; }
     if(!respuesta){ mostrarErr('Escribe tu respuesta secreta.'); return false; }
-
-    return true; // todo ok, enviar formulario
+    return true;
 }
 
 function mostrarErr(msg){
@@ -319,7 +312,6 @@ function mostrarErr(msg){
     err.scrollIntoView({behavior:'smooth', block:'center'});
 }
 
-/* ── Recuperar contraseña ── */
 function recBuscar(){
     var usuario = document.getElementById('rec-usuario').value.trim();
     var err = document.getElementById('rec-err1');
@@ -380,7 +372,6 @@ function recReset(){
     document.getElementById('rec-usuario').value = '';
 }
 
-/* ── Abrir pestaña correcta si hay error del servidor ── */
 {% if exito %}
 switchTabById('login');
 {% endif %}

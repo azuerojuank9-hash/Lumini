@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seleccionar jornada — Lumini</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root{--bg:#08080f;--bg2:#11111e;--bg3:#191928;--border:rgba(255,255,255,.06);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#6c63ff' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#3498db' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#6c63ff') | hex_to_rgb }};--text:#f0f0f8;--muted:#8080a0;--sub:#55557a;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);}
+        :root{--bg:#080B14;--bg2:rgba(15,23,42,0.8);--bg3:#1E293B;--border:rgba(37,99,235,0.2);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#2563EB' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#7C3AED' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#2563EB') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);}
         *{box-sizing:border-box;margin:0;padding:0;}
         body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow-x:hidden;}
         body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.08) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
@@ -14,30 +14,35 @@
         .orb1{width:450px;height:450px;background:var(--accent);top:-120px;left:-120px;animation-delay:0s;}
         .orb2{width:300px;height:300px;background:var(--accent2);bottom:-80px;right:-80px;animation-delay:4s;}
         @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-25px) scale(1.03);}}
-        .brand{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:6px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:6px;}
+        .brand{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:6px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:4px;}
         .sub{font-size:11px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;text-align:center;margin-bottom:24px;}
-        .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:32px 28px;width:100%;max-width:480px;box-shadow:0 1px 4px rgba(0,0,0,.2);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
+        .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:32px 28px;width:100%;max-width:480px;backdrop-filter:blur(20px);box-shadow:0 4px 30px rgba(0,0,0,.3);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
         @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-        .card-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:6px;}
+        .card-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:4px;}
         .card-desc{font-size:13px;color:var(--muted);margin-bottom:24px;}
-        .greeting{font-size:13px;color:color-mix(in srgb,var(--accent) 70%,white);margin-bottom:20px;}
+        .greeting{font-size:14px;color:color-mix(in srgb,var(--accent) 70%,white);margin-bottom:20px;padding:10px 14px;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--rsm);}
         .opciones{display:flex;flex-direction:column;gap:10px;}
-        .opcion-btn{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rmd);cursor:pointer;transition:all var(--tr);text-decoration:none;color:var(--text);width:100%;text-align:left;font-family:'DM Sans',sans-serif;}
-        .opcion-btn:hover{border-color:rgba(var(--accent-rgb),.4);background:rgba(var(--accent-rgb),.06);}
+        .opcion-btn{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(15,23,42,.6);border:1.5px solid var(--border);border-radius:var(--rmd);cursor:pointer;transition:all var(--tr);text-decoration:none;color:var(--text);width:100%;text-align:left;font-family:'DM Sans',sans-serif;}
+        .opcion-btn:hover{border-color:rgba(var(--accent-rgb),.5);background:rgba(var(--accent-rgb),.08);transform:translateY(-2px);box-shadow:0 4px 20px rgba(var(--accent-rgb),.1);}
         .opcion-left{display:flex;flex-direction:column;gap:3px;}
-        .opcion-materia{font-size:14px;font-weight:600;}
+        .opcion-materia{font-size:15px;font-weight:600;}
         .opcion-jornada{font-size:11px;color:var(--muted);}
-        .badge-jornada{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;}
-        .jornada-manana{background:rgba(243,156,18,.1);color:#f39c12;border:1px solid rgba(243,156,18,.2);}
-        .jornada-nocturna{background:rgba(var(--accent-rgb),.1);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.2);}
-        .alert-error{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.2);color:#e74c3c;padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
+        .badge-jornada{padding:4px 12px;border-radius:99px;font-size:11px;font-weight:600;}
+        .jornada-manana{background:rgba(245,158,11,.1);color:#F59E0B;border:1px solid rgba(245,158,11,.25);}
+        .jornada-tarde{background:rgba(37,99,235,.1);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.25);}
+        .jornada-nocturna{background:rgba(124,58,237,.1);color:var(--accent2);border:1px solid rgba(124,58,237,.25);}
+        .alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
         .logout-link{display:block;text-align:center;margin-top:20px;font-size:12px;color:var(--muted);text-decoration:none;transition:color var(--tr);}
-        .logout-link:hover{color:#e74c3c;}
+        .logout-link:hover{color:#EF4444;}
     </style>
 </head>
 <body>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<a href="/{{ slug }}/login" style="text-decoration:none;color:inherit;display:block;">
 <div class="brand">LUMINI</div>
 <p class="sub">{{ colegio.nombre if colegio else slug }}</p>
+</a>
 
 <div class="card">
     <div class="card-title">👋 Bienvenido, {{ profesor.nombre }}</div>
@@ -57,8 +62,8 @@
                     <span class="opcion-materia">{{ mj.materia }}</span>
                     <span class="opcion-jornada">Jornada {{ mj.jornada }}</span>
                 </div>
-                <span class="badge-jornada {% if mj.jornada == 'Mañana' %}jornada-manana{% else %}jornada-nocturna{% endif %}">
-                    {% if mj.jornada == 'Mañana' %}☀️{% else %}🌙{% endif %} {{ mj.jornada }}
+                <span class="badge-jornada {% if mj.jornada == 'Mañana' %}jornada-manana{% elif mj.jornada == 'Tarde' %}jornada-tarde{% else %}jornada-nocturna{% endif %}">
+                    {% if mj.jornada == 'Mañana' %}☀️{% elif mj.jornada == 'Tarde' %}🌤{% else %}🌙{% endif %} {{ mj.jornada }}
                 </span>
             </button>
         </form>

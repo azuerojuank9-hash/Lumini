@@ -5,98 +5,120 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lumini — Panel Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f0f1a;--bg2:#17171e;--bg3:#1e1e28;--border:#2a2a35;--accent:#6c63ff;--accent2:#3498db;--text:#e8e8f0;--muted:#7a7a90;--green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;}
+:root{--bg:#080B14;--bg2:rgba(15,23,42,0.85);--bg3:#1E293B;--border:rgba(37,99,235,0.2);--accent:#2563EB;--accent2:#7C3AED;--accent-rgb:37,99,235;--text:#F8FAFC;--muted:#94A3B8;--green:#10B981;--red:#EF4444;--yellow:#F59E0B;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:240px;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-.navbar{position:fixed;top:0;left:0;width:100%;background:rgba(10,10,15,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:8px 20px;z-index:1000;backdrop-filter:blur(10px);gap:12px;}
-.nav-left{display:flex;align-items:center;gap:12px;}
-.nav-logo{height:42px;width:42px;border-radius:8px;object-fit:contain;background:#000;}
-.nav-brand{font-family:'Syne',sans-serif;font-size:0.65rem;font-weight:800;letter-spacing:5px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.nav-sub{font-size:10px;color:var(--muted);}
-.btn{padding:8px 16px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:opacity .2s;}
-.btn:hover{opacity:.85;}
-.btn-pri{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
-.btn-red{background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.2);}
-.btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border);}
-.btn-green{background:rgba(46,204,113,.1);color:var(--green);border:1px solid rgba(46,204,113,.2);}
-.btn-yellow{background:rgba(243,156,18,.1);color:var(--yellow);border:1px solid rgba(243,156,18,.2);}
-.btn-sm{padding:5px 10px;font-size:11px;}
-.main{padding:80px 20px 40px;max-width:1200px;margin:0 auto;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:#0F172A;border-right:1px solid #1E293B;display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
+.sidebar-logo img{height:38px;width:38px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(37,99,235,.4);}
+.sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
+.sidebar-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:2px;}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all var(--tr);}
+.sidebar-link:hover{background:rgba(37,99,235,.1);color:var(--text);}
+.sidebar-link.active{background:rgba(37,99,235,.15);color:var(--accent);}
+.sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-footer{padding:12px 10px;border-top:1px solid #1E293B;}
+.main{margin-left:var(--sidebar);padding:32px 28px;width:calc(100% - var(--sidebar));min-height:100vh;max-width:1300px;}
 .alert{padding:12px 16px;border-radius:9px;font-size:13px;margin-bottom:20px;}
-.alert-error{background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.25);color:#e74c3c;}
-.alert-success{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.25);color:#2ecc71;}
-.alert-warning{background:rgba(243,156,18,.12);border:1px solid rgba(243,156,18,.25);color:var(--yellow);}
+.alert-error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:var(--red);}
+.alert-success{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);color:var(--green);}
+.alert-warning{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);color:var(--yellow);}
 .section-title{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;margin-top:28px;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;margin-bottom:16px;overflow:hidden;}
-.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);margin-bottom:16px;overflow:hidden;backdrop-filter:blur(20px);box-shadow:0 4px 20px rgba(0,0,0,.2);}
+.card-head{padding:14px 18px;border-bottom:1px solid #1E293B;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
 .card-title{font-size:13px;font-weight:600;}
 .card-body{padding:18px;}
 .field{margin-bottom:13px;}
 .field label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
-.field input,.field select{width:100%;padding:10px 13px;background:#0f0f13;border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color .2s;}
-.field input:focus,.field select:focus{outline:none;border-color:var(--accent);}
-.field input::placeholder{color:#444;}
-.field select option{background:#1a1a2e;}
-/* Código de invitación destacado */
-.codigo-box{background:rgba(108,99,255,.08);border:1.5px solid rgba(108,99,255,.3);border-radius:9px;padding:12px 14px;margin-bottom:13px;}
+.field input,.field select{width:100%;padding:10px 13px;background:#0F172A;border:1.5px solid #1E293B;border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color var(--tr);}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+.field input::placeholder{color:#64748B;}
+.field select option{background:#0F172A;}
+.codigo-box{background:rgba(37,99,235,.08);border:1.5px solid rgba(37,99,235,.3);border-radius:9px;padding:12px 14px;margin-bottom:13px;}
 .codigo-box label{display:block;font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-weight:600;}
-.codigo-box input{width:100%;padding:10px 13px;background:#0f0f13;border:1.5px solid rgba(108,99,255,.4);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;}
+.codigo-box input{width:100%;padding:10px 13px;background:#0F172A;border:1.5px solid rgba(37,99,235,.4);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;}
 .codigo-box input:focus{outline:none;border-color:var(--accent);}
 .codigo-box .hint{font-size:11px;color:var(--muted);margin-top:6px;}
-.codigo-badge{display:inline-block;background:rgba(108,99,255,.15);border:1px solid rgba(108,99,255,.3);color:#9b95ff;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:700;letter-spacing:1px;font-family:monospace;}
+.codigo-badge{display:inline-block;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#A78BFA;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:700;letter-spacing:1px;font-family:monospace;}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 @media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr;}}
 table{border-collapse:collapse;width:100%;font-size:12px;}
-th{padding:9px 12px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);background:var(--bg3);white-space:nowrap;}
-td{padding:10px 12px;border-bottom:1px solid rgba(42,42,53,.5);vertical-align:middle;}
+th{padding:9px 12px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #1E293B;background:#0F172A;white-space:nowrap;}
+td{padding:10px 12px;border-bottom:1px solid rgba(30,41,59,.5);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:rgba(108,99,255,.03);}
+tr:hover td{background:rgba(37,99,235,.03);}
 .badge{padding:3px 9px;border-radius:5px;font-size:10px;font-weight:600;}
-.badge-ok{background:rgba(46,204,113,.12);color:var(--green);}
-.badge-off{background:rgba(231,76,60,.12);color:var(--red);}
+.badge-ok{background:rgba(16,185,129,.12);color:var(--green);}
+.badge-off{background:rgba(239,68,68,.12);color:var(--red);}
 .stats-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
-.stat{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:14px 18px;flex:1;min-width:120px;}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:14px 18px;flex:1;min-width:120px;backdrop-filter:blur(20px);}
 .stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;}
 .stat-val{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;}
-.logo-preview{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--border);}
+.logo-preview{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #1E293B;}
 .actions-cell{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
 .tw{overflow-x:auto;}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);}
 .overlay.open{display:flex;}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;}
+.modal{background:rgba(15,23,42,.96);border:1px solid var(--border);border-radius:var(--rlg);padding:24px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .modal-title{font-size:15px;font-weight:600;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
 .close-btn{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;}
-.toast{position:fixed;bottom:22px;right:22px;background:var(--bg2);border:1px solid rgba(108,99,255,.3);color:var(--text);padding:11px 18px;border-radius:10px;font-size:13px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;}
+.close-btn:hover{color:var(--text);}
+.toast{position:fixed;bottom:22px;right:22px;background:rgba(15,23,42,.95);border:1px solid rgba(37,99,235,.3);color:var(--text);padding:11px 18px;border-radius:10px;font-size:13px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;backdrop-filter:blur(20px);box-shadow:0 4px 20px rgba(0,0,0,.4);}
 .toast.show{opacity:1;transform:translateY(0);}
-.prof-chip{display:inline-block;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;margin:2px;}
+.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
+.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
+.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);}
+.prof-chip{display:inline-block;background:#1E293B;border:1px solid #1E293B;border-radius:6px;padding:3px 8px;font-size:11px;margin:2px;color:var(--muted);}
 .venc-ok{color:var(--green);}
 .venc-warn{color:var(--yellow);}
 .venc-danger{color:var(--red);font-weight:700;}
-/* toggle visibilidad código */
 .pass-wrap{position:relative;}
 .pass-wrap input{padding-right:2.5rem;}
 .eye-btn{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;}
+.eye-btn:hover{color:var(--accent);}
+.btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:all var(--tr);}
+.btn:hover{opacity:.9;}
+.btn-pri{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.2);}
+.btn-pri:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.3);}
+.btn-red{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid #1E293B;}
+.btn-ghost:hover{background:rgba(255,255,255,.08);}
+.btn-green{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+.btn-yellow{background:rgba(245,158,11,.1);color:var(--yellow);border:1px solid rgba(245,158,11,.2);}
+.btn-sm{padding:5px 10px;font-size:11px;}
+@media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 12px;}}
 </style>
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="nav-left">
-        <img class="nav-logo" src="/static/lumini_logo.png" alt="Lumini">
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+    <a href="/admin" style="text-decoration:none;color:inherit;">
+    <div class="sidebar-logo">
+        <img src="/static/lumini_logo.png" alt="Lumini">
         <div>
-            <div class="nav-brand">LUMINI</div>
-            <div class="nav-sub">Panel de Administración</div>
+            <div class="sidebar-brand">LUMINI</div>
+            <div class="sidebar-brand-sub">Panel de Administración</div>
         </div>
     </div>
-    <a href="/admin/logout" class="btn btn-red">Cerrar sesión</a>
-</nav>
+    </a>
+    <nav class="sidebar-nav">
+        <a href="/admin" class="sidebar-link active"><span class="icon">📊</span> Dashboard</a>
+        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon">🚪</span> Cerrar sesión</a>
+    </nav>
+</aside>
 
 <div class="main">
+
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 
 {% if error %}<div class="alert alert-error">⚠️ {{ error }}</div>{% endif %}
 {% if exito %}<div class="alert alert-success">✅ {{ exito }}</div>{% endif %}
@@ -127,7 +149,6 @@ tr:hover td{background:rgba(108,99,255,.03);}
     <div class="stat"><div class="stat-label">Por vencer</div><div class="stat-val" style="color:var(--yellow);">{{ por_vencer|length }}</div></div>
 </div>
 
-<!-- ── CREAR COLEGIO ─────────────────────────────────────────────────────── -->
 <div class="section-title">➕ Crear nuevo colegio</div>
 <div class="card">
     <div class="card-body">
@@ -158,7 +179,6 @@ tr:hover td{background:rgba(108,99,255,.03);}
                     <input type="date" name="vencimiento">
                 </div>
             </div>
-            <!-- CÓDIGO DE INVITACIÓN destacado -->
             <div class="codigo-box">
                 <label>🔑 Código de invitación (obligatorio)</label>
                 <div class="pass-wrap">
@@ -176,13 +196,13 @@ tr:hover td{background:rgba(108,99,255,.03);}
                 </div>
                 <div class="field">
                     <label>Color primario</label>
-                    <input type="color" name="primary_color" value="#6c63ff" style="height:42px;width:100%;background:#0f0f13;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;">
+                    <input type="color" name="primary_color" value="#2563EB" style="height:42px;width:100%;background:#0F172A;border:1.5px solid #1E293B;border-radius:7px;cursor:pointer;">
                 </div>
             </div>
             <div class="grid-2">
                 <div class="field">
                     <label>Color secundario</label>
-                    <input type="color" name="secondary_color" value="#3498db" style="height:42px;width:100%;background:#0f0f13;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;">
+                    <input type="color" name="secondary_color" value="#7C3AED" style="height:42px;width:100%;background:#0F172A;border:1.5px solid #1E293B;border-radius:7px;cursor:pointer;">
                 </div>
                 <div class="field" style="display:flex;align-items:flex-end;padding-bottom:4px;">
                     <button type="submit" class="btn btn-pri" style="width:100%;">Crear colegio →</button>
@@ -192,7 +212,6 @@ tr:hover td{background:rgba(108,99,255,.03);}
     </div>
 </div>
 
-<!-- ── TABLA COLEGIOS ─────────────────────────────────────────────────────── -->
 <div class="section-title">🏫 Colegios registrados</div>
 <div class="card">
     <div class="card-head">
@@ -236,15 +255,15 @@ tr:hover td{background:rgba(108,99,255,.03);}
                 <span style="font-weight:700;color:var(--accent);font-size:14px;">{{ c.num_periodos or 4 }}</span>
             </td>
             <td>
-                <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:{{ c.primary_color or '#6c63ff' }};border:2px solid var(--border);vertical-align:middle;" title="Primario: {{ c.primary_color or '#6c63ff' }}"></span>
-                <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:{{ c.secondary_color or '#3498db' }};border:2px solid var(--border);vertical-align:middle;margin-left:4px;" title="Secundario: {{ c.secondary_color or '#3498db' }}"></span>
+                <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:{{ c.primary_color or '#2563EB' }};border:2px solid #1E293B;vertical-align:middle;" title="Primario: {{ c.primary_color or '#2563EB' }}"></span>
+                <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background:{{ c.secondary_color or '#7C3AED' }};border:2px solid #1E293B;vertical-align:middle;margin-left:4px;" title="Secundario: {{ c.secondary_color or '#7C3AED' }}"></span>
             </td>
             <td>
                 {% if c.codigo_registro %}
                 <span class="codigo-badge" id="cod-{{ c.slug }}" style="display:none;">{{ c.codigo_registro }}</span>
                 <button onclick="verCodigo('{{ c.slug }}')" class="btn btn-ghost btn-sm" style="font-size:10px;" id="btn-cod-{{ c.slug }}">🔑 Ver código</button>
                 {% else %}
-                <span style="color:#555;font-size:11px;">Sin código</span>
+                <span style="color:#64748B;font-size:11px;">Sin código</span>
                 {% endif %}
             </td>
             <td style="font-size:11px;">
@@ -259,7 +278,7 @@ tr:hover td{background:rgba(108,99,255,.03);}
                     <span class="venc-ok">📅 {{ c.vencimiento }}</span>
                   {% endif %}
                 {% else %}
-                <span style="color:#444;">Sin límite</span>
+                <span style="color:#64748B;">Sin límite</span>
                 {% endif %}
             </td>
             <td style="font-size:11px;color:var(--muted);">{{ c.creado }}</td>
@@ -278,7 +297,7 @@ tr:hover td{background:rgba(108,99,255,.03);}
                         </button>
                     </form>
                     <button class="btn btn-ghost btn-sm"
-                        onclick="abrirEditar('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}',{{ c.num_periodos or 4 }},'{{ c.vencimiento or "" }}','{{ c.codigo_registro or "" }}','{{ c.primary_color or "#6c63ff" }}','{{ c.secondary_color or "#3498db" }}')">
+                        onclick="abrirEditar('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}',{{ c.num_periodos or 4 }},'{{ c.vencimiento or "" }}','{{ c.codigo_registro or "" }}','{{ c.primary_color or "#2563EB" }}','{{ c.secondary_color or "#7C3AED" }}')">
                         ✏️ Editar
                     </button>
                     <button class="btn btn-yellow btn-sm" onclick="verProfesores('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}')">
@@ -306,7 +325,6 @@ tr:hover td{background:rgba(108,99,255,.03);}
 
 </div>
 
-<!-- ── MODAL EDITAR ──────────────────────────────────────────────────────────── -->
 <div class="overlay" id="modalEditar" onclick="if(event.target===this)cerrarEditar()">
     <div class="modal">
         <div class="modal-title">
@@ -335,7 +353,6 @@ tr:hover td{background:rgba(108,99,255,.03);}
                     <input type="date" name="vencimiento" id="edit-vencimiento">
                 </div>
             </div>
-            <!-- CÓDIGO DE INVITACIÓN en edición -->
             <div class="codigo-box">
                 <label>🔑 Código de invitación</label>
                 <div class="pass-wrap">
@@ -353,13 +370,13 @@ tr:hover td{background:rgba(108,99,255,.03);}
                 </div>
                 <div class="field">
                     <label>Color primario</label>
-                    <input type="color" name="primary_color" id="edit-primary" value="#6c63ff" style="height:42px;width:100%;background:#0f0f13;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;">
+                    <input type="color" name="primary_color" id="edit-primary" value="#2563EB" style="height:42px;width:100%;background:#0F172A;border:1.5px solid #1E293B;border-radius:7px;cursor:pointer;">
                 </div>
             </div>
             <div class="grid-2">
                 <div class="field">
                     <label>Color secundario</label>
-                    <input type="color" name="secondary_color" id="edit-secondary" value="#3498db" style="height:42px;width:100%;background:#0f0f13;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;">
+                    <input type="color" name="secondary_color" id="edit-secondary" value="#7C3AED" style="height:42px;width:100%;background:#0F172A;border:1.5px solid #1E293B;border-radius:7px;cursor:pointer;">
                 </div>
                 <div></div>
             </div>
@@ -371,7 +388,6 @@ tr:hover td{background:rgba(108,99,255,.03);}
     </div>
 </div>
 
-<!-- ── MODAL PROFESORES ──────────────────────────────────────────────────────── -->
 <div class="overlay" id="modalProfesores" onclick="if(event.target===this)cerrarProfesores()">
     <div class="modal">
         <div class="modal-title">
@@ -393,13 +409,12 @@ function abrirEditar(slug, nombre, periodos, vencimiento, codigo, primary, secon
     document.getElementById('edit-periodos').value = String(periodos);
     document.getElementById('edit-vencimiento').value = vencimiento;
     document.getElementById('edit-codigo').value = codigo;
-    document.getElementById('edit-primary').value = primary || '#6c63ff';
-    document.getElementById('edit-secondary').value = secondary || '#3498db';
+    document.getElementById('edit-primary').value = primary || '#2563EB';
+    document.getElementById('edit-secondary').value = secondary || '#7C3AED';
     document.getElementById('modalEditar').classList.add('open');
 }
 function cerrarEditar() { document.getElementById('modalEditar').classList.remove('open'); }
 
-// Mostrar/ocultar código en la tabla
 function verCodigo(slug) {
     var badge = document.getElementById('cod-' + slug);
     var btn   = document.getElementById('btn-cod-' + slug);
@@ -412,7 +427,6 @@ function verCodigo(slug) {
     }
 }
 
-// Mostrar/ocultar en inputs de texto
 function toggleCod(id, btn) {
     var inp = document.getElementById(id);
     if (inp.type === 'text') { inp.type = 'password'; btn.textContent = '👁️'; }
@@ -442,7 +456,7 @@ function verProfesores(slug, nombre) {
                 html += '<tr><td style="color:var(--muted);">' + (i+1) + '</td>'
                     + '<td style="font-weight:600;">' + p.nombre + '</td>'
                     + '<td style="font-size:11px;color:var(--muted);">' + p.usuario + '</td>'
-                    + '<td>' + (materias || '<span style="color:#444;font-size:11px;">Sin asignar</span>') + '</td>'
+                    + '<td>' + (materias || '<span style="color:#64748B;font-size:11px;">Sin asignar</span>') + '</td>'
                     + '<td style="text-align:center;">' + badge + '</td></tr>';
             });
             html += '</tbody></table>';
@@ -456,11 +470,15 @@ function verProfesores(slug, nombre) {
 }
 function cerrarProfesores() { document.getElementById('modalProfesores').classList.remove('open'); }
 
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+}
 function showToast(msg, ok){
     ok = ok !== false;
     var t = document.getElementById('toast');
     t.textContent = msg;
-    t.style.borderColor = ok ? 'rgba(46,204,113,.4)' : 'rgba(231,76,60,.4)';
+    t.style.borderColor = ok ? 'rgba(16,185,129,.4)' : 'rgba(239,68,68,.4)';
     t.classList.add('show');
     setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
