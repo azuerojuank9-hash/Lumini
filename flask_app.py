@@ -1917,33 +1917,31 @@ def rector_registrar(slug):
 @app.route('/<slug>/rector/buscar_usuario_recuperar', methods=['POST'])
 def rector_buscar_usuario_recuperar(slug):
     require_colegio(slug)
-    if not validar_csrf(): return jsonify({'error': 'Error de seguridad'}), 400
     u = request.form.get('usuario', '').strip()
     conn = conectar(slug)
-    r = conn.execute('SELECT pregunta_secreta FROM rectores WHERE usuario=?', (u,)).fetchone()
+    r = conn.execute('SELECT pregunta_secreta FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
     conn.close()
     if not r or not r['pregunta_secreta']:
-        return jsonify({'error': 'Usuario no encontrado o sin pregunta secreta.'}), 404
-    return jsonify({'pregunta': r['pregunta_secreta']})
+        return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
+    return jsonify({'ok': True, 'pregunta': r['pregunta_secreta']})
 
 @app.route('/<slug>/rector/cambiar_password_recuperar', methods=['POST'])
 def rector_cambiar_password_recuperar(slug):
     require_colegio(slug)
-    if not validar_csrf(): return jsonify({'error': 'Error de seguridad'}), 400
     u = request.form.get('usuario', '').strip()
     rta = request.form.get('respuesta', '').strip().lower()
-    pwd = request.form.get('password', '').strip()
-    if len(pwd) < 6:
-        return jsonify({'error': 'Mínimo 6 caracteres.'}), 400
+    nueva = request.form.get('nueva', '').strip()
     conn = conectar(slug)
-    r = conn.execute('SELECT id, respuesta_secreta FROM rectores WHERE usuario=?', (u,)).fetchone()
+    r = conn.execute('SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
     if not r:
-        conn.close(); return jsonify({'error': 'Usuario no encontrado.'}), 404
-    if not r['respuesta_secreta'] or r['respuesta_secreta'].strip().lower() != rta:
-        conn.close(); return jsonify({'error': 'Respuesta incorrecta.'}), 400
-    conn.execute('UPDATE rectores SET password=? WHERE id=?', (hash_pw(pwd), r['id']))
+        conn.close(); return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
+    if not r['respuesta_secreta'] or r['respuesta_secreta'].lower() != rta:
+        conn.close(); return jsonify({'ok': False, 'mensaje': 'Respuesta incorrecta.'})
+    if len(nueva) < 6:
+        conn.close(); return jsonify({'ok': False, 'mensaje': 'Mínimo 6 caracteres.'})
+    conn.execute('UPDATE rectores SET password=? WHERE id=?', (hash_pw(nueva), r['id']))
     conn.commit(); conn.close()
-    return jsonify({'ok': True})
+    return jsonify({'ok': True, 'mensaje': 'Contraseña actualizada. Ya puedes ingresar.'})
 
 @app.route('/<slug>/rector')
 @app.route('/<slug>/rector/panel')
