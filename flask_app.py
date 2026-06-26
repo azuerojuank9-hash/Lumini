@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort, jsonify
 import sqlite3, hashlib, os, time, secrets, logging
-from datetime import timedelta
+from datetime import timedelta, datetime
 from io import BytesIO
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache 24 horas
@@ -1054,6 +1054,46 @@ def home(slug):
 
         prom_gral = round(sum(d['promedio'] for d in datos) / len(datos), 2) if datos else 0
         mejor     = max(datos, key=lambda x: x['promedio'], default={'nombre': 'N/A', 'promedio': 0})
+
+        # ── Dashboard data ──────────────────────────────────────────────────
+        DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
+        hoy_idx = datetime.today().weekday()
+        hoy_nombre = DIAS[hoy_idx] if hoy_idx < 7 else ''
+        hoy_fecha = datetime.today().strftime('%Y-%m-%d')
+        total_alumnos = sum(
+            conn.execute(
+                'SELECT COUNT(*) as c FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
+                (c, jornada)
+            ).fetchone()['c'] for c in mis_cursos
+        ) if mis_cursos else 0
+        horario_hoy = conn.execute(
+            'SELECT * FROM horarios_curso WHERE materia=? AND jornada=? AND dia=? ORDER BY franja',
+            (materia, jornada, hoy_nombre)
+        ).fetchall() if curso_sel else []
+        asis_hoy = conn.execute(
+            "SELECT COUNT(DISTINCT aid) as total FROM asistencia WHERE fecha=?",
+            (hoy_fecha,)
+        ).fetchone()
+        asistencia_hoy = asis_hoy['total'] if asis_hoy else 0
+        notas_pend = 0
+        if curso_sel and actividades:
+            for act in actividades:
+                count = conn.execute(
+                    'SELECT COUNT(*) as c FROM alumnos WHERE curso=? AND jornada=? AND activo=1 AND id NOT IN (SELECT aid FROM notas WHERE actividad_id=?)',
+                    (curso_sel, jornada, act['id'])
+                ).fetchone()
+                notas_pend += count['c'] if count else 0
+        alertas = []
+        if curso_sel:
+            rows = conn.execute(
+                "SELECT a.nombre, a.id, COUNT(*) as faltas FROM asistencia asis JOIN alumnos a ON a.id=asis.aid WHERE asis.estado='A' AND a.curso=? AND a.jornada=? AND a.activo=1 GROUP BY asis.aid HAVING faltas > 1 ORDER BY faltas DESC LIMIT 5",
+                (curso_sel, jornada)
+            ).fetchall()
+            for r in rows: alertas.append({'nombre': r['nombre'], 'faltas': r['faltas']})
+            for e in datos:
+                if e['promedio'] > 0 and e['promedio'] < 3.0:
+                    alertas.append({'nombre': e['nombre'], 'promedio': e['promedio']})
+            alertas = alertas[:5]
     finally:
         conn.close()
     num_periodos = int(colegio['num_periodos']) if colegio and colegio['num_periodos'] else 4
@@ -1063,7 +1103,11 @@ def home(slug):
                            prom_general=prom_gral, mejor=mejor, slug=slug, colegio=colegio,
                            num_periodos=num_periodos, periodo_sel=periodo_sel,
                            materia=materia, jornada=jornada,
-                           materias_jornadas=get_materias_profesor(slug, prof['id']))
+                           materias_jornadas=get_materias_profesor(slug, prof['id']),
+                           hoy_nombre=hoy_nombre, hoy_fecha=hoy_fecha,
+                           total_alumnos=total_alumnos, horario_hoy=horario_hoy,
+                           asistencia_hoy=asistencia_hoy, notas_pend=notas_pend,
+                           alertas=alertas)
 
 # ── ACTIVIDADES ───────────────────────────────────────────────────────────────
 @app.route('/<slug>/nueva_actividad', methods=['POST'])
