@@ -145,9 +145,23 @@ def init_master_db():
         'codigo_registro TEXT DEFAULT ""',
         'primary_color TEXT DEFAULT "#6c63ff"',
         'secondary_color TEXT DEFAULT "#3498db"',
+        'codigo_profesores TEXT DEFAULT ""',
+        'codigo_directoras TEXT DEFAULT ""',
+        'codigo_rectores TEXT DEFAULT ""',
     ]:
         try: conn.execute(f'ALTER TABLE colegios ADD COLUMN {col}')
         except Exception: pass
+    # Migrar codigo_registro a las columnas específicas si están vacías
+    for c in conn.execute('SELECT slug, codigo_registro, codigo_profesores, codigo_directoras, codigo_rectores FROM colegios').fetchall():
+        updates = []
+        if c['codigo_registro'] and not c['codigo_profesores']:
+            updates.append(('codigo_profesores', c['codigo_registro']))
+        if c['codigo_registro'] and not c['codigo_directoras']:
+            updates.append(('codigo_directoras', c['codigo_registro']))
+        if c['codigo_registro'] and not c['codigo_rectores']:
+            updates.append(('codigo_rectores', c['codigo_registro']))
+        for col_name, val in updates:
+            conn.execute(f'UPDATE colegios SET {col_name}=? WHERE slug=?', (val, c['slug']))
     conn.commit()
     conn.close()
 
@@ -161,12 +175,20 @@ def colegio_activo(slug):
     c = get_colegio(slug)
     return c and c['activo'] == 1
 
-def get_codigo_registro(slug):
-    """Devuelve el código de invitación específico del colegio."""
+def get_codigo_registro(slug, rol=None):
+    """Devuelve el código de invitación del colegio para un rol específico.
+    rol: 'profesores', 'directoras', 'rectores' o None (usa codigo_registro genérico)."""
     c = get_colegio(slug)
-    if c and c['codigo_registro']:
-        return c['codigo_registro']
-    return ''  # sin código = registro libre (solo si está vacío)
+    if not c: return ''
+    if rol == 'profesores':
+        val = c['codigo_profesores'] or c['codigo_registro'] or ''
+    elif rol == 'directoras':
+        val = c['codigo_directoras'] or c['codigo_registro'] or ''
+    elif rol == 'rectores':
+        val = c['codigo_rectores'] or c['codigo_registro'] or ''
+    else:
+        val = c['codigo_registro'] or ''
+    return val
 
 # ── DB POR COLEGIO ────────────────────────────────────────────────────────────
 def db_path(slug): return os.path.join(DB_FOLDER, f'{slug}.db')
@@ -302,6 +324,9 @@ def migrar_db(slug):
         cols_rec = [r[1] for r in conn.execute('PRAGMA table_info(rectores)').fetchall()]
         if 'es_principal' not in cols_rec:
             conn.execute('ALTER TABLE rectores ADD COLUMN es_principal INTEGER DEFAULT 0')
+            conn.commit()
+        if 'jornada' not in cols_rec:
+            conn.execute('ALTER TABLE rectores ADD COLUMN jornada TEXT DEFAULT ""')
             conn.commit()
 
         tablas_actuales = [r[0] for r in conn.execute(
@@ -665,8 +690,8 @@ def admin():
                     cm = conectar_master()
                     try:
                         cm.execute(
-                            'INSERT INTO colegios (slug,nombre,logo,num_periodos,vencimiento,codigo_registro,primary_color,secondary_color) VALUES (?,?,?,?,?,?,?,?)',
-                            (slug, nombre, logo_filename, num_p, venc, codigo, pri_col, sec_col))
+                            'INSERT INTO colegios (slug,nombre,logo,num_periodos,vencimiento,codigo_registro,codigo_profesores,codigo_directoras,codigo_rectores,primary_color,secondary_color) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+                            (slug, nombre, logo_filename, num_p, venc, codigo, codigo, codigo, codigo, pri_col, sec_col))
                         cm.commit()
                     except sqlite3.IntegrityError:
                         error = f'El slug "{slug}" ya existe.'
@@ -697,8 +722,8 @@ def admin():
             pri_col = request.form.get('primary_color', '#6c63ff').strip()
             sec_col = request.form.get('secondary_color', '#3498db').strip()
             cm = conectar_master()
-            cm.execute('UPDATE colegios SET nombre=?, num_periodos=?, vencimiento=?, codigo_registro=?, primary_color=?, secondary_color=? WHERE slug=?',
-                       (nombre, num_p, venc, codigo, pri_col, sec_col, slug_e))
+            cm.execute('UPDATE colegios SET nombre=?, num_periodos=?, vencimiento=?, codigo_registro=?, codigo_profesores=?, codigo_directoras=?, codigo_rectores=?, primary_color=?, secondary_color=? WHERE slug=?',
+                       (nombre, num_p, venc, codigo, codigo, codigo, codigo, pri_col, sec_col, slug_e))
             cm.commit()
             if 'logo' in request.files:
                 f = request.files['logo']
@@ -892,8 +917,8 @@ def login(slug):
             jornadas_sel = request.form.getlist('jornadas_sel')
             codigo       = request.form.get('codigo_registro', '').strip()
             confirmar    = request.form.get('confirmar_password', '').strip()
-            # Validar código POR COLEGIO
-            codigo_colegio = get_codigo_registro(slug)
+            # Validar código POR COLEGIO Y ROL
+            codigo_colegio = get_codigo_registro(slug, 'profesores')
             if pw != confirmar:
                 error = 'Las contraseñas no coinciden.'
             elif codigo_colegio and codigo != codigo_colegio:
@@ -1843,6 +1868,83 @@ def rector_login(slug):
     return render_template('rector_login.html', slug=slug, colegio=colegio,
                            error=error, exito=exito)
 
+@app.route('/<slug>/rector/registrar', methods=['POST'])
+def rector_registrar(slug):
+    if not validar_csrf():
+        return 'Error de seguridad', 400
+    require_colegio(slug)
+    init_db(slug)
+    colegio  = get_colegio(slug)
+    error = exito = None
+    nombre   = request.form.get('nombre', '').strip()
+    usuario  = request.form.get('usuario', '').strip()
+    pw       = request.form.get('password', '').strip()
+    confirm  = request.form.get('confirmar_password', '').strip()
+    jornada  = request.form.get('jornada', '').strip()
+    email    = request.form.get('email', '').strip()
+    pregunta = request.form.get('pregunta_secreta', '').strip()
+    resp     = request.form.get('respuesta_secreta', '').strip().lower()
+    codigo   = request.form.get('codigo_registro_rec', '').strip()
+
+    codigo_colegio = get_codigo_registro(slug, 'rectores')
+    if codigo_colegio and codigo != codigo_colegio:
+        error = 'Código de invitación incorrecto.'
+    elif pw != confirm:
+        error = 'Las contraseñas no coinciden.'
+    elif not nombre or not usuario or not pw or not jornada:
+        error = 'Completa todos los campos obligatorios.'
+    elif len(pw) < 6:
+        error = 'Mínimo 6 caracteres.'
+    elif not pregunta or not resp:
+        error = 'Debes elegir una pregunta secreta y escribir tu respuesta.'
+    else:
+        conn = conectar(slug)
+        if conn.execute('SELECT 1 FROM rectores WHERE usuario=?', (usuario,)).fetchone():
+            error = 'Ese usuario ya existe. Elige otro nombre de usuario.'
+            conn.close()
+        else:
+            conn.execute(
+                '''INSERT INTO rectores
+                   (nombre, usuario, password, jornada, email, pregunta_secreta, respuesta_secreta)
+                   VALUES (?,?,?,?,?,?,?)''',
+                (nombre, usuario, hash_pw(pw), jornada, email, pregunta, resp))
+            conn.commit()
+            conn.close()
+            exito = 'Cuenta de Rector creada. Ya puedes ingresar.'
+    return render_template('rector_login.html', slug=slug, colegio=colegio,
+                           error=error, exito=exito)
+
+@app.route('/<slug>/rector/buscar_usuario_recuperar', methods=['POST'])
+def rector_buscar_usuario_recuperar(slug):
+    require_colegio(slug)
+    if not validar_csrf(): return jsonify({'error': 'Error de seguridad'}), 400
+    u = request.form.get('usuario', '').strip()
+    conn = conectar(slug)
+    r = conn.execute('SELECT pregunta_secreta FROM rectores WHERE usuario=?', (u,)).fetchone()
+    conn.close()
+    if not r or not r['pregunta_secreta']:
+        return jsonify({'error': 'Usuario no encontrado o sin pregunta secreta.'}), 404
+    return jsonify({'pregunta': r['pregunta_secreta']})
+
+@app.route('/<slug>/rector/cambiar_password_recuperar', methods=['POST'])
+def rector_cambiar_password_recuperar(slug):
+    require_colegio(slug)
+    if not validar_csrf(): return jsonify({'error': 'Error de seguridad'}), 400
+    u = request.form.get('usuario', '').strip()
+    rta = request.form.get('respuesta', '').strip().lower()
+    pwd = request.form.get('password', '').strip()
+    if len(pwd) < 6:
+        return jsonify({'error': 'Mínimo 6 caracteres.'}), 400
+    conn = conectar(slug)
+    r = conn.execute('SELECT id, respuesta_secreta FROM rectores WHERE usuario=?', (u,)).fetchone()
+    if not r:
+        conn.close(); return jsonify({'error': 'Usuario no encontrado.'}), 404
+    if not r['respuesta_secreta'] or r['respuesta_secreta'].strip().lower() != rta:
+        conn.close(); return jsonify({'error': 'Respuesta incorrecta.'}), 400
+    conn.execute('UPDATE rectores SET password=? WHERE id=?', (hash_pw(pwd), r['id']))
+    conn.commit(); conn.close()
+    return jsonify({'ok': True})
+
 @app.route('/<slug>/rector')
 @app.route('/<slug>/rector/panel')
 def rector_panel(slug):
@@ -2358,8 +2460,8 @@ def directora_registrar_directo(slug):
     respuesta = request.form.get('respuesta_secreta', '').strip().lower()
     codigo    = request.form.get('codigo_registro_dir', '').strip()
 
-    # Validar código POR COLEGIO
-    codigo_colegio = get_codigo_registro(slug)
+    # Validar código POR COLEGIO Y ROL
+    codigo_colegio = get_codigo_registro(slug, 'directoras')
     if codigo_colegio and codigo != codigo_colegio:
         error = 'Código de invitación incorrecto.'
     elif pw != confirmar:
@@ -2673,6 +2775,56 @@ def hex_to_rgb(hex_color):
     if len(h) != 6:
         return '108,99,255'
     return f'{int(h[0:2], 16)},{int(h[2:4], 16)},{int(h[4:6], 16)}'
+
+# ── ADMIN CÓDIGOS DE INVITACIÓN ──────────────────────────────────────────────
+@app.route('/admin/codigos', methods=['GET', 'POST'])
+@app.route('/admin/codigos/<slug>', methods=['GET', 'POST'])
+def admin_codigos(slug=None):
+    if not session.get('admin_auth'):
+        return redirect(url_for('admin'))
+    cm = conectar_master()
+    error = exito = None
+
+    if request.method == 'POST':
+        if not validar_csrf():
+            return 'Error de seguridad', 400
+        accion = request.form.get('accion')
+        if accion == 'actualizar_codigos':
+            s = request.form.get('slug', '').strip()
+            cod_prof = request.form.get('codigo_profesores', '').strip()
+            cod_dir  = request.form.get('codigo_directoras', '').strip()
+            cod_rec  = request.form.get('codigo_rectores', '').strip()
+            cm.execute(
+                'UPDATE colegios SET codigo_profesores=?, codigo_directoras=?, codigo_rectores=? WHERE slug=?',
+                (cod_prof, cod_dir, cod_rec, s))
+            cm.commit()
+            exito = 'Códigos actualizados correctamente.'
+            slug = s
+        elif accion == 'generar_codigos':
+            s = request.form.get('slug', '').strip()
+            prefijo = request.form.get('prefijo', '').strip()
+            if not prefijo:
+                error = 'Elige un prefijo para los códigos.'
+            else:
+                import secrets as sec
+                new_prof = f'{prefijo}_prof_{sec.token_hex(4)}'
+                new_dir  = f'{prefijo}_dir_{sec.token_hex(4)}'
+                new_rec  = f'{prefijo}_rec_{sec.token_hex(4)}'
+                cm.execute(
+                    'UPDATE colegios SET codigo_profesores=?, codigo_directoras=?, codigo_rectores=? WHERE slug=?',
+                    (new_prof, new_dir, new_rec, s))
+                cm.commit()
+                exito = f'Códigos generados para {s}: Profesores={new_prof}, Directoras={new_dir}, Rectores={new_rec}'
+                slug = s
+
+    colegios = cm.execute('SELECT * FROM colegios ORDER BY nombre').fetchall()
+    colegio_selected = None
+    if slug:
+        colegio_selected = cm.execute('SELECT * FROM colegios WHERE slug=?', (slug,)).fetchone()
+    cm.close()
+    return render_template('admin_codigos.html',
+                           colegios=colegios, colegio=colegio_selected,
+                           error=error, exito=exito)
 
 # ── API PROFESORES PARA ADMIN ─────────────────────────────────────────────────
 @app.route('/admin/profesores/<slug>')

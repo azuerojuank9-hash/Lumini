@@ -18,7 +18,8 @@ TABLES = [
         activo INTEGER DEFAULT 1,
         es_principal INTEGER DEFAULT 0,
         pregunta_secreta TEXT DEFAULT '',
-        respuesta_secreta TEXT DEFAULT '')''',
+        respuesta_secreta TEXT DEFAULT '',
+        jornada TEXT DEFAULT '')''',
     '''CREATE TABLE IF NOT EXISTS comunicaciones (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         rector_id INTEGER NOT NULL, titulo TEXT NOT NULL,

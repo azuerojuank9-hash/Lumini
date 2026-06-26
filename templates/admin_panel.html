@@ -129,8 +129,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
     </div>
     </a>
     <nav class="sidebar-nav">
-        <a href="/admin" class="sidebar-link active"><span class="icon"><i class="fas fa-chart-bar"></i></span> Dashboard</a>
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema"><i class="fas fa-moon"></i> Cambiar tema</button>
+        <a href="/admin" class="sidebar-link active"><span class="icon"><i class="fas fa-chart-bar"></i></span> Dashboard</a>
+        <a href="/admin/codigos" class="sidebar-link"><span class="icon"><i class="fas fa-key"></i></span> Códigos de invitación</a>
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema"><i class="fas fa-moon"></i> Cambiar tema</button>
         <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesión</a>
     </nav>
 </aside>
@@ -207,7 +208,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                            required autocomplete="off">
                     <button type="button" class="eye-btn" onclick="toggleCod('cod-crear',this)" aria-label="Mostrar/ocultar código">‘ï¸</button>
                 </div>
-                <p class="hint">Este código lo deben ingresar los profesores y directores al registrarse. Guárdalo bien — solo el admin lo conoce.</p>
+                <p class="hint">Este código se usará para todos los roles (profesores, directoras y rectores). Puedes personalizar códigos individuales desde <a href="/admin/codigos" style="color:var(--accent);">Códigos de invitación</a>.</p>
             </div>
             <div class="grid-2">
                 <div class="field">
@@ -384,7 +385,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                            autocomplete="off">
                     <button type="button" class="eye-btn" onclick="toggleCod('edit-codigo',this)" aria-label="Mostrar/ocultar código">‘ï¸</button>
                 </div>
-                <p class="hint">Cambia el código si lo quieres renovar. Los profesores y directores ya registrados no se ven afectados.</p>
+                <p class="hint">Este código se usará para todos los roles. Puedes personalizar códigos individuales desde <a href="/admin/codigos" style="color:var(--accent);">Códigos de invitación</a>. Los usuarios ya registrados no se ven afectados.</p>
             </div>
             <div class="grid-2">
                 <div class="field">
