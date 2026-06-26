@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% if comunicacion %}Editar{% else %}Nueva{% endif %} comunicación — {{ colegio.nombre if colegio else slug }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;line-height:1.5;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sidebar-logo{width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+.sidebar-brand{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sidebar-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
+.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;}
+.sidebar-section{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px;font-weight:600;}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);margin-bottom:1px;cursor:pointer;}
+.sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text);}
+.sidebar-item.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.sidebar-item .icon{width:18px;text-align:center;font-size:13px;flex-shrink:0;}
+.badge-count{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center;}
+.sidebar-user{border-top:1px solid var(--border);padding:12px 14px;font-size:12px;}
+.sidebar-user .name{color:var(--text);font-weight:600;font-size:12px;}
+.sidebar-user .role{color:var(--muted);font-size:10px;margin-top:2px;}
+.main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:900px;width:100%;}
+.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;}
+.topbar{margin-bottom:20px;}
+.topbar h1{font-size:20px;font-weight:700;}
+.topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
+.field textarea{min-height:140px;resize:vertical;}
+.field select option{background:var(--bg);}
+.field .hint{font-size:11px;color:var(--sub);margin-top:4px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;background:var(--bg3);border:1px solid var(--border);font-size:12px;color:var(--text);cursor:pointer;transition:all var(--tr);user-select:none;}
+.chip:hover{border-color:var(--accent);}
+.chip.selected{background:rgba(var(--accent-rgb),.15);border-color:var(--accent);color:var(--accent);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:var(--rsm);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'Inter',sans-serif;border:none;transition:all var(--tr);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.35);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted);}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+.form-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
+.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);}
+.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+@media(max-width:768px){
+  .hamburger{display:flex;}
+  .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay.open{display:block;}
+  .main{margin-left:0;padding:16px;}
+  .field-row{grid-template-columns:1fr;}
+  .card{padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<nav class="sidebar" id="sidebar">
+  <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
+  <div class="sidebar-header">
+    {% if colegio and colegio.logo %}
+    <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    {% else %}
+    <img class="sidebar-logo" src="/static/lumini_logo.png" alt="Lumini">
+    {% endif %}
+    <div>
+      <div class="sidebar-brand">LUMINI</div>
+      <div class="sidebar-sub">{{ colegio.nombre if colegio else slug }}</div>
+    </div>
+  </div>
+  </a>
+  <div class="sidebar-nav">
+    <div class="sidebar-section">Rector</div>
+    <a href="/{{ slug }}/rector" class="sidebar-item"><span class="icon"><i class="fas fa-chart-pie"></i></span><span>Dashboard</span></a>
+    <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item active"><span class="icon"><i class="fas fa-bullhorn"></i></span><span>Comunicaciones</span></a>
+    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i class="fas fa-bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+    <a href="#" class="sidebar-item"><span class="icon"><i class="fas fa-calendar-alt"></i></span><span>Horarios</span></a>
+    <a href="#" class="sidebar-item"><span class="icon"><i class="fas fa-chalkboard-teacher"></i></span><span>Profesores</span></a>
+    <a href="#" class="sidebar-item"><span class="icon"><i class="fas fa-user-graduate"></i></span><span>Estudiantes</span></a>
+    <a href="#" class="sidebar-item"><span class="icon"><i class="fas fa-book"></i></span><span>Cursos</span></a>
+    <a href="#" class="sidebar-item"><span class="icon"><i class="fas fa-chart-bar"></i></span><span>Reportes</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    <a href="#" class="sidebar-item"><span class="icon"><i class="fas fa-cog"></i></span><span>Configuración</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span>Cerrar sesión</span></a>
+  </div>
+  <div class="sidebar-user">
+    <div class="name">{{ rector.nombre }}</div>
+    <div class="role">Rector</div>
+  </div>
+</nav>
+
+<div class="main">
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+
+<div class="topbar">
+  <h1>{% if comunicacion %}Editar comunicación{% else %}Nueva comunicación{% endif %}</h1>
+  <div class="breadcrumb">{{ colegio.nombre if colegio else slug }}</div>
+</div>
+
+<div class="card">
+{% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+{% if exito %}<div class="alert alert-success">{{ exito }}</div>{% endif %}
+
+<form method="POST">
+  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+  <div class="field">
+    <label>Título</label>
+    <input type="text" name="titulo" placeholder="Ej: Circular No. 001 - Inicio de clases" value="{{ comunicacion.titulo if comunicacion else '' }}" required>
+  </div>
+
+  <div class="field">
+    <label>Contenido</label>
+    <textarea name="contenido" placeholder="Redacta el mensaje institucional..." required>{{ comunicacion.contenido if comunicacion else '' }}</textarea>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>Destinatarios</label>
+      <select name="destinatario_tipo" id="destTipo" onchange="toggleDestValor()" required>
+        <option value="todo_colegio" {% if comunicacion and comunicacion.destinatario_tipo == 'todo_colegio' %}selected{% endif %}>Todo el colegio</option>
+        <option value="profesores" {% if comunicacion and comunicacion.destinatario_tipo == 'profesores' %}selected{% endif %}>Solo profesores</option>
+        <option value="directores" {% if comunicacion and comunicacion.destinatario_tipo == 'directores' %}selected{% endif %}>Solo directores de curso</option>
+        <option value="estudiantes" {% if comunicacion and comunicacion.destinatario_tipo == 'estudiantes' %}selected{% endif %}>Solo estudiantes</option>
+        <option value="grado" {% if comunicacion and comunicacion.destinatario_tipo == 'grado' %}selected{% endif %}>Por grado</option>
+        <option value="cursos" {% if comunicacion and comunicacion.destinatario_tipo == 'cursos' %}selected{% endif %}>Por curso(s)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Prioridad</label>
+      <select name="prioridad">
+        <option value="baja" {% if comunicacion and comunicacion.prioridad == 'baja' %}selected{% endif %}>Baja</option>
+        <option value="normal" {% if comunicacion and comunicacion.prioridad == 'normal' %}selected{% endif %}>Normal</option>
+        <option value="alta" {% if comunicacion and comunicacion.prioridad == 'alta' %}selected{% endif %}>Alta</option>
+        <option value="urgente" {% if comunicacion and comunicacion.prioridad == 'urgente' %}selected{% endif %}>Urgente</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field" id="destValorField" style="display:none;">
+    <label>Seleccionar destinatarios específicos</label>
+    <div class="chips" id="destChips"></div>
+    <input type="hidden" name="destinatario_valor" id="destinatario_valor" value="{{ comunicacion.destinatario_valor if comunicacion else '' }}">
+    <div class="hint" id="destHint"></div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label>Programar publicación (opcional)</label>
+      <input type="date" name="fecha_programada" value="{{ comunicacion.fecha_programada[:10] if comunicacion and comunicacion.fecha_programada else '' }}">
+      <div class="hint">Dejar vacío para publicar manualmente</div>
+    </div>
+    <div class="field" style="display:flex;align-items:flex-end;padding-bottom:6px;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;text-transform:none;letter-spacing:0;color:var(--text);">
+        <input type="checkbox" name="publicar_ahora" value="1" onchange="if(this.checked)document.getElementsByName('fecha_programada')[0].value=''">
+        Publicar inmediatamente
+      </label>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {% if comunicacion %}Guardar cambios{% else %}Crear comunicación{% endif %}</button>
+    <a href="/{{ slug }}/rector/comunicaciones" class="btn btn-outline"><i class="fas fa-times"></i> Cancelar</a>
+  </div>
+</form>
+</div>
+</div>
+
+<script>
+const cursos = {{ cursos | tojson }};
+const profesores = {{ profesores | tojson }};
+const directoras = {{ directoras | tojson }};
+
+function toggleDestValor(){
+    var tipo = document.getElementById('destTipo').value;
+    var field = document.getElementById('destValorField');
+    var chips = document.getElementById('destChips');
+    var hint = document.getElementById('destHint');
+    var hidden = document.getElementById('destinatario_valor');
+    chips.innerHTML = '';
+    hint.textContent = '';
+    field.style.display = 'none';
+    hidden.value = '';
+
+    var items = [];
+    if (tipo === 'grado') {
+        var grados = [...new Set(cursos.map(function(c){ return c.replace(/[^0-9]/g,''); }).filter(function(g){ return g; }))];
+        items = [...new Set(grados)];
+        hint.textContent = 'Selecciona uno o más grados. Se notificará a todos los cursos de esos grados.';
+    } else if (tipo === 'cursos') {
+        items = cursos;
+        hint.textContent = 'Selecciona uno o más cursos específicos.';
+    } else if (tipo === 'profesores') {
+        items = profesores.map(function(p){ return {label: p.nombre, val: 'prof_'+p.id}; });
+        hint.textContent = 'Selecciona uno o más profesores.';
+    } else if (tipo === 'directores') {
+        items = directoras.map(function(d){ return {label: d.nombre + ' (' + d.curso + ')', val: 'dir_'+d.id}; });
+        hint.textContent = 'Selecciona uno o más directores.';
+    }
+    if (items.length > 0) {
+        field.style.display = 'block';
+        items.forEach(function(item){
+            var chip = document.createElement('div');
+            chip.className = 'chip';
+            var label = typeof item === 'string' ? item : item.label;
+            var val = typeof item === 'string' ? item : item.val;
+            chip.textContent = label;
+            chip.dataset.val = val;
+            chip.onclick = function(){
+                this.classList.toggle('selected');
+                updateHidden();
+            };
+            chips.appendChild(chip);
+        });
+    }
+}
+
+function updateHidden(){
+    var hidden = document.getElementById('destinatario_valor');
+    var sel = document.querySelectorAll('#destChips .chip.selected');
+    var vals = [];
+    sel.forEach(function(s){ vals.push(s.dataset.val); });
+    hidden.value = JSON.stringify(vals);
+}
+
+(function(){
+    var tipo = document.getElementById('destTipo');
+    if (tipo.value === 'grado' || tipo.value === 'cursos' || tipo.value === 'profesores' || tipo.value === 'directores') {
+        toggleDestValor();
+        var saved = document.getElementById('destinatario_valor').value;
+        if (saved) {
+            try {
+                var arr = JSON.parse(saved);
+                document.querySelectorAll('#destChips .chip').forEach(function(chip){
+                    if (arr.indexOf(chip.dataset.val) !== -1) chip.classList.add('selected');
+                });
+            } catch(e){}
+        }
+    }
+})();
+</script>
+<script>
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
+</body>
+</html>

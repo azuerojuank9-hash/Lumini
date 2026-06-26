@@ -11,8 +11,7 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 app.permanent_session_lifetime = timedelta(hours=4)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-if not app.debug:
-    app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SECURE'] = False
 
 # ── LOGGING ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -388,6 +387,43 @@ def init_db(slug):
             email TEXT DEFAULT '', activo INTEGER DEFAULT 1,
             pregunta_secreta TEXT DEFAULT '',
             respuesta_secreta TEXT DEFAULT '')''',
+        '''CREATE TABLE IF NOT EXISTS rectores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL, usuario TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL, email TEXT DEFAULT '',
+            activo INTEGER DEFAULT 1,
+            pregunta_secreta TEXT DEFAULT '',
+            respuesta_secreta TEXT DEFAULT '')''',
+        '''CREATE TABLE IF NOT EXISTS comunicaciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            rector_id INTEGER NOT NULL,
+            titulo TEXT NOT NULL,
+            contenido TEXT NOT NULL,
+            destinatario_tipo TEXT NOT NULL,
+            destinatario_valor TEXT DEFAULT '',
+            prioridad TEXT NOT NULL DEFAULT 'normal',
+            estado TEXT NOT NULL DEFAULT 'borrador',
+            fecha_creacion TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+            fecha_programada TEXT DEFAULT NULL,
+            fecha_publicacion TEXT DEFAULT NULL,
+            activo INTEGER DEFAULT 1)''',
+        '''CREATE TABLE IF NOT EXISTS comunicaciones_leidas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            comunicacion_id INTEGER NOT NULL,
+            usuario_tipo TEXT NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            fecha_lectura TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+            UNIQUE(comunicacion_id, usuario_tipo, usuario_id))''',
+        '''CREATE TABLE IF NOT EXISTS notificaciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_tipo TEXT NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            titulo TEXT NOT NULL,
+            mensaje TEXT DEFAULT '',
+            tipo TEXT NOT NULL DEFAULT 'info',
+            link TEXT DEFAULT '',
+            leida INTEGER DEFAULT 0,
+            fecha_creacion TEXT NOT NULL DEFAULT (datetime('now','localtime')))''',
     ]
     for s in stmts:
         conn.execute(s)
@@ -922,6 +958,19 @@ def login(slug):
                 return redirect(url_for('directora_panel', slug=slug))
             error = 'Usuario o contraseña incorrectos.'
 
+        elif accion == 'rector_login':
+            u = request.form.get('rec_usuario', '').strip()
+            p = request.form.get('rec_password', '').strip()
+            conn = conectar(slug)
+            rector = conn.execute(
+                'SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
+            conn.close()
+            if rector and verificar_pw(p, rector['password']):
+                session.permanent = True
+                session[f'rector_id_{slug}'] = rector['id']
+                return redirect(url_for('rector_panel', slug=slug))
+            error = 'Usuario o contraseña incorrectos.'
+
     return render_template('login_v2.html', error=error, materias=MATERIAS,
                            jornadas=JORNADAS, preguntas=PREGUNTAS_SECRETAS,
                            slug=slug, colegio=colegio)
@@ -961,7 +1010,7 @@ def seleccionar_jornada(slug):
 @app.route('/<slug>/logout')
 def logout(slug):
     for k in [f'rol_{slug}', f'profesor_id_{slug}', f'alumno_id_{slug}',
-              f'materia_{slug}', f'jornada_{slug}']:
+              f'materia_{slug}', f'jornada_{slug}', f'rector_id_{slug}']:
         session.pop(k, None)
     return redirect(url_for('login', slug=slug))
 
@@ -1756,6 +1805,369 @@ def get_directora(slug):
     d = conn.execute('SELECT * FROM directoras WHERE id=?', (did,)).fetchone()
     conn.close()
     return d
+
+def get_rector(slug):
+    rid = session.get(f'rector_id_{slug}')
+    if not rid: return None
+    conn = conectar(slug)
+    r = conn.execute('SELECT * FROM rectores WHERE id=?', (rid,)).fetchone()
+    conn.close()
+    return r
+
+@app.route('/<slug>/rector/login', methods=['GET', 'POST'])
+def rector_login(slug):
+    require_colegio(slug)
+    init_db(slug)
+    colegio = get_colegio(slug)
+    error = exito = None
+    if request.method == 'POST':
+        if not validar_csrf():
+            return 'Error de seguridad', 400
+        u = request.form.get('rec_usuario', '').strip()
+        p = request.form.get('rec_password', '').strip()
+        conn = conectar(slug)
+        rector = conn.execute(
+            'SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
+        conn.close()
+        if rector and verificar_pw(p, rector['password']):
+            session.permanent = True
+            session[f'rector_id_{slug}'] = rector['id']
+            return redirect(url_for('rector_panel', slug=slug))
+        error = 'Usuario o contraseña incorrectos.'
+    return render_template('rector_login.html', slug=slug, colegio=colegio,
+                           error=error, exito=exito)
+
+@app.route('/<slug>/rector')
+@app.route('/<slug>/rector/panel')
+def rector_panel(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    total_est = conn.execute(
+        'SELECT COUNT(*) as c FROM alumnos WHERE activo=1').fetchone()['c']
+    total_prof = conn.execute(
+        'SELECT COUNT(*) as c FROM profesores WHERE activo=1').fetchone()['c']
+    total_cursos = conn.execute(
+        'SELECT COUNT(DISTINCT curso) as c FROM alumnos WHERE activo=1').fetchone()['c']
+    total_materias = conn.execute(
+        'SELECT COUNT(DISTINCT materia) as c FROM asignaciones_materia').fetchone()['c']
+    total_directoras = conn.execute(
+        'SELECT COUNT(*) as c FROM directoras WHERE activo=1').fetchone()['c']
+    hoy = datetime.today().strftime('%Y-%m-%d')
+    asistencia_hoy = conn.execute(
+        "SELECT COUNT(DISTINCT aid) as c FROM asistencia WHERE fecha=?", (hoy,)).fetchone()['c']
+    comunicaciones = conn.execute(
+        '''SELECT * FROM comunicaciones WHERE rector_id=? AND activo=1
+           ORDER BY fecha_creacion DESC LIMIT 5''',
+        (rector['id'],)).fetchall()
+    notif_count = conn.execute(
+        'SELECT COUNT(*) as c FROM notificaciones WHERE usuario_tipo=? AND usuario_id=? AND leida=0',
+        ('rector', rector['id'])).fetchone()['c']
+    conn.close()
+    prom_general = 0
+    return render_template('rector_panel.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           total_estudiantes=total_est,
+                           total_profesores=total_prof,
+                           total_cursos=total_cursos,
+                           total_materias=total_materias,
+                           total_directoras=total_directoras,
+                           asistencia_hoy=asistencia_hoy,
+                           comunicaciones=comunicaciones,
+                           notif_count=notif_count)
+
+@app.route('/<slug>/rector/logout')
+def rector_logout(slug):
+    session.pop(f'rector_id_{slug}', None)
+    return redirect(url_for('login', slug=slug))
+
+# ── NOTIFICATION HELPERS ───────────────────────────────────────────────────────
+def crear_notificacion(slug, usuario_tipo, usuario_id, titulo, mensaje='', tipo='info', link=''):
+    conn = conectar(slug)
+    conn.execute(
+        'INSERT INTO notificaciones (usuario_tipo,usuario_id,titulo,mensaje,tipo,link) VALUES (?,?,?,?,?,?)',
+        (usuario_tipo, usuario_id, titulo, mensaje, tipo, link))
+    conn.commit()
+    conn.close()
+
+def notificaciones_no_leidas(slug, usuario_tipo, usuario_id):
+    conn = conectar(slug)
+    c = conn.execute(
+        'SELECT COUNT(*) as c FROM notificaciones WHERE usuario_tipo=? AND usuario_id=? AND leida=0',
+        (usuario_tipo, usuario_id)).fetchone()['c']
+    conn.close()
+    return c
+
+# ── COMUNICACIONES (RECTOR) ────────────────────────────────────────────────────
+@app.route('/<slug>/rector/comunicaciones')
+def rector_comunicaciones(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    estado_filtro = request.args.get('estado', '')
+    conn = conectar(slug)
+    if estado_filtro:
+        comunicaciones = conn.execute(
+            '''SELECT * FROM comunicaciones WHERE rector_id=? AND activo=1 AND estado=?
+               ORDER BY fecha_creacion DESC''',
+            (rector['id'], estado_filtro)).fetchall()
+    else:
+        comunicaciones = conn.execute(
+            '''SELECT * FROM comunicaciones WHERE rector_id=? AND activo=1
+               ORDER BY fecha_creacion DESC''',
+            (rector['id'],)).fetchall()
+    notif_count = notificaciones_no_leidas(slug, 'rector', rector['id'])
+    conn.close()
+    return render_template('rector_comunicaciones.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           comunicaciones=comunicaciones,
+                           estado_filtro=estado_filtro,
+                           notif_count=notif_count)
+
+@app.route('/<slug>/rector/comunicaciones/nueva', methods=['GET', 'POST'])
+def rector_comunicacion_nueva(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    error = exito = None
+    conn = conectar(slug)
+    cursos = [r['curso'] for r in conn.execute(
+        'SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()]
+    profesores = conn.execute(
+        'SELECT id, nombre FROM profesores WHERE activo=1 ORDER BY nombre').fetchall()
+    directoras = conn.execute(
+        'SELECT id, nombre, curso FROM directoras WHERE activo=1 ORDER BY nombre').fetchall()
+    conn.close()
+    if request.method == 'POST':
+        if not validar_csrf():
+            return 'Error de seguridad', 400
+        titulo = request.form.get('titulo', '').strip()
+        contenido = request.form.get('contenido', '').strip()
+        dest_tipo = request.form.get('destinatario_tipo', '').strip()
+        dest_valor = request.form.get('destinatario_valor', '').strip()
+        prioridad = request.form.get('prioridad', 'normal').strip()
+        programar = request.form.get('fecha_programada', '').strip()
+        publicar_ahora = request.form.get('publicar_ahora', '0').strip()
+        if not titulo or not contenido or not dest_tipo:
+            error = 'Completa todos los campos.'
+        else:
+            conn = conectar(slug)
+            conn.execute(
+                '''INSERT INTO comunicaciones (rector_id,titulo,contenido,destinatario_tipo,destinatario_valor,prioridad,estado,fecha_programada,fecha_publicacion)
+                   VALUES (?,?,?,?,?,?,?,?,?)''',
+                (rector['id'], titulo, contenido, dest_tipo, dest_valor, prioridad,
+                 'publicado' if publicar_ahora == '1' else ('programado' if programar else 'borrador'),
+                 programar if programar else None,
+                 datetime.today().strftime('%Y-%m-%d %H:%M:%S') if publicar_ahora == '1' else None))
+            conn.commit()
+            conn.close()
+            exito = 'Comunicación creada correctamente.'
+    return render_template('rector_comunicacion_form.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           error=error, exito=exito, comunicacion=None,
+                           cursos=cursos, profesores=profesores,
+                           directoras=directoras,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+@app.route('/<slug>/rector/comunicaciones/<int:cid>/editar', methods=['GET', 'POST'])
+def rector_comunicacion_editar(slug, cid):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    com = conn.execute(
+        'SELECT * FROM comunicaciones WHERE id=? AND rector_id=? AND activo=1',
+        (cid, rector['id'])).fetchone()
+    if not com: conn.close(); return 'Comunicación no encontrada', 404
+    cursos = [r['curso'] for r in conn.execute(
+        'SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()]
+    profesores = conn.execute(
+        'SELECT id, nombre FROM profesores WHERE activo=1 ORDER BY nombre').fetchall()
+    directoras = conn.execute(
+        'SELECT id, nombre, curso FROM directoras WHERE activo=1 ORDER BY nombre').fetchall()
+    error = exito = None
+    if request.method == 'POST':
+        if not validar_csrf():
+            return 'Error de seguridad', 400
+        titulo = request.form.get('titulo', '').strip()
+        contenido = request.form.get('contenido', '').strip()
+        dest_tipo = request.form.get('destinatario_tipo', '').strip()
+        dest_valor = request.form.get('destinatario_valor', '').strip()
+        prioridad = request.form.get('prioridad', 'normal').strip()
+        programar = request.form.get('fecha_programada', '').strip()
+        publicar_ahora = request.form.get('publicar_ahora', '0').strip()
+        if not titulo or not contenido or not dest_tipo:
+            error = 'Completa todos los campos.'
+        else:
+            conn.execute(
+                '''UPDATE comunicaciones SET titulo=?,contenido=?,destinatario_tipo=?,destinatario_valor=?,
+                   prioridad=?,estado=?,fecha_programada=?,fecha_publicacion=?
+                   WHERE id=? AND rector_id=?''',
+                (titulo, contenido, dest_tipo, dest_valor, prioridad,
+                 'publicado' if publicar_ahora == '1' else ('programado' if programar else com['estado']),
+                 programar if programar else None,
+                 datetime.today().strftime('%Y-%m-%d %H:%M:%S') if publicar_ahora == '1' else com.get('fecha_publicacion'),
+                 cid, rector['id']))
+            conn.commit()
+            exito = 'Comunicación actualizada correctamente.'
+            com = conn.execute(
+                'SELECT * FROM comunicaciones WHERE id=? AND activo=1', (cid,)).fetchone()
+    conn.close()
+    return render_template('rector_comunicacion_form.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           error=error, exito=exito, comunicacion=com,
+                           cursos=cursos, profesores=profesores,
+                           directoras=directoras,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+@app.route('/<slug>/rector/comunicaciones/<int:cid>')
+def rector_comunicacion_detalle(slug, cid):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    com = conn.execute(
+        'SELECT * FROM comunicaciones WHERE id=? AND rector_id=? AND activo=1',
+        (cid, rector['id'])).fetchone()
+    if not com: conn.close(); return 'Comunicación no encontrada', 404
+    leidas = conn.execute(
+        'SELECT COUNT(*) as c FROM comunicaciones_leidas WHERE comunicacion_id=?', (cid,)).fetchone()['c']
+    conn.close()
+    return render_template('rector_comunicacion_detail.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           com=com, leidas=leidas,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+@app.route('/<slug>/rector/comunicaciones/<int:cid>/publicar', methods=['POST'])
+def rector_comunicacion_publicar(slug, cid):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    if not validar_csrf(): return 'Error de seguridad', 400
+    conn = conectar(slug)
+    conn.execute(
+        '''UPDATE comunicaciones SET estado='publicado',fecha_publicacion=datetime('now','localtime')
+           WHERE id=? AND rector_id=? AND activo=1''',
+        (cid, rector['id']))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('rector_comunicaciones', slug=slug))
+
+@app.route('/<slug>/rector/comunicaciones/<int:cid>/archivar', methods=['POST'])
+def rector_comunicacion_archivar(slug, cid):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    if not validar_csrf(): return 'Error de seguridad', 400
+    conn = conectar(slug)
+    conn.execute(
+        "UPDATE comunicaciones SET estado='archivado' WHERE id=? AND rector_id=? AND activo=1",
+        (cid, rector['id']))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('rector_comunicaciones', slug=slug))
+
+@app.route('/<slug>/rector/comunicaciones/<int:cid>/eliminar', methods=['POST'])
+def rector_comunicacion_eliminar(slug, cid):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    if not validar_csrf(): return 'Error de seguridad', 400
+    conn = conectar(slug)
+    conn.execute(
+        'DELETE FROM comunicaciones WHERE id=? AND rector_id=?',
+        (cid, rector['id']))
+    conn.execute('DELETE FROM comunicaciones_leidas WHERE comunicacion_id=?', (cid,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('rector_comunicaciones', slug=slug))
+
+# ── NOTIFICACIONES (TODOS LOS ROLES) ───────────────────────────────────────────
+@app.route('/<slug>/notificaciones')
+def notificaciones(slug):
+    require_colegio(slug)
+    colegio = get_colegio(slug)
+    usuario_tipo = None
+    usuario_id = None
+    rector = get_rector(slug)
+    if rector: usuario_tipo, usuario_id = 'rector', rector['id']
+    if not usuario_id:
+        prof = get_profesor(slug)
+        if prof: usuario_tipo, usuario_id = 'profesor', prof['id']
+    if not usuario_id:
+        directora = get_directora(slug)
+        if directora: usuario_tipo, usuario_id = 'directora', directora['id']
+    if not usuario_id:
+        aid = session.get(f'alumno_id_{slug}')
+        if aid: usuario_tipo, usuario_id = 'estudiante', aid
+    if not usuario_id:
+        return redirect(url_for('login', slug=slug))
+    conn = conectar(slug)
+    notifs = conn.execute(
+        'SELECT * FROM notificaciones WHERE usuario_tipo=? AND usuario_id=? ORDER BY fecha_creacion DESC LIMIT 100',
+        (usuario_tipo, usuario_id)).fetchall()
+    conn.close()
+    return render_template('notificaciones.html',
+                           slug=slug, colegio=colegio,
+                           notificaciones=notifs,
+                           usuario_tipo=usuario_tipo)
+
+@app.route('/<slug>/notificaciones/<int:nid>/leer', methods=['POST'])
+def notificacion_leer(slug, nid):
+    require_colegio(slug)
+    if not validar_csrf(): return 'Error de seguridad', 400
+    conn = conectar(slug)
+    conn.execute('UPDATE notificaciones SET leida=1 WHERE id=?', (nid,))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
+
+@app.route('/<slug>/notificaciones/contar')
+def notificaciones_contar(slug):
+    require_colegio(slug)
+    usuario_tipo = None
+    usuario_id = None
+    rector = get_rector(slug)
+    if rector: usuario_tipo, usuario_id = 'rector', rector['id']
+    if not usuario_id:
+        prof = get_profesor(slug)
+        if prof: usuario_tipo, usuario_id = 'profesor', prof['id']
+    if not usuario_id:
+        directora = get_directora(slug)
+        if directora: usuario_tipo, usuario_id = 'directora', directora['id']
+    if not usuario_id:
+        aid = session.get(f'alumno_id_{slug}')
+        if aid: usuario_tipo, usuario_id = 'estudiante', aid
+    if not usuario_id:
+        return jsonify({'count': 0})
+    c = notificaciones_no_leidas(slug, usuario_tipo, usuario_id)
+    return jsonify({'count': c})
+
+# ── EVENTOS CALENDARIO ────────────────────────────────────────────────────────
+@app.route('/<slug>/rector/comunicaciones/<int:cid>/evento')
+def rector_comunicacion_evento(slug, cid):
+    """Return JSON for calendar integration."""
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return jsonify({'error': 'No autorizado'}), 403
+    conn = conectar(slug)
+    com = conn.execute(
+        'SELECT id, titulo, fecha_programada, prioridad FROM comunicaciones WHERE id=? AND rector_id=? AND activo=1',
+        (cid, rector['id'])).fetchone()
+    conn.close()
+    if not com: return jsonify({'error': 'No encontrada'}), 404
+    return jsonify({
+        'id': com['id'],
+        'title': com['titulo'],
+        'start': com['fecha_programada'] or datetime.today().strftime('%Y-%m-%d'),
+        'className': 'event-' + com['prioridad']
+    })
 
 @app.route('/<slug>/directora/login', methods=['GET', 'POST'])
 def directora_login(slug):

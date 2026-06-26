@@ -93,6 +93,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <button class="tab-btn" onclick="switchTab('registro',this)">Registrarse</button>
     <button class="tab-btn" onclick="switchTab('estudiante',this)">Estudiante</button>
     <button class="tab-btn" onclick="switchTab('directora',this)">Directora</button>
+    <button class="tab-btn" onclick="switchTab('rector',this)">Rector</button>
 </div>
 
 <div class="card">
@@ -318,6 +319,25 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
         </div>
     </div>
 
+    <div id="tab-rector" class="section">
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="accion" value="rector_login">
+            <div class="field">
+                <label>Usuario</label>
+                <input type="text" name="rec_usuario" placeholder="ej: rector_colegio" autocomplete="username">
+            </div>
+            <div class="field">
+                <label>Contraseña</label>
+                <div class="pass-wrapper">
+                    <input type="password" name="rec_password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Entrar al panel</button>
+        </form>
+    </div>
+
 </div>
 
 <script>
@@ -375,6 +395,8 @@ document.querySelectorAll('.tabs .tab-btn')[1].click();
 {% elif 'director' in e or 'Director' in e %}
 document.querySelectorAll('.tabs .tab-btn')[3].click();
 document.getElementById('dir-btn-reg').click();
+{% elif 'rector' in e or 'Rector' in e %}
+document.querySelectorAll('.tabs .tab-btn')[4].click();
 {% elif 'estudiante' in e %}
 document.querySelectorAll('.tabs .tab-btn')[2].click();
 {% endif %}
