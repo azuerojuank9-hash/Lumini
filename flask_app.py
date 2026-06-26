@@ -1987,6 +1987,155 @@ def rector_logout(slug):
     session.pop(f'rector_id_{slug}', None)
     return redirect(url_for('login', slug=slug))
 
+# ── RECTOR: HORARIOS ───────────────────────────────────────────────────────────
+@app.route('/<slug>/rector/horarios')
+def rector_horarios(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    cursos = [r['curso'] for r in conn.execute(
+        'SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()]
+    jornadas = JORNADAS
+    conn.close()
+    return render_template('rector_horarios.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           cursos=cursos, jornadas=jornadas,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+@app.route('/<slug>/rector/horarios/datos')
+def rector_horarios_datos(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return jsonify({})
+    curso = request.args.get('curso', '')
+    jornada = request.args.get('jornada', '')
+    if not curso: return jsonify({})
+    conn = conectar(slug)
+    filas = conn.execute(
+        'SELECT dia, franja, num, materia, profesor FROM horarios_curso WHERE curso=? AND jornada=?',
+        (curso, jornada)).fetchall()
+    conn.close()
+    mapa = {}
+    for r in filas:
+        mapa[f"{r['dia']}_{r['franja']}"] = {'num': r['num'], 'materia': r['materia'], 'profesor': r['profesor']}
+    return jsonify(mapa)
+
+# ── RECTOR: PROFESORES ─────────────────────────────────────────────────────────
+@app.route('/<slug>/rector/profesores')
+def rector_profesores(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    profesores = [dict(r) for r in conn.execute(
+        'SELECT id, nombre, email, activo FROM profesores ORDER BY nombre').fetchall()]
+    conn.close()
+    return render_template('rector_profesores.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           profesores=profesores,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+# ── RECTOR: ESTUDIANTES ────────────────────────────────────────────────────────
+@app.route('/<slug>/rector/estudiantes')
+def rector_estudiantes(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    estudiantes = [dict(r) for r in conn.execute(
+        '''SELECT id, nombre, curso, jornada, activo FROM alumnos WHERE activo=1
+           ORDER BY curso, nombre''').fetchall()]
+    conn.close()
+    return render_template('rector_estudiantes.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           estudiantes=estudiantes,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+# ── RECTOR: CURSOS ─────────────────────────────────────────────────────────────
+@app.route('/<slug>/rector/cursos')
+def rector_cursos(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    rows = conn.execute(
+        '''SELECT curso, jornada, COUNT(*) as total,
+                  SUM(CASE WHEN activo=1 THEN 1 ELSE 0 END) as activos
+           FROM alumnos GROUP BY curso, jornada ORDER BY curso''').fetchall()
+    cursos = [dict(r) for r in rows]
+    conn.close()
+    return render_template('rector_cursos.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           cursos=cursos,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+# ── RECTOR: REPORTES ───────────────────────────────────────────────────────────
+@app.route('/<slug>/rector/reportes')
+def rector_reportes(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    total_est = conn.execute(
+        'SELECT COUNT(*) as c FROM alumnos WHERE activo=1').fetchone()['c']
+    total_prof = conn.execute(
+        'SELECT COUNT(*) as c FROM profesores WHERE activo=1').fetchone()['c']
+    total_cursos = conn.execute(
+        'SELECT COUNT(DISTINCT curso) as c FROM alumnos WHERE activo=1').fetchone()['c']
+    total_directoras = conn.execute(
+        'SELECT COUNT(*) as c FROM directoras WHERE activo=1').fetchone()['c']
+    conn.close()
+    return render_template('rector_reportes.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           total_est=total_est, total_prof=total_prof,
+                           total_cursos=total_cursos,
+                           total_directoras=total_directoras,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+# ── RECTOR: CONFIGURACIÓN ──────────────────────────────────────────────────────
+@app.route('/<slug>/rector/configuracion', methods=['GET', 'POST'])
+def rector_configuracion(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    error = exito = None
+    conn = conectar(slug)
+    if request.method == 'POST':
+        if not validar_csrf():
+            return 'Error de seguridad', 400
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip()
+        pw_actual = request.form.get('password_actual', '').strip()
+        pw_nueva = request.form.get('password_nueva', '').strip()
+        if not nombre:
+            error = 'El nombre es obligatorio.'
+        elif pw_actual and not verificar_pw(pw_actual, rector['password']):
+            error = 'La contraseña actual no es correcta.'
+        elif pw_nueva and len(pw_nueva) < 6:
+            error = 'Mínimo 6 caracteres para la nueva contraseña.'
+        else:
+            if pw_nueva:
+                conn.execute('UPDATE rectores SET nombre=?, email=?, password=? WHERE id=?',
+                             (nombre, email, hash_pw(pw_nueva), rector['id']))
+            else:
+                conn.execute('UPDATE rectores SET nombre=?, email=? WHERE id=?',
+                             (nombre, email, rector['id']))
+            conn.commit()
+            exito = 'Configuración actualizada correctamente.'
+            rector = conn.execute('SELECT * FROM rectores WHERE id=?', (rector['id'],)).fetchone()
+    conn.close()
+    return render_template('rector_configuracion.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           error=error, exito=exito,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
 # ── NOTIFICATION HELPERS ───────────────────────────────────────────────────────
 def crear_notificacion(slug, usuario_tipo, usuario_id, titulo, mensaje='', tipo='info', link=''):
     conn = conectar(slug)
