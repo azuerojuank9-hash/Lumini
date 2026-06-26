@@ -320,22 +320,93 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     </div>
 
     <div id="tab-rector" class="section">
-        <form method="POST">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="accion" value="rector_login">
-            <div class="field">
-                <label>Usuario</label>
-                <input type="text" name="rec_usuario" placeholder="ej: rector_colegio" autocomplete="username">
-            </div>
-            <div class="field">
-                <label>Contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" name="rec_password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+        <div style="display:flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:16px;">
+            <button type="button" class="tab-btn active" id="rec-btn-login" onclick="switchRecTab('rec-login',this)" style="flex:1;font-size:11px;">Ingresar</button>
+            <button type="button" class="tab-btn" id="rec-btn-reg" onclick="switchRecTab('rec-registro',this)" style="flex:1;font-size:11px;">Registrarse</button>
+        </div>
+
+        <div id="tab-rec-login">
+            <form method="POST">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="accion" value="rector_login">
+                <div class="field">
+                    <label>Usuario</label>
+                    <input type="text" name="rec_usuario" placeholder="ej: rector_colegio" autocomplete="username">
                 </div>
-            </div>
-            <button type="submit" class="btn-submit">Entrar al panel</button>
-        </form>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="rec_password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Entrar al panel</button>
+            </form>
+            <a href="/{{ slug }}/recuperar" class="forgot-link">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <div id="tab-rec-registro" style="display:none;">
+            <form method="POST" action="/{{ slug }}/rector/registrar">
+                <div class="field">
+                    <label>Nombre completo</label>
+                    <input type="text" name="nombre" placeholder="Tu nombre" required>
+                </div>
+                <div class="field">
+                    <label>Usuario</label>
+                    <input type="text" name="usuario" placeholder="ej: rector_colegio" required>
+                </div>
+                <div class="field">
+                    <label>Correo (opcional)</label>
+                    <input type="email" name="email" placeholder="tu@correo.com">
+                </div>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Confirmar contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Jornada</label>
+                    <select name="jornada" required>
+                        <option value="" disabled selected>Selecciona</option>
+                        {% for j in jornadas %}
+                        <option value="{{ j }}">{{ j }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="codigo-field">
+                    <label>Código de invitación</label>
+                    <input type="text" name="codigo_registro_rec" placeholder="Ingresa el código que te dio el administrador" required autocomplete="off">
+                    <p class="hint">El código lo entrega el administrador del colegio.</p>
+                </div>
+
+                <div class="divider">Pregunta secreta (para recuperar contraseña)</div>
+                <div class="field">
+                    <label>Pregunta</label>
+                    <select name="pregunta_secreta" required>
+                        <option value="" disabled selected>Selecciona una pregunta</option>
+                        {% for p in preguntas %}
+                        <option value="{{ p }}">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Respuesta secreta</label>
+                    <input type="text" name="respuesta_secreta" placeholder="Tu respuesta (la usarás si olvidas tu contraseña)" required autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn-submit">Crear cuenta</button>
+            </form>
+        </div>
     </div>
 
 </div>
@@ -358,6 +429,15 @@ function switchDirTab(tab, btn) {
     document.getElementById('tab-' + tab).style.display = 'block';
     document.getElementById('dir-btn-login').classList.remove('active');
     document.getElementById('dir-btn-reg').classList.remove('active');
+    btn.classList.add('active');
+}
+
+function switchRecTab(tab, btn) {
+    document.getElementById('tab-rec-login').style.display = 'none';
+    document.getElementById('tab-rec-registro').style.display = 'none';
+    document.getElementById('tab-' + tab).style.display = 'block';
+    document.getElementById('rec-btn-login').classList.remove('active');
+    document.getElementById('rec-btn-reg').classList.remove('active');
     btn.classList.add('active');
 }
 
@@ -397,6 +477,9 @@ document.querySelectorAll('.tabs .tab-btn')[3].click();
 document.getElementById('dir-btn-reg').click();
 {% elif 'rector' in e or 'Rector' in e %}
 document.querySelectorAll('.tabs .tab-btn')[4].click();
+{% if 'Completa' in e or 'caracteres' in e or 'contraseñas' in e or 'pregunta' in e or 'invitación' in e or 'usuario ya existe' in e %}
+setTimeout(function(){ document.getElementById('rec-btn-reg').click(); }, 100);
+{% endif %}
 {% elif 'estudiante' in e %}
 document.querySelectorAll('.tabs .tab-btn')[2].click();
 {% endif %}

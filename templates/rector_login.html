@@ -69,13 +69,15 @@
         @media(max-width:480px){.card{padding:20px 16px;}.logo-wrap img{height:80px;width:80px;}.brand{font-size:1.2rem;}}
         @media(max-width:375px){.tab-btn{font-size:9px;padding:6px 2px;white-space:normal;word-break:break-word;}.card{padding:16px 12px;}.logo-wrap img{height:64px;width:64px;}.brand{font-size:1rem;letter-spacing:2px;}.field input,.field select{font-size:15px;padding:10px 12px;}.btn-submit{font-size:14px;min-height:44px;padding:10px;}}
     </style>
+<!-- Datadog RUM -->
+<script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
 </head>
 <body>
 
 <div class="bg-orb orb1"></div>
 <div class="bg-orb orb2"></div>
 
-<a href="/{{ slug }}/login" style="text-decoration:none;color:inherit;display:block;">
+<a href="/{{ slug }}/rector/login" style="text-decoration:none;color:inherit;display:block;">
 <div class="logo-wrap">
     {% if colegio and colegio.logo %}
     <img src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
@@ -100,7 +102,6 @@
 
     <div id="tab-login" class="section active">
         <form method="POST" action="/{{ slug }}/rector/login">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <div class="field">
                 <label>Usuario</label>
                 <input type="text" name="usuario" placeholder="Tu usuario" required autocomplete="username" autofocus>

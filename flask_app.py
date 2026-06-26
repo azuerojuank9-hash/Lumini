@@ -1852,8 +1852,6 @@ def rector_login(slug):
     colegio = get_colegio(slug)
     error = exito = None
     if request.method == 'POST':
-        if not validar_csrf():
-            return 'Error de seguridad', 400
         u = request.form.get('usuario', '').strip()
         p = request.form.get('password', '').strip()
         conn = conectar(slug)
