@@ -2041,10 +2041,10 @@ def rector_comunicacion_nueva(slug):
     conn = conectar(slug)
     cursos = [r['curso'] for r in conn.execute(
         'SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()]
-    profesores = conn.execute(
-        'SELECT id, nombre FROM profesores WHERE activo=1 ORDER BY nombre').fetchall()
-    directoras = conn.execute(
-        'SELECT id, nombre, curso FROM directoras WHERE activo=1 ORDER BY nombre').fetchall()
+    profesores = [dict(r) for r in conn.execute(
+        'SELECT id, nombre FROM profesores WHERE activo=1 ORDER BY nombre').fetchall()]
+    directoras = [dict(r) for r in conn.execute(
+        'SELECT id, nombre, curso FROM directoras WHERE activo=1 ORDER BY nombre').fetchall()]
     conn.close()
     if request.method == 'POST':
         if not validar_csrf():
@@ -2090,10 +2090,10 @@ def rector_comunicacion_editar(slug, cid):
     if not com: conn.close(); return 'Comunicación no encontrada', 404
     cursos = [r['curso'] for r in conn.execute(
         'SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()]
-    profesores = conn.execute(
-        'SELECT id, nombre FROM profesores WHERE activo=1 ORDER BY nombre').fetchall()
-    directoras = conn.execute(
-        'SELECT id, nombre, curso FROM directoras WHERE activo=1 ORDER BY nombre').fetchall()
+    profesores = [dict(r) for r in conn.execute(
+        'SELECT id, nombre FROM profesores WHERE activo=1 ORDER BY nombre').fetchall()]
+    directoras = [dict(r) for r in conn.execute(
+        'SELECT id, nombre, curso FROM directoras WHERE activo=1 ORDER BY nombre').fetchall()]
     error = exito = None
     if request.method == 'POST':
         if not validar_csrf():
