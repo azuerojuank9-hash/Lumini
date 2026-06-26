@@ -299,6 +299,11 @@ def migrar_db(slug):
             conn.execute('DROP TABLE horarios_curso_old')
             conn.commit()
 
+        cols_rec = [r[1] for r in conn.execute('PRAGMA table_info(rectores)').fetchall()]
+        if 'es_principal' not in cols_rec:
+            conn.execute('ALTER TABLE rectores ADD COLUMN es_principal INTEGER DEFAULT 0')
+            conn.commit()
+
         tablas_actuales = [r[0] for r in conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         ).fetchall()]
@@ -392,6 +397,7 @@ def init_db(slug):
             nombre TEXT NOT NULL, usuario TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL, email TEXT DEFAULT '',
             activo INTEGER DEFAULT 1,
+            es_principal INTEGER DEFAULT 0,
             pregunta_secreta TEXT DEFAULT '',
             respuesta_secreta TEXT DEFAULT '')''',
         '''CREATE TABLE IF NOT EXISTS comunicaciones (
@@ -2168,6 +2174,150 @@ def rector_comunicacion_evento(slug, cid):
         'start': com['fecha_programada'] or datetime.today().strftime('%Y-%m-%d'),
         'className': 'event-' + com['prioridad']
     })
+
+# ── GESTIÓN DE RECTORES (SÓLO PRINCIPAL) ───────────────────────────────────────
+def require_rector_principal(slug):
+    r = get_rector(slug)
+    if not r: abort(401)
+    if not r['es_principal']: abort(403)
+    return r
+
+@app.route('/<slug>/rector/gestion-rectores')
+def rector_gestion(slug):
+    r = require_rector_principal(slug)
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    rectores = conn.execute(
+        'SELECT id, nombre, usuario, email, activo, es_principal FROM rectores ORDER BY es_principal DESC, id').fetchall()
+    notif_count = notificaciones_no_leidas(slug, 'rector', r['id'])
+    conn.close()
+    return render_template('rector_gestion.html',
+                           slug=slug, colegio=colegio, rector=r,
+                           rectores=rectores, notif_count=notif_count)
+
+@app.route('/<slug>/rector/gestion-rectores/crear', methods=['GET', 'POST'])
+def rector_gestion_crear(slug):
+    r = require_rector_principal(slug)
+    colegio = get_colegio(slug)
+    error = exito = None
+    if request.method == 'POST':
+        if not validar_csrf(): return 'Error de seguridad', 400
+        nombre = request.form.get('nombre', '').strip()
+        usuario = request.form.get('usuario', '').strip()
+        password = request.form.get('password', '').strip()
+        confirmar = request.form.get('confirmar_password', '').strip()
+        email = request.form.get('email', '').strip()
+        if not nombre or not usuario or not password:
+            error = 'Completa todos los campos obligatorios.'
+        elif len(password) < 6:
+            error = 'Mínimo 6 caracteres para la contraseña.'
+        elif password != confirmar:
+            error = 'Las contraseñas no coinciden.'
+        else:
+            conn = conectar(slug)
+            if conn.execute('SELECT 1 FROM rectores WHERE usuario=?', (usuario,)).fetchone():
+                error = 'Ese usuario ya existe.'
+            else:
+                conn.execute(
+                    'INSERT INTO rectores (nombre, usuario, password, email) VALUES (?, ?, ?, ?)',
+                    (nombre, usuario, hash_pw(password), email))
+                conn.commit()
+                exito = f'Rector "{nombre}" creado correctamente.'
+                crear_notificacion(slug, 'rector', r['id'],
+                    'Nuevo rector creado', f'Se creó el rector {nombre} ({usuario}).', 'success')
+            conn.close()
+    return render_template('rector_gestion.html',
+                           slug=slug, colegio=colegio, rector=r,
+                           error=error, exito=exito, crear=True,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', r['id']))
+
+@app.route('/<slug>/rector/gestion-rectores/<int:rid>/editar', methods=['GET', 'POST'])
+def rector_gestion_editar(slug, rid):
+    r = require_rector_principal(slug)
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    target = conn.execute('SELECT * FROM rectores WHERE id=?', (rid,)).fetchone()
+    if not target: conn.close(); return 'Rector no encontrado', 404
+    error = exito = None
+    if request.method == 'POST':
+        if not validar_csrf(): return 'Error de seguridad', 400
+        nombre = request.form.get('nombre', '').strip()
+        usuario = request.form.get('usuario', '').strip()
+        password = request.form.get('password', '').strip()
+        confirmar = request.form.get('confirmar_password', '').strip()
+        email = request.form.get('email', '').strip()
+        if not nombre or not usuario:
+            error = 'Nombre y usuario son obligatorios.'
+        elif password and len(password) < 6:
+            error = 'Mínimo 6 caracteres.'
+        elif password and password != confirmar:
+            error = 'Las contraseñas no coinciden.'
+        else:
+            existing = conn.execute('SELECT 1 FROM rectores WHERE usuario=? AND id!=?', (usuario, rid)).fetchone()
+            if existing:
+                error = 'Ese nombre de usuario ya está en uso.'
+            else:
+                if password:
+                    conn.execute(
+                        'UPDATE rectores SET nombre=?, usuario=?, password=?, email=? WHERE id=?',
+                        (nombre, usuario, hash_pw(password), email, rid))
+                else:
+                    conn.execute(
+                        'UPDATE rectores SET nombre=?, usuario=?, email=? WHERE id=?',
+                        (nombre, usuario, email, rid))
+                conn.commit()
+                exito = 'Rector actualizado correctamente.'
+                target = conn.execute('SELECT * FROM rectores WHERE id=?', (rid,)).fetchone()
+    conn.close()
+    return render_template('rector_gestion.html',
+                           slug=slug, colegio=colegio, rector=r,
+                           error=error, exito=exito, editar=target,
+                           notif_count=notificaciones_no_leidas(slug, 'rector', r['id']))
+
+@app.route('/<slug>/rector/gestion-rectores/<int:rid>/toggle', methods=['POST'])
+def rector_gestion_toggle(slug, rid):
+    r = require_rector_principal(slug)
+    if not validar_csrf(): return 'Error de seguridad', 400
+    if rid == r['id']: return 'No puedes desactivarte a ti mismo.', 400
+    conn = conectar(slug)
+    conn.execute('UPDATE rectores SET activo = CASE WHEN activo=1 THEN 0 ELSE 1 END WHERE id=?', (rid,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('rector_gestion', slug=slug))
+
+@app.route('/<slug>/rector/gestion-rectores/<int:rid>/eliminar', methods=['POST'])
+def rector_gestion_eliminar(slug, rid):
+    r = require_rector_principal(slug)
+    if not validar_csrf(): return 'Error de seguridad', 400
+    if rid == r['id']: return 'No puedes eliminar tu propia cuenta.', 400
+    conn = conectar(slug)
+    target = conn.execute('SELECT es_principal FROM rectores WHERE id=?', (rid,)).fetchone()
+    if not target: conn.close(); return 'Rector no encontrado', 404
+    if target['es_principal']:
+        conn.close(); return 'No puedes eliminar al Rector Principal. Transfiere el rol primero.', 400
+    conn.execute('DELETE FROM rectores WHERE id=?', (rid,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('rector_gestion', slug=slug))
+
+@app.route('/<slug>/rector/gestion-rectores/<int:rid>/hacer-principal', methods=['POST'])
+def rector_gestion_hacer_principal(slug, rid):
+    r = require_rector_principal(slug)
+    if not validar_csrf(): return 'Error de seguridad', 400
+    if rid == r['id']: return 'Ya eres el Rector Principal.', 400
+    conn = conectar(slug)
+    target = conn.execute('SELECT id, activo FROM rectores WHERE id=?', (rid,)).fetchone()
+    if not target: conn.close(); return 'Rector no encontrado', 404
+    if not target['activo']:
+        conn.close(); return 'No puedes transferir el rol a un rector inactivo.', 400
+    conn.execute('UPDATE rectores SET es_principal=0 WHERE id=?', (r['id'],))
+    conn.execute('UPDATE rectores SET es_principal=1 WHERE id=?', (rid,))
+    conn.commit()
+    conn.close()
+    session[f'rector_id_{slug}'] = rid
+    crear_notificacion(slug, 'rector', rid,
+        'Rector Principal transferido', f'{r["nombre"]} te ha transferido el rol de Rector Principal.', 'warning')
+    return redirect(url_for('rector_panel', slug=slug))
 
 @app.route('/<slug>/directora/login', methods=['GET', 'POST'])
 def directora_login(slug):

@@ -119,13 +119,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <a href="#" class="sidebar-item"><span class="icon"><i class="fas fa-user-graduate"></i></span><span>Estudiantes</span></a>
     <a href="#" class="sidebar-item"><span class="icon"><i class="fas fa-book"></i></span><span>Cursos</span></a>
     <a href="#" class="sidebar-item"><span class="icon"><i class="fas fa-chart-bar"></i></span><span>Reportes</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    <div class="sidebar-section" style="margin-top:12px;">Administración</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i class="fas fa-user-shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
     <a href="#" class="sidebar-item"><span class="icon"><i class="fas fa-cog"></i></span><span>Configuración</span></a>
     <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
-    <div class="role">Rector</div>
+    <div class="role">{% if rector.es_principal %}Rector Principal{% else %}Rector{% endif %}</div>
   </div>
 </nav>
 

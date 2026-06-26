@@ -16,6 +16,7 @@ TABLES = [
         nombre TEXT NOT NULL, usuario TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL, email TEXT DEFAULT '',
         activo INTEGER DEFAULT 1,
+        es_principal INTEGER DEFAULT 0,
         pregunta_secreta TEXT DEFAULT '',
         respuesta_secreta TEXT DEFAULT '')''',
     '''CREATE TABLE IF NOT EXISTS comunicaciones (
@@ -62,12 +63,15 @@ def main():
     init_tables(conn)
     h = hash_pw(password)
     try:
+        existing = conn.execute('SELECT COUNT(*) as c FROM rectores').fetchone()[0]
+        es_principal = 1 if existing == 0 else 0
         conn.execute(
-            'INSERT OR IGNORE INTO rectores (nombre, usuario, password) VALUES (?, ?, ?)',
-            (nombre, usuario, h))
+            'INSERT OR IGNORE INTO rectores (nombre, usuario, password, es_principal) VALUES (?, ?, ?, ?)',
+            (nombre, usuario, h, es_principal))
         conn.commit()
         if conn.total_changes:
-            print(f"Rector '{nombre}' ({usuario}) inserted into '{slug}'.")
+            role = 'Rector Principal' if es_principal else 'Rector'
+            print(f"{role} '{nombre}' ({usuario}) inserted into '{slug}'.")
         else:
             print(f"Rector '{usuario}' already exists in '{slug}'.")
     except Exception as e:
