@@ -347,6 +347,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
         <div id="tab-rec-registro" style="display:none;">
             <form method="POST" action="/{{ slug }}/rector/registrar">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <div class="field">
                     <label>Nombre completo</label>
                     <input type="text" name="nombre" placeholder="Tu nombre" required>
