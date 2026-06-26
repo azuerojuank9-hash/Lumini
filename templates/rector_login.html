@@ -103,12 +103,12 @@
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <div class="field">
                 <label>Usuario</label>
-                <input type="text" name="rec_usuario" placeholder="Tu usuario" required autocomplete="username" autofocus>
+                <input type="text" name="usuario" placeholder="Tu usuario" required autocomplete="username" autofocus>
             </div>
             <div class="field">
                 <label>Contraseña</label>
                 <div class="pass-wrapper">
-                    <input type="password" name="rec_password" placeholder="••••••••" required autocomplete="current-password">
+                    <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
                     <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
                 </div>
             </div>

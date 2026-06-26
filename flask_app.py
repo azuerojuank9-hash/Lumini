@@ -1854,8 +1854,8 @@ def rector_login(slug):
     if request.method == 'POST':
         if not validar_csrf():
             return 'Error de seguridad', 400
-        u = request.form.get('rec_usuario', '').strip()
-        p = request.form.get('rec_password', '').strip()
+        u = request.form.get('usuario', '').strip()
+        p = request.form.get('password', '').strip()
         conn = conectar(slug)
         rector = conn.execute(
             'SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
