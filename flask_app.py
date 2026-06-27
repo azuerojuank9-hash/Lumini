@@ -2163,22 +2163,31 @@ def notificaciones_no_leidas(slug, usuario_tipo, usuario_id):
     return c
 
 def generar_destinatarios(slug, comunicacion_id):
-    conn = conectar(slug)
-    cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
-    if 'leido' not in cols_cl:
-        try:
+    try:
+        conn = conectar(slug)
+    except Exception as e:
+        app.logger.error(f'generar_destinatarios: error conectando DB {slug}: {e}')
+        return
+    try:
+        cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
+        if 'leido' not in cols_cl:
             conn.execute('ALTER TABLE comunicaciones_leidas ADD COLUMN leido INTEGER DEFAULT 0')
             conn.commit()
-        except Exception:
-            pass
+    except Exception as e:
+        app.logger.error(f'generar_destinatarios: error migrando columna leido: {e}')
     com = conn.execute('SELECT * FROM comunicaciones WHERE id=?', (comunicacion_id,)).fetchone()
-    if not com or com['estado'] != 'publicado':
+    if not com:
+        conn.close()
+        app.logger.warning(f'generar_destinatarios: comunicacion {comunicacion_id} no encontrada')
+        return
+    if com['estado'] != 'publicado':
         conn.close()
         return
     dest_tipo = com['destinatario_tipo']
     try:
         val_arr = json.loads(com['destinatario_valor']) if com['destinatario_valor'] else []
-    except (json.JSONDecodeError, TypeError):
+    except (json.JSONDecodeError, TypeError) as e:
+        app.logger.warning(f'generar_destinatarios: error parseando destinatario_valor="{com["destinatario_valor"]}": {e}')
         val_arr = []
     destinatarios = []
     if dest_tipo == 'todo_colegio':
@@ -2362,12 +2371,15 @@ def rector_comunicacion_editar(slug, cid):
                 (titulo, contenido, dest_tipo, dest_valor, prioridad,
                  'publicado' if publicar_ahora == '1' else ('programado' if programar else com['estado']),
                  programar if programar else None,
-                 datetime.today().strftime('%Y-%m-%d %H:%M:%S') if publicar_ahora == '1' else com.get('fecha_publicacion'),
+                 datetime.today().strftime('%Y-%m-%d %H:%M:%S') if publicar_ahora == '1' else (com['fecha_publicacion'] if com['fecha_publicacion'] else None),
                  cid, rector['id']))
             conn.commit()
             if publicar_ahora == '1':
                 conn.close()
-                generar_destinatarios(slug, cid)
+                try:
+                    generar_destinatarios(slug, cid)
+                except Exception as e:
+                    app.logger.error(f'Error en generar_destinatarios: {e}')
                 conn = conectar(slug)
             exito = 'Comunicación actualizada correctamente.'
             com = conn.execute(
