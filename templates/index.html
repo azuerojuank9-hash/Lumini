@@ -394,8 +394,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         <div class="dash-section-body">
             {% if comunicaciones_pendientes %}
                 {% for c in comunicaciones_pendientes[:5] %}
-                {% set prioridad_color = {'baja': 'var(--sub)', 'normal': 'var(--blue)', 'alta': '#F59E0B', 'urgente': 'var(--red)'} %}
-                {% set color = prioridad_color.get(c.prioridad, 'var(--blue)') %}
+                {% set prioridad_color = {'baja': '#64748B', 'normal': '#2563EB', 'alta': '#F59E0B', 'urgente': '#EF4444'} %}
+                {% set color = prioridad_color.get(c.prioridad, '#2563EB') %}
                 <div class="schedule-item" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;">
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
                         <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
@@ -890,17 +890,18 @@ function verComunicado(cid){
     var d = COM_DATA.find(function(x){ return x.id === cid; });
     if(!d) return;
     document.getElementById('comModalTitle').textContent = d.titulo;
-    document.getElementById('comModalContent').textContent = d.contenido;
-    document.getElementById('comModalMeta').innerHTML = (d.fecha_publicacion||d.fecha_creacion||'').slice(0,10) + ' &middot; ' + d.prioridad.charAt(0).toUpperCase()+d.prioridad.slice(1);
-    var pc = {'baja':'var(--sub)','normal':'var(--blue)','alta':'#F59E0B','urgente':'var(--red)'};
-    document.getElementById('comModalBadge').style.background = (pc[d.prioridad]||'var(--blue)')+'15';
-    document.getElementById('comModalBadge').style.color = pc[d.prioridad]||'var(--blue)';
-    document.getElementById('comModalBadge').textContent = d.prioridad.charAt(0).toUpperCase()+d.prioridad.slice(1);
+    document.getElementById('comModalContent').textContent = d.contenido||'';
+    var prio = (d.prioridad||'normal');
+    document.getElementById('comModalMeta').innerHTML = (d.fecha_publicacion||d.fecha_creacion||'').slice(0,10) + ' &middot; ' + prio.charAt(0).toUpperCase()+prio.slice(1);
+    var pc = {'baja':'#64748B','normal':'#2563EB','alta':'#F59E0B','urgente':'#EF4444'};
+    document.getElementById('comModalBadge').style.background = (pc[prio]||'#2563EB')+'15';
+    document.getElementById('comModalBadge').style.color = pc[prio]||'#2563EB';
+    document.getElementById('comModalBadge').textContent = prio.charAt(0).toUpperCase()+prio.slice(1);
     document.getElementById('comModalLeerBtn').setAttribute('data-cid',cid);
-    document.getElementById('comModal').classList.add('open');
+    document.getElementById('comModal').style.display='flex';
 }
 function cerrarComunicado(){
-    document.getElementById('comModal').classList.remove('open');
+    document.getElementById('comModal').style.display='none';
 }
 </script>
 <div id="comModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)cerrarComunicado()">
@@ -919,6 +920,6 @@ function cerrarComunicado(){
 </div>
 </div>
 </div>
-<script>document.getElementById('comModal').style.display='flex';document.getElementById('comModal').style.display='none';</script>
+
 </body>
 </html>
