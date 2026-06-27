@@ -2164,6 +2164,13 @@ def notificaciones_no_leidas(slug, usuario_tipo, usuario_id):
 
 def generar_destinatarios(slug, comunicacion_id):
     conn = conectar(slug)
+    cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
+    if 'leido' not in cols_cl:
+        try:
+            conn.execute('ALTER TABLE comunicaciones_leidas ADD COLUMN leido INTEGER DEFAULT 0')
+            conn.commit()
+        except Exception:
+            pass
     com = conn.execute('SELECT * FROM comunicaciones WHERE id=?', (comunicacion_id,)).fetchone()
     if not com or com['estado'] != 'publicado':
         conn.close()
@@ -2226,6 +2233,10 @@ def generar_destinatarios(slug, comunicacion_id):
 
 def comunicaciones_pendientes(slug, usuario_tipo, usuario_id):
     conn = conectar(slug)
+    cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
+    if 'leido' not in cols_cl:
+        conn.close()
+        return []
     rows = conn.execute(
         '''SELECT c.*, cl.leido, cl.fecha_lectura
            FROM comunicaciones c
@@ -2235,7 +2246,7 @@ def comunicaciones_pendientes(slug, usuario_tipo, usuario_id):
            ORDER BY c.fecha_publicacion DESC''',
         (usuario_tipo, usuario_id)).fetchall()
     conn.close()
-    return rows
+    return [dict(r) for r in rows]
 
 # ── COMUNICACIONES (RECTOR) ────────────────────────────────────────────────────
 @app.route('/<slug>/rector/comunicaciones')
@@ -2516,6 +2527,14 @@ def comunicacion_leer(slug, cid):
     if not usuario_id:
         return jsonify({'error': 'No autorizado'}), 403
     conn = conectar(slug)
+    cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
+    if 'leido' not in cols_cl:
+        try:
+            conn.execute('ALTER TABLE comunicaciones_leidas ADD COLUMN leido INTEGER DEFAULT 0')
+            conn.commit()
+        except Exception:
+            conn.close()
+            return jsonify({'error': 'Error de migración'}), 500
     existing = conn.execute(
         'SELECT 1 FROM comunicaciones_leidas WHERE comunicacion_id=? AND usuario_tipo=? AND usuario_id=?',
         (cid, usuario_tipo, usuario_id)).fetchone()

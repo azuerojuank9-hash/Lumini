@@ -151,20 +151,32 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
     </div>
   </div>
 
-  {% if comunicaciones_pendientes %}
   <div class="card" style="border-color:rgba(var(--accent-rgb),.3);">
     <div class="card-title" style="color:var(--accent);font-weight:700;"><i class="fas fa-bullhorn"></i> Nuevos avisos</div>
+    {% if comunicaciones_pendientes %}
     {% for c in comunicaciones_pendientes %}
-    <div class="ag-item" style="cursor:pointer;" onclick="marcarLeido({{ c.id }}, this)">
-      <div style="flex:1;">
-        <div style="font-weight:600;">{{ c.titulo }}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">{{ c.fecha_publicacion[:16] if c.fecha_publicacion else c.fecha_creacion[:16] }}</div>
+    {% set pc = {'baja':'var(--sub)','normal':'var(--blue)','alta':'#F59E0B','urgente':'var(--red)'} %}
+    {% set pc_name = {'baja':'Baja','normal':'Normal','alta':'Alta','urgente':'Urgente'} %}
+    <div class="ag-item">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:{{ pc.get(c.prioridad,'var(--blue)') }};flex-shrink:0;"></span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:13px;">{{ c.titulo }}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">{{ (c.fecha_publicacion or c.fecha_creacion)[:10] }}</div>
+          <div style="font-size:12px;color:var(--text);margin-top:6px;line-height:1.4;">{{ c.contenido | truncate(120) if c.contenido else '' }}</div>
+        </div>
+        <span style="font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;background:{{ pc.get(c.prioridad,'var(--blue)') }}15;color:{{ pc.get(c.prioridad,'var(--blue)') }};white-space:nowrap;">{{ pc_name.get(c.prioridad,c.prioridad|capitalize) }}</span>
       </div>
-      <span class="ag-materia" style="font-size:10px;padding:3px 10px;background:rgba(var(--accent-rgb),.15);color:var(--accent);border-radius:99px;">{{ c.prioridad | capitalize }}</span>
+      <div style="display:flex;gap:6px;margin-top:10px;margin-left:18px;">
+        <button onclick="estVerComunicado({{ c.id }})" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(37,99,235,.1);color:var(--blue);font-family:'Inter',sans-serif;transition:all var(--tr);"><i class="fas fa-eye"></i> Ver comunicado</button>
+        <button onclick="marcarLeido({{ c.id }}, this)" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;transition:all var(--tr);"><i class="fas fa-check"></i> Marcar como le&iacute;do</button>
+      </div>
     </div>
     {% endfor %}
+    {% else %}
+    <div class="ag-item" style="text-align:center;color:var(--muted);font-size:13px;padding:16px 0;">No tienes avisos nuevos.</div>
+    {% endif %}
   </div>
-  {% endif %}
 
   <a href="/{{ slug }}/directora/boletin_pdf?aid={{ alumno.id }}"
      style="display:inline-block;margin-bottom:20px;padding:10px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-radius:var(--rsm);text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);transition:all var(--tr);">
@@ -351,12 +363,49 @@ document.addEventListener('click', function(e){
 });
 </script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}
-function marcarLeido(cid, el){
+var COM_DATA = {{ comunicaciones_pendientes | tojson | safe }};
+function marcarLeido(cid, btn){
     fetch('/{{ slug }}/comunicaciones/'+cid+'/leer',{method:'POST',headers:{'X-CSRF-Token':'{{ csrf_token() }}'}}).then(function(r){return r.json()}).then(function(d){if(d.ok){
-        el.style.opacity='0.3';
-        el.style.pointerEvents='none';
+        var item = btn.closest('.ag-item');
+        if(item){ item.style.opacity='0.25'; item.style.pointerEvents='none'; }
+        else { btn.style.opacity='0.3'; btn.style.pointerEvents='none'; }
     }});
-}</script>
+}
+function estVerComunicado(cid){
+    var d = COM_DATA.find(function(x){ return x.id === cid; });
+    if(!d) return;
+    document.getElementById('estComModalTitle').textContent = d.titulo;
+    document.getElementById('estComModalContent').textContent = d.contenido;
+    document.getElementById('estComModalMeta').innerHTML = (d.fecha_publicacion||d.fecha_creacion||'').slice(0,10) + ' &middot; ' + d.prioridad.charAt(0).toUpperCase()+d.prioridad.slice(1);
+    var PRI_COLORS = {'baja':'var(--sub)','normal':'var(--blue)','alta':'#F59E0B','urgente':'var(--red)'};
+    var pc = PRI_COLORS[d.prioridad]||'var(--blue)';
+    document.getElementById('estComModalBadge').style.background = pc+'15';
+    document.getElementById('estComModalBadge').style.color = pc;
+    document.getElementById('estComModalBadge').textContent = d.prioridad.charAt(0).toUpperCase()+d.prioridad.slice(1);
+    document.getElementById('estComModalLeerBtn').setAttribute('data-cid',cid);
+    document.getElementById('estComModal').classList.add('open');
+}
+function estCerrarComunicado(){
+    document.getElementById('estComModal').classList.remove('open');
+}
+</script>
+<div id="estComModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)estCerrarComunicado()">
+<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);max-width:560px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.4);">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;">
+<div style="flex:1;min-width:0;">
+<h2 id="estComModalTitle" style="font-size:17px;font-weight:700;margin:0 0 4px 0;"></h2>
+<div id="estComModalMeta" style="font-size:11px;color:var(--muted);"></div>
+</div>
+<span id="estComModalBadge" style="font-size:10px;padding:3px 10px;border-radius:99px;font-weight:600;white-space:nowrap;"></span>
+</div>
+<div id="estComModalContent" style="padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;white-space:pre-wrap;color:var(--text);margin-bottom:14px;"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">
+<button onclick="var b=document.getElementById('estComModalLeerBtn');marcarLeido(parseInt(b.getAttribute('data-cid')),b);estCerrarComunicado();" id="estComModalLeerBtn" style="padding:8px 14px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;"><i class="fas fa-check"></i> Marcar como le&iacute;do</button>
+<button onclick="estCerrarComunicado()" style="padding:8px 14px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--muted);font-family:'Inter',sans-serif;">Cerrar</button>
+</div>
+</div>
+</div>
+<script>document.getElementById('estComModal').style.display='flex';document.getElementById('estComModal').style.display='none';</script>
 </body>
 </html>
 
