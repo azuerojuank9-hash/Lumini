@@ -2235,8 +2235,8 @@ def generar_destinatarios(slug, comunicacion_id):
             conn.execute(
                 'INSERT OR IGNORE INTO comunicaciones_leidas (comunicacion_id,usuario_tipo,usuario_id,leido) VALUES (?,?,?,0)',
                 (comunicacion_id, tipo, uid))
-        except Exception:
-            pass
+        except Exception as e_insert:
+            app.logger.error(f'generar_destinatarios: error insertando destinatario tipo={tipo} uid={uid}: {e_insert}')
     conn.commit()
     conn.close()
 
@@ -2324,7 +2324,10 @@ def rector_comunicacion_nueva(slug):
             conn.commit()
             conn.close()
             if publicar_ahora == '1':
-                generar_destinatarios(slug, new_id)
+                try:
+                    generar_destinatarios(slug, new_id)
+                except Exception as e:
+                    app.logger.error(f'Error en generar_destinatarios (nueva): {e}')
             exito = 'Comunicación creada correctamente.'
     return render_template('rector_comunicacion_form.html',
                            slug=slug, colegio=colegio, rector=rector,
@@ -2427,7 +2430,10 @@ def rector_comunicacion_publicar(slug, cid):
         (cid, rector['id']))
     conn.commit()
     conn.close()
-    generar_destinatarios(slug, cid)
+    try:
+        generar_destinatarios(slug, cid)
+    except Exception as e:
+        app.logger.error(f'Error en generar_destinatarios (publicar): {e}')
     return redirect(url_for('rector_comunicaciones', slug=slug))
 
 @app.route('/<slug>/rector/comunicaciones/<int:cid>/archivar', methods=['POST'])
