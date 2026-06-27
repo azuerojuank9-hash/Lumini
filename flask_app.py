@@ -2,7 +2,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort, jsonify
-import sqlite3, hashlib, os, time, secrets, logging
+import sqlite3, hashlib, os, time, secrets, logging, json
 from datetime import timedelta, datetime
 from io import BytesIO
 app = Flask(__name__)
@@ -327,6 +327,11 @@ def migrar_db(slug):
             conn.commit()
         if 'jornada' not in cols_rec:
             conn.execute('ALTER TABLE rectores ADD COLUMN jornada TEXT DEFAULT ""')
+            conn.commit()
+
+        cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
+        if 'leido' not in cols_cl:
+            conn.execute('ALTER TABLE comunicaciones_leidas ADD COLUMN leido INTEGER DEFAULT 0')
             conn.commit()
 
         tablas_actuales = [r[0] for r in conn.execute(
@@ -1176,6 +1181,7 @@ def home(slug):
             alertas = alertas[:5]
     finally:
         conn.close()
+    pendientes = comunicaciones_pendientes(slug, 'profesor', prof['id'])
     num_periodos = int(colegio['num_periodos']) if colegio and colegio['num_periodos'] else 4
     return render_template('index.html',
                            profesor=prof, mis_cursos=mis_cursos, curso_sel=curso_sel,
@@ -1187,7 +1193,8 @@ def home(slug):
                            hoy_nombre=hoy_nombre, hoy_fecha=hoy_fecha,
                            total_alumnos=total_alumnos, horario_hoy=horario_hoy,
                            asistencia_hoy=asistencia_hoy, notas_pend=notas_pend,
-                           alertas=alertas)
+                           alertas=alertas,
+                           comunicaciones_pendientes=pendientes)
 
 # ── ACTIVIDADES ───────────────────────────────────────────────────────────────
 @app.route('/<slug>/nueva_actividad', methods=['POST'])
@@ -1821,12 +1828,14 @@ def vista_estudiante(slug):
         f"{r['dia']}_{r['franja']}": {'num': r['num'], 'materia': r['materia'], 'profesor': r['profesor']}
         for r in horario_raw}
     conn.close()
+    pendientes = comunicaciones_pendientes(slug, 'estudiante', aid)
     return render_template('estudiante.html',
                            alumno=alumno, slug=slug, colegio=colegio, agenda=agenda,
                            notas_por_materia=notas_pm, evals_map=evals_map,
                            promedio_general=promedio_general,
                            asist_stats=asist_stats, historial_meses=historial_meses,
-                           observaciones=observaciones, horario_map=horario_map)
+                           observaciones=observaciones, horario_map=horario_map,
+                           comunicaciones_pendientes=pendientes)
 
 # ── DIRECTORA ─────────────────────────────────────────────────────────────────
 def get_directora(slug):
@@ -2153,6 +2162,81 @@ def notificaciones_no_leidas(slug, usuario_tipo, usuario_id):
     conn.close()
     return c
 
+def generar_destinatarios(slug, comunicacion_id):
+    conn = conectar(slug)
+    com = conn.execute('SELECT * FROM comunicaciones WHERE id=?', (comunicacion_id,)).fetchone()
+    if not com or com['estado'] != 'publicado':
+        conn.close()
+        return
+    dest_tipo = com['destinatario_tipo']
+    try:
+        val_arr = json.loads(com['destinatario_valor']) if com['destinatario_valor'] else []
+    except (json.JSONDecodeError, TypeError):
+        val_arr = []
+    destinatarios = []
+    if dest_tipo == 'todo_colegio':
+        for r in conn.execute('SELECT id FROM profesores WHERE activo=1').fetchall():
+            destinatarios.append(('profesor', r['id']))
+        for r in conn.execute('SELECT id FROM directoras WHERE activo=1').fetchall():
+            destinatarios.append(('directora', r['id']))
+        for r in conn.execute('SELECT id FROM alumnos WHERE activo=1').fetchall():
+            destinatarios.append(('estudiante', r['id']))
+    elif dest_tipo == 'profesores':
+        if val_arr:
+            for v in val_arr:
+                if isinstance(v, str) and v.startswith('prof_'):
+                    destinatarios.append(('profesor', int(v.split('_')[1])))
+        else:
+            for r in conn.execute('SELECT id FROM profesores WHERE activo=1').fetchall():
+                destinatarios.append(('profesor', r['id']))
+    elif dest_tipo == 'directores':
+        if val_arr:
+            for v in val_arr:
+                if isinstance(v, str) and v.startswith('dir_'):
+                    destinatarios.append(('directora', int(v.split('_')[1])))
+        else:
+            for r in conn.execute('SELECT id FROM directoras WHERE activo=1').fetchall():
+                destinatarios.append(('directora', r['id']))
+    elif dest_tipo == 'estudiantes':
+        for r in conn.execute('SELECT id FROM alumnos WHERE activo=1').fetchall():
+            destinatarios.append(('estudiante', r['id']))
+    elif dest_tipo == 'grado':
+        cursos_grado = {}
+        for row in conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1').fetchall():
+            c = row['curso']
+            g = ''.join(filter(str.isdigit, c))
+            cursos_grado.setdefault(g, []).append(c)
+        for grado in val_arr:
+            for curso in cursos_grado.get(str(grado), []):
+                for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():
+                    destinatarios.append(('estudiante', r['id']))
+    elif dest_tipo == 'cursos':
+        for curso in val_arr:
+            for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():
+                destinatarios.append(('estudiante', r['id']))
+    for tipo, uid in destinatarios:
+        try:
+            conn.execute(
+                'INSERT OR IGNORE INTO comunicaciones_leidas (comunicacion_id,usuario_tipo,usuario_id,leido) VALUES (?,?,?,0)',
+                (comunicacion_id, tipo, uid))
+        except Exception:
+            pass
+    conn.commit()
+    conn.close()
+
+def comunicaciones_pendientes(slug, usuario_tipo, usuario_id):
+    conn = conectar(slug)
+    rows = conn.execute(
+        '''SELECT c.*, cl.leido, cl.fecha_lectura
+           FROM comunicaciones c
+           JOIN comunicaciones_leidas cl ON cl.comunicacion_id=c.id
+           WHERE cl.usuario_tipo=? AND cl.usuario_id=? AND cl.leido=0
+           AND c.estado='publicado' AND c.activo=1
+           ORDER BY c.fecha_publicacion DESC''',
+        (usuario_tipo, usuario_id)).fetchall()
+    conn.close()
+    return rows
+
 # ── COMUNICACIONES (RECTOR) ────────────────────────────────────────────────────
 @app.route('/<slug>/rector/comunicaciones')
 def rector_comunicaciones(slug):
@@ -2209,15 +2293,18 @@ def rector_comunicacion_nueva(slug):
             error = 'Completa todos los campos.'
         else:
             conn = conectar(slug)
-            conn.execute(
+            cursor = conn.execute(
                 '''INSERT INTO comunicaciones (rector_id,titulo,contenido,destinatario_tipo,destinatario_valor,prioridad,estado,fecha_programada,fecha_publicacion)
                    VALUES (?,?,?,?,?,?,?,?,?)''',
                 (rector['id'], titulo, contenido, dest_tipo, dest_valor, prioridad,
                  'publicado' if publicar_ahora == '1' else ('programado' if programar else 'borrador'),
                  programar if programar else None,
                  datetime.today().strftime('%Y-%m-%d %H:%M:%S') if publicar_ahora == '1' else None))
+            new_id = cursor.lastrowid
             conn.commit()
             conn.close()
+            if publicar_ahora == '1':
+                generar_destinatarios(slug, new_id)
             exito = 'Comunicación creada correctamente.'
     return render_template('rector_comunicacion_form.html',
                            slug=slug, colegio=colegio, rector=rector,
@@ -2267,6 +2354,10 @@ def rector_comunicacion_editar(slug, cid):
                  datetime.today().strftime('%Y-%m-%d %H:%M:%S') if publicar_ahora == '1' else com.get('fecha_publicacion'),
                  cid, rector['id']))
             conn.commit()
+            if publicar_ahora == '1':
+                conn.close()
+                generar_destinatarios(slug, cid)
+                conn = conectar(slug)
             exito = 'Comunicación actualizada correctamente.'
             com = conn.execute(
                 'SELECT * FROM comunicaciones WHERE id=? AND activo=1', (cid,)).fetchone()
@@ -2289,12 +2380,15 @@ def rector_comunicacion_detalle(slug, cid):
         'SELECT * FROM comunicaciones WHERE id=? AND rector_id=? AND activo=1',
         (cid, rector['id'])).fetchone()
     if not com: conn.close(); return 'Comunicación no encontrada', 404
-    leidas = conn.execute(
+    total_dest = conn.execute(
         'SELECT COUNT(*) as c FROM comunicaciones_leidas WHERE comunicacion_id=?', (cid,)).fetchone()['c']
+    leidas_count = conn.execute(
+        'SELECT COUNT(*) as c FROM comunicaciones_leidas WHERE comunicacion_id=? AND leido=1', (cid,)).fetchone()['c']
+    no_leidas = total_dest - leidas_count
     conn.close()
     return render_template('rector_comunicacion_detail.html',
                            slug=slug, colegio=colegio, rector=rector,
-                           com=com, leidas=leidas,
+                           com=com, total_dest=total_dest, leidas=leidas_count, no_leidas=no_leidas,
                            notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
 
 @app.route('/<slug>/rector/comunicaciones/<int:cid>/publicar', methods=['POST'])
@@ -2310,6 +2404,7 @@ def rector_comunicacion_publicar(slug, cid):
         (cid, rector['id']))
     conn.commit()
     conn.close()
+    generar_destinatarios(slug, cid)
     return redirect(url_for('rector_comunicaciones', slug=slug))
 
 @app.route('/<slug>/rector/comunicaciones/<int:cid>/archivar', methods=['POST'])
@@ -2401,6 +2496,40 @@ def notificaciones_contar(slug):
         return jsonify({'count': 0})
     c = notificaciones_no_leidas(slug, usuario_tipo, usuario_id)
     return jsonify({'count': c})
+
+@app.route('/<slug>/comunicaciones/<int:cid>/leer', methods=['POST'])
+def comunicacion_leer(slug, cid):
+    require_colegio(slug)
+    usuario_tipo = None
+    usuario_id = None
+    rector = get_rector(slug)
+    if rector: usuario_tipo, usuario_id = 'rector', rector['id']
+    if not usuario_id:
+        prof = get_profesor(slug)
+        if prof: usuario_tipo, usuario_id = 'profesor', prof['id']
+    if not usuario_id:
+        directora = get_directora(slug)
+        if directora: usuario_tipo, usuario_id = 'directora', directora['id']
+    if not usuario_id:
+        aid = session.get(f'alumno_id_{slug}')
+        if aid: usuario_tipo, usuario_id = 'estudiante', aid
+    if not usuario_id:
+        return jsonify({'error': 'No autorizado'}), 403
+    conn = conectar(slug)
+    existing = conn.execute(
+        'SELECT 1 FROM comunicaciones_leidas WHERE comunicacion_id=? AND usuario_tipo=? AND usuario_id=?',
+        (cid, usuario_tipo, usuario_id)).fetchone()
+    if existing:
+        conn.execute(
+            'UPDATE comunicaciones_leidas SET leido=1, fecha_lectura=datetime(\'now\',\'localtime\') WHERE comunicacion_id=? AND usuario_tipo=? AND usuario_id=?',
+            (cid, usuario_tipo, usuario_id))
+    else:
+        conn.execute(
+            'INSERT INTO comunicaciones_leidas (comunicacion_id,usuario_tipo,usuario_id,leido,fecha_lectura) VALUES (?,?,?,1,datetime(\'now\',\'localtime\'))',
+            (cid, usuario_tipo, usuario_id))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
 
 # ── EVENTOS CALENDARIO ────────────────────────────────────────────────────────
 @app.route('/<slug>/rector/comunicaciones/<int:cid>/evento')

@@ -33,7 +33,8 @@ TABLES = [
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         comunicacion_id INTEGER NOT NULL, usuario_tipo TEXT NOT NULL,
         usuario_id INTEGER NOT NULL,
-        fecha_lectura TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+        leido INTEGER DEFAULT 0,
+        fecha_lectura TEXT DEFAULT NULL,
         UNIQUE(comunicacion_id, usuario_tipo, usuario_id))''',
     '''CREATE TABLE IF NOT EXISTS notificaciones (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

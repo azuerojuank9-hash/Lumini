@@ -135,8 +135,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
   <div class="stats-row">
     <div class="stat">
-      <div class="num">{{ leidas }}</div>
-      <div class="lab">Lecturas</div>
+      <div class="num">{{ total_dest }}</div>
+      <div class="lab">Destinatarios</div>
+    </div>
+    <div class="stat">
+      <div class="num" style="color:var(--green);">{{ leidas }}</div>
+      <div class="lab">Leídos</div>
+    </div>
+    <div class="stat">
+      <div class="num" style="color:var(--red);">{{ no_leidas }}</div>
+      <div class="lab">No leídos</div>
     </div>
     <div class="stat">
       <div class="num">{{ com.prioridad | capitalize }}</div>

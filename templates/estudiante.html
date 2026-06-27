@@ -151,10 +151,25 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
     </div>
   </div>
 
-  <a href="/{{ slug }}/directora/boletin_pdf?aid={{ alumno.id }}"
-     style="display:inline-block;margin-bottom:20px;padding:10px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-radius:var(--rsm);text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);transition:all var(--tr);">
-      📥 Descargar boletín PDF
-  </a>
+  {% if comunicaciones_pendientes %}
+  <div class="card" style="border-color:rgba(var(--accent-rgb),.3);">
+    <div class="card-title" style="color:var(--accent);font-weight:700;"><i class="fas fa-bullhorn"></i> Nuevos avisos</div>
+    {% for c in comunicaciones_pendientes %}
+    <div class="ag-item" style="cursor:pointer;" onclick="marcarLeido({{ c.id }}, this)">
+      <div style="flex:1;">
+        <div style="font-weight:600;">{{ c.titulo }}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">{{ c.fecha_publicacion[:16] if c.fecha_publicacion else c.fecha_creacion[:16] }}</div>
+      </div>
+      <span class="ag-materia" style="font-size:10px;padding:3px 10px;background:rgba(var(--accent-rgb),.15);color:var(--accent);border-radius:99px;">{{ c.prioridad | capitalize }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <a href="/{{ slug }}/directora/boletin_pdf?aid={{ alumno.id }}"
+     style="display:inline-block;margin-bottom:20px;padding:10px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-radius:var(--rsm);text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);transition:all var(--tr);">
+      📥 Descargar boletín PDF
+  </a>
 
   <div class="card">
     <div class="card-title"><i class="fas fa-calendar-alt"></i> Agenda de trabajos</div>
@@ -335,7 +350,13 @@ document.addEventListener('click', function(e){
     }
 });
 </script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}
+function marcarLeido(cid, el){
+    fetch('/{{ slug }}/comunicaciones/'+cid+'/leer',{method:'POST',headers:{'X-CSRF-Token':'{{ csrf_token() }}'}}).then(function(r){return r.json()}).then(function(d){if(d.ok){
+        el.style.opacity='0.3';
+        el.style.pointerEvents='none';
+    }});
+}</script>
 </body>
 </html>
 

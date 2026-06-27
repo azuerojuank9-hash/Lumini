@@ -442,6 +442,27 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     </div>
 </div>
 </div>
+
+{% if comunicaciones_pendientes %}
+<div class="dash-section" style="margin-bottom:16px;border-color:rgba(var(--accent-rgb),.3);">
+  <div class="dash-section-head" style="color:var(--accent);font-weight:700;">
+    <span class="icon"><i class="fas fa-bullhorn"></i></span>
+    Nuevos avisos
+  </div>
+  <div class="dash-section-body">
+    {% for c in comunicaciones_pendientes %}
+    <div class="schedule-item" style="cursor:pointer;" onclick="marcarLeidoProf({{ c.id }}, this)">
+      <div style="flex:1;">
+        <div style="font-weight:600;">{{ c.titulo }}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">{{ c.fecha_publicacion[:16] if c.fecha_publicacion else c.fecha_creacion[:16] }}</div>
+      </div>
+      <span style="font-size:10px;padding:2px 8px;background:rgba(var(--accent-rgb),.15);color:var(--accent);border-radius:99px;">{{ c.prioridad | capitalize }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
 <div class="topbar">
   <div class="topbar-left">
     <h1>{{ materia }}</h1>
@@ -853,6 +874,12 @@ function addDataLabels(){
             });
         });
     });
+}
+function marcarLeidoProf(cid, el){
+    fetch('/'+slug+'/comunicaciones/'+cid+'/leer',{method:'POST',headers:{'X-CSRF-Token':getCsrf()}}).then(function(r){return r.json()}).then(function(d){if(d.ok){
+        el.style.opacity='0.3';
+        el.style.pointerEvents='none';
+    }});
 }
 window.addEventListener('scroll',function(){
     var st = document.getElementById('scrollTop');
