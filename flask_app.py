@@ -448,6 +448,7 @@ def init_db(slug):
             comunicacion_id INTEGER NOT NULL,
             usuario_tipo TEXT NOT NULL,
             usuario_id INTEGER NOT NULL,
+            leido INTEGER DEFAULT 0,
             fecha_lectura TEXT NOT NULL DEFAULT (datetime('now','localtime')),
             UNIQUE(comunicacion_id, usuario_tipo, usuario_id))''',
         '''CREATE TABLE IF NOT EXISTS notificaciones (
@@ -2173,8 +2174,13 @@ def generar_destinatarios(slug, comunicacion_id):
         if 'leido' not in cols_cl:
             conn.execute('ALTER TABLE comunicaciones_leidas ADD COLUMN leido INTEGER DEFAULT 0')
             conn.commit()
+            cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
     except Exception as e:
         app.logger.error(f'generar_destinatarios: error migrando columna leido: {e}')
+    if 'leido' not in cols_cl:
+        conn.close()
+        app.logger.error('generar_destinatarios: columna leido no disponible en comunicaciones_leidas, abortando')
+        return
     com = conn.execute('SELECT * FROM comunicaciones WHERE id=?', (comunicacion_id,)).fetchone()
     if not com:
         conn.close()
@@ -2189,6 +2195,9 @@ def generar_destinatarios(slug, comunicacion_id):
     except (json.JSONDecodeError, TypeError) as e:
         app.logger.warning(f'generar_destinatarios: error parseando destinatario_valor="{com["destinatario_valor"]}": {e}')
         val_arr = []
+    if not isinstance(val_arr, list):
+        app.logger.warning(f'generar_destinatarios: destinatario_valor no es un array, ignorando: {type(val_arr).__name__}')
+        val_arr = []
     destinatarios = []
     if dest_tipo == 'todo_colegio':
         for r in conn.execute('SELECT id FROM profesores WHERE activo=1').fetchall():
@@ -2201,7 +2210,10 @@ def generar_destinatarios(slug, comunicacion_id):
         if val_arr:
             for v in val_arr:
                 if isinstance(v, str) and v.startswith('prof_'):
-                    destinatarios.append(('profesor', int(v.split('_')[1])))
+                    try:
+                        destinatarios.append(('profesor', int(v.split('_')[1])))
+                    except (ValueError, IndexError):
+                        app.logger.warning(f'generar_destinatarios: valor prof_ invalido: {v}')
         else:
             for r in conn.execute('SELECT id FROM profesores WHERE activo=1').fetchall():
                 destinatarios.append(('profesor', r['id']))
@@ -2209,7 +2221,10 @@ def generar_destinatarios(slug, comunicacion_id):
         if val_arr:
             for v in val_arr:
                 if isinstance(v, str) and v.startswith('dir_'):
-                    destinatarios.append(('directora', int(v.split('_')[1])))
+                    try:
+                        destinatarios.append(('directora', int(v.split('_')[1])))
+                    except (ValueError, IndexError):
+                        app.logger.warning(f'generar_destinatarios: valor dir_ invalido: {v}')
         else:
             for r in conn.execute('SELECT id FROM directoras WHERE activo=1').fetchall():
                 destinatarios.append(('directora', r['id']))
@@ -2217,19 +2232,21 @@ def generar_destinatarios(slug, comunicacion_id):
         for r in conn.execute('SELECT id FROM alumnos WHERE activo=1').fetchall():
             destinatarios.append(('estudiante', r['id']))
     elif dest_tipo == 'grado':
-        cursos_grado = {}
-        for row in conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1').fetchall():
-            c = row['curso']
-            g = ''.join(filter(str.isdigit, c))
-            cursos_grado.setdefault(g, []).append(c)
-        for grado in val_arr:
-            for curso in cursos_grado.get(str(grado), []):
+        if val_arr:
+            cursos_grado = {}
+            for row in conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1').fetchall():
+                c = row['curso']
+                g = ''.join(filter(str.isdigit, c))
+                cursos_grado.setdefault(g, []).append(c)
+            for grado in val_arr:
+                for curso in cursos_grado.get(str(grado), []):
+                    for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():
+                        destinatarios.append(('estudiante', r['id']))
+    elif dest_tipo == 'cursos':
+        if val_arr:
+            for curso in val_arr:
                 for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():
                     destinatarios.append(('estudiante', r['id']))
-    elif dest_tipo == 'cursos':
-        for curso in val_arr:
-            for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():
-                destinatarios.append(('estudiante', r['id']))
     for tipo, uid in destinatarios:
         try:
             conn.execute(
@@ -2250,7 +2267,7 @@ def comunicaciones_pendientes(slug, usuario_tipo, usuario_id):
         '''SELECT c.*, cl.leido, cl.fecha_lectura
            FROM comunicaciones c
            JOIN comunicaciones_leidas cl ON cl.comunicacion_id=c.id
-           WHERE cl.usuario_tipo=? AND cl.usuario_id=? AND cl.leido=0
+           WHERE cl.usuario_tipo=? AND cl.usuario_id=? AND COALESCE(cl.leido,0)=0
            AND c.estado='publicado' AND c.activo=1
            ORDER BY c.fecha_publicacion DESC''',
         (usuario_tipo, usuario_id)).fetchall()
@@ -2545,14 +2562,17 @@ def comunicacion_leer(slug, cid):
     if not usuario_id:
         return jsonify({'error': 'No autorizado'}), 403
     conn = conectar(slug)
-    cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
-    if 'leido' not in cols_cl:
-        try:
+    try:
+        cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
+        if 'leido' not in cols_cl:
             conn.execute('ALTER TABLE comunicaciones_leidas ADD COLUMN leido INTEGER DEFAULT 0')
             conn.commit()
-        except Exception:
+            cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
+        if 'leido' not in cols_cl:
             conn.close()
             return jsonify({'error': 'Error de migración'}), 500
+    except Exception as e:
+        app.logger.error(f'comunicacion_leer: error migrando columna leido: {e}')
     existing = conn.execute(
         'SELECT 1 FROM comunicaciones_leidas WHERE comunicacion_id=? AND usuario_tipo=? AND usuario_id=?',
         (cid, usuario_tipo, usuario_id)).fetchone()
