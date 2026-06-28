@@ -469,6 +469,39 @@ def init_db(slug):
             link TEXT DEFAULT '',
             leida INTEGER DEFAULT 0,
             fecha_creacion TEXT NOT NULL DEFAULT (datetime('now','localtime')))''',
+        '''CREATE TABLE IF NOT EXISTS canales (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            slug TEXT NOT NULL,
+            rector_id INTEGER NOT NULL,
+            tipo TEXT NOT NULL,
+            nombre TEXT NOT NULL,
+            descripcion TEXT DEFAULT '',
+            curso TEXT DEFAULT '',
+            materia TEXT DEFAULT '',
+            activo INTEGER DEFAULT 1,
+            fecha_creacion TEXT DEFAULT (datetime('now','localtime')))''',
+        '''CREATE TABLE IF NOT EXISTS canal_miembros (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            canal_id INTEGER NOT NULL,
+            usuario_tipo TEXT NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            fecha_ingreso TEXT DEFAULT (datetime('now','localtime')),
+            UNIQUE(canal_id, usuario_tipo, usuario_id))''',
+        '''CREATE TABLE IF NOT EXISTS mensajes_canal (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            canal_id INTEGER NOT NULL,
+            usuario_tipo TEXT NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            mensaje TEXT NOT NULL,
+            fecha TEXT DEFAULT (datetime('now','localtime')),
+            editado INTEGER DEFAULT 0)''',
+        '''CREATE TABLE IF NOT EXISTS mensajes_leidos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            mensaje_id INTEGER NOT NULL,
+            usuario_tipo TEXT NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            fecha_lectura TEXT DEFAULT (datetime('now','localtime')),
+            UNIQUE(mensaje_id, usuario_tipo, usuario_id))''',
     ]
     for s in stmts:
         conn.execute(s)
@@ -521,6 +554,80 @@ def get_cursos_profesor(slug, pid, materia, jornada):
 def require_colegio(slug):
     if not get_colegio(slug): abort(404)
     if not colegio_activo(slug): abort(403)
+
+# ── CANALES HELPERS ─────────────────────────────────────────────────────────────
+def get_usuario_actual(slug):
+    prof = get_profesor(slug)
+    if prof: return ('profesor', prof['id'])
+    aid = session.get(f'alumno_id_{slug}')
+    if aid: return ('estudiante', aid)
+    direc = get_directora(slug)
+    if direc: return ('directora', direc['id'])
+    rector = get_rector(slug)
+    if rector: return ('rector', rector['id'])
+    return (None, None)
+
+def canales_usuario(slug, usuario_tipo, usuario_id):
+    conn = conectar(slug)
+    rows = conn.execute('''
+        SELECT c.*,
+            (SELECT mensaje FROM mensajes_canal WHERE canal_id=c.id ORDER BY id DESC LIMIT 1) as ultimo_mensaje,
+            (SELECT usuario_tipo FROM mensajes_canal WHERE canal_id=c.id ORDER BY id DESC LIMIT 1) as ultimo_autor_tipo,
+            (SELECT usuario_id FROM mensajes_canal WHERE canal_id=c.id ORDER BY id DESC LIMIT 1) as ultimo_autor_id,
+            (SELECT fecha FROM mensajes_canal WHERE canal_id=c.id ORDER BY id DESC LIMIT 1) as ultima_fecha,
+            (SELECT COUNT(*) FROM mensajes_canal mc
+             LEFT JOIN mensajes_leidos ml ON ml.mensaje_id=mc.id AND ml.usuario_tipo=? AND ml.usuario_id=?
+             WHERE mc.canal_id=c.id AND ml.id IS NULL) as no_leidos
+        FROM canales c
+        JOIN canal_miembros cm ON cm.canal_id=c.id
+        WHERE cm.usuario_tipo=? AND cm.usuario_id=? AND c.activo=1
+        ORDER BY ultima_fecha DESC''', (usuario_tipo, usuario_id, usuario_tipo, usuario_id)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def agregar_miembro_canal(conn, canal_id, usuario_tipo, usuario_id):
+    conn.execute('INSERT OR IGNORE INTO canal_miembros (canal_id, usuario_tipo, usuario_id) VALUES (?,?,?)',
+                 (canal_id, usuario_tipo, usuario_id))
+
+def asignar_miembros_auto(conn, slug, canal_id, tipo, curso='', materia=''):
+    if tipo in ('institucional','rectoria','profesores'):
+        for p in conn.execute('SELECT id FROM profesores WHERE activo=1').fetchall():
+            agregar_miembro_canal(conn, canal_id, 'profesor', p['id'])
+    if tipo == 'institucional':
+        for a in conn.execute('SELECT id FROM alumnos WHERE activo=1').fetchall():
+            agregar_miembro_canal(conn, canal_id, 'estudiante', a['id'])
+    elif tipo == 'director_curso' and curso:
+        for d in conn.execute('SELECT id FROM directoras WHERE curso=? AND activo=1', (curso,)).fetchall():
+            agregar_miembro_canal(conn, canal_id, 'directora', d['id'])
+        for p in conn.execute('SELECT DISTINCT profesor_id FROM asignaciones_curso WHERE curso=?', (curso,)).fetchall():
+            agregar_miembro_canal(conn, canal_id, 'profesor', p['profesor_id'])
+    elif tipo == 'curso' and curso:
+        for p in conn.execute('SELECT DISTINCT profesor_id FROM asignaciones_curso WHERE curso=?', (curso,)).fetchall():
+            agregar_miembro_canal(conn, canal_id, 'profesor', p['profesor_id'])
+        for a in conn.execute('SELECT id FROM alumnos WHERE curso=? AND activo=1', (curso,)).fetchall():
+            agregar_miembro_canal(conn, canal_id, 'estudiante', a['id'])
+    elif tipo == 'materia' and materia:
+        for p in conn.execute('SELECT DISTINCT profesor_id FROM asignaciones_materia WHERE materia=?', (materia,)).fetchall():
+            agregar_miembro_canal(conn, canal_id, 'profesor', p['profesor_id'])
+        for cr in conn.execute('SELECT DISTINCT curso FROM actividades WHERE materia=?', (materia,)).fetchall():
+            for a in conn.execute('SELECT id FROM alumnos WHERE curso=? AND activo=1', (cr['curso'],)).fetchall():
+                agregar_miembro_canal(conn, canal_id, 'estudiante', a['id'])
+    rector = get_rector(slug)
+    if rector:
+        agregar_miembro_canal(conn, canal_id, 'rector', rector['id'])
+
+def nombre_usuario_canal(conn, tipo, uid):
+    if tipo == 'profesor':
+        r = conn.execute('SELECT nombre FROM profesores WHERE id=?', (uid,)).fetchone()
+    elif tipo == 'estudiante':
+        r = conn.execute('SELECT nombre FROM alumnos WHERE id=?', (uid,)).fetchone()
+    elif tipo == 'rector':
+        r = conn.execute('SELECT nombre FROM rectores WHERE id=?', (uid,)).fetchone()
+    elif tipo == 'directora':
+        r = conn.execute('SELECT nombre FROM directoras WHERE id=?', (uid,)).fetchone()
+    else:
+        return 'Desconocido'
+    return r['nombre'] if r else 'Desconocido'
 
 # ── PDF REUTILIZABLE ──────────────────────────────────────────────────────────
 def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
@@ -2597,6 +2704,151 @@ def comunicacion_leer(slug, cid):
     conn.commit()
     conn.close()
     return jsonify({'ok': True})
+
+# ── CANALES CRUD (Rector) ──────────────────────────────────────────────────────
+@app.route('/<slug>/rector/canales')
+def rector_canales(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('rector_login', slug=slug))
+    conn = conectar(slug)
+    canales = conn.execute('SELECT * FROM canales WHERE slug=? ORDER BY fecha_creacion DESC', (slug,)).fetchall()
+    cursos = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
+    materias_rows = conn.execute('SELECT DISTINCT materia FROM actividades').fetchall()
+    if not materias_rows:
+        materias_rows = conn.execute('SELECT DISTINCT materia FROM asignaciones_materia').fetchall()
+    materias = list(set(r['materia'] for r in materias_rows))
+    conn.close()
+    colegio = get_colegio(slug)
+    return render_template('rector_canales.html', slug=slug, rector=rector, canales=canales, colegio=colegio,
+                          cursos=[r['curso'] for r in cursos],
+                          materias=materias)
+
+@app.route('/<slug>/rector/canales/crear', methods=['POST'])
+def rector_canales_crear(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return jsonify({'ok':False,'error':'No autorizado'})
+    tipo = request.form.get('tipo')
+    nombre = request.form.get('nombre','').strip()
+    curso = request.form.get('curso','')
+    materia = request.form.get('materia','')
+    descripcion = request.form.get('descripcion','')
+    if not nombre:
+        nombres = {'institucional':'Institucional','rectoria':'Rectoría','profesores':'Profesores',
+                   'director_curso':f'Directores {curso}','curso':f'Curso {curso}','materia':f'Materia {materia}'}
+        nombre = nombres.get(tipo, tipo)
+    conn = conectar(slug)
+    cid = conn.execute('INSERT INTO canales (slug,rector_id,tipo,nombre,descripcion,curso,materia) VALUES (?,?,?,?,?,?,?)',
+                       (slug,rector['id'],tipo,nombre,descripcion,curso,materia)).lastrowid
+    asignar_miembros_auto(conn, slug, cid, tipo, curso, materia)
+    conn.commit()
+    conn.close()
+    return jsonify({'ok':True, 'canal_id':cid})
+
+@app.route('/<slug>/rector/canales/<int:cid>/eliminar', methods=['POST'])
+def rector_canales_eliminar(slug, cid):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return jsonify({'ok':False,'error':'No autorizado'})
+    conn = conectar(slug)
+    conn.execute('UPDATE canales SET activo=0 WHERE id=? AND slug=?', (cid, slug))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok':True})
+
+@app.route('/<slug>/rector/canales/<int:cid>/miembros')
+def rector_canales_miembros(slug, cid):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return jsonify({'ok':False,'error':'No autorizado'})
+    conn = conectar(slug)
+    miembros = conn.execute('SELECT * FROM canal_miembros WHERE canal_id=?', (cid,)).fetchall()
+    canal = conn.execute('SELECT * FROM canales WHERE id=?', (cid,)).fetchone()
+    conn.close()
+    data = [dict(m) for m in miembros]
+    for m in data:
+        conn2 = conectar(slug)
+        m['nombre_usuario'] = nombre_usuario_canal(conn2, m['usuario_tipo'], m['usuario_id'])
+        conn2.close()
+    return jsonify({'ok':True, 'miembros':data, 'canal':dict(canal) if canal else None})
+
+# ── CANALES API (usuarios) ─────────────────────────────────────────────────────
+@app.route('/<slug>/api/canales')
+def api_canales(slug):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False,'error':'No autenticado'}), 401
+    if tipo == 'rector':
+        rector = get_rector(slug)
+        conn = conectar(slug)
+        rows = conn.execute('''
+            SELECT c.*,
+                (SELECT mensaje FROM mensajes_canal WHERE canal_id=c.id ORDER BY id DESC LIMIT 1) as ultimo_mensaje,
+                (SELECT usuario_tipo FROM mensajes_canal WHERE canal_id=c.id ORDER BY id DESC LIMIT 1) as ultimo_autor_tipo,
+                (SELECT usuario_id FROM mensajes_canal WHERE canal_id=c.id ORDER BY id DESC LIMIT 1) as ultimo_autor_id,
+                (SELECT fecha FROM mensajes_canal WHERE canal_id=c.id ORDER BY id DESC LIMIT 1) as ultima_fecha,
+                (SELECT COUNT(*) FROM mensajes_canal mc
+                 LEFT JOIN mensajes_leidos ml ON ml.mensaje_id=mc.id AND ml.usuario_tipo='rector' AND ml.usuario_id=?
+                 WHERE mc.canal_id=c.id AND ml.id IS NULL) as no_leidos
+            FROM canales c WHERE c.activo=1 ORDER BY ultima_fecha DESC''', (rector['id'],)).fetchall()
+        conn.close()
+        return jsonify([dict(r) for r in rows])
+    return jsonify(canales_usuario(slug, tipo, uid))
+
+@app.route('/<slug>/api/canales/<int:cid>/mensajes')
+def api_canales_mensajes(slug, cid):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify([])
+    conn = conectar(slug)
+    canal = conn.execute('SELECT * FROM canales WHERE id=? AND activo=1', (cid,)).fetchone()
+    if not canal: conn.close(); return jsonify([])
+    if tipo != 'rector':
+        miembro = conn.execute('SELECT 1 FROM canal_miembros WHERE canal_id=? AND usuario_tipo=? AND usuario_id=?',
+                              (cid, tipo, uid)).fetchone()
+        if not miembro: conn.close(); return jsonify([])
+    mensajes = conn.execute('''
+        SELECT m.*, COALESCE(ml.id,0) as leido
+        FROM mensajes_canal m
+        LEFT JOIN mensajes_leidos ml ON ml.mensaje_id=m.id AND ml.usuario_tipo=? AND ml.usuario_id=?
+        WHERE m.canal_id=? ORDER BY m.id ASC''', (tipo, uid, cid)).fetchall()
+    conn.close()
+    return jsonify([dict(r) for r in mensajes])
+
+@app.route('/<slug>/api/canales/<int:cid>/enviar', methods=['POST'])
+def api_canales_enviar(slug, cid):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False,'error':'No autorizado'})
+    mensaje = request.form.get('mensaje','').strip()
+    if not mensaje: return jsonify({'ok':False,'error':'Mensaje vacío'})
+    conn = conectar(slug)
+    canal = conn.execute('SELECT * FROM canales WHERE id=? AND activo=1', (cid,)).fetchone()
+    if not canal: conn.close(); return jsonify({'ok':False,'error':'Canal no encontrado'})
+    if tipo != 'rector':
+        miembro = conn.execute('SELECT 1 FROM canal_miembros WHERE canal_id=? AND usuario_tipo=? AND usuario_id=?',
+                              (cid, tipo, uid)).fetchone()
+        if not miembro: conn.close(); return jsonify({'ok':False,'error':'No eres miembro'})
+    mid = conn.execute('INSERT INTO mensajes_canal (canal_id,usuario_tipo,usuario_id,mensaje) VALUES (?,?,?,?)',
+                      (cid, tipo, uid, mensaje)).lastrowid
+    conn.commit()
+    conn.close()
+    return jsonify({'ok':True, 'mensaje_id':mid})
+
+@app.route('/<slug>/api/canales/<int:cid>/leer', methods=['POST'])
+def api_canales_leer(slug, cid):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False})
+    conn = conectar(slug)
+    msgs = conn.execute('SELECT id FROM mensajes_canal WHERE canal_id=?', (cid,)).fetchall()
+    for m in msgs:
+        conn.execute('INSERT OR IGNORE INTO mensajes_leidos (mensaje_id,usuario_tipo,usuario_id) VALUES (?,?,?)',
+                    (m['id'], tipo, uid))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok':True})
 
 # ── API COMUNICACIONES (Fase 2 — polling) ─────────────────────────────────────
 @app.route('/<slug>/api/comunicaciones')

@@ -227,6 +227,35 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 /* ── Toast & Scroll-top ─────────────────────────────────────────────── */
 .toast{position:fixed;bottom:24px;right:24px;background:rgba(34,197,94,.95);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s ease;pointer-events:none;display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px);}
 .toast.show{opacity:1;transform:translateY(0);}
+.comm-tabs{display:flex;gap:2px;width:100%;}
+.comm-tab{flex:1;padding:6px 8px;border:none;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;transition:all var(--tr);display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;}
+.comm-tab:hover{background:var(--bg3);color:var(--text);}
+.comm-tab.active{background:rgba(var(--accent-rgb),.12);color:var(--accent);}
+.canal-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;gap:10px;}
+.canal-item:hover{border-color:rgba(var(--accent-rgb),.2);}
+.canal-item-avatar{width:34px;height:34px;border-radius:50%;background:rgba(var(--accent-rgb),.1);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;color:var(--accent);}
+.canal-item-body{flex:1;min-width:0;}
+.canal-item-nombre{font-size:13px;font-weight:600;color:var(--text);}
+.canal-item-ultimo{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.canal-item-meta{text-align:right;flex-shrink:0;}
+.canal-item-hora{font-size:10px;color:var(--sub);display:block;}
+.canal-item-no-leidos{font-size:10px;font-weight:700;color:#fff;background:var(--accent);padding:1px 6px;border-radius:99px;display:inline-block;margin-top:2px;min-width:16px;text-align:center;}
+.canal-chat-header{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:8px;}
+.canal-chat-back{padding:4px 8px;border:none;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--muted);font-family:'Inter',sans-serif;transition:all var(--tr);}
+.canal-chat-back:hover{background:var(--bg4);color:var(--text);}
+.canal-chat-title{font-size:14px;font-weight:700;color:var(--text);flex:1;}
+.canal-mensajes{max-height:340px;overflow-y:auto;margin-bottom:8px;}
+.canal-msg{padding:6px 0;border-bottom:1px solid var(--border);}
+.canal-msg:last-child{border-bottom:none;}
+.canal-msg-autor{font-size:11px;font-weight:600;color:var(--accent);}
+.canal-msg-texto{font-size:12px;color:var(--text);margin-top:1px;line-height:1.4;}
+.canal-msg-fecha{font-size:9px;color:var(--sub);margin-top:1px;}
+.canal-msg.mio .canal-msg-autor{color:var(--blue);}
+.canal-input-area{display:flex;gap:6px;}
+.canal-input{flex:1;padding:7px 10px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;transition:all var(--tr);}
+.canal-input:focus{outline:none;border-color:var(--accent);}
+.canal-send-btn{padding:7px 12px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;font-family:'Inter',sans-serif;transition:all var(--tr);}
+.canal-send-btn:hover{background:var(--accent2);}
 .com-toast{position:fixed;top:16px;right:16px;z-index:99999;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rsm);padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;align-items:flex-start;gap:12px;max-width:360px;opacity:0;transform:translateY(-16px);transition:all .3s ease;pointer-events:none;cursor:pointer;}
 .com-toast.show{opacity:1;transform:translateY(0);pointer-events:auto;}
 .com-toast-icon{font-size:22px;line-height:1;flex-shrink:0;}
@@ -393,12 +422,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 <hr class="dash-divider">
 
 <div class="dash-grid">
-    <div class="dash-section">
-        <div class="dash-section-head" style="color:var(--accent);font-weight:700;">
-            <span class="icon"><i class="fas fa-bullhorn"></i></span>
-            Centro de Avisos <span id="comCountBadge" style="display:none;font-size:10px;padding:2px 8px;border-radius:99px;background:var(--accent);color:#fff;margin-left:6px;font-weight:600;vertical-align:middle;"></span>
+    <div class="dash-section" id="centroComunicacion">
+        <div class="dash-section-head" style="color:var(--accent);font-weight:700;padding:6px 14px;">
+            <div class="comm-tabs">
+                <button class="comm-tab active" onclick="switchComTab('avisos')"><i class="fas fa-bullhorn"></i> Avisos <span id="comCountBadge" style="display:none;font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent);color:#fff;margin-left:4px;font-weight:600;"></span></button>
+                <button class="comm-tab" onclick="switchComTab('canales')"><i class="fas fa-comments"></i> Canales <span id="canalesCountBadge" style="display:none;font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent);color:#fff;margin-left:4px;font-weight:600;"></span></button>
+            </div>
         </div>
-        <div class="dash-section-body">
+        <div class="dash-section-body" id="panelAvisos">
             {% if comunicaciones_pendientes %}
                 {% for c in comunicaciones_pendientes[:5] %}
                 {% set prioridad_color = {'baja': '#64748B', 'normal': '#2563EB', 'alta': '#F59E0B', 'urgente': '#EF4444'} %}
@@ -427,6 +458,10 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                 No tienes avisos nuevos.
             </div>
             {% endif %}
+        </div>
+        <div class="dash-section-body" id="panelCanales" style="display:none;">
+            <div id="canalesLista"></div>
+            <div id="canalChatView" style="display:none;"></div>
         </div>
     </div>
     <div class="dash-section">
@@ -896,7 +931,7 @@ addDataLabels();
 actualizarContadorAvisos();
 
 function renderComunicaciones(){
-    var container = document.querySelector('.dash-section-body');
+    var container = document.getElementById('panelAvisos');
     if(!container) return;
     if(!COM_DATA || COM_DATA.length===0){
         container.innerHTML='<div class="empty-state"><div class="icon"><i class="fas fa-check-circle" style="color:var(--green);"></i></div>No tienes avisos nuevos.</div>';
@@ -962,6 +997,148 @@ function checkNuevosComunicados(){
     .catch(function(){});
 }
 setInterval(checkNuevosComunicados,30000);
+
+// ── Canales ──────────────────────────────────────────────────────
+var CANALES_DATA = [];
+var CANAL_ACTUAL = null;
+
+function switchComTab(tab){
+    document.querySelectorAll('#centroComunicacion .comm-tab').forEach(function(t){t.classList.remove('active');});
+    document.getElementById('panelAvisos').style.display=tab==='avisos'?'block':'none';
+    document.getElementById('panelCanales').style.display=tab==='canales'?'block':'none';
+    document.querySelectorAll('#centroComunicacion .comm-tab').forEach(function(t){
+        if(t.getAttribute('onclick')&&t.getAttribute('onclick').indexOf("'"+tab+"'")>=0)t.classList.add('active');
+    });
+    if(tab==='canales')cargarCanales();
+}
+
+function cargarCanales(){
+    fetch('/'+slug+'/api/canales',{headers:{'X-CSRF-Token':getCsrf()}})
+    .then(function(r){return r.json()})
+    .then(function(lista){
+        CANALES_DATA=lista;
+        renderCanales();
+        actualizarContadorCanales();
+    })
+    .catch(function(){});
+}
+
+function renderCanales(){
+    var cont=document.getElementById('canalesLista');
+    if(!cont)return;
+    if(CANALES_DATA.length===0){
+        cont.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:16px 0;">No tienes canales disponibles.</div>';
+        return;
+    }
+    var html='';
+    for(var i=0;i<CANALES_DATA.length;i++){
+        var ch=CANALES_DATA[i];
+        var fecha=ch.ultima_fecha||ch.fecha_creacion;
+        var hora=fecha?fecha.slice(11,16):'';
+        var ultimo=ch.ultimo_mensaje||'Sin mensajes';
+        var noLeidos=ch.no_leidos||0;
+        var icons={'institucional':'🏫','rectoria':'👔','profesores':'👨‍🏫','director_curso':'📋','curso':'📚','materia':'🔬'};
+        var avatar=icons[ch.tipo]||'💬';
+        html+='<div class="canal-item" onclick="abrirCanal('+ch.id+')">'
+            +'<div class="canal-item-avatar">'+avatar+'</div>'
+            +'<div class="canal-item-body">'
+            +'<div class="canal-item-nombre">'+ch.nombre+'</div>'
+            +'<div class="canal-item-ultimo">'+ultimo+'</div></div>'
+            +'<div class="canal-item-meta">'
+            +'<span class="canal-item-hora">'+hora+'</span>'
+            +(noLeidos>0?'<span class="canal-item-no-leidos" style="font-size:10px;font-weight:700;color:#fff;background:var(--accent);padding:1px 6px;border-radius:99px;display:inline-block;margin-top:2px;min-width:16px;text-align:center;">'+noLeidos+'</span>':'')
+            +'</div></div>';
+    }
+    cont.innerHTML=html;
+}
+
+function actualizarContadorCanales(){
+    var badge=document.getElementById('canalesCountBadge');
+    if(!badge)return;
+    var total=0;
+    CANALES_DATA.forEach(function(ch){total+=ch.no_leidos||0;});
+    if(total>0){badge.textContent=total;badge.style.display='inline';}
+    else{badge.style.display='none';}
+}
+
+function abrirCanal(cid){
+    CANAL_ACTUAL=cid;
+    document.getElementById('canalesLista').style.display='none';
+    var chat=document.getElementById('canalChatView');
+    chat.style.display='block';
+    fetch('/'+slug+'/api/canales/'+cid+'/leer',{method:'POST',headers:{'X-CSRF-Token':getCsrf()}});
+    fetch('/'+slug+'/api/canales/'+cid+'/mensajes',{headers:{'X-CSRF-Token':getCsrf()}})
+    .then(function(r){return r.json()})
+    .then(function(msgs){
+        var ch=CANALES_DATA.find(function(x){return x.id===cid;});
+        if(!ch)return;
+        var html='<div class="canal-chat-header">'
+            +'<button class="canal-chat-back" onclick="cerrarCanal()"><i class="fas fa-arrow-left"></i></button>'
+            +'<div class="canal-chat-title">'+escHtml(ch.nombre)+'</div></div>'
+            +'<div class="canal-mensajes" id="canalMensajes">';
+        if(msgs.length===0){
+            html+='<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">No hay mensajes. S&eacute; el primero en escribir.</div>';
+        } else {
+            for(var i=0;i<msgs.length;i++){
+                var m=msgs[i];
+                var autor=m.usuario_tipo==='profesor'?'T&uacute;':m.usuario_tipo==='rector'?'Rector&iacute;a':m.usuario_tipo;
+                html+='<div class="canal-msg">'
+                    +'<div class="canal-msg-autor">'+autor+'</div>'
+                    +'<div class="canal-msg-texto">'+escHtml(m.mensaje)+'</div>'
+                    +'<div class="canal-msg-fecha">'+(m.fecha||'').slice(11,16)+'</div></div>';
+            }
+        }
+        html+='</div><div class="canal-input-area">'
+            +'<input class="canal-input" id="canalMsgInput" placeholder="Escribe un mensaje..." onkeydown="if(event.key===\'Enter\')enviarMensaje()">'
+            +'<button class="canal-send-btn" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button></div>';
+        chat.innerHTML=html;
+        var msgsDiv=document.getElementById('canalMensajes');
+        if(msgsDiv)msgsDiv.scrollTop=msgsDiv.scrollHeight;
+        var inp=document.getElementById('canalMsgInput');
+        if(inp)inp.focus();
+        ch.no_leidos=0;
+        actualizarContadorCanales();
+    })
+    .catch(function(){});
+}
+
+function cerrarCanal(){
+    CANAL_ACTUAL=null;
+    document.getElementById('canalesLista').style.display='block';
+    document.getElementById('canalChatView').style.display='none';
+    cargarCanales();
+}
+
+function enviarMensaje(){
+    var input=document.getElementById('canalMsgInput');
+    if(!input||!input.value.trim())return;
+    var msg=input.value.trim();
+    input.value='';
+    var fd=new FormData();
+    fd.append('mensaje',msg);
+    fetch('/'+slug+'/api/canales/'+CANAL_ACTUAL+'/enviar',{method:'POST',body:fd,headers:{'X-CSRF-Token':getCsrf()}})
+    .then(function(r){return r.json()})
+    .then(function(d){
+        if(d.ok){
+            var msgsDiv=document.getElementById('canalMensajes');
+            if(msgsDiv){
+                msgsDiv.insertAdjacentHTML('beforeend',
+                    '<div class="canal-msg"><div class="canal-msg-autor">T&uacute;</div>'
+                    +'<div class="canal-msg-texto">'+escHtml(msg)+'</div>'
+                    +'<div class="canal-msg-fecha">Ahora</div></div>');
+                msgsDiv.scrollTop=msgsDiv.scrollHeight;
+            }
+        } else {
+            input.value=msg;
+        }
+    })
+    .catch(function(){});
+}
+
+function escHtml(s){
+    if(!s)return'';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 </script>
 <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}
