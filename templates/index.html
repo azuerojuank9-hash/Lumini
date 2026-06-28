@@ -653,7 +653,7 @@ function getCsrf(){
 function showToast(msg){
     msg = msg || '<i class="fas fa-check-circle"></i> Guardado';
     const t = document.getElementById('toast');
-    t.textContent = msg;
+    t.innerHTML = msg;
     t.classList.add('show');
     setTimeout(function(){ t.classList.remove('show'); }, 1800);
 }

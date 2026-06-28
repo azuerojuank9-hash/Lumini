@@ -2,7 +2,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort, jsonify
-import sqlite3, hashlib, os, time, secrets, logging, json
+import sqlite3, hashlib, time, secrets, logging, json
 from datetime import timedelta, datetime
 from io import BytesIO
 app = Flask(__name__)
@@ -90,6 +90,7 @@ def ip_bloqueada(ip, prefijo=''):
     return False
 
 def registrar_fallo(ip, prefijo=''):
+    _purgar_intentos_antiguos()
     clave = f'{prefijo}_{ip}'
     d = login_intentos.setdefault(clave, {'intentos': 0, 'bloqueado_hasta': None})
     d['intentos'] += 1
@@ -97,6 +98,13 @@ def registrar_fallo(ip, prefijo=''):
         d['bloqueado_hasta'] = time.time() + 300
         logger.warning(f"IP bloqueada por fuerza bruta: {ip} (ctx={prefijo})")
     return d['intentos']
+
+def _purgar_intentos_antiguos():
+    ahora = time.time()
+    viejas = [k for k, v in login_intentos.items()
+              if v['bloqueado_hasta'] and ahora > v['bloqueado_hasta'] + 3600]
+    for k in viejas:
+        del login_intentos[k]
 
 def limpiar_intentos(ip, prefijo=''):
     login_intentos.pop(f'{prefijo}_{ip}', None)
@@ -1280,9 +1288,11 @@ def guardar_evaluacion(slug):
     ev_final = ev if ev is not None else (existing['evaluacion'] if existing else None)
     au_final = au if au is not None else (existing['autoevaluacion'] if existing else None)
     conn.execute(
-        '''INSERT OR REPLACE INTO evaluaciones
+        '''INSERT INTO evaluaciones
            (aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
-           VALUES (?,?,?,?,?,?,?)''',
+           VALUES (?,?,?,?,?,?,?)
+           ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
+           DO UPDATE SET evaluacion=excluded.evaluacion, autoevaluacion=excluded.autoevaluacion''',
         (aid, prof['id'], materia, jornada, ev_final, au_final, periodo))
     conn.commit(); conn.close()
     return ('', 204)

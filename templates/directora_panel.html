@@ -285,7 +285,7 @@ function getCsrf(){
 }
 
 function showToast(msg, ok=true){
-    const t=document.getElementById('toast'); t.textContent=msg;
+    const t=document.getElementById('toast'); t.innerHTML=msg;
     t.style.borderColor=ok?'rgba(16,185,129,.4)':'rgba(239,68,68,.4)';
     t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500);
 }

@@ -516,8 +516,8 @@ function toggleSidebar(){
 }
 function showToast(msg, ok){
     ok = ok !== false;
-    var t = document.getElementById('toast');
-    t.textContent = msg;
+    var t = document.getElementById('toast');
+    t.innerHTML = msg;
     t.style.borderColor = ok ? 'rgba(16,185,129,.4)' : 'rgba(239,68,68,.4)';
     t.classList.add('show');
     setTimeout(function(){ t.classList.remove('show'); }, 3000);

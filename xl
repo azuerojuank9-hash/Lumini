@@ -1,0 +1,157 @@
+[1mdiff --git a/flask_app.py b/flask_app.py[m
+[1mindex 2aa8165..42378e9 100644[m
+[1m--- a/flask_app.py[m
+[1m+++ b/flask_app.py[m
+[36m@@ -448,6 +448,7 @@[m [mdef init_db(slug):[m
+             comunicacion_id INTEGER NOT NULL,[m
+             usuario_tipo TEXT NOT NULL,[m
+             usuario_id INTEGER NOT NULL,[m
+[32m+[m[32m            leido INTEGER DEFAULT 0,[m
+             fecha_lectura TEXT NOT NULL DEFAULT (datetime('now','localtime')),[m
+             UNIQUE(comunicacion_id, usuario_tipo, usuario_id))''',[m
+         '''CREATE TABLE IF NOT EXISTS notificaciones ([m
+[36m@@ -2173,8 +2174,13 @@[m [mdef generar_destinatarios(slug, comunicacion_id):[m
+         if 'leido' not in cols_cl:[m
+             conn.execute('ALTER TABLE comunicaciones_leidas ADD COLUMN leido INTEGER DEFAULT 0')[m
+             conn.commit()[m
+[32m+[m[32m            cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()][m
+     except Exception as e:[m
+         app.logger.error(f'generar_destinatarios: error migrando columna leido: {e}')[m
+[32m+[m[32m    if 'leido' not in cols_cl:[m
+[32m+[m[32m        conn.close()[m
+[32m+[m[32m        app.logger.error('generar_destinatarios: columna leido no disponible en comunicaciones_leidas, abortando')[m
+[32m+[m[32m        return[m
+     com = conn.execute('SELECT * FROM comunicaciones WHERE id=?', (comunicacion_id,)).fetchone()[m
+     if not com:[m
+         conn.close()[m
+[36m@@ -2189,6 +2195,9 @@[m [mdef generar_destinatarios(slug, comunicacion_id):[m
+     except (json.JSONDecodeError, TypeError) as e:[m
+         app.logger.warning(f'generar_destinatarios: error parseando destinatario_valor="{com["destinatario_valor"]}": {e}')[m
+         val_arr = [][m
+[32m+[m[32m    if not isinstance(val_arr, list):[m
+[32m+[m[32m        app.logger.warning(f'generar_destinatarios: destinatario_valor no es un array, ignorando: {type(val_arr).__name__}')[m
+[32m+[m[32m        val_arr = [][m
+     destinatarios = [][m
+     if dest_tipo == 'todo_colegio':[m
+         for r in conn.execute('SELECT id FROM profesores WHERE activo=1').fetchall():[m
+[36m@@ -2201,7 +2210,10 @@[m [mdef generar_destinatarios(slug, comunicacion_id):[m
+         if val_arr:[m
+             for v in val_arr:[m
+                 if isinstance(v, str) and v.startswith('prof_'):[m
+[31m-                    destinatarios.append(('profesor', int(v.split('_')[1])))[m
+[32m+[m[32m                    try:[m
+[32m+[m[32m                        destinatarios.append(('profesor', int(v.split('_')[1])))[m
+[32m+[m[32m                    except (ValueError, IndexError):[m
+[32m+[m[32m                        app.logger.warning(f'generar_destinatarios: valor prof_ invalido: {v}')[m
+         else:[m
+             for r in conn.execute('SELECT id FROM profesores WHERE activo=1').fetchall():[m
+                 destinatarios.append(('profesor', r['id']))[m
+[36m@@ -2209,7 +2221,10 @@[m [mdef generar_destinatarios(slug, comunicacion_id):[m
+         if val_arr:[m
+             for v in val_arr:[m
+                 if isinstance(v, str) and v.startswith('dir_'):[m
+[31m-                    destinatarios.append(('directora', int(v.split('_')[1])))[m
+[32m+[m[32m                    try:[m
+[32m+[m[32m                        destinatarios.append(('directora', int(v.split('_')[1])))[m
+[32m+[m[32m                    except (ValueError, IndexError):[m
+[32m+[m[32m                        app.logger.warning(f'generar_destinatarios: valor dir_ invalido: {v}')[m
+         else:[m
+             for r in conn.execute('SELECT id FROM directoras WHERE activo=1').fetchall():[m
+                 destinatarios.append(('directora', r['id']))[m
+[36m@@ -2217,26 +2232,28 @@[m [mdef generar_destinatarios(slug, comunicacion_id):[m
+         for r in conn.execute('SELECT id FROM alumnos WHERE activo=1').fetchall():[m
+             destinatarios.append(('estudiante', r['id']))[m
+     elif dest_tipo == 'grado':[m
+[31m-        cursos_grado = {}[m
+[31m-        for row in conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1').fetchall():[m
+[31m-            c = row['curso'][m
+[31m-            g = ''.join(filter(str.isdigit, c))[m
+[31m-            cursos_grado.setdefault(g, []).append(c)[m
+[31m-        for grado in val_arr:[m
+[31m-            for curso in cursos_grado.get(str(grado), []):[m
+[32m+[m[32m        if val_arr:[m
+[32m+[m[32m            cursos_grado = {}[m
+[32m+[m[32m            for row in conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1').fetchall():[m
+[32m+[m[32m                c = row['curso'][m
+[32m+[m[32m                g = ''.join(filter(str.isdigit, c))[m
+[32m+[m[32m                cursos_grado.setdefault(g, []).append(c)[m
+[32m+[m[32m            for grado in val_arr:[m
+[32m+[m[32m                for curso in cursos_grado.get(str(grado), []):[m
+[32m+[m[32m                    for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():[m
+[32m+[m[32m                        destinatarios.append(('estudiante', r['id']))[m
+[32m+[m[32m    elif dest_tipo == 'cursos':[m
+[32m+[m[32m        if val_arr:[m
+[32m+[m[32m            for curso in val_arr:[m
+                 for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():[m
+                     destinatarios.append(('estudiante', r['id']))[m
+[31m-    elif dest_tipo == 'cursos':[m
+[31m-        for curso in val_arr:[m
+[31m-            for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():[m
+[31m-                destinatarios.append(('estudiante', r['id']))[m
+     for tipo, uid in destinatarios:[m
+         try:[m
+             conn.execute([m
+                 'INSERT OR IGNORE INTO comunicaciones_leidas (comunicacion_id,usuario_tipo,usuario_id,leido) VALUES (?,?,?,0)',[m
+                 (comunicacion_id, tipo, uid))[m
+[31m-        except Exception:[m
+[31m-            pass[m
+[32m+[m[32m        except Exception as e_insert:[m
+[32m+[m[32m            app.logger.error(f'generar_destinatarios: error insertando destinatario tipo={tipo} uid={uid}: {e_insert}')[m
+     conn.commit()[m
+     conn.close()[m
+ [m
+[36m@@ -2250,7 +2267,7 @@[m [mdef comunicaciones_pendientes(slug, usuario_tipo, usuario_id):[m
+         '''SELECT c.*, cl.leido, cl.fecha_lectura[m
+            FROM comunicaciones c[m
+            JOIN comunicaciones_leidas cl ON cl.comunicacion_id=c.id[m
+[31m-           WHERE cl.usuario_tipo=? AND cl.usuario_id=? AND cl.leido=0[m
+[32m+[m[32m           WHERE cl.usuario_tipo=? AND cl.usuario_id=? AND COALESCE(cl.leido,0)=0[m
+            AND c.estado='publicado' AND c.activo=1[m
+            ORDER BY c.fecha_publicacion DESC''',[m
+         (usuario_tipo, usuario_id)).fetchall()[m
+[36m@@ -2324,7 +2341,10 @@[m [mdef rector_comunicacion_nueva(slug):[m
+             conn.commit()[m
+             conn.close()[m
+             if publicar_ahora == '1':[m
+[31m-                generar_destinatarios(slug, new_id)[m
+[32m+[m[32m                try:[m
+[32m+[m[32m                    generar_destinatarios(slug, new_id)[m
+[32m+[m[32m                except Exception as e:[m
+[32m+[m[32m                    app.logger.error(f'Error en generar_destinatarios (nueva): {e}')[m
+             exito = 'Comunicación creada correctamente.'[m
+     return render_template('rector_comunicacion_form.html',[m
+                            slug=slug, colegio=colegio, rector=rector,[m
+[36m@@ -2427,7 +2447,10 @@[m [mdef rector_comunicacion_publicar(slug, cid):[m
+         (cid, rector['id']))[m
+     conn.commit()[m
+     conn.close()[m
+[31m-    generar_destinatarios(slug, cid)[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        generar_destinatarios(slug, cid)[m
+[32m+[m[32m    except Exception as e:[m
+[32m+[m[32m        app.logger.error(f'Error en generar_destinatarios (publicar): {e}')[m
+     return redirect(url_for('rector_comunicaciones', slug=slug))[m
+ [m
+ @app.route('/<slug>/rector/comunicaciones/<int:cid>/archivar', methods=['POST'])[m
+[36m@@ -2539,14 +2562,17 @@[m [mdef comunicacion_leer(slug, cid):[m
+     if not usuario_id:[m
+         return jsonify({'error': 'No autorizado'}), 403[m
+     conn = conectar(slug)[m
+[31m-    cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()][m
+[31m-    if 'leido' not in cols_cl:[m
+[31m-        try:[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()][m
+[32m+[m[32m        if 'leido' not in cols_cl:[m
+             conn.execute('ALTER TABLE comunicaciones_leidas ADD COLUMN leido INTEGER DEFAULT 0')[m
+             conn.commit()[m
+[31m-        except Exception:[m
+[32m+[m[32m            cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()][m
+[32m+[m[32m        if 'leido' not in cols_cl:[m
+             conn.close()[m
+             return jsonify({'error': 'Error de migración'}), 500[m
+[32m+[m[32m    except Exception as e:[m
+[32m+[m[32m        app.logger.error(f'comunicacion_leer: error migrando columna leido: {e}')[m
+     existing = conn.execute([m
+         'SELECT 1 FROM comunicaciones_leidas WHERE comunicacion_id=? AND usuario_tipo=? AND usuario_id=?',[m
+         (cid, usuario_tipo, usuario_id)).fetchone()[m

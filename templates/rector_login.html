@@ -265,7 +265,7 @@ function switchTabById(tab){ switchTab(tab, document.getElementById('btn-'+tab))
 function togglePass(btn){
     var inp = btn.previousElementSibling;
     inp.type = inp.type==='password' ? 'text' : 'password';
-    btn.textContent = inp.type==='password' ? '<i class="fas fa-eye"></i>' : '🙈';
+    btn.innerHTML = inp.type==='password' ? '<i class="fas fa-eye"></i>' : '🙈';
 }
 
 function checkPwd(inp){

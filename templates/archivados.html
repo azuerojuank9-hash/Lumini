@@ -308,8 +308,8 @@ function getCsrf(){
 }
 
 function showToast(msg, ok){
-    var t = document.getElementById('toast');
-    t.textContent = msg;
+    var t = document.getElementById('toast');
+    t.innerHTML = msg;
     t.className = 'toast ' + (ok !== false ? 'ok' : 'err');
     t.classList.add('show');
     setTimeout(function(){ t.classList.remove('show'); }, 2200);

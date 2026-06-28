@@ -86,9 +86,9 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
 <aside class="sidebar" id="sidebar">
     <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
     <div class="sidebar-logo">
-        {% if colegio and colegio.logo_url %}
-        <img src="{{ colegio.logo_url }}" alt="Logo">
-        {% else %}
+{% if colegio and colegio.logo %}
+        <img src="/static/logos/{{ colegio.logo }}" alt="Logo">
+        {% else %}
         <img src="/static/lumini_logo.png" alt="Lumini">
         {% endif %}
         <div>
@@ -220,6 +220,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
   </div>
 </div>
 
+<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i> Guardado</div>
 
 <script>
@@ -236,9 +237,12 @@ const HORAS = {
 };
 let _dia='', _franja='';
 
-function showToast(m){
-  const t=document.getElementById('toast');
-  t.textContent=m; t.classList.add('show');
+function getCsrf(){
+  return document.getElementById('csrf-global').value;
+}
+function showToast(m){
+  const t=document.getElementById('toast');
+  t.innerHTML=m; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2000);
 }
 
