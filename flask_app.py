@@ -2598,6 +2598,29 @@ def comunicacion_leer(slug, cid):
     conn.close()
     return jsonify({'ok': True})
 
+# ── API COMUNICACIONES (Fase 2 — polling) ─────────────────────────────────────
+@app.route('/<slug>/api/comunicaciones')
+def api_comunicaciones(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if prof:
+        return jsonify(comunicaciones_pendientes(slug,'profesor',prof['id']))
+    aid = session.get(f'alumno_id_{slug}')
+    if aid:
+        return jsonify(comunicaciones_pendientes(slug,'estudiante',aid))
+    return jsonify([])
+
+@app.route('/<slug>/api/comunicaciones/count')
+def api_comunicaciones_count(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if prof:
+        return jsonify({'pendientes':len(comunicaciones_pendientes(slug,'profesor',prof['id']))})
+    aid = session.get(f'alumno_id_{slug}')
+    if aid:
+        return jsonify({'pendientes':len(comunicaciones_pendientes(slug,'estudiante',aid))})
+    return jsonify({'pendientes':0})
+
 # ── EVENTOS CALENDARIO ────────────────────────────────────────────────────────
 @app.route('/<slug>/rector/comunicaciones/<int:cid>/evento')
 def rector_comunicacion_evento(slug, cid):

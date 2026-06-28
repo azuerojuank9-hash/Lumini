@@ -227,6 +227,13 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 /* ── Toast & Scroll-top ─────────────────────────────────────────────── */
 .toast{position:fixed;bottom:24px;right:24px;background:rgba(34,197,94,.95);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s ease;pointer-events:none;display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px);}
 .toast.show{opacity:1;transform:translateY(0);}
+.com-toast{position:fixed;top:16px;right:16px;z-index:99999;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rsm);padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;align-items:flex-start;gap:12px;max-width:360px;opacity:0;transform:translateY(-16px);transition:all .3s ease;pointer-events:none;cursor:pointer;}
+.com-toast.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+.com-toast-icon{font-size:22px;line-height:1;flex-shrink:0;}
+.com-toast-body{flex:1;min-width:0;}
+.com-toast-title{font-weight:700;font-size:13px;color:var(--text);}
+.com-toast-msg{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.com-toast-time{font-size:10px;color:var(--sub);margin-top:4px;}
 .scroll-top{display:none;position:fixed;bottom:70px;right:20px;z-index:2000;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:50%;color:var(--text);font-size:18px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.3);transition:all var(--tr);}
 .scroll-top.show{display:flex;}
 .scroll-top:hover{background:var(--bg3);border-color:var(--accent);}
@@ -389,7 +396,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     <div class="dash-section">
         <div class="dash-section-head" style="color:var(--accent);font-weight:700;">
             <span class="icon"><i class="fas fa-bullhorn"></i></span>
-            Centro de Avisos
+            Centro de Avisos <span id="comCountBadge" style="display:none;font-size:10px;padding:2px 8px;border-radius:99px;background:var(--accent);color:#fff;margin-left:6px;font-weight:600;vertical-align:middle;"></span>
         </div>
         <div class="dash-section-body">
             {% if comunicaciones_pendientes %}
@@ -875,6 +882,9 @@ function marcarLeidoProf(cid, btn){
         var item = btn.closest('.schedule-item');
         if(item){ item.style.opacity='0.25'; item.style.pointerEvents='none'; }
         else { btn.style.opacity='0.3'; btn.style.pointerEvents='none'; }
+        COM_DATA = COM_DATA.filter(function(x){return x.id!==cid;});
+        actualizarContadorAvisos();
+        renderComunicaciones();
     }});
 }
 window.addEventListener('scroll',function(){
@@ -883,6 +893,75 @@ window.addEventListener('scroll',function(){
     st.classList.toggle('show',window.scrollY > 400);
 });
 addDataLabels();
+actualizarContadorAvisos();
+
+function renderComunicaciones(){
+    var container = document.querySelector('.dash-section-body');
+    if(!container) return;
+    if(!COM_DATA || COM_DATA.length===0){
+        container.innerHTML='<div class="empty-state"><div class="icon"><i class="fas fa-check-circle" style="color:var(--green);"></i></div>No tienes avisos nuevos.</div>';
+        return;
+    }
+    var PRIO_COLORS={'baja':'#64748B','normal':'#2563EB','alta':'#F59E0B','urgente':'#EF4444'};
+    var html='';
+    var len=Math.min(COM_DATA.length,5);
+    for(var i=0;i<len;i++){
+        var c=COM_DATA[i];
+        var pc=PRIO_COLORS[c.prioridad]||'#2563EB';
+        var fecha=(c.fecha_publicacion||c.fecha_creacion||'').slice(0,10);
+        var contenido=(c.contenido||'').slice(0,120);
+        if(c.contenido&&c.contenido.length>120)contenido+='…';
+        html+='<div class="schedule-item" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;">'
+            +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">'
+            +'<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">'
+            +'<span style="width:8px;height:8px;border-radius:50%;background:'+pc+';flex-shrink:0;"></span>'
+            +'<span style="font-weight:600;font-size:13px;">'+c.titulo+'</span></div>'
+            +'<span style="font-size:10px;color:var(--muted);white-space:nowrap;">'+fecha+'</span></div>'
+            +'<div style="font-size:12px;color:var(--muted);line-height:1.4;margin-left:16px;">'+contenido+'</div>'
+            +'<div style="display:flex;gap:6px;margin-left:16px;margin-top:4px;">'
+            +'<span style="font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;background:'+pc+'15;color:'+pc+';">'+(c.prioridad.charAt(0).toUpperCase()+c.prioridad.slice(1))+'</span></div>'
+            +'<div style="display:flex;gap:6px;margin-left:16px;margin-top:2px;">'
+            +'<button onclick="verComunicado('+c.id+')" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(37,99,235,.1);color:var(--blue);font-family:\'Inter\',sans-serif;transition:all var(--tr);" onmouseover="this.style.background=\'rgba(37,99,235,.2)\'" onmouseout="this.style.background=\'rgba(37,99,235,.1)\'"><i class="fas fa-eye"></i> Ver comunicado</button>'
+            +'<button onclick="marcarLeidoProf('+c.id+', this)" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:\'Inter\',sans-serif;transition:all var(--tr);" onmouseover="this.style.background=\'rgba(var(--accent-rgb),.2)\'" onmouseout="this.style.background=\'rgba(var(--accent-rgb),.1)\'"><i class="fas fa-check"></i> Marcar como le&iacute;do</button>'
+            +'</div></div>';
+    }
+    container.innerHTML=html;
+}
+function actualizarContadorAvisos(){
+    var badge=document.getElementById('comCountBadge');
+    if(!badge)return;
+    if(COM_DATA&&COM_DATA.length>0){badge.textContent=COM_DATA.length;badge.style.display='inline-flex';}
+    else{badge.style.display='none';}
+}
+function showComToast(titulo,contenido){
+    var t=document.getElementById('comToast');
+    if(!t)return;
+    document.getElementById('comToastTitle').textContent=titulo;
+    document.getElementById('comToastMsg').textContent=(contenido||'').slice(0,120);
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t=setTimeout(function(){t.classList.remove('show');},5000);
+}
+function hideComToast(){document.getElementById('comToast').classList.remove('show');}
+function checkNuevosComunicados(){
+    fetch('/'+slug+'/api/comunicaciones/count',{headers:{'X-CSRF-Token':getCsrf()}})
+    .then(function(r){return r.json()})
+    .then(function(d){
+        if(d.pendientes>(COM_DATA?COM_DATA.length:0)){
+            fetch('/'+slug+'/api/comunicaciones',{headers:{'X-CSRF-Token':getCsrf()}})
+            .then(function(r){return r.json()})
+            .then(function(lista){
+                COM_DATA=lista;
+                renderComunicaciones();
+                actualizarContadorAvisos();
+                if(lista.length>0)showComToast(lista[0].titulo,lista[0].contenido||'');
+            })
+            .catch(function(){});
+        }
+    })
+    .catch(function(){});
+}
+setInterval(checkNuevosComunicados,30000);
 </script>
 <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}
@@ -921,5 +1000,13 @@ function cerrarComunicado(){
 </div>
 </div>
 
+<div id="comToast" class="com-toast" onclick="hideComToast()">
+  <div class="com-toast-icon">🔔</div>
+  <div class="com-toast-body">
+    <div class="com-toast-title" id="comToastTitle">Nuevo comunicado</div>
+    <div class="com-toast-msg" id="comToastMsg"></div>
+    <div class="com-toast-time">Reci&eacute;n publicado</div>
+  </div>
+</div>
 </body>
 </html>
