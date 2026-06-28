@@ -2813,8 +2813,39 @@ def api_canales_mensajes(slug, cid):
         FROM mensajes_canal m
         LEFT JOIN mensajes_leidos ml ON ml.mensaje_id=m.id AND ml.usuario_tipo=? AND ml.usuario_id=?
         WHERE m.canal_id=? ORDER BY m.id ASC''', (tipo, uid, cid)).fetchall()
+    result = []
+    for r in mensajes:
+        d = dict(r)
+        d['autor_nombre'] = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
+        result.append(d)
     conn.close()
-    return jsonify([dict(r) for r in mensajes])
+    return jsonify(result)
+
+@app.route('/<slug>/api/canales/<int:cid>/mensajes/nuevos')
+def api_canales_mensajes_nuevos(slug, cid):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False,'error':'No autenticado'}), 401
+    ultimo_id = request.args.get('ultimo_id', 0, type=int)
+    conn = conectar(slug)
+    canal = conn.execute('SELECT * FROM canales WHERE id=? AND activo=1', (cid,)).fetchone()
+    if not canal: conn.close(); return jsonify({'ok':False,'error':'Canal no encontrado'})
+    if tipo != 'rector':
+        miembro = conn.execute('SELECT 1 FROM canal_miembros WHERE canal_id=? AND usuario_tipo=? AND usuario_id=?',
+                              (cid, tipo, uid)).fetchone()
+        if not miembro: conn.close(); return jsonify({'ok':False,'error':'No eres miembro'})
+    mensajes = conn.execute('''
+        SELECT m.*, COALESCE(ml.id,0) as leido
+        FROM mensajes_canal m
+        LEFT JOIN mensajes_leidos ml ON ml.mensaje_id=m.id AND ml.usuario_tipo=? AND ml.usuario_id=?
+        WHERE m.canal_id=? AND m.id > ? ORDER BY m.id ASC''', (tipo, uid, cid, ultimo_id)).fetchall()
+    result = []
+    for r in mensajes:
+        d = dict(r)
+        d['autor_nombre'] = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
+        result.append(d)
+    conn.close()
+    return jsonify({'ok':True, 'mensajes':result})
 
 @app.route('/<slug>/api/canales/<int:cid>/enviar', methods=['POST'])
 def api_canales_enviar(slug, cid):

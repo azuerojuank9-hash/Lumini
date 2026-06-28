@@ -231,27 +231,48 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .comm-tab{flex:1;padding:6px 8px;border:none;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;transition:all var(--tr);display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;}
 .comm-tab:hover{background:var(--bg3);color:var(--text);}
 .comm-tab.active{background:rgba(var(--accent-rgb),.12);color:var(--accent);}
-.canal-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;gap:10px;}
-.canal-item:hover{border-color:rgba(var(--accent-rgb),.2);}
-.canal-item-avatar{width:34px;height:34px;border-radius:50%;background:rgba(var(--accent-rgb),.1);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;color:var(--accent);}
-.canal-item-body{flex:1;min-width:0;}
-.canal-item-nombre{font-size:13px;font-weight:600;color:var(--text);}
-.canal-item-ultimo{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.canal-item-meta{text-align:right;flex-shrink:0;}
-.canal-item-hora{font-size:10px;color:var(--sub);display:block;}
-.canal-item-no-leidos{font-size:10px;font-weight:700;color:#fff;background:var(--accent);padding:1px 6px;border-radius:99px;display:inline-block;margin-top:2px;min-width:16px;text-align:center;}
-.canal-chat-header{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:8px;}
+/* ── Canales (Fase 4 — split layout + bubbles) ─────────────────── */
+.canales-split{display:flex;height:420px;border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden;background:var(--bg2);}
+.canales-sidebar{width:260px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);background:var(--bg);}
+.canales-sidebar-header{padding:12px 14px;font-size:13px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.canales-sidebar-badge{font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent);color:#fff;font-weight:600;}
+.canales-sidebar-list{flex:1;overflow-y:auto;padding:4px;}
+.canales-sidebar-list .empty-channel-list{text-align:center;color:var(--muted);font-size:12px;padding:20px 0;}
+.canal-list-item{display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:2px;border-radius:var(--rsm);cursor:pointer;transition:all var(--tr);}
+.canal-list-item:hover{background:rgba(var(--accent-rgb),.06);}
+.canal-list-item.active{background:rgba(var(--accent-rgb),.12);}
+.canal-list-avatar{width:32px;height:32px;border-radius:50%;background:rgba(var(--accent-rgb),.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.canal-list-info{flex:1;min-width:0;}
+.canal-list-nombre{font-size:12px;font-weight:600;color:var(--text);}
+.canal-list-ultimo{font-size:10px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.canal-list-meta{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+.canal-list-hora{font-size:9px;color:var(--sub);}
+.canal-list-no-leidos{font-size:9px;font-weight:700;color:#fff;background:var(--accent);padding:1px 5px;border-radius:99px;display:inline-block;min-width:16px;text-align:center;}
+.canales-main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.canales-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-size:13px;gap:8px;}
+.canales-empty i{font-size:32px;opacity:.3;}
+.canales-chat{flex:1;display:flex;flex-direction:column;height:100%;}
+.canal-chat-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.canal-chat-title{font-size:14px;font-weight:700;color:var(--text);flex:1;}
 .canal-chat-back{padding:4px 8px;border:none;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--muted);font-family:'Inter',sans-serif;transition:all var(--tr);}
 .canal-chat-back:hover{background:var(--bg4);color:var(--text);}
-.canal-chat-title{font-size:14px;font-weight:700;color:var(--text);flex:1;}
-.canal-mensajes{max-height:340px;overflow-y:auto;margin-bottom:8px;}
-.canal-msg{padding:6px 0;border-bottom:1px solid var(--border);}
-.canal-msg:last-child{border-bottom:none;}
-.canal-msg-autor{font-size:11px;font-weight:600;color:var(--accent);}
-.canal-msg-texto{font-size:12px;color:var(--text);margin-top:1px;line-height:1.4;}
-.canal-msg-fecha{font-size:9px;color:var(--sub);margin-top:1px;}
-.canal-msg.mio .canal-msg-autor{color:var(--blue);}
-.canal-input-area{display:flex;gap:6px;}
+.canal-mensajes{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:6px;}
+.canal-msg{display:flex;flex-direction:column;max-width:75%;}
+.canal-msg.mio{align-self:flex-end;align-items:flex-end;}
+.canal-msg:not(.mio){align-self:flex-start;}
+.canal-msg-texto{padding:7px 12px;border-radius:12px;font-size:12.5px;line-height:1.45;word-wrap:break-word;white-space:pre-wrap;}
+.canal-msg.mio .canal-msg-texto{background:var(--accent);color:#fff;border-bottom-right-radius:4px;}
+.canal-msg:not(.mio) .canal-msg-texto{background:var(--bg3);color:var(--text);border-bottom-left-radius:4px;}
+.canal-msg-autor{font-size:10px;color:var(--muted);margin-bottom:1px;padding:0 4px;}
+.canal-msg-fecha{font-size:9px;color:var(--sub);margin-top:1px;padding:0 4px;}
+.canal-msg.mio .canal-msg-fecha{text-align:right;}
+.canales-typing{font-size:11px;color:var(--muted);padding:4px 14px;display:flex;align-items:center;gap:6px;}
+.typing-dots span{animation:typingDot 1.4s infinite;opacity:0;}
+.typing-dots span:nth-child(1){animation-delay:0s;}
+.typing-dots span:nth-child(2){animation-delay:.2s;}
+.typing-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes typingDot{0%,60%,100%{opacity:0;}30%{opacity:1;}}
+.canal-input-area{display:flex;gap:6px;padding:8px 14px;border-top:1px solid var(--border);}
 .canal-input{flex:1;padding:7px 10px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;transition:all var(--tr);}
 .canal-input:focus{outline:none;border-color:var(--accent);}
 .canal-send-btn{padding:7px 12px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;font-family:'Inter',sans-serif;transition:all var(--tr);}
@@ -275,6 +296,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 /* ── Responsive: mobile ─────────────────────────────────────────────── */
 @media(max-width:768px){
   .hamburger{display:flex;}
+  .canales-split{flex-direction:column;height:auto;min-height:350px;}
+  .canales-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}
+  .canales-sidebar-list{max-height:160px;}
   .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
   .sidebar.open{transform:translateX(0);}
   .sidebar-overlay.open{display:block;}
@@ -460,8 +484,35 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
             {% endif %}
         </div>
         <div class="dash-section-body" id="panelCanales" style="display:none;">
-            <div id="canalesLista"></div>
-            <div id="canalChatView" style="display:none;"></div>
+            <div class="canales-split">
+                <div class="canales-sidebar">
+                    <div class="canales-sidebar-header">
+                        <span>Canales</span>
+                        <span class="canales-sidebar-badge" id="canalesCountBadge" style="display:none;"></span>
+                    </div>
+                    <div class="canales-sidebar-list" id="canalesLista"></div>
+                </div>
+                <div class="canales-main">
+                    <div class="canales-empty" id="canalEmpty">
+                        <i class="fas fa-comments"></i>
+                        <p>Selecciona un canal para iniciar la conversaci&oacute;n</p>
+                    </div>
+                    <div class="canales-chat" id="canalChatView" style="display:none;">
+                        <div class="canal-chat-header">
+                            <button class="canal-chat-back" id="canalChatBack"><i class="fas fa-arrow-left"></i></button>
+                            <div class="canal-chat-title" id="canalChatTitle"></div>
+                        </div>
+                        <div class="canal-mensajes" id="canalMensajes"></div>
+                        <div class="canales-typing" id="canalTyping" style="display:none;">
+                            <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span> escribiendo...
+                        </div>
+                        <div class="canal-input-area">
+                            <input type="text" id="canalMsgInput" class="canal-input" placeholder="Escribe un mensaje...">
+                            <button id="canalSendBtn" class="canal-send-btn"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="dash-section">
@@ -998,147 +1049,261 @@ function checkNuevosComunicados(){
 }
 setInterval(checkNuevosComunicados,30000);
 
-// ── Canales ──────────────────────────────────────────────────────
-var CANALES_DATA = [];
-var CANAL_ACTUAL = null;
-
-function switchComTab(tab){
-    document.querySelectorAll('#centroComunicacion .comm-tab').forEach(function(t){t.classList.remove('active');});
-    document.getElementById('panelAvisos').style.display=tab==='avisos'?'block':'none';
-    document.getElementById('panelCanales').style.display=tab==='canales'?'block':'none';
-    document.querySelectorAll('#centroComunicacion .comm-tab').forEach(function(t){
-        if(t.getAttribute('onclick')&&t.getAttribute('onclick').indexOf("'"+tab+"'")>=0)t.classList.add('active');
-    });
-    if(tab==='canales')cargarCanales();
-}
-
-function cargarCanales(){
-    fetch('/'+slug+'/api/canales',{headers:{'X-CSRF-Token':getCsrf()}})
-    .then(function(r){return r.json()})
-    .then(function(lista){
-        CANALES_DATA=lista;
-        renderCanales();
-        actualizarContadorCanales();
-    })
-    .catch(function(){});
-}
-
-function renderCanales(){
-    var cont=document.getElementById('canalesLista');
-    if(!cont)return;
-    if(CANALES_DATA.length===0){
-        cont.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:16px 0;">No tienes canales disponibles.</div>';
-        return;
-    }
-    var html='';
-    for(var i=0;i<CANALES_DATA.length;i++){
-        var ch=CANALES_DATA[i];
-        var fecha=ch.ultima_fecha||ch.fecha_creacion;
-        var hora=fecha?fecha.slice(11,16):'';
-        var ultimo=ch.ultimo_mensaje||'Sin mensajes';
-        var noLeidos=ch.no_leidos||0;
-        var icons={'institucional':'🏫','rectoria':'👔','profesores':'👨‍🏫','director_curso':'📋','curso':'📚','materia':'🔬'};
-        var avatar=icons[ch.tipo]||'💬';
-        html+='<div class="canal-item" onclick="abrirCanal('+ch.id+')">'
-            +'<div class="canal-item-avatar">'+avatar+'</div>'
-            +'<div class="canal-item-body">'
-            +'<div class="canal-item-nombre">'+ch.nombre+'</div>'
-            +'<div class="canal-item-ultimo">'+ultimo+'</div></div>'
-            +'<div class="canal-item-meta">'
-            +'<span class="canal-item-hora">'+hora+'</span>'
-            +(noLeidos>0?'<span class="canal-item-no-leidos" style="font-size:10px;font-weight:700;color:#fff;background:var(--accent);padding:1px 6px;border-radius:99px;display:inline-block;margin-top:2px;min-width:16px;text-align:center;">'+noLeidos+'</span>':'')
-            +'</div></div>';
-    }
-    cont.innerHTML=html;
-}
-
-function actualizarContadorCanales(){
-    var badge=document.getElementById('canalesCountBadge');
-    if(!badge)return;
-    var total=0;
-    CANALES_DATA.forEach(function(ch){total+=ch.no_leidos||0;});
-    if(total>0){badge.textContent=total;badge.style.display='inline';}
-    else{badge.style.display='none';}
-}
-
-function abrirCanal(cid){
-    CANAL_ACTUAL=cid;
-    document.getElementById('canalesLista').style.display='none';
-    var chat=document.getElementById('canalChatView');
-    chat.style.display='block';
-    fetch('/'+slug+'/api/canales/'+cid+'/leer',{method:'POST',headers:{'X-CSRF-Token':getCsrf()}});
-    fetch('/'+slug+'/api/canales/'+cid+'/mensajes',{headers:{'X-CSRF-Token':getCsrf()}})
-    .then(function(r){return r.json()})
-    .then(function(msgs){
-        var ch=CANALES_DATA.find(function(x){return x.id===cid;});
-        if(!ch)return;
-        var html='<div class="canal-chat-header">'
-            +'<button class="canal-chat-back" onclick="cerrarCanal()"><i class="fas fa-arrow-left"></i></button>'
-            +'<div class="canal-chat-title">'+escHtml(ch.nombre)+'</div></div>'
-            +'<div class="canal-mensajes" id="canalMensajes">';
-        if(msgs.length===0){
-            html+='<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">No hay mensajes. S&eacute; el primero en escribir.</div>';
-        } else {
-            for(var i=0;i<msgs.length;i++){
-                var m=msgs[i];
-                var autor=m.usuario_tipo==='profesor'?'T&uacute;':m.usuario_tipo==='rector'?'Rector&iacute;a':m.usuario_tipo;
-                html+='<div class="canal-msg">'
-                    +'<div class="canal-msg-autor">'+autor+'</div>'
-                    +'<div class="canal-msg-texto">'+escHtml(m.mensaje)+'</div>'
-                    +'<div class="canal-msg-fecha">'+(m.fecha||'').slice(11,16)+'</div></div>';
-            }
-        }
-        html+='</div><div class="canal-input-area">'
-            +'<input class="canal-input" id="canalMsgInput" placeholder="Escribe un mensaje..." onkeydown="if(event.key===\'Enter\')enviarMensaje()">'
-            +'<button class="canal-send-btn" onclick="enviarMensaje()"><i class="fas fa-paper-plane"></i></button></div>';
-        chat.innerHTML=html;
-        var msgsDiv=document.getElementById('canalMensajes');
-        if(msgsDiv)msgsDiv.scrollTop=msgsDiv.scrollHeight;
-        var inp=document.getElementById('canalMsgInput');
-        if(inp)inp.focus();
-        ch.no_leidos=0;
-        actualizarContadorCanales();
-    })
-    .catch(function(){});
-}
-
-function cerrarCanal(){
-    CANAL_ACTUAL=null;
-    document.getElementById('canalesLista').style.display='block';
-    document.getElementById('canalChatView').style.display='none';
-    cargarCanales();
-}
-
-function enviarMensaje(){
-    var input=document.getElementById('canalMsgInput');
-    if(!input||!input.value.trim())return;
-    var msg=input.value.trim();
-    input.value='';
-    var fd=new FormData();
-    fd.append('mensaje',msg);
-    fetch('/'+slug+'/api/canales/'+CANAL_ACTUAL+'/enviar',{method:'POST',body:fd,headers:{'X-CSRF-Token':getCsrf()}})
-    .then(function(r){return r.json()})
-    .then(function(d){
-        if(d.ok){
-            var msgsDiv=document.getElementById('canalMensajes');
-            if(msgsDiv){
-                msgsDiv.insertAdjacentHTML('beforeend',
-                    '<div class="canal-msg"><div class="canal-msg-autor">T&uacute;</div>'
-                    +'<div class="canal-msg-texto">'+escHtml(msg)+'</div>'
-                    +'<div class="canal-msg-fecha">Ahora</div></div>');
-                msgsDiv.scrollTop=msgsDiv.scrollHeight;
-            }
-        } else {
-            input.value=msg;
-        }
-    })
-    .catch(function(){});
-}
-
+// ── Canales (Fase 4 — unified) ───────────────────────────────────
 function escHtml(s){
     if(!s)return'';
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+function crearSistemaCanales(opts){
+    var P = opts.prefix || '';
+    var TIPO = opts.tipoUsuario || 'profesor';
+    var SLUG = opts.slug;
+    var CSRF = opts.getCsrf;
+
+    var canales = [];
+    var canalActivo = null;
+    var ultimoMsgId = 0;
+    var pollTimer = null;
+    var _dom = {};
+
+    function el(id){
+        var key = id + P;
+        if(!_dom[key]) _dom[key] = document.getElementById(key);
+        return _dom[key];
+    }
+
+    window['switchComTab' + P] = function(tab){
+        var containerId = 'centroComunicacion' + P;
+        document.querySelectorAll('#' + containerId + ' .comm-tab').forEach(function(t){t.classList.remove('active');});
+        el('panelAvisos').style.display = tab === 'avisos' ? 'block' : 'none';
+        el('panelCanales').style.display = tab === 'canales' ? 'block' : 'none';
+        document.querySelectorAll('#' + containerId + ' .comm-tab').forEach(function(t){
+            var o = t.getAttribute('onclick');
+            if(o && o.indexOf("'" + tab + "'") >= 0) t.classList.add('active');
+        });
+        if(tab === 'canales'){ cargarCanales(); }
+        else { cerrarCanal(); }
+    };
+
+    function cargarCanales(){
+        fetch('/' + SLUG + '/api/canales', {headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(lista){
+            canales = lista;
+            renderCanales();
+            actualizarContador();
+            if(canalActivo){
+                var existe = false;
+                for(var i=0;i<canales.length;i++){ if(canales[i].id === canalActivo){ existe = true; break; } }
+                if(!existe) cerrarCanal();
+            }
+        })
+        .catch(function(){});
+    }
+
+    function renderCanales(){
+        var cont = el('canalesLista');
+        if(!cont) return;
+        if(!canales || canales.length === 0){
+            cont.innerHTML = '<div class="empty-channel-list">No tienes canales disponibles.</div>';
+            return;
+        }
+        var icons = {'institucional':'🏫','rectoria':'👔','profesores':'👨‍🏫','director_curso':'📋','curso':'📚','materia':'🔬'};
+        var html = '';
+        for(var i=0;i<canales.length;i++){
+            var ch = canales[i];
+            var activoCls = (canalActivo === ch.id) ? ' active' : '';
+            var fecha = ch.ultima_fecha || ch.fecha_creacion;
+            var hora = fecha ? fecha.slice(11,16) : '';
+            var ultimo = ch.ultimo_mensaje || 'Sin mensajes';
+            if(ultimo.length > 45) ultimo = ultimo.slice(0,45) + '…';
+            var noLeidos = ch.no_leidos || 0;
+            var avatar = icons[ch.tipo] || '💬';
+            var badgeHtml = noLeidos > 0 ? '<span class="canal-list-no-leidos">' + noLeidos + '</span>' : '';
+            html += '<div class="canal-list-item' + activoCls + '" data-cid="' + ch.id + '">'
+                + '<div class="canal-list-avatar">' + avatar + '</div>'
+                + '<div class="canal-list-info">'
+                + '<div class="canal-list-nombre">' + escHtml(ch.nombre) + '</div>'
+                + '<div class="canal-list-ultimo">' + escHtml(ultimo) + '</div></div>'
+                + '<div class="canal-list-meta">'
+                + '<span class="canal-list-hora">' + hora + '</span>'
+                + badgeHtml
+                + '</div></div>';
+        }
+        cont.innerHTML = html;
+    }
+
+    function actualizarContador(){
+        var badge = el('canalesCountBadge');
+        if(!badge) return;
+        var total = 0;
+        for(var i=0;i<canales.length;i++){ total += canales[i].no_leidos || 0; }
+        if(total > 0){ badge.textContent = total; badge.style.display = 'inline'; }
+        else { badge.style.display = 'none'; }
+    }
+
+    function abrirCanal(cid){
+        if(canalActivo === cid) return;
+        canalActivo = cid;
+        ultimoMsgId = 0;
+        fetch('/' + SLUG + '/api/canales/' + cid + '/leer', {method:'POST', headers:{'X-CSRF-Token':CSRF()}}).catch(function(){});
+        var ch = null;
+        for(var i=0;i<canales.length;i++){ if(canales[i].id === cid){ ch = canales[i]; break; } }
+        if(!ch){ cerrarCanal(); return; }
+        ch.no_leidos = 0;
+        renderCanales();
+        actualizarContador();
+        el('canalEmpty').style.display = 'none';
+        var chatView = el('canalChatView');
+        chatView.style.display = 'flex';
+        el('canalChatTitle').textContent = ch.nombre;
+        el('canalMensajes').innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">Cargando mensajes...</div>';
+        fetch('/' + SLUG + '/api/canales/' + cid + '/mensajes', {headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(msgs){
+            renderMensajes(msgs);
+            if(msgs && msgs.length > 0) ultimoMsgId = msgs[msgs.length - 1].id;
+            iniciarPolling();
+        })
+        .catch(function(){});
+    }
+
+    function cerrarCanal(){
+        detenerPolling();
+        canalActivo = null;
+        ultimoMsgId = 0;
+        el('canalChatView').style.display = 'none';
+        el('canalEmpty').style.display = 'flex';
+        renderCanales();
+    }
+
+    function renderMensajes(msgs){
+        var container = el('canalMensajes');
+        if(!container) return;
+        if(!msgs || msgs.length === 0){
+            container.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">No hay mensajes. S&eacute; el primero en escribir.</div>';
+            return;
+        }
+        var html = '';
+        for(var i=0;i<msgs.length;i++){
+            var m = msgs[i];
+            var esMio = (m.usuario_tipo === TIPO);
+            var autor = m.autor_nombre || (m.usuario_tipo === 'rector' ? 'Rector&iacute;a' : m.usuario_tipo);
+            if(esMio) autor = 'T&uacute;';
+            var fecha = m.fecha || '';
+            var horaStr = fecha.slice(11,16);
+            html += '<div class="canal-msg' + (esMio ? ' mio' : '') + '">'
+                + '<div class="canal-msg-autor">' + escHtml(autor) + '</div>'
+                + '<div class="canal-msg-texto">' + escHtml(m.mensaje) + '</div>'
+                + '<div class="canal-msg-fecha">' + horaStr + '</div></div>';
+        }
+        container.innerHTML = html;
+        scrollAbajo();
+    }
+
+    function agregarMensajes(msgs){
+        var container = el('canalMensajes');
+        if(!container) return;
+        var emptyMsg = container.querySelector('div[style*="text-align:center"]');
+        if(emptyMsg && msgs.length > 0) container.innerHTML = '';
+        for(var i=0;i<msgs.length;i++){
+            var m = msgs[i];
+            var esMio = (m.usuario_tipo === TIPO);
+            var autor = m.autor_nombre || (m.usuario_tipo === 'rector' ? 'Rector&iacute;a' : m.usuario_tipo);
+            if(esMio) autor = 'T&uacute;';
+            var fecha = m.fecha || '';
+            var horaStr = fecha.slice(11,16);
+            container.insertAdjacentHTML('beforeend',
+                '<div class="canal-msg' + (esMio ? ' mio' : '') + '">'
+                + '<div class="canal-msg-autor">' + escHtml(autor) + '</div>'
+                + '<div class="canal-msg-texto">' + escHtml(m.mensaje) + '</div>'
+                + '<div class="canal-msg-fecha">' + horaStr + '</div></div>');
+        }
+        scrollAbajo();
+    }
+
+    function scrollAbajo(){
+        var container = el('canalMensajes');
+        if(container) setTimeout(function(){ container.scrollTop = container.scrollHeight; }, 20);
+    }
+
+    function enviarMensaje(){
+        var input = el('canalMsgInput');
+        if(!input || !input.value.trim() || !canalActivo) return;
+        var msg = input.value.trim();
+        input.value = '';
+        input.focus();
+        var fd = new FormData();
+        fd.append('mensaje', msg);
+        fetch('/' + SLUG + '/api/canales/' + canalActivo + '/enviar', {method:'POST', body:fd, headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(d){
+            if(d.ok && d.mensaje_id){
+                var container = el('canalMensajes');
+                if(container){
+                    var emptyMsg = container.querySelector('div[style*="text-align:center"]');
+                    if(emptyMsg) container.innerHTML = '';
+                    var now = new Date();
+                    var h = ('0' + now.getHours()).slice(-2);
+                    var m = ('0' + now.getMinutes()).slice(-2);
+                    container.insertAdjacentHTML('beforeend',
+                        '<div class="canal-msg mio">'
+                        + '<div class="canal-msg-autor">T&uacute;</div>'
+                        + '<div class="canal-msg-texto">' + escHtml(msg) + '</div>'
+                        + '<div class="canal-msg-fecha">' + h + ':' + m + '</div></div>');
+                    scrollAbajo();
+                }
+                if(d.mensaje_id > ultimoMsgId) ultimoMsgId = d.mensaje_id;
+            }
+        })
+        .catch(function(){});
+    }
+
+    function iniciarPolling(){
+        detenerPolling();
+        pollTimer = setInterval(function(){
+            if(!canalActivo){ detenerPolling(); return; }
+            fetch('/' + SLUG + '/api/canales/' + canalActivo + '/mensajes/nuevos?ultimo_id=' + ultimoMsgId)
+            .then(function(r){return r.json()})
+            .then(function(d){
+                if(d.ok && d.mensajes && d.mensajes.length > 0){
+                    agregarMensajes(d.mensajes);
+                    for(var i=0;i<d.mensajes.length;i++){
+                        if(d.mensajes[i].id > ultimoMsgId) ultimoMsgId = d.mensajes[i].id;
+                    }
+                }
+            })
+            .catch(function(){});
+        }, 3000);
+    }
+
+    function detenerPolling(){
+        if(pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+    }
+
+    function initDOM(){
+        var lista = el('canalesLista');
+        if(lista) lista.addEventListener('click', function(e){
+            var item = e.target.closest('.canal-list-item');
+            if(item){ var cid = parseInt(item.getAttribute('data-cid')); if(cid) abrirCanal(cid); }
+        });
+        var backBtn = el('canalChatBack');
+        if(backBtn) backBtn.addEventListener('click', cerrarCanal);
+        var sendBtn = el('canalSendBtn');
+        if(sendBtn) sendBtn.addEventListener('click', enviarMensaje);
+        var inp = el('canalMsgInput');
+        if(inp) inp.addEventListener('keydown', function(e){
+            if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); enviarMensaje(); }
+        });
+    }
+
+    initDOM();
+
+    return { cargar: cargarCanales, abrir: abrirCanal, cerrar: cerrarCanal };
+}
+
+var canales = crearSistemaCanales({prefix:'', tipoUsuario:'profesor', slug:slug, getCsrf:getCsrf});
 </script>
 <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}
