@@ -183,6 +183,12 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .pc{font-weight:700;font-size:12px;}
 .ph{color:var(--green);}.pm{color:var(--yellow);}.pb{color:var(--red);}
 
+/* ── Locked period ──────────────────────────────────────────────────── */
+.td-locked{position:relative;}
+.td-locked .ni{opacity:.5;cursor:not-allowed;background:var(--bg);}
+.lock-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;color:var(--muted);cursor:pointer;opacity:.6;transition:opacity var(--tr);}
+.lock-overlay:hover{opacity:1;color:var(--red);}
+
 /* ── Attendance ─────────────────────────────────────────────────────── */
 .asist-wrap{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:nowrap;}
 .asist-badge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;font-size:11px;font-weight:800;transition:all .2s ease;}
@@ -579,6 +585,11 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     {{ p }}° P
   </a>
   {% endfor %}
+  {% if periodo_cerrado %}
+  <span style="margin-left:6px;font-size:10px;padding:3px 8px;border-radius:99px;background:rgba(239,68,68,.1);color:var(--red);font-weight:600;">
+    <i class="fas fa-lock"></i> Cerrado
+  </span>
+  {% endif %}
 </div>
 
 <div class="stats">
@@ -666,16 +677,18 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                 <td class="tnum">{{ e.num_curso }}</td>
                 <td class="tnombrecell" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">{{ e.nombre }}</td>
                 {% for act in actividades %}
-                <td>
+                <td class="{% if periodo_cerrado %}td-locked{% endif %}">
                     {% set nota = e.notas_map.get(act.id) %}
                     <input class="ni nota-input" type="number" min="0" max="5" step="0.1"
                            value="{{ nota.val if nota else '' }}" placeholder="—"
                            data-aid="{{ e.id }}" data-actid="{{ act.id }}"
+                           {% if periodo_cerrado %}disabled{% endif %}
                            onchange="guardarNota(this)">
+                    {% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},{{ act.id }},{{ nota.val if nota else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','{{ act.nombre|replace("'", "\\'") }}')" title="Solicitar modificación"><i class="fas fa-lock"></i></span>{% endif %}
                 </td>
                 {% endfor %}
-                <td><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="evaluacion" onchange="guardarEval(this)"></td>
-                <td><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="autoevaluacion" onchange="guardarEval(this)"></td>
+                <td class="{% if periodo_cerrado %}td-locked{% endif %}"><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="evaluacion" {% if periodo_cerrado %}disabled{% endif %} onchange="guardarEval(this)">{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.evaluacion if e.evaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Evaluación')" title="Solicitar modificación"><i class="fas fa-lock"></i></span>{% endif %}</td>
+                <td class="{% if periodo_cerrado %}td-locked{% endif %}"><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="autoevaluacion" {% if periodo_cerrado %}disabled{% endif %} onchange="guardarEval(this)">{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.autoevaluacion if e.autoevaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Autoevaluación')" title="Solicitar modificación"><i class="fas fa-lock"></i></span>{% endif %}</td>
                 <td class="pc prom-cell" id="prom-{{ e.id }}">
                     <span class="{% if e.promedio is not none and e.promedio>=3.5 %}ph{% elif e.promedio is not none and e.promedio>=3.0 %}pm{% elif e.promedio is not none %}pb{% endif %}">
                         {{ e.promedio if e.promedio is not none else '—' }}
@@ -721,6 +734,41 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         <input type="text" id="oTexto" placeholder="Escribir observación...">
         <button class="bsm badd" onclick="guardarObs()">Guardar</button>
     </div>
+</div>
+</div>
+
+<div class="overlay" id="modalSolicitud" onclick="if(event.target===this)cerrarSolicitud()">
+<div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3><i class="fas fa-pen" style="color:var(--accent);"></i> Solicitar modificación</h3>
+        <button onclick="cerrarSolicitud()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--sub);margin-bottom:12px;">
+        El periodo esta cerrado. Solicite una modificacion al rector.
+    </p>
+    <div style="margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Estudiante</div>
+        <div id="sol-alumno" style="font-size:13px;font-weight:600;"></div>
+    </div>
+    <div style="margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Actividad</div>
+        <div id="sol-actividad" style="font-size:13px;font-weight:600;"></div>
+    </div>
+    <div style="margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Nota actual</div>
+        <div id="sol-nota-actual" style="font-size:13px;font-weight:600;"></div>
+    </div>
+    <div style="margin-bottom:12px;">
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Nueva nota</label>
+        <input type="number" id="sol-nota-nueva" min="0" max="5" step="0.1" style="width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-size:13px;font-family:'Inter',sans-serif;">
+    </div>
+    <div style="margin-bottom:12px;">
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Motivo</label>
+        <textarea id="sol-motivo" rows="3" placeholder="Indique el motivo de la solicitud..." style="width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;resize:vertical;"></textarea>
+    </div>
+    <button onclick="enviarSolicitud()" class="bsm badd" style="width:100%;padding:10px;font-size:13px;">
+        <i class="fas fa-paper-plane"></i> Enviar solicitud
+    </button>
 </div>
 </div>
 
@@ -953,6 +1001,56 @@ function cerrarObs(){
     document.getElementById('modalObs').classList.remove('open');
     _aidObs = null;
 }
+
+/* ── Solicitar modificación (periodo cerrado) ──────────────────────── */
+var _solAid = null, _solActid = null, _solActividad = '';
+
+function abrirSolicitud(aid, actid, notaActual, nombre, actividad){
+    _solAid = aid;
+    _solActid = actid;
+    _solActividad = actividad;
+    document.getElementById('sol-alumno').textContent = nombre;
+    document.getElementById('sol-actividad').textContent = actividad;
+    document.getElementById('sol-nota-actual').textContent = notaActual !== null ? notaActual : '—';
+    document.getElementById('sol-nota-nueva').value = notaActual !== null ? notaActual : '';
+    document.getElementById('sol-motivo').value = '';
+    document.getElementById('modalSolicitud').classList.add('open');
+}
+
+function cerrarSolicitud(){
+    document.getElementById('modalSolicitud').classList.remove('open');
+}
+
+function enviarSolicitud(){
+    const notaNueva = document.getElementById('sol-nota-nueva').value.trim();
+    const motivo = document.getElementById('sol-motivo').value.trim();
+    if(!notaNueva || !motivo){
+        showToast('✘ Complete la nota y el motivo');
+        return;
+    }
+    const f = new FormData();
+    f.append('alumno_id', _solAid);
+    f.append('actividad_id', _solActid !== null ? _solActid : '');
+    f.append('nombre_actividad', _solActividad);
+    f.append('periodo', periodoSel);
+    f.append('nota_actual', document.getElementById('sol-nota-actual').textContent === '—' ? '' : document.getElementById('sol-nota-actual').textContent);
+    f.append('nota_solicitada', notaNueva);
+    f.append('motivo', motivo);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/solicitar_modificacion', {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                showToast('<i class="fas fa-check-circle"></i> Solicitud enviada al rector');
+                cerrarSolicitud();
+            } else if(r.status === 423){
+                showToast('✘ El periodo esta cerrado');
+            } else {
+                showToast('✘ Error al enviar solicitud');
+            }
+        })
+        .catch(function(){ showToast('✘ Error de conexión'); });
+}
+
 function addDataLabels(){
     document.querySelectorAll('table').forEach(function(t){
         var ths = t.querySelectorAll('thead th');

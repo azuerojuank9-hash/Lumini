@@ -686,6 +686,30 @@ def init_db(slug):
             usuario_id INTEGER NOT NULL,
             fecha_lectura TEXT DEFAULT (datetime('now','localtime')),
             UNIQUE(mensaje_id, usuario_tipo, usuario_id))''',
+        '''CREATE TABLE IF NOT EXISTS periodos_estado (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            periodo INTEGER NOT NULL UNIQUE,
+            estado TEXT NOT NULL DEFAULT 'abierto',
+            fecha_apertura TEXT,
+            fecha_cierre TEXT,
+            abierto_por INTEGER,
+            cerrado_por INTEGER)''',
+        '''CREATE TABLE IF NOT EXISTS solicitudes_modificacion (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            periodo INTEGER NOT NULL,
+            aid INTEGER NOT NULL,
+            actividad_id INTEGER,
+            campo TEXT DEFAULT 'nota',
+            materia TEXT,
+            nota_actual REAL,
+            nota_solicitada REAL NOT NULL,
+            motivo TEXT NOT NULL,
+            estado TEXT NOT NULL DEFAULT 'pendiente',
+            solicitado_por INTEGER NOT NULL,
+            revisado_por INTEGER,
+            respuesta TEXT,
+            creado TEXT DEFAULT (datetime('now','localtime')),
+            actualizado TEXT DEFAULT (datetime('now','localtime')))''',
     ]
     for s in stmts:
         conn.execute(s)
@@ -772,7 +796,9 @@ PERMISOS_POR_CODIGO = {
     'authority': ['people.teachers.view', 'people.students.view',
         'structure.courses.manage', 'structure.subjects.manage',
         'academic.grades.view', 'academic.grades.write', 'academic.grades.approve',
-        'academic.grades.history',
+        'academic.grades.history', 'academico.periodos.cerrar',
+        'academico.periodos.abrir', 'academico.notas.aprobar',
+        'academico.notas.modificar_cerrado',
         'academic.attendance.view',
         'academic.observations.view', 'academic.observations.write',
         'academic.evaluations.create', 'academic.evaluations.edit',
@@ -839,6 +865,17 @@ def requiere_permiso(permiso, obtener_entidad=None):
             return f(*args, **kwargs)
         return wrapper
     return decorator
+
+# ── PERIOD HELPERS ────────────────────────────────────────────────────────────
+def periodo_cerrado(slug, periodo, conn=None):
+    cerrar_propia = conn or conectar(slug)
+    try:
+        row = cerrar_propia.execute(
+            'SELECT estado FROM periodos_estado WHERE periodo=?',
+            (periodo,)).fetchone()
+        return row is not None and row['estado'] == 'cerrado'
+    finally:
+        if not conn: cerrar_propia.close()
 
 # ── AUDIT HELPER ──────────────────────────────────────────────────────────────
 def audit_log(slug, usuario_id, accion, tabla, registro_id=None, valor_anterior=None, valor_nuevo=None):
@@ -1644,6 +1681,10 @@ def home(slug):
         conn.close()
     pendientes = comunicaciones_pendientes(slug, 'profesor', prof['id'])
     num_periodos = int(colegio['num_periodos']) if colegio and colegio['num_periodos'] else 4
+    pc = periodo_cerrado(slug, periodo_sel) if curso_sel and materia else False
+    solicitudes_pend = conn.execute(
+        'SELECT COUNT(*) as c FROM solicitudes_modificacion WHERE solicitado_por=? AND estado=?',
+        (prof['id'], 'pendiente')).fetchone()['c'] if curso_sel else 0
     return render_template('index.html',
                            profesor=prof, mis_cursos=mis_cursos, curso_sel=curso_sel,
                            estudiantes=datos, actividades=actividades, compromisos=agenda,
@@ -1654,8 +1695,10 @@ def home(slug):
                            hoy_nombre=hoy_nombre, hoy_fecha=hoy_fecha,
                            total_alumnos=total_alumnos, horario_hoy=horario_hoy,
                            asistencia_hoy=asistencia_hoy, notas_pend=notas_pend,
-                           alertas=alertas,
-                           comunicaciones_pendientes=pendientes)
+                            alertas=alertas,
+                            periodo_cerrado=pc,
+                            solicitudes_pendientes_mod=solicitudes_pend,
+                            comunicaciones_pendientes=pendientes)
 
 # ── ACTIVIDADES ───────────────────────────────────────────────────────────────
 @app.route('/<slug>/nueva_actividad', methods=['POST'])
@@ -1708,13 +1751,27 @@ def guardar_nota(slug):
     val          = request.form.get('val', type=float)
     if None in (aid, actividad_id, val): return ('', 400)
     conn = conectar(slug)
-    act = conn.execute('SELECT id FROM actividades WHERE id=?', (actividad_id,)).fetchone()
-    if act:
-        conn.execute(
-            '''INSERT INTO notas (aid,actividad_id,val) VALUES (?,?,?)
-               ON CONFLICT(aid,actividad_id) DO UPDATE SET val=excluded.val''',
-            (aid, actividad_id, val))
-        conn.commit()
+    act = conn.execute(
+        'SELECT a.id, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
+        (actividad_id,)).fetchone()
+    if not act:
+        conn.close()
+        return ('', 404)
+    if periodo_cerrado(slug, act['p'], conn):
+        conn.close()
+        return ('Periodo cerrado', 423)
+    old = conn.execute(
+        'SELECT val FROM notas WHERE aid=? AND actividad_id=?',
+        (aid, actividad_id)).fetchone()
+    old_val = old['val'] if old else None
+    conn.execute(
+        '''INSERT INTO notas (aid,actividad_id,val) VALUES (?,?,?)
+           ON CONFLICT(aid,actividad_id) DO UPDATE SET val=excluded.val''',
+        (aid, actividad_id, val))
+    conn.commit()
+    audit_log(slug, prof['id'], 'nota_editada', 'notas', registro_id=None,
+              valor_anterior={'aid': aid, 'actividad_id': actividad_id, 'val': old_val},
+              valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'val': val})
     conn.close()
     return ('', 204)
 
@@ -1732,13 +1789,18 @@ def guardar_evaluacion(slug):
     periodo = request.form.get('periodo', 1, type=int)
     if aid is None: return ('', 400)
     conn = conectar(slug)
+    if periodo_cerrado(slug, periodo, conn):
+        conn.close()
+        return ('Periodo cerrado', 423)
     existing = conn.execute(
         '''SELECT evaluacion, autoevaluacion FROM evaluaciones
            WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
         (aid, prof['id'], materia, jornada, periodo)
     ).fetchone()
-    ev_final = ev if ev is not None else (existing['evaluacion'] if existing else None)
-    au_final = au if au is not None else (existing['autoevaluacion'] if existing else None)
+    old_eval = existing['evaluacion'] if existing else None
+    old_auto = existing['autoevaluacion'] if existing else None
+    ev_final = ev if ev is not None else old_eval
+    au_final = au if au is not None else old_auto
     conn.execute(
         '''INSERT INTO evaluaciones
            (aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
@@ -1746,8 +1808,72 @@ def guardar_evaluacion(slug):
            ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
            DO UPDATE SET evaluacion=excluded.evaluacion, autoevaluacion=excluded.autoevaluacion''',
         (aid, prof['id'], materia, jornada, ev_final, au_final, periodo))
-    conn.commit(); conn.close()
+    conn.commit()
+    audit_log(slug, prof['id'], 'evaluacion_editada', 'evaluaciones', registro_id=None,
+              valor_anterior={'aid': aid, 'evaluacion': old_eval, 'autoevaluacion': old_auto},
+              valor_nuevo={'aid': aid, 'evaluacion': ev_final, 'autoevaluacion': au_final})
+    conn.close()
     return ('', 204)
+
+# ── SOLICITUDES DE MODIFICACION ──────────────────────────────────────────────
+@app.route('/<slug>/solicitar_modificacion', methods=['POST'])
+def solicitar_modificacion(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof: return ('', 403)
+    if not validar_csrf(): return ('Error CSRF', 403)
+    aid              = request.form.get('alumno_id', request.form.get('aid'), type=int)
+    actividad_id     = request.form.get('actividad_id', type=int)
+    nombre_actividad = request.form.get('nombre_actividad', '').strip()
+    periodo          = request.form.get('periodo', type=int)
+    nota_actual_raw  = request.form.get('nota_actual', '').strip()
+    nota_solicitada  = request.form.get('nota_solicitada', type=float)
+    motivo           = request.form.get('motivo', '').strip()
+    if None in (aid, nota_solicitada) or not motivo:
+        return ('Datos incompletos', 400)
+    if periodo is None:
+        periodo = 1
+    conn = conectar(slug)
+    campo = 'nota'
+    materia = ''
+    nota_actual_val = None
+    if actividad_id is not None:
+        act = conn.execute(
+            'SELECT a.id, a.nombre, a.materia, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
+            (actividad_id,)).fetchone()
+        if not act:
+            conn.close()
+            return ('Actividad no encontrada', 404)
+        materia = act['materia']
+        nota_db = conn.execute(
+            'SELECT val FROM notas WHERE aid=? AND actividad_id=?',
+            (aid, actividad_id)).fetchone()
+        nota_actual_val = nota_db['val'] if nota_db else None
+    else:
+        if nombre_actividad == 'Evaluación':
+            campo = 'evaluacion'
+            alumno = conn.execute('SELECT evaluacion FROM alumnos WHERE id=?', (aid,)).fetchone()
+            nota_actual_val = alumno['evaluacion'] if alumno else None
+        elif nombre_actividad == 'Autoevaluación':
+            campo = 'autoevaluacion'
+            alumno = conn.execute('SELECT autoevaluacion FROM alumnos WHERE id=?', (aid,)).fetchone()
+            nota_actual_val = alumno['autoevaluacion'] if alumno else None
+        else:
+            conn.close()
+            return ('Actividad no especificada', 400)
+    conn.execute(
+        '''INSERT INTO solicitudes_modificacion
+           (periodo, aid, actividad_id, campo, materia, nota_actual, nota_solicitada, motivo, solicitado_por)
+           VALUES (?,?,?,?,?,?,?,?,?)''',
+        (periodo, aid, actividad_id, campo, materia,
+         nota_actual_val, nota_solicitada, motivo, prof['id']))
+    conn.commit()
+    audit_log(slug, prof['id'], 'solicitud_creada', 'solicitudes_modificacion',
+              valor_anterior={'aid': aid, 'actividad_id': actividad_id, 'campo': campo, 'val': nota_actual_val},
+              valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'campo': campo, 'val': nota_solicitada,
+                           'motivo': motivo})
+    conn.close()
+    return redirect(url_for('home', slug=slug))
 
 # ── AGENDA ────────────────────────────────────────────────────────────────────
 @app.route('/<slug>/nuevo_trabajo', methods=['POST'])
@@ -2674,11 +2800,109 @@ def rector_configuracion(slug):
             exito = 'Configuración institucional guardada.'
 
     config = config_get(slug)
+    periodos_estado = conn.execute(
+        'SELECT * FROM periodos_estado ORDER BY periodo').fetchall()
     conn.close()
     return render_template('rector_configuracion.html',
                            slug=slug, colegio=colegio, rector=rector,
                            config=config, error=error, exito=exito,
-                            notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+                           periodos_estado={r['periodo']: dict(r) for r in periodos_estado},
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+@app.route('/<slug>/rector/periodos/<int:periodo>/<accion>', methods=['POST'])
+def rector_periodo_accion(slug, periodo, accion):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return ('No autorizado', 403)
+    if not validar_csrf(): return ('Error CSRF', 403)
+    if accion not in ('abrir', 'cerrar'): return ('Accion invalida', 400)
+    conn = conectar(slug)
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    if accion == 'cerrar':
+        conn.execute('''INSERT INTO periodos_estado (periodo, estado, fecha_cierre, cerrado_por)
+                        VALUES (?, 'cerrado', ?, ?)
+                        ON CONFLICT(periodo) DO UPDATE SET estado='cerrado', fecha_cierre=?, cerrado_por=?''',
+                     (periodo, now, rector['id'], now, rector['id']))
+        audit_log(slug, rector['id'], 'periodo_cerrado', 'periodos_estado', registro_id=periodo)
+    else:
+        conn.execute('''INSERT INTO periodos_estado (periodo, estado, fecha_apertura, abierto_por)
+                        VALUES (?, 'abierto', ?, ?)
+                        ON CONFLICT(periodo) DO UPDATE SET estado='abierto', fecha_apertura=?, abierto_por=?''',
+                     (periodo, now, rector['id'], now, rector['id']))
+        audit_log(slug, rector['id'], 'periodo_abierto', 'periodos_estado', registro_id=periodo)
+    conn.commit()
+    conn.close()
+    return redirect(url_for('rector_configuracion', slug=slug, _anchor='periodos'))
+
+@app.route('/<slug>/rector/solicitudes')
+def rector_solicitudes(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    conn = conectar(slug)
+    solicitudes = conn.execute(
+        '''SELECT s.*, a.nombre as alumno_nombre, p.nombre as profesor_nombre,
+                  COALESCE(ac.nombre, s.campo) as actividad_nombre
+           FROM solicitudes_modificacion s
+           JOIN alumnos a ON a.id=s.aid
+           LEFT JOIN actividades ac ON ac.id=s.actividad_id
+           JOIN profesores p ON p.id=s.solicitado_por
+           ORDER BY s.creado DESC''').fetchall()
+    conn.close()
+    return render_template('rector_solicitudes.html',
+                           slug=slug, colegio=get_colegio(slug), rector=rector,
+                           solicitudes=[dict(s) for s in solicitudes],
+                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+@app.route('/<slug>/rector/solicitudes/<int:sid>/<accion>', methods=['POST'])
+def rector_solicitud_accion(slug, sid, accion):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return ('No autorizado', 403)
+    if not validar_csrf(): return ('Error CSRF', 403)
+    if accion not in ('aprobar', 'rechazar'): return ('Accion invalida', 400)
+    conn = conectar(slug)
+    sol = conn.execute(
+        'SELECT * FROM solicitudes_modificacion WHERE id=?', (sid,)).fetchone()
+    if not sol:
+        conn.close()
+        return ('Solicitud no encontrada', 404)
+    respuesta = request.form.get('respuesta', '').strip()
+    if accion == 'aprobar':
+        conn.execute(
+            '''UPDATE solicitudes_modificacion
+               SET estado='aprobada', revisado_por=?, respuesta=?, actualizado=datetime('now','localtime')
+               WHERE id=?''',
+            (rector['id'], respuesta, sid))
+        campo = sol['campo'] or 'nota'
+        if campo == 'nota' and sol['actividad_id'] is not None:
+            conn.execute(
+                '''INSERT INTO notas (aid,actividad_id,val) VALUES (?,?,?)
+                   ON CONFLICT(aid,actividad_id) DO UPDATE SET val=excluded.val''',
+                (sol['aid'], sol['actividad_id'], sol['nota_solicitada']))
+        elif campo == 'evaluacion':
+            conn.execute('UPDATE alumnos SET evaluacion=? WHERE id=?',
+                         (sol['nota_solicitada'], sol['aid']))
+        elif campo == 'autoevaluacion':
+            conn.execute('UPDATE alumnos SET autoevaluacion=? WHERE id=?',
+                         (sol['nota_solicitada'], sol['aid']))
+        audit_log(slug, rector['id'], 'solicitud_aprobada', 'solicitudes_modificacion',
+                  registro_id=sid,
+                  valor_anterior={'aid': sol['aid'], 'actividad_id': sol['actividad_id'],
+                                  'campo': campo, 'val': sol['nota_actual']},
+                  valor_nuevo={'aid': sol['aid'], 'actividad_id': sol['actividad_id'],
+                               'campo': campo, 'val': sol['nota_solicitada']})
+    else:
+        conn.execute(
+            '''UPDATE solicitudes_modificacion
+               SET estado='rechazada', revisado_por=?, respuesta=?, actualizado=datetime('now','localtime')
+               WHERE id=?''',
+            (rector['id'], respuesta, sid))
+        audit_log(slug, rector['id'], 'solicitud_rechazada', 'solicitudes_modificacion',
+                  registro_id=sid)
+    conn.commit()
+    conn.close()
+    return redirect(url_for('rector_solicitudes', slug=slug))
 
 @app.route('/<slug>/rector/auditoria')
 def rector_auditoria(slug):
