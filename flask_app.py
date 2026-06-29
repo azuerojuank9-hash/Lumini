@@ -1023,16 +1023,16 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
         story.append(t)
         if final is not None: todos_finales.append(final)
 
-    prom_general = round(sum(todos_finales) / len(todos_finales), 2) if todos_finales else 0
+    prom_general = round(sum(todos_finales) / len(todos_finales), 2) if todos_finales else None
     story.append(Spacer(1, 0.5*cm))
+    estado = 'Pendiente' if prom_general is None else ('Aprobado' if prom_general >= 3.0 else 'Reprobado')
+    bg_color = pri_color if prom_general is not None and prom_general >= 3.0 else colors.HexColor('#e74c3c') if prom_general is not None else colors.HexColor('#64748B')
     resumen = Table(
-        [['PROMEDIO GENERAL', str(prom_general), 'ESTADO',
-          'Aprobado' if prom_general >= 3.0 else 'Reprobado']],
+        [['PROMEDIO GENERAL', str(prom_general) if prom_general is not None else '—', 'ESTADO', estado]],
         colWidths=[5*cm, 3*cm, 3*cm, 3*cm]
     )
     resumen.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, -1),
-         pri_color if prom_general >= 3.0 else colors.HexColor('#e74c3c')),
+        ('BACKGROUND', (0, 0), (-1, -1), bg_color),
         ('TEXTCOLOR',  (0, 0), (-1, -1), colors.white),
         ('FONTNAME',   (0, 0), (-1, -1), 'Helvetica-Bold'),
         ('FONTSIZE',   (0, 0), (-1, -1), 11),
@@ -1558,7 +1558,7 @@ def home(slug):
             todas = [nr['val'] for nr in notas_raw]
             if eval_v is not None: todas.append(eval_v)
             if auto_v is not None: todas.append(auto_v)
-            prom = round(sum(todas) / len(todas), 2) if todas else 0
+            prom = round(sum(todas) / len(todas), 2) if todas else None
             historial_raw = conn.execute(
                 'SELECT fecha, estado FROM asistencia WHERE aid=? ORDER BY fecha', (a['id'],)).fetchall()
             hist_meses = {}
@@ -1584,8 +1584,9 @@ def home(slug):
                 'observaciones': [dict(o) for o in obs],
             })
 
-        prom_gral = round(sum(d['promedio'] for d in datos) / len(datos), 2) if datos else 0
-        mejor     = max(datos, key=lambda x: x['promedio'], default={'nombre': 'N/A', 'promedio': 0})
+        promedios = [d['promedio'] for d in datos if d['promedio'] is not None]
+        prom_gral = round(sum(promedios) / len(promedios), 2) if promedios else None
+        mejor     = max(datos, key=lambda x: x['promedio'] or 0, default={'nombre': 'N/A', 'promedio': None})
 
         # ── Dashboard data ──────────────────────────────────────────────────
         DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
@@ -1623,7 +1624,7 @@ def home(slug):
             ).fetchall()
             for r in rows: alertas.append({'nombre': r['nombre'], 'faltas': r['faltas']})
             for e in datos:
-                if e['promedio'] > 0 and e['promedio'] < 3.0:
+                if e['promedio'] is not None and e['promedio'] < 3.0:
                     alertas.append({'nombre': e['nombre'], 'promedio': e['promedio']})
             alertas = alertas[:5]
     finally:
@@ -2253,7 +2254,7 @@ def vista_estudiante(slug):
     for e in evals_raw:
         if e['evaluacion']     is not None: todos_vals.append(e['evaluacion'])
         if e['autoevaluacion'] is not None: todos_vals.append(e['autoevaluacion'])
-    promedio_general = round(sum(todos_vals) / len(todos_vals), 2) if todos_vals else 0
+    promedio_general = round(sum(todos_vals) / len(todos_vals), 2) if todos_vals else None
     asist_raw   = conn.execute(
         'SELECT fecha, estado FROM asistencia WHERE aid=? ORDER BY fecha', (aid,)).fetchall()
     asist_stats = {'P': 0, 'A': 0, 'T': 0, 'total': 0}

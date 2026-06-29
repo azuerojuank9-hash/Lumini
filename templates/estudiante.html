@@ -1084,14 +1084,14 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-      <div class="valor {% if promedio_general >= 3.5 %}ok{% elif promedio_general >= 3.0 %}warn{% else %}bad{% endif %}">
+      <div class="valor {% if promedio_general is not none and promedio_general >= 3.5 %}ok{% elif promedio_general is not none and promedio_general >= 3.0 %}warn{% else %}bad{% endif %}">
 
 
 
 
 
 
-        {{ promedio_general if promedio_general > 0 else '—' }}
+        {{ promedio_general if promedio_general is not none else '—' }}
 
 
 
@@ -1405,14 +1405,14 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-          <span class="prom-badge {% if prom >= 3.5 %}prom-ok{% elif prom >= 3.0 %}prom-warn{% else %}prom-bad{% endif %}">
+          <span class="prom-badge {% if prom is not none and prom >= 3.5 %}prom-ok{% elif prom is not none and prom >= 3.0 %}prom-warn{% else %}prom-bad{% endif %}">
 
 
 
 
 
 
-            {{ prom if prom > 0 else '—' }}
+            {{ prom if prom is not none else '—' }}
 
 
 

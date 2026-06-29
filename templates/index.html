@@ -584,7 +584,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 <div class="stats">
     <div class="scard"><div class="slabel">Curso</div><div class="sval" style="background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{{ curso_sel }}</div></div>
     <div class="scard"><div class="slabel">Estudiantes</div><div class="sval" style="color:var(--accent);">{{ estudiantes|length }}</div></div>
-    <div class="scard"><div class="slabel">Prom. grupo</div><div class="sval {% if prom_general>=3.5 %}ph{% elif prom_general>=3.0 %}pm{% else %}pb{% endif %}" id="promGrupo">{{ prom_general }}</div></div>
+    <div class="scard"><div class="slabel">Prom. grupo</div><div class="sval {% if prom_general is not none and prom_general>=3.5 %}ph{% elif prom_general is not none and prom_general>=3.0 %}pm{% else %}pb{% endif %}" id="promGrupo">{{ prom_general if prom_general is not none else '—' }}</div></div>
     <div class="scard"><div class="slabel">Destacado</div><div class="sval" style="font-size:1rem;color:var(--accent);">{{ mejor.nombre }}</div></div>
 </div>
 
@@ -677,8 +677,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                 <td><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="evaluacion" onchange="guardarEval(this)"></td>
                 <td><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="autoevaluacion" onchange="guardarEval(this)"></td>
                 <td class="pc prom-cell" id="prom-{{ e.id }}">
-                    <span class="{% if e.promedio>=3.5 %}ph{% elif e.promedio>=3.0 %}pm{% elif e.promedio>0 %}pb{% endif %}">
-                        {{ e.promedio if e.promedio>0 else '—' }}
+                    <span class="{% if e.promedio is not none and e.promedio>=3.5 %}ph{% elif e.promedio is not none and e.promedio>=3.0 %}pm{% elif e.promedio is not none %}pb{% endif %}">
+                        {{ e.promedio if e.promedio is not none else '—' }}
                     </span>
                 </td>
                 <td>
