@@ -102,6 +102,7 @@
 
     <div id="tab-login" class="section active">
         <form method="POST" action="/{{ slug }}/directora/login">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <div class="field">
                 <label>Usuario</label>
                 <input type="text" name="usuario" placeholder="Tu usuario" required autocomplete="username" autofocus>
@@ -323,7 +324,7 @@ function recBuscar(){
     var err = document.getElementById('rec-err1');
     err.style.display = 'none';
     if(!usuario){ err.textContent='<i class="fas fa-exclamation-triangle"></i> Escribe tu usuario.'; err.style.display='block'; return; }
-    var f = new FormData(); f.append('usuario', usuario);
+    var f = new FormData(); f.append('usuario', usuario); f.append('_csrf_token', '{{ csrf_token() }}');
     fetch('/'+SLUG+'/directora/buscar_usuario_recuperar', {method:'POST', body:f})
         .then(function(r){ return r.json(); })
         .then(function(d){
@@ -356,6 +357,7 @@ function recCambiar(){
     f.append('usuario', usuario);
     f.append('respuesta', respuesta);
     f.append('nueva', nueva);
+    f.append('_csrf_token', '{{ csrf_token() }}');
     fetch('/'+SLUG+'/directora/cambiar_password_recuperar', {method:'POST', body:f})
         .then(function(r){ return r.json(); })
         .then(function(d){

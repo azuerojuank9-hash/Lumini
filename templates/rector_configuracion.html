@@ -81,6 +81,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i class="fas fa-user-graduate"></i></span><span>Estudiantes</span></a>
     <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i class="fas fa-book"></i></span><span>Cursos</span></a>
     <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i class="fas fa-chart-bar"></i></span><span>Reportes</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i class="fas fa-history"></i></span><span>Auditoría</span></a>
     <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
     {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i class="fas fa-user-shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
     <a href="/{{ slug }}/rector/configuracion" class="sidebar-item active"><span class="icon"><i class="fas fa-cog"></i></span><span>Configuración</span></a>
@@ -95,14 +96,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 <div class="topbar">
   <h1><i class="fas fa-cog" style="color:var(--accent);"></i> Configuración</h1>
-  <div class="breadcrumb">Administra tu perfil y contraseña</div>
+  <div class="breadcrumb">Administra los parámetros de la institución</div>
 </div>
 {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
 {% if exito %}<div class="alert alert-success">{{ exito }}</div>{% endif %}
+
 <div class="card">
   <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;"><i class="fas fa-user" style="color:var(--accent);"></i> Mi perfil</h3>
   <form method="POST">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="accion" value="perfil">
     <div class="field">
       <label>Nombre completo</label>
       <input type="text" name="nombre" value="{{ rector.nombre }}" required>
@@ -124,6 +127,103 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div style="margin-top:16px;">
       <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar cambios</button>
+    </div>
+  </form>
+</div>
+
+<div class="card" style="margin-top:24px;">
+  <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;"><i class="fas fa-university" style="color:var(--accent);"></i> Configuración institucional</h3>
+  <form method="POST">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="accion" value="institucion">
+
+    <h4 style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px;">Evaluación</h4>
+    <div class="field">
+      <label>Tipo de evaluación</label>
+      <select name="tipo_evaluacion" style="width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;">
+        <option value="numerica" {% if config.tipo_evaluacion == 'numerica' %}selected{% endif %}>Numérica (1.0 - 10.0)</option>
+        <option value="conceptual" {% if config.tipo_evaluacion == 'conceptual' %}selected{% endif %}>Conceptual (A - F)</option>
+        <option value="porcentaje" {% if config.tipo_evaluacion == 'porcentaje' %}selected{% endif %}>Porcentaje (0% - 100%)</option>
+        <option value="letras" {% if config.tipo_evaluacion == 'letras' %}selected{% endif %}>Letras (A, B, C, D, E, F)</option>
+      </select>
+      <div class="hint">Define cómo se ingresan y muestran las notas en todo el sistema.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+      <div class="field">
+        <label>Escala mínima</label>
+        <input type="number" name="escala_min" value="{{ config.escala_min or 1.0 }}" step="0.1">
+      </div>
+      <div class="field">
+        <label>Escala máxima</label>
+        <input type="number" name="escala_max" value="{{ config.escala_max or 10.0 }}" step="0.1">
+      </div>
+      <div class="field">
+        <label>Nota mínima aprobar</label>
+        <input type="number" name="nota_minima_aprobar" value="{{ config.nota_minima_aprobar or 6.0 }}" step="0.1">
+      </div>
+    </div>
+    <div class="field">
+      <label>Decimales en notas</label>
+      <input type="number" name="decimales_notas" value="{{ config.decimales_notas or 1 }}" min="0" max="2" style="width:100px;">
+    </div>
+
+    <hr class="separator">
+    <h4 style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px;">Períodos académicos</h4>
+    <div class="field">
+      <label>Número de períodos</label>
+      <input type="number" name="num_periodos" value="{{ config.num_periodos or 4 }}" min="1" max="6" style="width:100px;">
+      <div class="hint">Cantidad de períodos académicos en el año lectivo.</div>
+    </div>
+
+    <hr class="separator">
+    <h4 style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px;">Roles institucionales</h4>
+    <p style="font-size:12px;color:var(--sub);margin-bottom:12px;">Personaliza los nombres de los roles según la estructura de tu institución.</p>
+    {% set roles_data = config.roles_json|default('{}')|parse_json %}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="field">
+        <label>Rector / Director</label>
+        <input type="text" name="rol_rector" value="{{ roles_data.get('rector', 'Rector') }}">
+      </div>
+      <div class="field">
+        <label>Autoridad académica</label>
+        <input type="text" name="rol_authority" value="{{ roles_data.get('authority', 'Coordinador') }}">
+        <div class="hint">Coordinador, Decano, Director de programa...</div>
+      </div>
+      <div class="field">
+        <label>Docente</label>
+        <input type="text" name="rol_teacher" value="{{ roles_data.get('teacher', 'Docente') }}">
+        <div class="hint">Docente, Profesor, Instructor, Facilitador...</div>
+      </div>
+      <div class="field">
+        <label>Estudiante</label>
+        <input type="text" name="rol_student" value="{{ roles_data.get('student', 'Estudiante') }}">
+        <div class="hint">Estudiante, Alumno, Participante, Aprendiz...</div>
+      </div>
+      <div class="field">
+        <label>Acudiente</label>
+        <input type="text" name="rol_guardian" value="{{ roles_data.get('guardian', 'Acudiente') }}">
+        <div class="hint">Acudiente, Padre, Representante, Tutor...</div>
+      </div>
+    </div>
+
+    <hr class="separator">
+    <h4 style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px;">Jornadas</h4>
+    {% set jornadas_list = config.jornadas_json|default('["Mañana","Tarde","Nocturna"]')|parse_json %}
+    <div class="field">
+      <label>Jornadas disponibles</label>
+      <input type="text" name="jornadas" value="{{ jornadas_list|join(', ') }}" placeholder="Mañana, Tarde, Nocturna">
+      <div class="hint">Separadas por coma. Ej: Mañana, Tarde, Nocturna, Sabatina</div>
+    </div>
+
+    <hr class="separator">
+    <h4 style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:12px;">Comunicación</h4>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <input type="checkbox" name="acuse_recibo" id="acuse_recibo" value="1" {% if config.acuse_recibo %}checked{% endif %} style="width:18px;height:18px;">
+      <label for="acuse_recibo" style="font-size:13px;margin:0;">Registrar acuse de recibo en comunicados</label>
+    </div>
+
+    <div style="margin-top:20px;">
+      <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar configuración</button>
     </div>
   </form>
 </div>

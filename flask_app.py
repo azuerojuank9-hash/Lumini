@@ -13,6 +13,11 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = False
 
+@app.template_filter('parse_json')
+def parse_json_filter(val):
+    try: return json.loads(val) if val else {}
+    except: return {}
+
 # ── LOGGING ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
@@ -124,6 +129,181 @@ def verificar_pw(plano, guardada):
 def necesita_rehash(guardada):
     return '$' not in guardada
 
+# ── SCHEMA VERSIONING ──────────────────────────────────────────────────────────
+SCHEMA_VERSION = 10
+
+def _ejecutar_migraciones(slug, conn):
+    conn.execute('''CREATE TABLE IF NOT EXISTS schema_meta (
+        version INTEGER PRIMARY KEY,
+        applied_at TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+    conn.commit()
+    row = conn.execute('SELECT COALESCE(MAX(version), 0) as v FROM schema_meta').fetchone()
+    current = row['v'] if row else 0
+    for v in range(current + 1, SCHEMA_VERSION + 1):
+        mig_fn = MIGRACIONES.get(v)
+        if mig_fn:
+            logger.info(f"[{slug}] Migrando a versión {v}...")
+            mig_fn(conn, slug)
+            conn.execute('INSERT OR IGNORE INTO schema_meta (version) VALUES (?)', (v,))
+            conn.commit()
+            logger.info(f"[{slug}] Versión {v} aplicada.")
+
+def _migrar_v6(conn, slug=None):
+    conn.execute('''CREATE TABLE IF NOT EXISTS usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        email TEXT NOT NULL,
+        password_hash TEXT,
+        nombre TEXT NOT NULL,
+        apellido TEXT DEFAULT '',
+        tipo_documento TEXT DEFAULT '',
+        documento TEXT DEFAULT '',
+        telefono TEXT DEFAULT '',
+        avatar TEXT DEFAULT '',
+        activo INTEGER DEFAULT 1,
+        creado TEXT DEFAULT (datetime('now','localtime')),
+        actualizado TEXT DEFAULT (datetime('now','localtime')),
+        ultimo_acceso TEXT,
+        UNIQUE(slug, email)
+    )''')
+
+def _migrar_v7(conn, slug=None):
+    conn.execute('''CREATE TABLE IF NOT EXISTS roles_base (
+        codigo TEXT PRIMARY KEY,
+        nombre_default TEXT NOT NULL,
+        nivel INTEGER NOT NULL,
+        descripcion TEXT
+    )''')
+    roles_default = [
+        ('admin',     'Administrador',     0, 'Acceso global al sistema'),
+        ('rector',    'Rector',            1, 'Máxima autoridad institucional'),
+        ('authority', 'Autoridad Académica',2, 'Coordinadores, decanos, directores'),
+        ('teacher',   'Docente',           3, 'Profesores e instructores'),
+        ('student',   'Estudiante',         4, 'Alumnos y participantes'),
+        ('guardian',  'Acudiente',          5, 'Padres y representantes'),
+    ]
+    for cod, nom, niv, desc in roles_default:
+        conn.execute('INSERT OR IGNORE INTO roles_base (codigo, nombre_default, nivel, descripcion) VALUES (?,?,?,?)',
+                    (cod, nom, niv, desc))
+    conn.execute('''CREATE TABLE IF NOT EXISTS roles_instancia (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        codigo TEXT NOT NULL,
+        nombre TEXT NOT NULL,
+        jerarquia INTEGER DEFAULT 1,
+        activo INTEGER DEFAULT 1,
+        UNIQUE(slug, codigo)
+    )''')
+
+def _migrar_v8(conn, slug=None):
+    conn.execute('''CREATE TABLE IF NOT EXISTS usuarios_roles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id INTEGER NOT NULL,
+        rol_id INTEGER NOT NULL,
+        entidad_tipo TEXT,
+        entidad_id INTEGER,
+        asignado_por INTEGER,
+        creado TEXT DEFAULT (datetime('now','localtime')),
+        UNIQUE(usuario_id, rol_id, entidad_tipo, entidad_id)
+    )''')
+    conn.execute('''CREATE TABLE IF NOT EXISTS password_resets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id INTEGER NOT NULL,
+        token TEXT UNIQUE NOT NULL,
+        expira TEXT NOT NULL,
+        usado INTEGER DEFAULT 0,
+        creado TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+
+def _migrar_v9(conn, slug=None):
+    conn.execute('''CREATE TABLE IF NOT EXISTS config_institucion (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL UNIQUE,
+        tipo_evaluacion TEXT DEFAULT 'numerica',
+        escala_min REAL DEFAULT 1.0,
+        escala_max REAL DEFAULT 10.0,
+        nota_minima_aprobar REAL DEFAULT 6.0,
+        decimales_notas INTEGER DEFAULT 1,
+        creditos_activo INTEGER DEFAULT 0,
+        escala_conceptual TEXT DEFAULT '["A","B","C","D","E","F"]',
+        num_periodos INTEGER DEFAULT 4,
+        periodos_json TEXT,
+        jornadas_json TEXT,
+        jerarquia_activa INTEGER DEFAULT 0,
+        niveles_json TEXT,
+        roles_json TEXT,
+        acuse_recibo INTEGER DEFAULT 1,
+        firmas_activas INTEGER DEFAULT 0,
+        notas_publicas_entre_pares INTEGER DEFAULT 0,
+        idioma TEXT DEFAULT 'es',
+        huso_horario TEXT DEFAULT 'America/Bogota',
+        updated_at TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+    if slug:
+        conn.execute('''INSERT OR IGNORE INTO config_institucion
+            (slug, num_periodos, jornadas_json, roles_json)
+            VALUES (?, 4, '["Mañana","Tarde","Nocturna"]',
+            '{"rector":"Rector","authority":"Coordinador","teacher":"Docente","student":"Estudiante","guardian":"Acudiente"}')''',
+            (slug,))
+
+def _migrar_v10(conn, slug=None):
+    conn.execute('''CREATE TABLE IF NOT EXISTS audit_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id INTEGER,
+        accion TEXT NOT NULL,
+        tabla TEXT NOT NULL,
+        registro_id INTEGER,
+        valor_anterior TEXT,
+        valor_nuevo TEXT,
+        ip TEXT,
+        user_agent TEXT,
+        creado TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_audit_tabla ON audit_log(tabla, registro_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_audit_usuario ON audit_log(usuario_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_audit_fecha ON audit_log(creado)')
+    conn.execute('''CREATE TABLE IF NOT EXISTS estructura_academica (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        nivel INTEGER NOT NULL,
+        nombre TEXT NOT NULL,
+        nombre_tipo TEXT DEFAULT '',
+        padre_id INTEGER,
+        activo INTEGER DEFAULT 1,
+        UNIQUE(slug, nivel, nombre)
+    )''')
+    conn.execute('''CREATE TABLE IF NOT EXISTS curso_nuevo (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        estructura_id INTEGER,
+        nombre TEXT NOT NULL,
+        jornada TEXT DEFAULT 'Mañana',
+        activo INTEGER DEFAULT 1
+    )''')
+    conn.execute('''CREATE TABLE IF NOT EXISTS materias (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        nombre TEXT NOT NULL,
+        activo INTEGER DEFAULT 1,
+        UNIQUE(slug, nombre)
+    )''')
+    conn.execute('''CREATE TABLE IF NOT EXISTS curso_materias (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        curso_id INTEGER NOT NULL,
+        materia_id INTEGER NOT NULL,
+        docente_id INTEGER,
+        UNIQUE(curso_id, materia_id)
+    )''')
+
+MIGRACIONES = {
+    6:  _migrar_v6,
+    7:  _migrar_v7,
+    8:  _migrar_v8,
+    9:  _migrar_v9,
+    10: _migrar_v10,
+}
+
 # ── MASTER DB ─────────────────────────────────────────────────────────────────
 def conectar_master():
     c = sqlite3.connect(MASTER_DB, timeout=30)
@@ -156,9 +336,11 @@ def init_master_db():
         'codigo_profesores TEXT DEFAULT ""',
         'codigo_directoras TEXT DEFAULT ""',
         'codigo_rectores TEXT DEFAULT ""',
+        'schema_version INTEGER DEFAULT 0',
     ]:
         try: conn.execute(f'ALTER TABLE colegios ADD COLUMN {col}')
-        except Exception: pass
+        except sqlite3.OperationalError:
+            logger.debug(f'Columna ya existe en colegios: {col.split()[0]}')
     # Migrar codigo_registro a las columnas específicas si están vacías
     for c in conn.execute('SELECT slug, codigo_registro, codigo_profesores, codigo_directoras, codigo_rectores FROM colegios').fetchall():
         updates = []
@@ -317,7 +499,8 @@ def migrar_db(slug):
             conn.execute('INSERT OR IGNORE INTO horarios_curso (curso,jornada,dia,franja) VALUES ("__test__","__test__","__test__","__test__")')
             conn.execute('DELETE FROM horarios_curso WHERE curso="__test__"')
             conn.commit()
-        except Exception:
+        except sqlite3.OperationalError:
+            logger.warning(f'[{slug}] Recreando tabla horarios_curso (schema legacy)')
             conn.execute('ALTER TABLE horarios_curso RENAME TO horarios_curso_old')
             conn.execute('''CREATE TABLE horarios_curso (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -361,7 +544,8 @@ def migrar_db(slug):
         conn.commit()
 
     except Exception as e:
-        logger.error(f'[{slug}] Error en migración: {e}')
+        logger.error(f'[{slug}] Error en migración legacy: {e}', exc_info=True)
+        raise
     finally:
         conn.close()
 
@@ -518,6 +702,7 @@ def init_db(slug):
         try: conn.execute(idx)
         except Exception: pass
     conn.commit()
+    _ejecutar_migraciones(slug, conn)
     conn.close()
     migrar_db(slug)
 
@@ -567,6 +752,132 @@ def get_usuario_actual(slug):
     if rector: return ('rector', rector['id'])
     return (None, None)
 
+# ── PERMISSION SYSTEM ────────────────────────────────────────────────────────
+def obtener_roles_usuario(slug, usuario_id):
+    conn = conectar(slug)
+    rows = conn.execute('''
+        SELECT r.codigo, ri.nombre as rol_nombre, ri.jerarquia,
+               ur.entidad_tipo, ur.entidad_id
+        FROM usuarios_roles ur
+        JOIN roles_instancia ri ON ri.id = ur.rol_id
+        JOIN roles_base r ON r.codigo = ri.codigo
+        WHERE ur.usuario_id = ? AND ri.activo = 1
+    ''', (usuario_id,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+PERMISOS_POR_CODIGO = {
+    'admin':     ['*'],
+    'rector':    ['*'],
+    'authority': ['people.teachers.view', 'people.students.view',
+        'structure.courses.manage', 'structure.subjects.manage',
+        'academic.grades.view', 'academic.grades.write', 'academic.grades.approve',
+        'academic.grades.history',
+        'academic.attendance.view',
+        'academic.observations.view', 'academic.observations.write',
+        'academic.evaluations.create', 'academic.evaluations.edit',
+        'communication.communicados.view', 'communication.communicados.create',
+        'communication.channels.read', 'communication.channels.send',
+        'reports.grades', 'reports.attendance', 'reports.export',
+        'audit.log.view'],
+    'teacher': ['people.students.view',
+        'academic.grades.view', 'academic.grades.write',
+        'academic.attendance.view', 'academic.attendance.write',
+        'academic.observations.view', 'academic.observations.write',
+        'academic.evaluations.create', 'academic.evaluations.edit',
+        'academic.activities.create', 'academic.activities.edit',
+        'communication.communicados.view',
+        'communication.channels.read', 'communication.channels.send'],
+    'student': ['academic.grades.view', 'academic.attendance.view',
+        'communication.communicados.view',
+        'communication.channels.read', 'communication.channels.send'],
+    'guardian': ['academic.grades.view', 'academic.attendance.view',
+        'communication.communicados.view',
+        'communication.channels.read'],
+}
+
+NIVELES_ROL = {'admin': 0, 'rector': 1, 'authority': 2, 'teacher': 3, 'student': 4, 'guardian': 5}
+
+def _permisos_para_rol(codigo):
+    permisos = set()
+    nivel = NIVELES_ROL.get(codigo, 99)
+    for rc, rn in NIVELES_ROL.items():
+        if rn >= nivel:
+            permisos.update(PERMISOS_POR_CODIGO.get(rc, []))
+    return list(permisos)
+
+def tiene_permiso(slug, usuario_id, permiso, entidad_tipo=None, entidad_id=None):
+    roles = obtener_roles_usuario(slug, usuario_id)
+    for rol in roles:
+        if rol['codigo'] in ('admin', 'rector'):
+            return True
+        if permiso not in _permisos_para_rol(rol['codigo']) and '*' not in _permisos_para_rol(rol['codigo']):
+            continue
+        if entidad_tipo and rol['entidad_tipo']:
+            if rol['entidad_tipo'] != entidad_tipo or rol['entidad_id'] != entidad_id:
+                continue
+        return True
+    return False
+
+from functools import wraps
+
+def requiere_permiso(permiso, obtener_entidad=None):
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            slug = kwargs.get('slug')
+            if not slug: abort(400)
+            usuario_tipo, usuario_id = get_usuario_actual(slug)
+            if not usuario_id:
+                return redirect(url_for('login', slug=slug))
+            if obtener_entidad:
+                e_tipo, e_id = obtener_entidad(kwargs)
+            else:
+                e_tipo, e_id = None, None
+            if not tiene_permiso(slug, usuario_id, permiso, e_tipo, e_id):
+                abort(403)
+            return f(*args, **kwargs)
+        return wrapper
+    return decorator
+
+# ── AUDIT HELPER ──────────────────────────────────────────────────────────────
+def audit_log(slug, usuario_id, accion, tabla, registro_id=None, valor_anterior=None, valor_nuevo=None):
+    from flask import request as flask_request
+    try:
+        conn = conectar(slug)
+        conn.execute(
+            '''INSERT INTO audit_log (usuario_id, accion, tabla, registro_id, valor_anterior, valor_nuevo, ip, user_agent)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+            (usuario_id, accion, tabla, registro_id,
+             json.dumps(valor_anterior) if valor_anterior else None,
+             json.dumps(valor_nuevo) if valor_nuevo else None,
+             flask_request.remote_addr,
+             flask_request.user_agent.string if flask_request.user_agent else None)
+        )
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        logger.warning(f"[audit] {e}")
+
+# ── CONFIG HELPERS ────────────────────────────────────────────────────────────
+def config_get(slug):
+    conn = conectar(slug)
+    c = conn.execute('SELECT * FROM config_institucion WHERE slug=?', (slug,)).fetchone()
+    conn.close()
+    return dict(c) if c else {}
+
+def config_get_nombre_rol(slug, codigo):
+    config = config_get(slug)
+    roles = {}
+    try: roles = json.loads(config.get('roles_json', '{}'))
+    except (json.JSONDecodeError, TypeError): pass
+    return roles.get(codigo, codigo.capitalize())
+
+def config_get_nombre_institucion(slug):
+    inst = get_colegio(slug)
+    return inst['nombre'] if inst else slug
+
+# ── CANALES HELPERS ─────────────────────────────────────────────────────────────
 def canales_usuario(slug, usuario_tipo, usuario_id):
     conn = conectar(slug)
     rows = conn.execute('''
@@ -890,11 +1201,16 @@ def recuperar_password(slug):
     pregunta = None
     usuario_val = ''
     paso = 1
+    ip = request.remote_addr
 
     if request.method == 'POST':
         if not validar_csrf():
             error = 'Error de seguridad. Intenta de nuevo.'
             paso = 1
+        bloqueado = ip_bloqueada(ip, prefijo=f'recup_{slug}')
+        if bloqueado:
+            error = f'Demasiados intentos. Espera {bloqueado}s.'
+            return render_template('recuperar.html', slug=slug, colegio=colegio, error=error, exito=exito, pregunta=pregunta, usuario_val=usuario_val, paso=paso)
         accion      = request.form.get('accion', '')
         usuario_val = request.form.get('usuario', '').strip()
 
@@ -906,8 +1222,10 @@ def recuperar_password(slug):
             conn.close()
             if not prof:
                 error = 'Usuario no encontrado.'
+                registrar_fallo(ip, prefijo=f'recup_{slug}')
             elif not prof['pregunta_secreta']:
                 error = 'Este usuario no tiene pregunta secreta. Contacta al administrador.'
+                registrar_fallo(ip, prefijo=f'recup_{slug}')
             else:
                 pregunta = prof['pregunta_secreta']
                 paso = 2
@@ -922,20 +1240,25 @@ def recuperar_password(slug):
             ).fetchone()
             if not prof:
                 error = 'Usuario no encontrado.'; conn.close()
+                registrar_fallo(ip, prefijo=f'recup_{slug}')
             elif prof['respuesta_secreta'].lower() != respuesta:
                 error = 'Respuesta incorrecta.'
                 pregunta = prof['pregunta_secreta']; paso = 2; conn.close()
+                registrar_fallo(ip, prefijo=f'recup_{slug}')
             elif len(nueva) < 6:
                 error = 'Mínimo 6 caracteres.'
                 pregunta = prof['pregunta_secreta']; paso = 2; conn.close()
+                registrar_fallo(ip, prefijo=f'recup_{slug}')
             elif nueva != confirmar:
                 error = 'Las contraseñas no coinciden.'
                 pregunta = prof['pregunta_secreta']; paso = 2; conn.close()
+                registrar_fallo(ip, prefijo=f'recup_{slug}')
             else:
                 conn.execute('UPDATE profesores SET password=? WHERE id=?',
                              (hash_pw(nueva), prof['id']))
                 conn.commit(); conn.close()
                 exito = '✅ Contraseña actualizada. Ya puedes ingresar.'
+                limpiar_intentos(ip, prefijo=f'recup_{slug}')
 
     return render_template('recuperar.html',
                            slug=slug, colegio=colegio, error=error, exito=exito,
@@ -944,7 +1267,9 @@ def recuperar_password(slug):
 # ── RECUPERAR CONTRASEÑA DIRECTORAS (AJAX) ────────────────────────────────────
 @app.route('/<slug>/directora/buscar_usuario_recuperar', methods=['POST'])
 def directora_buscar_usuario_recuperar(slug):
+    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
     require_colegio(slug)
+    ip = request.remote_addr
     usuario = request.form.get('usuario', '').strip()
     conn = conectar(slug)
     d = conn.execute(
@@ -952,14 +1277,18 @@ def directora_buscar_usuario_recuperar(slug):
     ).fetchone()
     conn.close()
     if not d:
+        registrar_fallo(ip, prefijo=f'recup_directora_{slug}')
         return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
     if not d['pregunta_secreta']:
+        registrar_fallo(ip, prefijo=f'recup_directora_{slug}')
         return jsonify({'ok': False, 'mensaje': 'Este usuario no tiene pregunta secreta. Contacta al administrador.'})
     return jsonify({'ok': True, 'pregunta': d['pregunta_secreta']})
 
 @app.route('/<slug>/directora/cambiar_password_recuperar', methods=['POST'])
 def directora_cambiar_password_recuperar(slug):
+    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
     require_colegio(slug)
+    ip = request.remote_addr
     usuario   = request.form.get('usuario', '').strip()
     respuesta = request.form.get('respuesta', '').strip().lower()
     nueva     = request.form.get('nueva', '').strip()
@@ -968,16 +1297,17 @@ def directora_cambiar_password_recuperar(slug):
         'SELECT * FROM directoras WHERE usuario=? AND activo=1', (usuario,)
     ).fetchone()
     if not d:
-        conn.close()
+        conn.close(); registrar_fallo(ip, prefijo=f'recup_directora_{slug}')
         return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
     if not d['respuesta_secreta'] or d['respuesta_secreta'].lower() != respuesta:
-        conn.close()
+        conn.close(); registrar_fallo(ip, prefijo=f'recup_directora_{slug}')
         return jsonify({'ok': False, 'mensaje': 'Respuesta incorrecta.'})
     if len(nueva) < 6:
-        conn.close()
+        conn.close(); registrar_fallo(ip, prefijo=f'recup_directora_{slug}')
         return jsonify({'ok': False, 'mensaje': 'Mínimo 6 caracteres.'})
     conn.execute('UPDATE directoras SET password=? WHERE id=?', (hash_pw(nueva), d['id']))
     conn.commit(); conn.close()
+    limpiar_intentos(ip, prefijo=f'recup_directora_{slug}')
     return jsonify({'ok': True, 'mensaje': 'Contraseña actualizada. Ya puedes ingresar.'})
 
 # ── LOGIN ─────────────────────────────────────────────────────────────────────
@@ -1143,6 +1473,7 @@ def seleccionar_jornada(slug):
                                error='No tienes materias asignadas. Contacta al administrador.')
 
     if request.method == 'POST':
+        if not validar_csrf(): return ('Error CSRF', 403)
         materia = request.form.get('materia', '').strip()
         jornada = request.form.get('jornada', '').strip()
         if materia and jornada:
@@ -1978,7 +2309,12 @@ def rector_login(slug):
     init_db(slug)
     colegio = get_colegio(slug)
     error = exito = None
+    ip = request.remote_addr
     if request.method == 'POST':
+        bloqueado = ip_bloqueada(ip, prefijo=f'rector_{slug}')
+        if bloqueado:
+            error = f'Demasiados intentos. Espera {bloqueado}s.'
+            return render_template('rector_login.html', slug=slug, colegio=colegio, error=error, exito=exito)
         u = request.form.get('usuario', '').strip()
         p = request.form.get('password', '').strip()
         conn = conectar(slug)
@@ -1988,7 +2324,9 @@ def rector_login(slug):
         if rector and verificar_pw(p, rector['password']):
             session.permanent = True
             session[f'rector_id_{slug}'] = rector['id']
+            limpiar_intentos(ip, prefijo=f'rector_{slug}')
             return redirect(url_for('rector_panel', slug=slug))
+        registrar_fallo(ip, prefijo=f'rector_{slug}')
         error = 'Usuario o contraseña incorrectos.'
     return render_template('rector_login.html', slug=slug, colegio=colegio,
                            error=error, exito=exito)
@@ -2041,31 +2379,37 @@ def rector_registrar(slug):
 
 @app.route('/<slug>/rector/buscar_usuario_recuperar', methods=['POST'])
 def rector_buscar_usuario_recuperar(slug):
+    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
     require_colegio(slug)
+    ip = request.remote_addr
     u = request.form.get('usuario', '').strip()
     conn = conectar(slug)
     r = conn.execute('SELECT pregunta_secreta FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
     conn.close()
     if not r or not r['pregunta_secreta']:
+        registrar_fallo(ip, prefijo=f'recup_rector_{slug}')
         return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
     return jsonify({'ok': True, 'pregunta': r['pregunta_secreta']})
 
 @app.route('/<slug>/rector/cambiar_password_recuperar', methods=['POST'])
 def rector_cambiar_password_recuperar(slug):
+    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
     require_colegio(slug)
+    ip = request.remote_addr
     u = request.form.get('usuario', '').strip()
     rta = request.form.get('respuesta', '').strip().lower()
     nueva = request.form.get('nueva', '').strip()
     conn = conectar(slug)
     r = conn.execute('SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
     if not r:
-        conn.close(); return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
+        conn.close(); registrar_fallo(ip, prefijo=f'recup_rector_{slug}'); return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
     if not r['respuesta_secreta'] or r['respuesta_secreta'].lower() != rta:
-        conn.close(); return jsonify({'ok': False, 'mensaje': 'Respuesta incorrecta.'})
+        conn.close(); registrar_fallo(ip, prefijo=f'recup_rector_{slug}'); return jsonify({'ok': False, 'mensaje': 'Respuesta incorrecta.'})
     if len(nueva) < 6:
-        conn.close(); return jsonify({'ok': False, 'mensaje': 'Mínimo 6 caracteres.'})
+        conn.close(); registrar_fallo(ip, prefijo=f'recup_rector_{slug}'); return jsonify({'ok': False, 'mensaje': 'Mínimo 6 caracteres.'})
     conn.execute('UPDATE rectores SET password=? WHERE id=?', (hash_pw(nueva), r['id']))
     conn.commit(); conn.close()
+    limpiar_intentos(ip, prefijo=f'recup_rector_{slug}')
     return jsonify({'ok': True, 'mensaje': 'Contraseña actualizada. Ya puedes ingresar.'})
 
 @app.route('/<slug>/rector')
@@ -2234,34 +2578,115 @@ def rector_configuracion(slug):
     colegio = get_colegio(slug)
     error = exito = None
     conn = conectar(slug)
+
+    accion = request.form.get('accion', '')
     if request.method == 'POST':
         if not validar_csrf():
             return 'Error de seguridad', 400
-        nombre = request.form.get('nombre', '').strip()
-        email = request.form.get('email', '').strip()
-        pw_actual = request.form.get('password_actual', '').strip()
-        pw_nueva = request.form.get('password_nueva', '').strip()
-        if not nombre:
-            error = 'El nombre es obligatorio.'
-        elif pw_actual and not verificar_pw(pw_actual, rector['password']):
-            error = 'La contraseña actual no es correcta.'
-        elif pw_nueva and len(pw_nueva) < 6:
-            error = 'Mínimo 6 caracteres para la nueva contraseña.'
-        else:
-            if pw_nueva:
-                conn.execute('UPDATE rectores SET nombre=?, email=?, password=? WHERE id=?',
-                             (nombre, email, hash_pw(pw_nueva), rector['id']))
+
+        if accion == 'perfil':
+            nombre = request.form.get('nombre', '').strip()
+            email = request.form.get('email', '').strip()
+            pw_actual = request.form.get('password_actual', '').strip()
+            pw_nueva = request.form.get('password_nueva', '').strip()
+            if not nombre:
+                error = 'El nombre es obligatorio.'
+            elif pw_actual and not verificar_pw(pw_actual, rector['password']):
+                error = 'La contraseña actual no es correcta.'
+            elif pw_nueva and len(pw_nueva) < 6:
+                error = 'Mínimo 6 caracteres para la nueva contraseña.'
             else:
-                conn.execute('UPDATE rectores SET nombre=?, email=? WHERE id=?',
-                             (nombre, email, rector['id']))
+                if pw_nueva:
+                    conn.execute('UPDATE rectores SET nombre=?, email=?, password=? WHERE id=?',
+                                 (nombre, email, hash_pw(pw_nueva), rector['id']))
+                else:
+                    conn.execute('UPDATE rectores SET nombre=?, email=? WHERE id=?',
+                                 (nombre, email, rector['id']))
+                conn.commit()
+                exito = 'Perfil actualizado correctamente.'
+                rector = conn.execute('SELECT * FROM rectores WHERE id=?', (rector['id'],)).fetchone()
+
+        elif accion == 'institucion':
+            tipo_ev = request.form.get('tipo_evaluacion', 'numerica')
+            esc_min = request.form.get('escala_min', 1, type=float)
+            esc_max = request.form.get('escala_max', 10, type=float)
+            nota_min = request.form.get('nota_minima_aprobar', 6, type=float)
+            decimales = request.form.get('decimales_notas', 1, type=int)
+            num_per = request.form.get('num_periodos', 4, type=int)
+            acuse = 1 if request.form.get('acuse_recibo') else 0
+
+            # Nombres personalizados de roles
+            roles_json = json.dumps({
+                'rector': request.form.get('rol_rector', 'Rector'),
+                'authority': request.form.get('rol_authority', 'Coordinador'),
+                'teacher': request.form.get('rol_teacher', 'Docente'),
+                'student': request.form.get('rol_student', 'Estudiante'),
+                'guardian': request.form.get('rol_guardian', 'Acudiente'),
+            })
+
+            # Jornadas
+            jornadas_raw = request.form.get('jornadas', 'Mañana, Tarde, Nocturna')
+            jornadas_list = [j.strip() for j in jornadas_raw.split(',') if j.strip()]
+            jornadas_json = json.dumps(jornadas_list)
+
+            conn.execute('''UPDATE config_institucion SET
+                tipo_evaluacion=?, escala_min=?, escala_max=?, nota_minima_aprobar=?,
+                decimales_notas=?, num_periodos=?, acuse_recibo=?,
+                roles_json=?, jornadas_json=?, updated_at=datetime('now','localtime')
+                WHERE slug=?''',
+                (tipo_ev, esc_min, esc_max, nota_min, decimales, num_per,
+                 acuse, roles_json, jornadas_json, slug))
             conn.commit()
-            exito = 'Configuración actualizada correctamente.'
-            rector = conn.execute('SELECT * FROM rectores WHERE id=?', (rector['id'],)).fetchone()
+            exito = 'Configuración institucional guardada.'
+
+    config = config_get(slug)
     conn.close()
     return render_template('rector_configuracion.html',
                            slug=slug, colegio=colegio, rector=rector,
-                           error=error, exito=exito,
-                           notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+                           config=config, error=error, exito=exito,
+                            notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+@app.route('/<slug>/rector/auditoria')
+def rector_auditoria(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+
+    tabla = request.args.get('tabla', '')
+    page = max(1, int(request.args.get('page', 1)))
+    limit = 50
+    offset = (page - 1) * limit
+
+    where = []
+    params = []
+    if tabla:
+        where.append('a.tabla = ?')
+        params.append(tabla)
+
+    where_clause = ('WHERE ' + ' AND '.join(where)) if where else ''
+    total = conn.execute(f'SELECT COUNT(*) as c FROM audit_log a {where_clause}', params).fetchone()['c']
+    registros = conn.execute(f'''
+        SELECT a.*, u.nombre as usuario_nombre
+        FROM audit_log a
+        LEFT JOIN usuarios u ON a.usuario_id = u.id
+        {where_clause}
+        ORDER BY a.creado DESC LIMIT ? OFFSET ?
+    ''', params + [limit, offset]).fetchall()
+
+    tablas = [r['name'] for r in conn.execute(
+        "SELECT DISTINCT tabla FROM audit_log ORDER BY tabla"
+    ).fetchall()]
+    conn.close()
+
+    total_pages = max(1, (total + limit - 1) // limit)
+    return render_template('rector_auditoria.html',
+                         slug=slug, colegio=colegio, rector=rector,
+                         registros=[dict(r) for r in registros],
+                         tabla=tabla, tablas=tablas,
+                         page=page, total_pages=total_pages, total=total,
+                         notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
 
 # ── NOTIFICATION HELPERS ───────────────────────────────────────────────────────
 def crear_notificacion(slug, usuario_tipo, usuario_id, titulo, mensaje='', tipo='info', link=''):
@@ -2662,6 +3087,7 @@ def notificaciones_contar(slug):
 
 @app.route('/<slug>/comunicaciones/<int:cid>/leer', methods=['POST'])
 def comunicacion_leer(slug, cid):
+    if not validar_csrf(): return jsonify({'error': 'Error CSRF'}), 403
     require_colegio(slug)
     usuario_tipo = None
     usuario_id = None
@@ -2726,6 +3152,7 @@ def rector_canales(slug):
 
 @app.route('/<slug>/rector/canales/crear', methods=['POST'])
 def rector_canales_crear(slug):
+    if not validar_csrf(): return jsonify({'ok': False, 'error': 'Error CSRF'}), 403
     require_colegio(slug)
     rector = get_rector(slug)
     if not rector: return jsonify({'ok':False,'error':'No autorizado'})
@@ -2748,6 +3175,7 @@ def rector_canales_crear(slug):
 
 @app.route('/<slug>/rector/canales/<int:cid>/eliminar', methods=['POST'])
 def rector_canales_eliminar(slug, cid):
+    if not validar_csrf(): return jsonify({'ok': False, 'error': 'Error CSRF'}), 403
     require_colegio(slug)
     rector = get_rector(slug)
     if not rector: return jsonify({'ok':False,'error':'No autorizado'})
@@ -2849,6 +3277,7 @@ def api_canales_mensajes_nuevos(slug, cid):
 
 @app.route('/<slug>/api/canales/<int:cid>/enviar', methods=['POST'])
 def api_canales_enviar(slug, cid):
+    if not validar_csrf(): return jsonify({'ok': False, 'error': 'Error CSRF'}), 403
     require_colegio(slug)
     tipo, uid = get_usuario_actual(slug)
     if not tipo: return jsonify({'ok':False,'error':'No autorizado'})
@@ -2869,6 +3298,7 @@ def api_canales_enviar(slug, cid):
 
 @app.route('/<slug>/api/canales/<int:cid>/leer', methods=['POST'])
 def api_canales_leer(slug, cid):
+    if not validar_csrf(): return jsonify({'ok': False, 'error': 'Error CSRF'}), 403
     require_colegio(slug)
     tipo, uid = get_usuario_actual(slug)
     if not tipo: return jsonify({'ok':False})
@@ -3073,7 +3503,12 @@ def directora_login(slug):
     require_colegio(slug)
     colegio = get_colegio(slug)
     error = exito = None
+    ip = request.remote_addr
     if request.method == 'POST':
+        bloqueado = ip_bloqueada(ip, prefijo=f'directora_{slug}')
+        if bloqueado:
+            error = f'Demasiados intentos. Espera {bloqueado}s.'
+            return render_template('directora_login.html', slug=slug, colegio=colegio, error=error, exito=exito)
         u = request.form.get('usuario', '').strip()
         p = request.form.get('password', '').strip()
         conn = conectar(slug)
@@ -3083,7 +3518,9 @@ def directora_login(slug):
         if d and verificar_pw(p, d['password']):
             session.permanent = True
             session[f'directora_id_{slug}'] = d['id']
+            limpiar_intentos(ip, prefijo=f'directora_{slug}')
             return redirect(url_for('directora_panel', slug=slug))
+        registrar_fallo(ip, prefijo=f'directora_{slug}')
         error = 'Usuario o contraseña incorrectos.'
     return render_template('directora_login.html', slug=slug, colegio=colegio,
                            error=error, exito=exito)

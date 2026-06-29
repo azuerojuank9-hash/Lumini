@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reportes — {{ colegio.nombre if colegio else slug }}</title>
+<title>Auditoría — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
@@ -27,28 +27,36 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .sidebar-user{border-top:1px solid var(--border);padding:12px 14px;font-size:12px;}
 .sidebar-user .name{color:var(--text);font-weight:600;font-size:12px;}
 .sidebar-user .role{color:var(--muted);font-size:10px;margin-top:2px;}
-.main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:1100px;width:100%;}
+.main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:960px;width:100%;}
 .hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;}
 .topbar{margin-bottom:20px;}
 .topbar h1{font-size:20px;font-weight:700;}
 .topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:20px;}
-.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rmd);padding:20px;text-align:center;}
-.stat-card .icon{font-size:24px;margin-bottom:8px;}
-.stat-card .num{font-size:28px;font-weight:800;color:var(--text);}
-.stat-card .label{font-size:11px;color:var(--muted);margin-top:4px;}
-.stat-card.purple .icon{color:var(--accent);}
-.stat-card.blue .icon{color:var(--blue);}
-.stat-card.green .icon{color:var(--green);}
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:10px 8px;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);}
+td{padding:8px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;}
+tr:hover td{background:rgba(var(--accent-rgb),.02);}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
+.badge-create{background:rgba(34,197,94,.12);color:var(--green);}
+.badge-update{background:rgba(37,99,235,.12);color:var(--blue);}
+.badge-delete{background:rgba(239,68,68,.12);color:var(--red);}
+.badge-login{background:rgba(109,40,217,.12);color:var(--accent);}
+.filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+.filter-bar select{padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;}
+.pagination{display:flex;gap:6px;align-items:center;margin-top:16px;justify-content:center;}
+.pagination a{padding:6px 12px;background:var(--bg3);border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;transition:all var(--tr);}
+.pagination a:hover{background:var(--accent);color:#fff;}
+.pagination .active{background:var(--accent);color:#fff;}
+.pagination .info{font-size:11px;color:var(--sub);}
+.val-diff{font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.val-diff code{background:var(--bg3);padding:1px 4px;border-radius:3px;font-size:10px;}
 @media(max-width:768px){
   .hamburger{display:flex;}
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .sidebar-overlay.open{display:block;}
   .main{margin-left:0;padding:16px;}
-  .stats-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
@@ -78,7 +86,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <a href="/{{ slug }}/rector/profesores" class="sidebar-item"><span class="icon"><i class="fas fa-chalkboard-teacher"></i></span><span>Profesores</span></a>
     <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i class="fas fa-user-graduate"></i></span><span>Estudiantes</span></a>
     <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i class="fas fa-book"></i></span><span>Cursos</span></a>
-    <a href="/{{ slug }}/rector/reportes" class="sidebar-item active"><span class="icon"><i class="fas fa-chart-bar"></i></span><span>Reportes</span></a>
+    <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i class="fas fa-chart-bar"></i></span><span>Reportes</span></a>
     <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i class="fas fa-history"></i></span><span>Auditoría</span></a>
     <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
     {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i class="fas fa-user-shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
@@ -93,37 +101,96 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="main">
 <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 <div class="topbar">
-  <h1><i class="fas fa-chart-bar" style="color:var(--accent);"></i> Reportes</h1>
-  <div class="breadcrumb">Estadísticas generales de la institución</div>
+  <h1><i class="fas fa-history" style="color:var(--accent);"></i> Auditoría</h1>
+  <div class="breadcrumb">Registro de cambios y accesos al sistema</div>
 </div>
-<div class="stats-grid">
-  <div class="stat-card purple">
-    <div class="icon"><i class="fas fa-user-graduate"></i></div>
-    <div class="num">{{ total_est }}</div>
-    <div class="label">Estudiantes activos</div>
-  </div>
-  <div class="stat-card blue">
-    <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
-    <div class="num">{{ total_prof }}</div>
-    <div class="label">Profesores activos</div>
-  </div>
-  <div class="stat-card green">
-    <div class="icon"><i class="fas fa-book"></i></div>
-    <div class="num">{{ total_cursos }}</div>
-    <div class="label">Cursos</div>
-  </div>
-  <div class="stat-card purple">
-    <div class="icon"><i class="fas fa-user-tie"></i></div>
-    <div class="num">{{ total_directoras }}</div>
-    <div class="label">Directoras de curso</div>
-  </div>
-</div>
+
 <div class="card">
-  <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;"><i class="fas fa-info-circle" style="color:var(--accent);"></i> Información institucional</h3>
-  <p style="font-size:13px;color:var(--muted);line-height:1.7;">Total de estudiantes activos en el sistema: <strong style="color:var(--text);">{{ total_est }}</strong></p>
-  <p style="font-size:13px;color:var(--muted);line-height:1.7;">Profesores registrados: <strong style="color:var(--text);">{{ total_prof }}</strong></p>
-  <p style="font-size:13px;color:var(--muted);line-height:1.7;">Cursos disponibles: <strong style="color:var(--text);">{{ total_cursos }}</strong></p>
-  <p style="font-size:13px;color:var(--muted);line-height:1.7;">Directoras de curso: <strong style="color:var(--text);">{{ total_directoras }}</strong></p>
+  <div class="filter-bar">
+    <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <select name="tabla" onchange="this.form.submit()">
+        <option value="">Todas las tablas</option>
+        {% for t in tablas %}
+        <option value="{{ t }}" {% if tabla == t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+      <span style="font-size:11px;color:var(--sub);">{{ total }} registro(s)</span>
+      {% if tabla %}
+      <a href="/{{ slug }}/rector/auditoria" style="font-size:11px;color:var(--accent);">Limpiar filtro</a>
+      {% endif %}
+    </form>
+  </div>
+
+  {% if registros %}
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Usuario</th>
+        <th>Acción</th>
+        <th>Tabla</th>
+        <th>ID</th>
+        <th>Cambio</th>
+        <th>IP</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in registros %}
+      <tr>
+        <td style="white-space:nowrap;font-size:11px;color:var(--sub);">{{ r.creado[:19] }}</td>
+        <td style="font-weight:500;">{{ r.usuario_nombre or 'Sistema' }}</td>
+        <td>
+          {% set cls = {'create':'badge-create','update':'badge-update','delete':'badge-delete','login':'badge-login'} %}
+          <span class="badge {{ cls.get(r.accion, 'badge-login') }}">{{ r.accion }}</span>
+        </td>
+        <td style="font-family:monospace;font-size:11px;">{{ r.tabla }}</td>
+        <td style="font-family:monospace;font-size:11px;color:var(--sub);">{{ r.registro_id or '-' }}</td>
+        <td>
+          {% if r.valor_anterior and r.valor_nuevo %}
+          <div class="val-diff">
+            <span style="color:var(--red);"><code>{{ r.valor_anterior[:60] }}</code></span>
+            <span style="color:var(--sub);"> → </span>
+            <span style="color:var(--green);"><code>{{ r.valor_nuevo[:60] }}</code></span>
+          </div>
+          {% elif r.valor_nuevo %}
+          <div class="val-diff"><code>{{ r.valor_nuevo[:80] }}</code></div>
+          {% else %}
+          <span style="color:var(--sub);">—</span>
+          {% endif %}
+        </td>
+        <td style="font-family:monospace;font-size:11px;color:var(--sub);">{{ r.ip or '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if total_pages > 1 %}
+  <div class="pagination">
+    <span class="info">Página {{ page }} de {{ total_pages }}</span>
+    {% if page > 1 %}
+    <a href="?page={{ page - 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">‹ Anterior</a>
+    {% endif %}
+    {% for p in range(1, total_pages + 1) %}
+      {% if p == page %}
+      <span class="active">{{ p }}</span>
+      {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+      <a href="?page={{ p }}{% if tabla %}&tabla={{ tabla }}{% endif %}">{{ p }}</a>
+      {% elif p == page - 3 or p == page + 3 %}
+      <span style="color:var(--sub);">…</span>
+      {% endif %}
+    {% endfor %}
+    {% if page < total_pages %}
+    <a href="?page={{ page + 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">Siguiente ›</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <p style="text-align:center;padding:40px 0;color:var(--sub);font-size:14px;">
+    <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+    No hay registros de auditoría aún.
+  </p>
+  {% endif %}
 </div>
 </div>
 <script>

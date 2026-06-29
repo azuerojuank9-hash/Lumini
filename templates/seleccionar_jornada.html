@@ -59,6 +59,7 @@
     <div class="opciones">
         {% for mj in materias_jornadas %}
         <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="materia" value="{{ mj.materia }}">
             <input type="hidden" name="jornada" value="{{ mj.jornada }}">
             <button type="submit" class="opcion-btn" style="width:100%;text-align:left;">
