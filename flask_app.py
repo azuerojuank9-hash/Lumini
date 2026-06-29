@@ -1540,19 +1540,32 @@ def home(slug):
         MESES = {'01': 'Ene', '02': 'Feb', '03': 'Mar', '04': 'Abr', '05': 'May', '06': 'Jun',
                  '07': 'Jul', '08': 'Ago', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dic'}
         datos = []
+        # Pre-fetch grade data for all students (avoids N+1 queries)
+        aid_list = [a['id'] for a in alumnos]
+        if aid_list:
+            placeholders = ','.join('?' * len(aid_list))
+            notas_all = conn.execute(
+                f'''SELECT n.aid, n.actividad_id, n.val, n.id FROM notas n
+                    JOIN actividades ac ON ac.id=n.actividad_id
+                    WHERE n.aid IN ({placeholders}) AND ac.materia=? AND ac.jornada=? AND ac.curso=?
+                    AND COALESCE(ac.periodo,1)=? ORDER BY n.aid''',
+                (*aid_list, materia, jornada, curso_sel, periodo_sel)).fetchall()
+            notas_by_aid = {}
+            for r in notas_all:
+                notas_by_aid.setdefault(r['aid'], []).append(r)
+            evals_all = conn.execute(
+                f'''SELECT aid, evaluacion, autoevaluacion FROM evaluaciones
+                    WHERE aid IN ({placeholders}) AND profesor_id=? AND materia=? AND jornada=?
+                    AND COALESCE(periodo,1)=?''',
+                (*aid_list, prof['id'], materia, jornada, periodo_sel)).fetchall()
+            evals_by_aid = {r['aid']: r for r in evals_all}
+        else:
+            notas_by_aid = {}
+            evals_by_aid = {}
         for a in alumnos:
-            notas_raw = conn.execute(
-                '''SELECT n.actividad_id, n.val, n.id FROM notas n
-                   JOIN actividades ac ON ac.id=n.actividad_id
-                   WHERE n.aid=? AND ac.materia=? AND ac.jornada=? AND ac.curso=?
-                   AND COALESCE(ac.periodo,1)=?''',
-                (a['id'], materia, jornada, curso_sel, periodo_sel)).fetchall()
+            notas_raw = notas_by_aid.get(a['id'], [])
             notas_map = {nr['actividad_id']: {'val': nr['val'], 'id': nr['id']} for nr in notas_raw}
-            ev = conn.execute(
-                '''SELECT evaluacion, autoevaluacion FROM evaluaciones
-                   WHERE aid=? AND profesor_id=? AND materia=? AND jornada=?
-                   AND COALESCE(periodo,1)=?''',
-                (a['id'], prof['id'], materia, jornada, periodo_sel)).fetchone()
+            ev = evals_by_aid.get(a['id'])
             eval_v = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
             auto_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
             todas = [nr['val'] for nr in notas_raw]
@@ -2238,23 +2251,42 @@ def vista_estudiante(slug):
     agenda = conn.execute(
         'SELECT * FROM compromisos WHERE curso=? AND jornada=? ORDER BY fecha, materia',
         (alumno['curso'], alumno['jornada'])).fetchall()
+    periodo = request.args.get('periodo', 1, type=int)
     notas_raw = conn.execute(
         '''SELECT ac.materia, ac.nombre as act_nombre, n.val
            FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
-           WHERE n.aid=? ORDER BY ac.materia, ac.orden''', (aid,)).fetchall()
+           WHERE n.aid=? AND ac.curso=? AND ac.jornada=?
+           AND COALESCE(ac.periodo,1)=?
+           ORDER BY ac.materia, ac.orden''',
+        (aid, alumno['curso'], alumno['jornada'], periodo)).fetchall()
     evals_raw = conn.execute(
-        'SELECT materia, evaluacion, autoevaluacion FROM evaluaciones WHERE aid=?', (aid,)).fetchall()
+        'SELECT materia, evaluacion, autoevaluacion FROM evaluaciones WHERE aid=? AND COALESCE(periodo,1)=?',
+        (aid, periodo)).fetchall()
     evals_map = {e['materia']: dict(e) for e in evals_raw}
     notas_pm = {}
     for nr in notas_raw:
         notas_pm.setdefault(nr['materia'], []).append({'actividad': nr['act_nombre'], 'val': nr['val']})
     for mat in evals_map:
         if mat not in notas_pm: notas_pm[mat] = []
-    todos_vals = [n['val'] for v in notas_pm.values() for n in v]
-    for e in evals_raw:
-        if e['evaluacion']     is not None: todos_vals.append(e['evaluacion'])
-        if e['autoevaluacion'] is not None: todos_vals.append(e['autoevaluacion'])
-    promedio_general = round(sum(todos_vals) / len(todos_vals), 2) if todos_vals else None
+    proms_pm = {}
+    todos_finales = []
+    for mat, notas in notas_pm.items():
+        notas_vals = [n['val'] for n in notas]
+        act_prom = round(sum(notas_vals) / len(notas_vals), 2) if notas_vals else None
+        ev = evals_map.get(mat, {})
+        eval_v = ev.get('evaluacion') if ev.get('evaluacion') is not None else None
+        auto_v = ev.get('autoevaluacion') if ev.get('autoevaluacion') is not None else None
+        if act_prom is not None or eval_v is not None or auto_v is not None:
+            total_peso = 0; nota_final = 0
+            if act_prom is not None: nota_final += act_prom * 0.65; total_peso += 0.65
+            if eval_v   is not None: nota_final += eval_v   * 0.25; total_peso += 0.25
+            if auto_v   is not None: nota_final += auto_v   * 0.10; total_peso += 0.10
+            prom = round(nota_final / total_peso, 2) if total_peso else None
+        else:
+            prom = None
+        proms_pm[mat] = prom
+        if prom is not None: todos_finales.append(prom)
+    promedio_general = round(sum(todos_finales) / len(todos_finales), 2) if todos_finales else None
     asist_raw   = conn.execute(
         'SELECT fecha, estado FROM asistencia WHERE aid=? ORDER BY fecha', (aid,)).fetchall()
     asist_stats = {'P': 0, 'A': 0, 'T': 0, 'total': 0}
@@ -2282,6 +2314,7 @@ def vista_estudiante(slug):
     return render_template('estudiante.html',
                            alumno=alumno, slug=slug, colegio=colegio, agenda=agenda,
                            notas_por_materia=notas_pm, evals_map=evals_map,
+                           proms_por_materia=proms_pm,
                            promedio_general=promedio_general,
                            asist_stats=asist_stats, historial_meses=historial_meses,
                            observaciones=observaciones, horario_map=horario_map,
@@ -3607,22 +3640,35 @@ def directora_panel(slug):
         if enviado: materias_enviadas.add(p['materia'])
         profesores.append({'materia': p['materia'], 'nombre': p['nombre'],
                            'enviado': enviado, 'fecha_envio': None})
+    # Pre-fetch all notas and evaluaciones for this course/period (avoids N+1)
+    aid_alumno = {a['id'] for a in alumnos}
+    notas_all = conn.execute(
+        '''SELECT n.aid, ac.materia, n.val FROM notas n
+           JOIN actividades ac ON ac.id=n.actividad_id
+           WHERE ac.curso=? AND ac.jornada=? AND COALESCE(ac.periodo,1)=?
+           ORDER BY n.aid, ac.materia''',
+        (curso, jornada, periodo)).fetchall()
+    notas_by = {}
+    for r in notas_all:
+        notas_by.setdefault((r['aid'], r['materia']), []).append(r['val'])
+    evals_all = conn.execute(
+        '''SELECT aid, materia, evaluacion, autoevaluacion FROM evaluaciones
+           WHERE aid IN ({}) AND COALESCE(periodo,1)=?'''.format(
+               ','.join('?' * len(aid_alumno))),
+        (*aid_alumno, periodo)).fetchall()
+    evals_by = {}
+    for r in evals_all:
+        evals_by[(r['aid'], r['materia'])] = r
+
     tabla = []
     for a in alumnos:
         fila = {'id': a['id'], 'nombre': a['nombre'],
                 'email': a['email_acudiente'] or '', 'materias': {}, 'promedio': None}
         todos_finales = []
         for mat in lista_materias:
-            notas_r = conn.execute(
-                '''SELECT n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
-                   WHERE n.aid=? AND ac.materia=? AND ac.curso=? AND ac.jornada=?
-                   AND COALESCE(ac.periodo,1)=?''',
-                (a['id'], mat, curso, jornada, periodo)).fetchall()
-            ev = conn.execute(
-                '''SELECT evaluacion, autoevaluacion FROM evaluaciones
-                   WHERE aid=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
-                (a['id'], mat, jornada, periodo)).fetchone()
-            act_prom = round(sum(r['val'] for r in notas_r) / len(notas_r), 2) if notas_r else None
+            notas_vals = notas_by.get((a['id'], mat), [])
+            act_prom = round(sum(notas_vals) / len(notas_vals), 2) if notas_vals else None
+            ev = evals_by.get((a['id'], mat))
             eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
             auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
             if act_prom is not None or eval_v is not None or auto_v is not None:

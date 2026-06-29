@@ -1356,28 +1356,28 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-      {% set vals = notas | map(attribute='val') | list %}
+      
 
 
 
 
 
 
-      {% if ev.get('evaluacion') is not none %}{% set _ = vals.append(ev.evaluacion) %}{% endif %}
+      
 
 
 
 
 
 
-      {% if ev.get('autoevaluacion') is not none %}{% set _ = vals.append(ev.autoevaluacion) %}{% endif %}
+      
 
 
 
 
 
 
-      {% set prom = (vals | sum / vals | length) | round(2) if vals else 0 %}
+      {% set prom = proms_por_materia.get(materia) %}
 
 
 
@@ -1405,7 +1405,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-          <span class="prom-badge {% if prom is not none and prom >= 3.5 %}prom-ok{% elif prom is not none and prom >= 3.0 %}prom-warn{% else %}prom-bad{% endif %}">
+          <span class="prom-badge {% if prom is not none and prom >= 3.5 %}prom-ok{% elif prom is not none and prom >= 3.0 %}prom-warn{% elif prom is not none %}prom-bad{% endif %}">
 
 
 
