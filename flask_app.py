@@ -2,7 +2,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file, abort, jsonify
-import sqlite3, hashlib, time, secrets, logging, json, uuid
+import sqlite3, hashlib, time, secrets, logging, json, uuid, bcrypt
 from datetime import timedelta, datetime
 from io import BytesIO
 app = Flask(__name__)
@@ -11,12 +11,12 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 app.permanent_session_lifetime = timedelta(hours=4)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('SESSION_COOKIE_SECURE', 'false').lower() == 'true'
 
 @app.template_filter('parse_json')
 def parse_json_filter(val):
     try: return json.loads(val) if val else {}
-    except: return {}
+    except Exception: return {}
 
 # ── LOGGING ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -47,10 +47,9 @@ if not SENDGRID_API_KEY:
 
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 
-EXTENSIONES_PERMITIDAS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-
 def extension_permitida(filename):
-    return '.' in filename and filename.rsplit('.', 1)[-1].lower() in EXTENSIONES_PERMITIDAS
+    ext = ('.' + filename.rsplit('.', 1)[-1]).lower() if '.' in filename else ''
+    return ext in ('.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg')
 
 JORNADAS = ['Mañana', 'Tarde', 'Nocturna']
 
@@ -115,19 +114,23 @@ def limpiar_intentos(ip, prefijo=''):
     login_intentos.pop(f'{prefijo}_{ip}', None)
 
 # ── HASH ──────────────────────────────────────────────────────────────────────
-def hash_pw(pw, sal=None):
-    if sal is None: sal = secrets.token_hex(16)
-    return f"{sal}${hashlib.sha256((sal + pw).encode()).hexdigest()}"
+def hash_pw(pw, _sal=None):
+    return bcrypt.hashpw(pw.encode(), bcrypt.gensalt()).decode()
 
 def verificar_pw(plano, guardada):
     if not guardada: return False
+    if guardada.startswith('$2b$') or guardada.startswith('$2a$'):
+        return bcrypt.checkpw(plano.encode(), guardada.encode())
     if '$' in guardada:
-        sal, _ = guardada.split('$', 1)
-        return hash_pw(plano, sal) == guardada
+        partes = guardada.split('$', 1)
+        if len(partes) == 2:
+            sal, h = partes
+            return hashlib.sha256((sal + plano).encode()).hexdigest() == h
+        return False
     return hashlib.sha256(plano.encode()).hexdigest() == guardada
 
 def necesita_rehash(guardada):
-    return '$' not in guardada
+    return not (guardada.startswith('$2b$') or guardada.startswith('$2a$'))
 
 # ── SCHEMA VERSIONING ──────────────────────────────────────────────────────────
 SCHEMA_VERSION = 10
@@ -1067,7 +1070,7 @@ EXTENSIONES_PERMITIDAS = {
 }
 
 def guardar_archivo_mensaje(slug, canal_id, f, usuario_tipo, usuario_id):
-    import uuid, os, mimetypes
+    import os
     nombre_original = f.filename
     ext = os.path.splitext(nombre_original)[1].lower()
     if ext not in EXTENSIONES_PERMITIDAS:
@@ -1243,6 +1246,9 @@ def admin():
 
     if not session.get('admin_auth'):
         if request.method == 'POST' and request.form.get('accion') == 'admin_login':
+            if not validar_csrf():
+                error = 'Error de seguridad.'
+                return render_template('admin_login.html', error=error)
             bloqueado = ip_bloqueada(ip, prefijo='admin')
             if bloqueado:
                 error = f'Demasiados intentos. Espera {bloqueado}s.'
@@ -1861,8 +1867,9 @@ def nueva_actividad(slug):
         conn.commit(); conn.close()
     return redirect(url_for('home', slug=slug, curso=curso_sel, periodo=periodo))
 
-@app.route('/<slug>/borrar_actividad/<int:act_id>')
+@app.route('/<slug>/borrar_actividad/<int:act_id>', methods=['POST'])
 def borrar_actividad(slug, act_id):
+    if not validar_csrf(): return redirect(url_for('home', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
@@ -2027,8 +2034,9 @@ def nuevo_trabajo(slug):
     conn.commit(); conn.close()
     return redirect(url_for('home', slug=slug, curso=curso_sel))
 
-@app.route('/<slug>/borrar_trabajo/<int:id_t>')
+@app.route('/<slug>/borrar_trabajo/<int:id_t>', methods=['POST'])
 def borrar_trabajo(slug, id_t):
+    if not validar_csrf(): return redirect(url_for('home', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
@@ -2062,44 +2070,51 @@ def registrar(slug):
                 (cur, jornada)).fetchall()
             for i, a in enumerate(todos, 1):
                 conn.execute('UPDATE alumnos SET num_curso=? WHERE id=?', (i, a['id']))
+        audit_log(slug, prof['id'], 'crear', 'alumnos')
         conn.close()
     return redirect(url_for('home', slug=slug, curso=curso_sel))
 
-@app.route('/<slug>/archivar_alumno/<int:id>')
+@app.route('/<slug>/archivar_alumno/<int:id>', methods=['POST'])
 def archivar_alumno(slug, id):
+    if not validar_csrf(): return redirect(url_for('home', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
-    curso_sel = request.args.get('curso', '')
+    curso_sel = request.form.get('curso', '')
     conn = conectar(slug)
     conn.execute('UPDATE alumnos SET activo=0 WHERE id=?', (id,))
-    conn.commit(); conn.close()
+    conn.commit(); audit_log(slug, prof['id'], 'archivar', 'alumnos', id)
+    conn.close()
     return redirect(url_for('home', slug=slug, curso=curso_sel))
 
-@app.route('/<slug>/reactivar_alumno/<int:id>')
+@app.route('/<slug>/reactivar_alumno/<int:id>', methods=['POST'])
 def reactivar_alumno(slug, id):
+    if not validar_csrf(): return redirect(url_for('archivados', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
-    curso_sel = request.args.get('curso', '')
+    curso_sel = request.form.get('curso', '')
     conn = conectar(slug)
     conn.execute('UPDATE alumnos SET activo=1 WHERE id=?', (id,))
-    conn.commit(); conn.close()
+    conn.commit(); audit_log(slug, prof['id'], 'reactivar', 'alumnos', id)
+    conn.close()
     return redirect(url_for('archivados', slug=slug, curso=curso_sel))
 
-@app.route('/<slug>/eliminar_alumno/<int:id>')
+@app.route('/<slug>/eliminar_alumno/<int:id>', methods=['POST'])
 def eliminar_alumno(slug, id):
+    if not validar_csrf(): return redirect(url_for('archivados', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
-    curso_sel = request.args.get('curso', '')
+    curso_sel = request.form.get('curso', '')
     conn = conectar(slug)
     conn.execute('DELETE FROM alumnos WHERE id=?', (id,))
     conn.execute('DELETE FROM notas WHERE aid=?', (id,))
     conn.execute('DELETE FROM evaluaciones WHERE aid=?', (id,))
     conn.execute('DELETE FROM asistencia WHERE aid=?', (id,))
     conn.execute('DELETE FROM observaciones WHERE aid=?', (id,))
-    conn.commit(); conn.close()
+    conn.commit(); audit_log(slug, prof['id'], 'eliminar', 'alumnos', id)
+    conn.close()
     return redirect(url_for('archivados', slug=slug, curso=curso_sel))
 
 # ── ARCHIVADOS ────────────────────────────────────────────────────────────────
@@ -2161,15 +2176,16 @@ def archivados(slug):
                            profesores_archivados=profs_arch,
                            profesores_activos=profesores_activos)
 
-@app.route('/<slug>/archivar_profesor/<int:id>')
+@app.route('/<slug>/archivar_profesor/<int:id>', methods=['POST'])
 def archivar_profesor(slug, id):
+    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'}), 403
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return jsonify({'ok': False, 'mensaje': 'No autorizado'}), 403
     conn = conectar(slug)
     conn.execute('UPDATE profesores SET activo=0 WHERE id=?', (id,))
     conn.commit(); conn.close()
-    return redirect(url_for('archivados', slug=slug))
+    return jsonify({'ok': True})
 
 @app.route('/<slug>/archivar_profesor_con_reasignacion', methods=['POST'])
 def archivar_profesor_con_reasignacion(slug):
@@ -2217,27 +2233,29 @@ def archivar_profesor_con_reasignacion(slug):
     finally:
         conn.close()
 
-@app.route('/<slug>/reactivar_profesor/<int:id>')
+@app.route('/<slug>/reactivar_profesor/<int:id>', methods=['POST'])
 def reactivar_profesor(slug, id):
+    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'}), 403
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return jsonify({'ok': False, 'mensaje': 'No autorizado'}), 403
     conn = conectar(slug)
     conn.execute('UPDATE profesores SET activo=1 WHERE id=?', (id,))
     conn.commit(); conn.close()
-    return redirect(url_for('archivados', slug=slug))
+    return jsonify({'ok': True})
 
-@app.route('/<slug>/eliminar_profesor/<int:id>')
+@app.route('/<slug>/eliminar_profesor/<int:id>', methods=['POST'])
 def eliminar_profesor(slug, id):
+    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'}), 403
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return jsonify({'ok': False, 'mensaje': 'No autorizado'}), 403
     conn = conectar(slug)
     conn.execute('DELETE FROM profesores WHERE id=?', (id,))
     conn.execute('DELETE FROM asignaciones_materia WHERE profesor_id=?', (id,))
     conn.execute('DELETE FROM asignaciones_curso WHERE profesor_id=?', (id,))
     conn.commit(); conn.close()
-    return redirect(url_for('archivados', slug=slug))
+    return jsonify({'ok': True})
 
 # ── ASISTENCIA ────────────────────────────────────────────────────────────────
 @app.route('/<slug>/marcar_asistencia', methods=['POST'])
@@ -2346,8 +2364,9 @@ def agregar_cursos(slug):
     conn.commit(); conn.close()
     return redirect(url_for('cambiar_password', slug=slug))
 
-@app.route('/<slug>/quitar_curso/<curso>')
+@app.route('/<slug>/quitar_curso/<curso>', methods=['POST'])
 def quitar_curso(slug, curso):
+    if not validar_csrf(): return redirect(url_for('cambiar_password', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
@@ -2608,6 +2627,9 @@ def rector_login(slug):
     error = exito = None
     ip = request.remote_addr
     if request.method == 'POST':
+        if not validar_csrf():
+            error = 'Error de seguridad.'
+            return render_template('rector_login.html', slug=slug, colegio=colegio, error=error, exito=exito)
         bloqueado = ip_bloqueada(ip, prefijo=f'rector_{slug}')
         if bloqueado:
             error = f'Demasiados intentos. Espera {bloqueado}s.'
@@ -3980,24 +4002,32 @@ def api_canales_lecturas(slug, cid):
     conn = conectar(slug)
     miembros = conn.execute(
         'SELECT usuario_tipo, usuario_id FROM canal_miembros WHERE canal_id=?', (cid,)).fetchall()
+    total_msg = conn.execute(
+        'SELECT COUNT(*) as c FROM mensajes_canal WHERE canal_id=? AND eliminado=0', (cid,)).fetchone()['c']
+    ult_vistas = {}
+    for row in conn.execute(
+        'SELECT usuario_tipo, usuario_id, ultima_vista FROM canal_actividad WHERE canal_id=?',
+        (cid,)).fetchall():
+        ult_vistas[f"{row['usuario_tipo']}_{row['usuario_id']}"] = row['ultima_vista']
+    leidos_por_miembro = {}
+    for row in conn.execute(
+        '''SELECT ml.usuario_tipo, ml.usuario_id, COUNT(DISTINCT mc.id) as c
+           FROM mensajes_leidos ml
+           JOIN mensajes_canal mc ON ml.mensaje_id=mc.id
+           WHERE mc.canal_id=? AND mc.eliminado=0
+           GROUP BY ml.usuario_tipo, ml.usuario_id''',
+        (cid,)).fetchall():
+        leidos_por_miembro[f"{row['usuario_tipo']}_{row['usuario_id']}"] = row['c']
     result = {}
     for m in miembros:
         nombre = nombre_usuario_canal(conn, m['usuario_tipo'], m['usuario_id'])
-        total = conn.execute(
-            'SELECT COUNT(*) as c FROM mensajes_canal WHERE canal_id=? AND usuario_tipo!=? AND usuario_id!=? AND eliminado=0',
-            (cid, m['usuario_tipo'], m['usuario_id'])).fetchone()['c']
-        leidos = conn.execute(
-            'SELECT COUNT(DISTINCT mc.id) as c FROM mensajes_canal mc JOIN mensajes_leidos ml ON ml.mensaje_id=mc.id AND ml.usuario_tipo=? AND ml.usuario_id=? WHERE mc.canal_id=? AND mc.eliminado=0',
-            (m['usuario_tipo'], m['usuario_id'], cid)).fetchone()['c']
-        ult_act = conn.execute(
-            'SELECT ultima_vista FROM canal_actividad WHERE canal_id=? AND usuario_tipo=? AND usuario_id=?',
-            (cid, m['usuario_tipo'], m['usuario_id'])).fetchone()
-        result[f"{m['usuario_tipo']}_{m['usuario_id']}"] = {
+        key = f"{m['usuario_tipo']}_{m['usuario_id']}"
+        result[key] = {
             'nombre': nombre,
             'tipo': m['usuario_tipo'],
-            'total': total,
-            'leidos': leidos,
-            'ultima_vista': ult_act['ultima_vista'] if ult_act else None,
+            'total': total_msg,
+            'leidos': leidos_por_miembro.get(key, 0),
+            'ultima_vista': ult_vistas.get(key),
         }
     conn.close()
     return jsonify(result)
@@ -4248,6 +4278,9 @@ def directora_login(slug):
     error = exito = None
     ip = request.remote_addr
     if request.method == 'POST':
+        if not validar_csrf():
+            error = 'Error de seguridad.'
+            return render_template('directora_login.html', slug=slug, colegio=colegio, error=error, exito=exito)
         bloqueado = ip_bloqueada(ip, prefijo=f'directora_{slug}')
         if bloqueado:
             error = f'Demasiados intentos. Espera {bloqueado}s.'
@@ -4605,7 +4638,7 @@ def dias_restantes(fecha_str):
     try:
         fecha = _date.fromisoformat(str(fecha_str))
         return (fecha - _date.today()).days
-    except:
+    except Exception:
         return None
 
 @app.template_filter('hex_to_rgb')

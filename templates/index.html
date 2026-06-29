@@ -697,7 +697,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                 <div><span style="font-weight:500">{{ t.titulo }}</span><span style="font-size:10px;color:var(--muted);margin-left:7px">{{ t.materia }}</span></div>
                 <div style="display:flex;align-items:center;gap:7px;">
                     <span class="agfecha">{{ t.fecha }}</span>
-                    <a href="/{{ slug }}/borrar_trabajo/{{ t.id }}" class="bsm bdel" style="font-size:10px;text-decoration:none;padding:3px 8px;">🗑</a>
+                    <form action="/{{ slug }}/borrar_trabajo/{{ t.id }}" method="POST" style="display:inline"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="bsm bdel" style="font-size:10px;padding:3px 8px;border:none;cursor:pointer;">🗑</button></form>
                 </div>
             </div>
             {% endfor %}
@@ -725,7 +725,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                     <th style="width:28px">#</th>
                     <th class="tnombre">Estudiante</th>
                     {% for act in actividades %}
-                    <th>{{ act.nombre }}<a href="/{{ slug }}/borrar_actividad/{{ act.id }}?curso={{ curso_sel }}" onclick="return confirm('¿Borrar actividad?')" style="color:var(--red);font-size:9px;margin-left:3px;text-decoration:none;">✕</a></th>
+                    <th>{{ act.nombre }}<form action="/{{ slug }}/borrar_actividad/{{ act.id }}" method="POST" style="display:inline;margin-left:3px;" onsubmit="return confirm('¿Borrar actividad?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" style="color:var(--red);font-size:9px;border:none;background:none;cursor:pointer;padding:0;">✕</button></form></th>
                     {% endfor %}
                     <th>Eval.</th>
                     <th>Autoev.</th>
@@ -771,7 +771,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                     </div>
                 </td>
                 <td><button class="bsm badd" style="font-size:10px;padding:4px 9px;" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">{{ e.observaciones|length }}</button></td>
-                <td><a href="/{{ slug }}/archivar_alumno/{{ e.id }}?curso={{ curso_sel }}" onclick="return confirm('¿Archivar a {{ e.nombre }}? Sus datos se conservan.')" class="bsm bdel" style="font-size:10px;text-decoration:none;"><i class="fas fa-archive"></i></a></td>
+                <td><form action="/{{ slug }}/archivar_alumno/{{ e.id }}" method="POST" style="display:inline" onsubmit="return confirm('¿Archivar a {{ e.nombre }}? Sus datos se conservan.')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel" style="font-size:10px;padding:4px 9px;border:none;cursor:pointer;"><i class="fas fa-archive"></i></button></form></td>
             </tr>
             {% else %}
             <tr><td colspan="20" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes todavía.</td></tr>
