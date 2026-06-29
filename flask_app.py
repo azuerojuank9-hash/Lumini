@@ -1,8 +1,8 @@
 ﻿import os
 from dotenv import load_dotenv
 load_dotenv()
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort, jsonify
-import sqlite3, hashlib, time, secrets, logging, json
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file, abort, jsonify
+import sqlite3, hashlib, time, secrets, logging, json, uuid
 from datetime import timedelta, datetime
 from io import BytesIO
 app = Flask(__name__)
@@ -710,9 +710,68 @@ def init_db(slug):
             respuesta TEXT,
             creado TEXT DEFAULT (datetime('now','localtime')),
             actualizado TEXT DEFAULT (datetime('now','localtime')))''',
+        # ── Fase 5 – Comunicación v2 ─────────────────────────────────
+        '''CREATE TABLE IF NOT EXISTS mensajes_archivos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            mensaje_id INTEGER,
+            canal_id INTEGER NOT NULL,
+            usuario_tipo TEXT NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            nombre_original TEXT NOT NULL,
+            nombre_archivo TEXT NOT NULL,
+            tipo_mime TEXT NOT NULL,
+            tamano INTEGER NOT NULL,
+            es_imagen INTEGER DEFAULT 0,
+            ancho INTEGER,
+            alto INTEGER,
+            fecha TEXT DEFAULT (datetime('now','localtime')))''',
+        '''CREATE TABLE IF NOT EXISTS mensajes_reacciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            mensaje_id INTEGER NOT NULL,
+            usuario_tipo TEXT NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            reaccion TEXT NOT NULL,
+            fecha TEXT DEFAULT (datetime('now','localtime')),
+            UNIQUE(mensaje_id, usuario_tipo, usuario_id, reaccion))''',
+        '''CREATE TABLE IF NOT EXISTS mensajes_fijados (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            canal_id INTEGER NOT NULL,
+            mensaje_id INTEGER NOT NULL,
+            fijado_por_tipo TEXT NOT NULL,
+            fijado_por_id INTEGER NOT NULL,
+            fecha TEXT DEFAULT (datetime('now','localtime')),
+            UNIQUE(canal_id, mensaje_id))''',
+        '''CREATE TABLE IF NOT EXISTS canal_enlaces (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            canal_id INTEGER NOT NULL,
+            titulo TEXT,
+            url TEXT NOT NULL,
+            agregado_por_tipo TEXT NOT NULL,
+            agregado_por_id INTEGER NOT NULL,
+            fecha TEXT DEFAULT (datetime('now','localtime')))''',
+        '''CREATE TABLE IF NOT EXISTS canal_actividad (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            canal_id INTEGER NOT NULL,
+            usuario_tipo TEXT NOT NULL,
+            usuario_id INTEGER NOT NULL,
+            estado TEXT DEFAULT 'online',
+            ultima_vista TEXT DEFAULT (datetime('now','localtime')),
+            UNIQUE(canal_id, usuario_tipo, usuario_id))''',
     ]
     for s in stmts:
-        conn.execute(s)
+        try: conn.execute(s)
+        except Exception: pass
+    # Phase 5 – alteraciones a tablas existentes (ignorar si ya existen)
+    alter_stmts = [
+        "ALTER TABLE mensajes_canal ADD COLUMN responde_a INTEGER REFERENCES mensajes_canal(id)",
+        "ALTER TABLE mensajes_canal ADD COLUMN editado_en TEXT",
+        "ALTER TABLE mensajes_canal ADD COLUMN eliminado INTEGER DEFAULT 0",
+        "ALTER TABLE mensajes_canal ADD COLUMN tiene_archivos INTEGER DEFAULT 0",
+        "ALTER TABLE config_institucion ADD COLUMN max_tamano_archivo INTEGER DEFAULT 10485760",
+    ]
+    for stmt in alter_stmts:
+        try: conn.execute(stmt)
+        except Exception: pass
     indexes = [
         'CREATE INDEX IF NOT EXISTS idx_notas_aid ON notas(aid)',
         'CREATE INDEX IF NOT EXISTS idx_notas_actividad ON notas(actividad_id)',
@@ -721,6 +780,13 @@ def init_db(slug):
         'CREATE INDEX IF NOT EXISTS idx_evaluaciones_aid ON evaluaciones(aid)',
         'CREATE INDEX IF NOT EXISTS idx_actividades_prof ON actividades(profesor_id,materia,curso,jornada,periodo)',
         'CREATE INDEX IF NOT EXISTS idx_alumnos_nombre ON alumnos(nombre,jornada)',
+        'CREATE INDEX IF NOT EXISTS idx_mensajes_canal ON mensajes_canal(canal_id, id)',
+        'CREATE INDEX IF NOT EXISTS idx_archivos_canal ON mensajes_archivos(canal_id, mensaje_id)',
+        'CREATE INDEX IF NOT EXISTS idx_archivos_mensaje ON mensajes_archivos(mensaje_id)',
+        'CREATE INDEX IF NOT EXISTS idx_reacciones_mensaje ON mensajes_reacciones(mensaje_id)',
+        'CREATE INDEX IF NOT EXISTS idx_fijados_canal ON mensajes_fijados(canal_id)',
+        'CREATE INDEX IF NOT EXISTS idx_enlaces_canal ON canal_enlaces(canal_id)',
+        'CREATE INDEX IF NOT EXISTS idx_actividad_canal ON canal_actividad(canal_id)',
     ]
     for idx in indexes:
         try: conn.execute(idx)
@@ -976,6 +1042,77 @@ def nombre_usuario_canal(conn, tipo, uid):
     else:
         return 'Desconocido'
     return r['nombre'] if r else 'Desconocido'
+
+# ── FILE STORAGE (Fase 5) ─────────────────────────────────────────────────────
+def max_tamano_archivo(slug):
+    conn = conectar(slug)
+    cfg = conn.execute('SELECT max_tamano_archivo FROM config_institucion WHERE slug=?', (slug,)).fetchone()
+    conn.close()
+    return cfg['max_tamano_archivo'] if cfg else 10485760
+
+EXTENSIONES_PERMITIDAS = {
+    '.pdf': 'application/pdf',
+    '.doc': 'application/msword',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.xls': 'application/vnd.ms-excel',
+    '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    '.ppt': 'application/vnd.ms-powerpoint',
+    '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+    '.png': 'image/png', '.gif': 'image/gif', '.webp': 'image/webp',
+    '.svg': 'image/svg+xml',
+    '.txt': 'text/plain',
+    '.csv': 'text/csv',
+    '.zip': 'application/zip',
+}
+
+def guardar_archivo_mensaje(slug, canal_id, f, usuario_tipo, usuario_id):
+    import uuid, os, mimetypes
+    nombre_original = f.filename
+    ext = os.path.splitext(nombre_original)[1].lower()
+    if ext not in EXTENSIONES_PERMITIDAS:
+        return None, 'Extensión no permitida'
+    tamano = len(f.read())
+    f.seek(0)
+    max_sz = max_tamano_archivo(slug)
+    if tamano > max_sz:
+        return None, f'Archivo muy grande (máx {max_sz//1048576} MB)'
+    nombre_archivo = f'{uuid.uuid4().hex}{ext}'
+    upload_dir = os.path.join(app.root_path, 'static', 'uploads', slug)
+    os.makedirs(upload_dir, exist_ok=True)
+    ruta = os.path.join(upload_dir, nombre_archivo)
+    f.save(ruta)
+    es_img = ext in ('.jpg','.jpeg','.png','.gif','.webp','.svg')
+    ancho = alto = None
+    if es_img and ext != '.svg':
+        try:
+            from PIL import Image
+            img = Image.open(ruta)
+            ancho, alto = img.size
+        except Exception: pass
+    conn = conectar(slug)
+    fid = conn.execute(
+        '''INSERT INTO mensajes_archivos
+           (canal_id, usuario_tipo, usuario_id, nombre_original, nombre_archivo, tipo_mime, tamano, es_imagen, ancho, alto)
+           VALUES (?,?,?,?,?,?,?,?,?,?)''',
+        (canal_id, usuario_tipo, usuario_id, nombre_original, nombre_archivo,
+         EXTENSIONES_PERMITIDAS[ext], tamano, 1 if es_img else 0, ancho, alto)).lastrowid
+    conn.commit()
+    conn.close()
+    return fid, None
+
+def archivos_por_mensaje(conn, mensaje_id):
+    return [dict(r) for r in conn.execute(
+        'SELECT * FROM mensajes_archivos WHERE mensaje_id=? ORDER BY id', (mensaje_id,)).fetchall()]
+
+def reacciones_por_mensaje(conn, mensaje_id):
+    rows = conn.execute(
+        'SELECT reaccion, usuario_tipo, usuario_id FROM mensajes_reacciones WHERE mensaje_id=?',
+        (mensaje_id,)).fetchall()
+    result = {}
+    for r in rows:
+        result.setdefault(r['reaccion'], []).append({'tipo': r['usuario_tipo'], 'id': r['usuario_id']})
+    return result
 
 # ── PDF REUTILIZABLE ──────────────────────────────────────────────────────────
 def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
@@ -3482,6 +3619,19 @@ def api_canales(slug):
         return jsonify([dict(r) for r in rows])
     return jsonify(canales_usuario(slug, tipo, uid))
 
+def _enriquecer_mensaje(conn, d):
+    d['archivos'] = archivos_por_mensaje(conn, d['id'])
+    d['reacciones'] = reacciones_por_mensaje(conn, d['id'])
+    if d.get('responde_a'):
+        padre = conn.execute('SELECT id, mensaje, usuario_tipo, usuario_id FROM mensajes_canal WHERE id=?', (d['responde_a'],)).fetchone()
+        if padre:
+            d['responde_a_info'] = {
+                'id': padre['id'],
+                'mensaje': padre['mensaje'][:120],
+                'autor_nombre': nombre_usuario_canal(conn, padre['usuario_tipo'], padre['usuario_id'])
+            }
+    return d
+
 @app.route('/<slug>/api/canales/<int:cid>/mensajes')
 def api_canales_mensajes(slug, cid):
     require_colegio(slug)
@@ -3498,11 +3648,12 @@ def api_canales_mensajes(slug, cid):
         SELECT m.*, COALESCE(ml.id,0) as leido
         FROM mensajes_canal m
         LEFT JOIN mensajes_leidos ml ON ml.mensaje_id=m.id AND ml.usuario_tipo=? AND ml.usuario_id=?
-        WHERE m.canal_id=? ORDER BY m.id ASC''', (tipo, uid, cid)).fetchall()
+        WHERE m.canal_id=? AND m.eliminado=0 ORDER BY m.id ASC''', (tipo, uid, cid)).fetchall()
     result = []
     for r in mensajes:
         d = dict(r)
         d['autor_nombre'] = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
+        _enriquecer_mensaje(conn, d)
         result.append(d)
     conn.close()
     return jsonify(result)
@@ -3524,11 +3675,13 @@ def api_canales_mensajes_nuevos(slug, cid):
         SELECT m.*, COALESCE(ml.id,0) as leido
         FROM mensajes_canal m
         LEFT JOIN mensajes_leidos ml ON ml.mensaje_id=m.id AND ml.usuario_tipo=? AND ml.usuario_id=?
-        WHERE m.canal_id=? AND m.id > ? ORDER BY m.id ASC''', (tipo, uid, cid, ultimo_id)).fetchall()
+        WHERE m.canal_id=? AND m.id > ? AND m.eliminado=0 ORDER BY m.id ASC''',
+        (tipo, uid, cid, ultimo_id)).fetchall()
     result = []
     for r in mensajes:
         d = dict(r)
         d['autor_nombre'] = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
+        _enriquecer_mensaje(conn, d)
         result.append(d)
     conn.close()
     return jsonify({'ok':True, 'mensajes':result})
@@ -3540,7 +3693,8 @@ def api_canales_enviar(slug, cid):
     tipo, uid = get_usuario_actual(slug)
     if not tipo: return jsonify({'ok':False,'error':'No autorizado'})
     mensaje = request.form.get('mensaje','').strip()
-    if not mensaje: return jsonify({'ok':False,'error':'Mensaje vacío'})
+    responde_a = request.form.get('responde_a', type=int)
+    tiene_archivos = 0
     conn = conectar(slug)
     canal = conn.execute('SELECT * FROM canales WHERE id=? AND activo=1', (cid,)).fetchone()
     if not canal: conn.close(); return jsonify({'ok':False,'error':'Canal no encontrado'})
@@ -3548,11 +3702,27 @@ def api_canales_enviar(slug, cid):
         miembro = conn.execute('SELECT 1 FROM canal_miembros WHERE canal_id=? AND usuario_tipo=? AND usuario_id=?',
                               (cid, tipo, uid)).fetchone()
         if not miembro: conn.close(); return jsonify({'ok':False,'error':'No eres miembro'})
-    mid = conn.execute('INSERT INTO mensajes_canal (canal_id,usuario_tipo,usuario_id,mensaje) VALUES (?,?,?,?)',
-                      (cid, tipo, uid, mensaje)).lastrowid
+    mid = conn.execute(
+        'INSERT INTO mensajes_canal (canal_id,usuario_tipo,usuario_id,mensaje,responde_a,tiene_archivos) VALUES (?,?,?,?,?,?)',
+        (cid, tipo, uid, mensaje, responde_a, tiene_archivos)).lastrowid
+    archivos_subidos = []
+    if request.files:
+        for key in request.files:
+            f = request.files[key]
+            if f and f.filename:
+                fid, err = guardar_archivo_mensaje(slug, cid, f, tipo, uid)
+                if fid:
+                    conn.execute('UPDATE mensajes_archivos SET mensaje_id=? WHERE id=?', (mid, fid))
+                    archivos_subidos.append(fid)
+                    tiene_archivos = 1
+    if tiene_archivos:
+        conn.execute('UPDATE mensajes_canal SET tiene_archivos=1 WHERE id=?', (mid,))
+    # Actualizar canal_actividad
+    conn.execute('INSERT OR REPLACE INTO canal_actividad (canal_id, usuario_tipo, usuario_id, estado, ultima_vista) VALUES (?,?,?,?,?)',
+                (cid, tipo, uid, 'online', datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
     conn.commit()
     conn.close()
-    return jsonify({'ok':True, 'mensaje_id':mid})
+    return jsonify({'ok':True, 'mensaje_id':mid, 'archivos': archivos_subidos})
 
 @app.route('/<slug>/api/canales/<int:cid>/leer', methods=['POST'])
 def api_canales_leer(slug, cid):
@@ -3567,6 +3737,321 @@ def api_canales_leer(slug, cid):
                     (m['id'], tipo, uid))
     conn.commit()
     conn.close()
+    return jsonify({'ok':True})
+
+# ── FASE 5 – ARCHIVOS ─────────────────────────────────────────────────────────
+@app.route('/<slug>/api/canales/<int:cid>/archivos/subir', methods=['POST'])
+def api_canales_subir_archivos(slug, cid):
+    if not validar_csrf(): return jsonify({'ok':False,'error':'CSRF'}), 403
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False,'error':'No autorizado'}), 401
+    if 'archivo' not in request.files: return jsonify({'ok':False,'error':'No hay archivo'}), 400
+    f = request.files['archivo']
+    if not f.filename: return jsonify({'ok':False,'error':'Archivo vacío'}), 400
+    fid, err = guardar_archivo_mensaje(slug, cid, f, tipo, uid)
+    if err: return jsonify({'ok':False,'error':err}), 400
+    return jsonify({'ok':True, 'archivo_id': fid})
+
+@app.route('/<slug>/api/archivos/<int:fid>/descargar')
+def api_archivo_descargar(slug, fid):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return 'No autorizado', 401
+    conn = conectar(slug)
+    arch = conn.execute('SELECT * FROM mensajes_archivos WHERE id=?', (fid,)).fetchone()
+    conn.close()
+    if not arch: return 'No encontrado', 404
+    ruta = os.path.join(app.root_path, 'static', 'uploads', slug, arch['nombre_archivo'])
+    if not os.path.exists(ruta): return 'No encontrado', 404
+    return send_file(ruta, mimetype=arch['tipo_mime'], as_attachment=True,
+                     download_name=arch['nombre_original'])
+
+@app.route('/<slug>/api/archivos/<int:fid>/previsualizar')
+def api_archivo_previsualizar(slug, fid):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return 'No autorizado', 401
+    conn = conectar(slug)
+    arch = conn.execute('SELECT * FROM mensajes_archivos WHERE id=?', (fid,)).fetchone()
+    conn.close()
+    if not arch: return 'No encontrado', 404
+    ruta = os.path.join(app.root_path, 'static', 'uploads', slug, arch['nombre_archivo'])
+    if not os.path.exists(ruta): return 'No encontrado', 404
+    if arch['es_imagen']:
+        return send_file(ruta, mimetype=arch['tipo_mime'])
+    if arch['tipo_mime'] == 'application/pdf':
+        return send_file(ruta, mimetype='application/pdf')
+    return jsonify({'ok':False,'error':'Vista previa no disponible'})
+
+@app.route('/<slug>/api/archivos/<int:fid>/eliminar', methods=['DELETE','POST'])
+def api_archivo_eliminar(slug, fid):
+    if not validar_csrf(): return jsonify({'ok':False,'error':'CSRF'}), 403
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False,'error':'No autorizado'}), 401
+    conn = conectar(slug)
+    arch = conn.execute('SELECT * FROM mensajes_archivos WHERE id=?', (fid,)).fetchone()
+    if not arch: conn.close(); return jsonify({'ok':False,'error':'No encontrado'}), 404
+    if arch['usuario_tipo'] != tipo or arch['usuario_id'] != uid:
+        if tipo != 'rector':
+            conn.close(); return jsonify({'ok':False,'error':'No puedes eliminar este archivo'}), 403
+    conn.execute('DELETE FROM mensajes_archivos WHERE id=?', (fid,))
+    conn.commit()
+    audit_log(slug, uid, 'delete', 'mensajes_archivos', fid,
+              valor_anterior={'nombre_original': arch['nombre_original']})
+    conn.close()
+    ruta = os.path.join(app.root_path, 'static', 'uploads', slug, arch['nombre_archivo'])
+    try: os.remove(ruta)
+    except Exception: pass
+    return jsonify({'ok':True})
+
+# ── FASE 5 – REACCIONES ───────────────────────────────────────────────────────
+@app.route('/<slug>/api/canales/<int:cid>/reaccionar', methods=['POST'])
+def api_canales_reaccionar(slug, cid):
+    if not validar_csrf(): return jsonify({'ok':False,'error':'CSRF'}), 403
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False,'error':'No autorizado'}), 401
+    mensaje_id = request.form.get('mensaje_id', type=int)
+    reaccion = request.form.get('reaccion','').strip()
+    if not mensaje_id or reaccion not in ('👍','✅','❓','📌','❤'):
+        return jsonify({'ok':False,'error':'Reacción inválida'}), 400
+    conn = conectar(slug)
+    existing = conn.execute(
+        'SELECT id FROM mensajes_reacciones WHERE mensaje_id=? AND usuario_tipo=? AND usuario_id=? AND reaccion=?',
+        (mensaje_id, tipo, uid, reaccion)).fetchone()
+    if existing:
+        conn.execute('DELETE FROM mensajes_reacciones WHERE id=?', (existing['id'],))
+        conn.commit(); conn.close()
+        return jsonify({'ok':True, 'activo':False})
+    conn.execute('INSERT OR IGNORE INTO mensajes_reacciones (mensaje_id,usuario_tipo,usuario_id,reaccion) VALUES (?,?,?,?)',
+                (mensaje_id, tipo, uid, reaccion))
+    conn.commit(); conn.close()
+    return jsonify({'ok':True, 'activo':True})
+
+# ── FASE 5 – MENSAJES FIJADOS ─────────────────────────────────────────────────
+@app.route('/<slug>/api/canales/<int:cid>/fijar', methods=['POST'])
+def api_canales_fijar(slug, cid):
+    if not validar_csrf(): return jsonify({'ok':False,'error':'CSRF'}), 403
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False,'error':'No autorizado'}), 401
+    mensaje_id = request.form.get('mensaje_id', type=int)
+    if not mensaje_id: return jsonify({'ok':False,'error':'mensaje_id requerido'}), 400
+    conn = conectar(slug)
+    existing = conn.execute('SELECT id FROM mensajes_fijados WHERE canal_id=? AND mensaje_id=?',
+                           (cid, mensaje_id)).fetchone()
+    if existing:
+        conn.execute('DELETE FROM mensajes_fijados WHERE id=?', (existing['id'],))
+        conn.commit(); conn.close()
+        return jsonify({'ok':True, 'fijado':False})
+    conn.execute('INSERT INTO mensajes_fijados (canal_id,mensaje_id,fijado_por_tipo,fijado_por_id) VALUES (?,?,?,?)',
+                (cid, mensaje_id, tipo, uid))
+    conn.commit(); conn.close()
+    return jsonify({'ok':True, 'fijado':True})
+
+@app.route('/<slug>/api/canales/<int:cid>/fijados')
+def api_canales_fijados(slug, cid):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify([])
+    conn = conectar(slug)
+    rows = conn.execute(
+        '''SELECT m.id, m.mensaje, m.usuario_tipo, m.usuario_id, m.fecha, m.editado,
+                  f.fecha as fijado_en, f.fijado_por_tipo, f.fijado_por_id
+           FROM mensajes_fijados f
+           JOIN mensajes_canal m ON m.id=f.mensaje_id
+           WHERE f.canal_id=? AND m.eliminado=0
+           ORDER BY f.id DESC''', (cid,)).fetchall()
+    result = []
+    for r in rows:
+        d = dict(r)
+        d['autor_nombre'] = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
+        result.append(d)
+    conn.close()
+    return jsonify(result)
+
+# ── FASE 5 – BIBLIOTECA DEL CANAL ─────────────────────────────────────────────
+@app.route('/<slug>/api/canales/<int:cid>/biblioteca')
+def api_canales_biblioteca(slug, cid):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({})
+    conn = conectar(slug)
+    archivos = [dict(r) for r in conn.execute(
+        'SELECT * FROM mensajes_archivos WHERE canal_id=? ORDER BY fecha DESC LIMIT 50', (cid,)).fetchall()]
+    enlaces = [dict(r) for r in conn.execute(
+        'SELECT * FROM canal_enlaces WHERE canal_id=? ORDER BY fecha DESC LIMIT 50', (cid,)).fetchall()]
+    conn.close()
+    return jsonify({'archivos': archivos, 'enlaces': enlaces})
+
+# ── FASE 5 – BUSCAR EN EL CANAL ───────────────────────────────────────────────
+@app.route('/<slug>/api/canales/<int:cid>/buscar')
+def api_canales_buscar(slug, cid):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify([])
+    q = request.args.get('q','').strip()
+    autor = request.args.get('autor','').strip()
+    desde = request.args.get('desde','').strip()
+    hasta = request.args.get('hasta','').strip()
+    conn = conectar(slug)
+    sql = 'SELECT m.* FROM mensajes_canal m WHERE m.canal_id=? AND m.eliminado=0'
+    params = [cid]
+    if q:
+        sql += ' AND m.mensaje LIKE ?'
+        params.append(f'%{q}%')
+    if autor:
+        sql += ' AND (SELECT nombre FROM profesores WHERE id=m.usuario_id AND m.usuario_tipo=\'profesor\') LIKE ?'
+        params.append(f'%{autor}%')
+    if desde:
+        sql += ' AND m.fecha >= ?'
+        params.append(desde)
+    if hasta:
+        sql += ' AND m.fecha <= ?'
+        params.append(hasta + ' 23:59:59')
+    sql += ' ORDER BY m.id DESC LIMIT 100'
+    rows = conn.execute(sql, params).fetchall()
+    result = []
+    for r in rows:
+        d = dict(r)
+        d['autor_nombre'] = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
+        _enriquecer_mensaje(conn, d)
+        result.append(d)
+    conn.close()
+    return jsonify(result)
+
+# ── FASE 5 – EDITAR / ELIMINAR MENSAJES ────────────────────────────────────────
+TIEMPO_EDICION_SEGUNDOS = 300  # 5 minutos, configurable
+
+@app.route('/<slug>/api/canales/<int:cid>/editar/<int:mid>', methods=['POST'])
+def api_canales_editar(slug, cid, mid):
+    if not validar_csrf(): return jsonify({'ok':False,'error':'CSRF'}), 403
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False,'error':'No autorizado'}), 401
+    conn = conectar(slug)
+    msg = conn.execute('SELECT * FROM mensajes_canal WHERE id=? AND canal_id=?', (mid, cid)).fetchone()
+    if not msg: conn.close(); return jsonify({'ok':False,'error':'No encontrado'}), 404
+    if msg['usuario_tipo'] != tipo or msg['usuario_id'] != uid:
+        conn.close(); return jsonify({'ok':False,'error':'No puedes editar este mensaje'}), 403
+    if msg['eliminado']:
+        conn.close(); return jsonify({'ok':False,'error':'Mensaje eliminado'}), 400
+    creado = datetime.strptime(msg['fecha'], '%Y-%m-%d %H:%M:%S')
+    if (datetime.now() - creado).total_seconds() > TIEMPO_EDICION_SEGUNDOS:
+        conn.close(); return jsonify({'ok':False,'error':'Tiempo de edición expirado'}), 400
+    nuevo_texto = request.form.get('mensaje','').strip()
+    if not nuevo_texto: conn.close(); return jsonify({'ok':False,'error':'Mensaje vacío'}), 400
+    viejo_texto = msg['mensaje']
+    conn.execute('UPDATE mensajes_canal SET mensaje=?, editado=editado+1, editado_en=? WHERE id=?',
+                (nuevo_texto, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), mid))
+    conn.commit()
+    audit_log(slug, uid, 'update', 'mensajes_canal', mid,
+              valor_anterior={'mensaje': viejo_texto},
+              valor_nuevo={'mensaje': nuevo_texto})
+    conn.close()
+    return jsonify({'ok':True})
+
+@app.route('/<slug>/api/canales/<int:cid>/eliminar/<int:mid>', methods=['DELETE','POST'])
+def api_canales_eliminar(slug, cid, mid):
+    if not validar_csrf(): return jsonify({'ok':False,'error':'CSRF'}), 403
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False,'error':'No autorizado'}), 401
+    conn = conectar(slug)
+    msg = conn.execute('SELECT * FROM mensajes_canal WHERE id=? AND canal_id=?', (mid, cid)).fetchone()
+    if not msg: conn.close(); return jsonify({'ok':False,'error':'No encontrado'}), 404
+    if msg['usuario_tipo'] != tipo or msg['usuario_id'] != uid:
+        conn.close(); return jsonify({'ok':False,'error':'No puedes eliminar este mensaje'}), 403
+    conn.execute('UPDATE mensajes_canal SET eliminado=1 WHERE id=?', (mid,))
+    conn.commit()
+    audit_log(slug, uid, 'delete', 'mensajes_canal', mid,
+              valor_anterior={'mensaje': msg['mensaje'][:200]})
+    conn.close()
+    return jsonify({'ok':True})
+
+# ── FASE 5 – LECTURAS ──────────────────────────────────────────────────────────
+@app.route('/<slug>/api/canales/<int:cid>/lecturas')
+def api_canales_lecturas(slug, cid):
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify([])
+    conn = conectar(slug)
+    miembros = conn.execute(
+        'SELECT usuario_tipo, usuario_id FROM canal_miembros WHERE canal_id=?', (cid,)).fetchall()
+    result = {}
+    for m in miembros:
+        nombre = nombre_usuario_canal(conn, m['usuario_tipo'], m['usuario_id'])
+        total = conn.execute(
+            'SELECT COUNT(*) as c FROM mensajes_canal WHERE canal_id=? AND usuario_tipo!=? AND usuario_id!=? AND eliminado=0',
+            (cid, m['usuario_tipo'], m['usuario_id'])).fetchone()['c']
+        leidos = conn.execute(
+            'SELECT COUNT(DISTINCT mc.id) as c FROM mensajes_canal mc JOIN mensajes_leidos ml ON ml.mensaje_id=mc.id AND ml.usuario_tipo=? AND ml.usuario_id=? WHERE mc.canal_id=? AND mc.eliminado=0',
+            (m['usuario_tipo'], m['usuario_id'], cid)).fetchone()['c']
+        ult_act = conn.execute(
+            'SELECT ultima_vista FROM canal_actividad WHERE canal_id=? AND usuario_tipo=? AND usuario_id=?',
+            (cid, m['usuario_tipo'], m['usuario_id'])).fetchone()
+        result[f"{m['usuario_tipo']}_{m['usuario_id']}"] = {
+            'nombre': nombre,
+            'tipo': m['usuario_tipo'],
+            'total': total,
+            'leidos': leidos,
+            'ultima_vista': ult_act['ultima_vista'] if ult_act else None,
+        }
+    conn.close()
+    return jsonify(result)
+
+# ── FASE 5 – ESCRIBIENDO / ACTIVIDAD ──────────────────────────────────────────
+@app.route('/<slug>/api/canales/<int:cid>/escribiendo', methods=['POST'])
+def api_canales_escribiendo(slug, cid):
+    if not validar_csrf(): return jsonify({'ok':False,'error':'CSRF'}), 403
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False})
+    conn = conectar(slug)
+    conn.execute('INSERT OR REPLACE INTO canal_actividad (canal_id,usuario_tipo,usuario_id,estado,ultima_vista) VALUES (?,?,?,?,?)',
+                (cid, tipo, uid, 'typing', datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+    conn.commit(); conn.close()
+    return jsonify({'ok':True})
+
+@app.route('/<slug>/api/canales/<int:cid>/actividad')
+def api_canales_actividad(slug, cid):
+    require_colegio(slug)
+    conn = conectar(slug)
+    rows = conn.execute(
+        '''SELECT ca.*
+           FROM canal_actividad ca
+           WHERE ca.canal_id=?''', (cid,)).fetchall()
+    result = {}
+    now = datetime.now()
+    for r in rows:
+        estado = r['estado']
+        ult_vista = datetime.strptime(r['ultima_vista'], '%Y-%m-%d %H:%M:%S') if r['ultima_vista'] else None
+        if estado == 'typing' and ult_vista and (now - ult_vista).total_seconds() > 8:
+            estado = 'online'
+        if ult_vista and (now - ult_vista).total_seconds() > 120:
+            estado = 'offline'
+        nombre = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
+        key = f"{r['usuario_tipo']}_{r['usuario_id']}"
+        result[key] = {'estado': estado, 'nombre': nombre, 'ultima_vista': r['ultima_vista']}
+    conn.close()
+    return jsonify(result)
+
+# ── FASE 5 – GUARDAR ENLACE ───────────────────────────────────────────────────
+@app.route('/<slug>/api/canales/<int:cid>/enlaces', methods=['POST'])
+def api_canales_guardar_enlace(slug, cid):
+    if not validar_csrf(): return jsonify({'ok':False,'error':'CSRF'}), 403
+    require_colegio(slug)
+    tipo, uid = get_usuario_actual(slug)
+    if not tipo: return jsonify({'ok':False,'error':'No autorizado'}), 401
+    url = request.form.get('url','').strip()
+    titulo = request.form.get('titulo','').strip()
+    if not url: return jsonify({'ok':False,'error':'URL requerida'}), 400
+    conn = conectar(slug)
+    conn.execute('INSERT INTO canal_enlaces (canal_id,titulo,url,agregado_por_tipo,agregado_por_id) VALUES (?,?,?,?,?)',
+                (cid, titulo or url, url, tipo, uid))
+    conn.commit(); conn.close()
     return jsonify({'ok':True})
 
 # ── API COMUNICACIONES (Fase 2 — polling) ─────────────────────────────────────
