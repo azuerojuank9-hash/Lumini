@@ -6,7 +6,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — Panel Admin</title>
+<title>Lumini â€” Panel Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 3px rgba(0,0,0,.15);--sidebar:200px;}
@@ -113,7 +113,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 </style>
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -124,23 +125,23 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
         <img src="/static/lumini_logo.png" alt="Lumini">
         <div>
             <div class="sidebar-brand">LUMINI</div>
-            <div class="sidebar-brand-sub">Panel de Administración</div>
+            <div class="sidebar-brand-sub">Panel de AdministraciÃ³n</div>
         </div>
     </div>
     </a>
     <nav class="sidebar-nav">
         <a href="/admin" class="sidebar-link active"><span class="icon"><i class="fas fa-chart-bar"></i></span> Dashboard</a>
-        <a href="/admin/codigos" class="sidebar-link"><span class="icon"><i class="fas fa-key"></i></span> Códigos de invitación</a>
+        <a href="/admin/codigos" class="sidebar-link"><span class="icon"><i class="fas fa-key"></i></span> CÃ³digos de invitaciÃ³n</a>
         <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema"><i class="fas fa-moon"></i> Cambiar tema</button>
-        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesión</a>
+        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesiÃ³n</a>
     </nav>
 </aside>
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â’°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">Ã¢â€™Â°</button>
 
-{% if error %}<div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i>ï¸ {{ error }}</div>{% endif %}
+{% if error %}<div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i>Ã¯Â¸ {{ error }}</div>{% endif %}
 {% if exito %}<div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ exito }}</div>{% endif %}
 
 {% set por_vencer = [] %}
@@ -155,7 +156,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 {% if por_vencer %}
 <div class="alert alert-warning">
-  <i class="fas fa-exclamation-triangle"></i>ï¸ <strong>Colegios por vencer pronto:</strong>
+  <i class="fas fa-exclamation-triangle"></i>Ã¯Â¸ <strong>Colegios por vencer pronto:</strong>
   {% for c in por_vencer %}
     <strong>{{ c.nombre }}</strong> vence el {{ c.vencimiento }}{% if not loop.last %}, {% endif %}
   {% endfor %}
@@ -178,7 +179,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
             <div class="grid-2">
                 <div class="field">
                     <label>Nombre del colegio</label>
-                    <input type="text" name="nombre" placeholder="Ej: Institución Educativa Compartir" required>
+                    <input type="text" name="nombre" placeholder="Ej: InstituciÃ³n Educativa Compartir" required>
                 </div>
                 <div class="field">
                     <label>Slug (URL)</label>
@@ -187,7 +188,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
             </div>
             <div class="grid-2">
                 <div class="field">
-                    <label>Número de periodos</label>
+                    <label>NÃºmero de periodos</label>
                     <select name="num_periodos">
                         <option value="3">3 periodos</option>
                         <option value="4" selected>4 periodos</option>
@@ -201,14 +202,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                 </div>
             </div>
             <div class="codigo-box">
-                <label><i class="fas fa-key"></i> Código de invitación (obligatorio)</label>
+                <label><i class="fas fa-key"></i> CÃ³digo de invitaciÃ³n (obligatorio)</label>
                 <div class="pass-wrap">
                     <input type="text" name="codigo_registro" id="cod-crear"
-                           placeholder="Ej: profe2025 · directora2025 · lumini123"
+                           placeholder="Ej: profe2025 Â· directora2025 Â· lumini123"
                            required autocomplete="off">
-                    <button type="button" class="eye-btn" onclick="toggleCod('cod-crear',this)" aria-label="Mostrar/ocultar código">‘ï¸</button>
+                    <button type="button" class="eye-btn" onclick="toggleCod('cod-crear',this)" aria-label="Mostrar/ocultar cÃ³digo">â€˜Ã¯Â¸</button>
                 </div>
-                <p class="hint">Este código se usará para todos los roles (profesores, directoras y rectores). Puedes personalizar códigos individuales desde <a href="/admin/codigos" style="color:var(--accent);">Códigos de invitación</a>.</p>
+                <p class="hint">Este cÃ³digo se usarÃ¡ para todos los roles (profesores, directoras y rectores). Puedes personalizar cÃ³digos individuales desde <a href="/admin/codigos" style="color:var(--accent);">CÃ³digos de invitaciÃ³n</a>.</p>
             </div>
             <div class="grid-2">
                 <div class="field">
@@ -226,14 +227,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                     <input type="color" name="secondary_color" value="#7C3AED" style="height:42px;width:100%;background:#0F172A;border:1.5px solid #1E293B;border-radius:7px;cursor:pointer;">
                 </div>
                 <div class="field" style="display:flex;align-items:flex-end;padding-bottom:4px;">
-                    <button type="submit" class="btn btn-pri" style="width:100%;">Crear colegio →</button>
+                    <button type="submit" class="btn btn-pri" style="width:100%;">Crear colegio â†’</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-<div class="section-title">« Colegios registrados</div>
+<div class="section-title">Â« Colegios registrados</div>
 <div class="card">
     <div class="card-head">
         <span class="card-title">{{ colegios|length }} colegio(s) registrado(s)</span>
@@ -248,7 +249,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                 <th>Slug / URL</th>
                 <th style="text-align:center;">Periodos</th>
                 <th>Colores</th>
-                <th>Código invitación</th>
+                <th>CÃ³digo invitaciÃ³n</th>
                 <th>Vencimiento</th>
                 <th>Creado</th>
                 <th style="text-align:center;">Estado</th>
@@ -282,9 +283,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
             <td>
                 {% if c.codigo_registro %}
                 <span class="codigo-badge" id="cod-{{ c.slug }}" style="display:none;">{{ c.codigo_registro }}</span>
-                <button onclick="verCodigo('{{ c.slug }}')" class="btn btn-ghost btn-sm" style="font-size:10px;" id="btn-cod-{{ c.slug }}"><i class="fas fa-key"></i> Ver código</button>
+                <button onclick="verCodigo('{{ c.slug }}')" class="btn btn-ghost btn-sm" style="font-size:10px;" id="btn-cod-{{ c.slug }}"><i class="fas fa-key"></i> Ver cÃ³digo</button>
                 {% else %}
-                <span style="color:#64748B;font-size:11px;">Sin código</span>
+                <span style="color:#64748B;font-size:11px;">Sin cÃ³digo</span>
                 {% endif %}
             </td>
             <td style="font-size:11px;">
@@ -292,20 +293,20 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                   {% if dias is not none and dias < 0 %}
                     <span class="venc-danger"><i class="fas fa-ban"></i> Vencido ({{ c.vencimiento }})</span>
                   {% elif dias is not none and dias <= 7 %}
-                    <span class="venc-danger">🚨 {{ dias }}d — {{ c.vencimiento }}</span>
+                    <span class="venc-danger">ðŸš¨ {{ dias }}d â€” {{ c.vencimiento }}</span>
                   {% elif dias is not none and dias <= 30 %}
-                    <span class="venc-warn"><i class="fas fa-exclamation-triangle"></i>ï¸ {{ dias }}d — {{ c.vencimiento }}</span>
+                    <span class="venc-warn"><i class="fas fa-exclamation-triangle"></i>Ã¯Â¸ {{ dias }}d â€” {{ c.vencimiento }}</span>
                   {% else %}
                     <span class="venc-ok"><i class="fas fa-calendar-alt"></i> {{ c.vencimiento }}</span>
                   {% endif %}
                 {% else %}
-                <span style="color:#64748B;">Sin límite</span>
+                <span style="color:#64748B;">Sin lÃ­mite</span>
                 {% endif %}
             </td>
             <td style="font-size:11px;color:var(--muted);">{{ c.creado }}</td>
             <td style="text-align:center;">
                 <span class="badge {% if c.activo %}badge-ok{% else %}badge-off{% endif %}">
-                    {% if c.activo %}â— Activo{% else %}â—‹ Inactivo{% endif %}
+                    {% if c.activo %}Ã¢â€” Activo{% else %}Ã¢â€”â€¹ Inactivo{% endif %}
                 </span>
             </td>
             <td>
@@ -315,24 +316,24 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                         <input type="hidden" name="accion" value="toggle_colegio">
                         <input type="hidden" name="slug" value="{{ c.slug }}">
                         <button type="submit" class="btn btn-ghost btn-sm">
-                            {% if c.activo %}â¸ Desactivar{% else %}<i class="fas fa-play"></i> Activar{% endif %}
+                            {% if c.activo %}Ã¢Â¸ Desactivar{% else %}<i class="fas fa-play"></i> Activar{% endif %}
                         </button>
                     </form>
                     <button class="btn btn-ghost btn-sm"
                         onclick="abrirEditar('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}',{{ c.num_periodos or 4 }},'{{ c.vencimiento or "" }}','{{ c.codigo_registro or "" }}','{{ c.primary_color or "#7C3AED" }}','{{ c.secondary_color or "#7C3AED" }}')">
-                        â”ï¸ Editar
+                        Ã¢â€Ã¯Â¸ Editar
                     </button>
                     <button class="btn btn-yellow btn-sm" onclick="verProfesores('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}')">
-                        👥 Profesores
+                        ðŸ‘¥ Profesores
                     </button>
                     <a href="/{{ c.slug }}/directora/panel" target="_blank" class="btn btn-ghost btn-sm"><i class="fas fa-chart-bar"></i> Panel</a>
-                    <a href="/{{ c.slug }}/login" target="_blank" class="btn btn-green btn-sm">🔗 Login</a>
+                    <a href="/{{ c.slug }}/login" target="_blank" class="btn btn-green btn-sm">ðŸ”— Login</a>
                     <form method="POST" style="display:inline;"
-                          onsubmit="return confirm('¿Eliminar {{ c.nombre }}?\nEsta acción no se puede deshacer.')">
+                          onsubmit="return confirm('Â¿Eliminar {{ c.nombre }}?\nEsta acciÃ³n no se puede deshacer.')">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="accion" value="eliminar_colegio">
                         <input type="hidden" name="slug" value="{{ c.slug }}">
-                        <button type="submit" class="btn btn-red btn-sm">🗑 Eliminar</button>
+                        <button type="submit" class="btn btn-red btn-sm">ðŸ—‘ Eliminar</button>
                     </form>
                 </div>
             </td>
@@ -341,7 +342,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
         </tbody>
     </table>
     {% else %}
-    <p style="color:var(--muted);padding:28px;font-size:13px;text-align:center;">No hay colegios registrados aún. Crea el primero arriba.</p>
+    <p style="color:var(--muted);padding:28px;font-size:13px;text-align:center;">No hay colegios registrados aÃºn. Crea el primero arriba.</p>
     {% endif %}
     </div>
 </div>
@@ -351,8 +352,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 <div class="overlay" id="modalEditar" onclick="if(event.target===this)cerrarEditar()">
     <div class="modal">
         <div class="modal-title">
-            â”ï¸ Editar colegio
-            <button class="close-btn" onclick="cerrarEditar()">✕</button>
+            Ã¢â€Ã¯Â¸ Editar colegio
+            <button class="close-btn" onclick="cerrarEditar()">âœ•</button>
         </div>
         <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
@@ -364,7 +365,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
             </div>
             <div class="grid-2">
                 <div class="field">
-                    <label>Número de periodos</label>
+                    <label>NÃºmero de periodos</label>
                     <select name="num_periodos" id="edit-periodos">
                         <option value="3">3 periodos</option>
                         <option value="4">4 periodos</option>
@@ -378,14 +379,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
                 </div>
             </div>
             <div class="codigo-box">
-                <label><i class="fas fa-key"></i> Código de invitación</label>
+                <label><i class="fas fa-key"></i> CÃ³digo de invitaciÃ³n</label>
                 <div class="pass-wrap">
                     <input type="text" name="codigo_registro" id="edit-codigo"
-                           placeholder="Código de invitación del colegio"
+                           placeholder="CÃ³digo de invitaciÃ³n del colegio"
                            autocomplete="off">
-                    <button type="button" class="eye-btn" onclick="toggleCod('edit-codigo',this)" aria-label="Mostrar/ocultar código">‘ï¸</button>
+                    <button type="button" class="eye-btn" onclick="toggleCod('edit-codigo',this)" aria-label="Mostrar/ocultar cÃ³digo">â€˜Ã¯Â¸</button>
                 </div>
-                <p class="hint">Este código se usará para todos los roles. Puedes personalizar códigos individuales desde <a href="/admin/codigos" style="color:var(--accent);">Códigos de invitación</a>. Los usuarios ya registrados no se ven afectados.</p>
+                <p class="hint">Este cÃ³digo se usarÃ¡ para todos los roles. Puedes personalizar cÃ³digos individuales desde <a href="/admin/codigos" style="color:var(--accent);">CÃ³digos de invitaciÃ³n</a>. Los usuarios ya registrados no se ven afectados.</p>
             </div>
             <div class="grid-2">
                 <div class="field">
@@ -415,8 +416,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 <div class="overlay" id="modalProfesores" onclick="if(event.target===this)cerrarProfesores()">
     <div class="modal">
         <div class="modal-title">
-            👥 Profesores — <span id="prof-colegio-nombre"></span>
-            <button class="close-btn" onclick="cerrarProfesores()">✕</button>
+            ðŸ‘¥ Profesores â€” <span id="prof-colegio-nombre"></span>
+            <button class="close-btn" onclick="cerrarProfesores()">âœ•</button>
         </div>
         <div id="prof-contenido">
             <p style="color:var(--muted);font-size:13px;">Cargando...</p>
@@ -424,7 +425,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
     </div>
 </div>
 
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">â†‘</button>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -460,17 +461,17 @@ function verCodigo(slug) {
     var btn   = document.getElementById('btn-cod-' + slug);
     if (badge.style.display === 'none') {
         badge.style.display = 'inline-block';
-        btn.textContent = '™ˆ Ocultar';
+        btn.textContent = 'â„¢Ë† Ocultar';
     } else {
         badge.style.display = 'none';
-        btn.textContent = '<i class="fas fa-key"></i> Ver código';
+        btn.textContent = '<i class="fas fa-key"></i> Ver cÃ³digo';
     }
 }
 
 function toggleCod(id, btn) {
     var inp = document.getElementById(id);
-    if (inp.type === 'text') { inp.type = 'password'; btn.textContent = '‘ï¸'; }
-    else { inp.type = 'text'; btn.textContent = '™ˆ'; }
+    if (inp.type === 'text') { inp.type = 'password'; btn.textContent = 'â€˜Ã¯Â¸'; }
+    else { inp.type = 'text'; btn.textContent = 'â„¢Ë†'; }
 }
 
 function verProfesores(slug, nombre) {
@@ -488,10 +489,10 @@ function verProfesores(slug, nombre) {
             var html = '<table><thead><tr><th>#</th><th>Nombre</th><th>Usuario</th><th>Materias</th><th style="text-align:center;">Estado</th></tr></thead><tbody>';
             data.profesores.forEach(function(p, i){
                 var badge = p.activo
-                    ? '<span class="badge badge-ok">â— Activo</span>'
-                    : '<span class="badge badge-off">â—‹ Inactivo</span>';
+                    ? '<span class="badge badge-ok">Ã¢â€” Activo</span>'
+                    : '<span class="badge badge-off">Ã¢â€”â€¹ Inactivo</span>';
                 var materias = p.materias.map(function(m){
-                    return '<span class="prof-chip">' + m.materia + ' · ' + m.jornada + '</span>';
+                    return '<span class="prof-chip">' + m.materia + ' Â· ' + m.jornada + '</span>';
                 }).join('');
                 html += '<tr><td style="color:var(--muted);">' + (i+1) + '</td>'
                     + '<td style="font-weight:600;">' + p.nombre + '</td>'
@@ -524,7 +525,8 @@ function showToast(msg, ok){
 }
 </script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 </html>
 
 

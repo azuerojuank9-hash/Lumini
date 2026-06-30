@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestión de Rectores — {{ colegio.nombre if colegio else slug }}</title>
+<title>GestiÃ³n de Rectores â€” {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
@@ -73,7 +73,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .rector-table td,.rector-table th{padding:8px 6px;}
 }
 </style>
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -98,11 +99,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item"><span class="icon"><i class="fas fa-bullhorn"></i></span><span>Comunicaciones</span></a>
     <a href="/{{ slug }}/rector/canales" class="sidebar-item"><span class="icon"><i class="fas fa-comments"></i></span><span>Canales</span></a>
     <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i class="fas fa-bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i class="fas fa-history"></i></span><span>Auditoría</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Administración</div>
-    <a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item active"><span class="icon"><i class="fas fa-user-shield"></i></span><span>Gestión de Rectores</span></a>
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i class="fas fa-cog"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span>Cerrar sesión</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i class="fas fa-history"></i></span><span>AuditorÃ­a</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">AdministraciÃ³n</div>
+    <a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item active"><span class="icon"><i class="fas fa-user-shield"></i></span><span>GestiÃ³n de Rectores</span></a>
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i class="fas fa-cog"></i></span><span>ConfiguraciÃ³n</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span>Cerrar sesiÃ³n</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -111,11 +112,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </nav>
 
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
 
 <div class="topbar">
   <div class="topbar-left">
-    <h1>Gestión de Rectores</h1>
+    <h1>GestiÃ³n de Rectores</h1>
     <div class="breadcrumb">Administra las cuentas de rector del colegio</div>
   </div>
   <div class="topbar-actions">
@@ -135,7 +136,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="field-row">
       <div class="field">
         <label>Nombre completo</label>
-        <input type="text" name="nombre" placeholder="Ej: Carlos Méndez" required>
+        <input type="text" name="nombre" placeholder="Ej: Carlos MÃ©ndez" required>
       </div>
       <div class="field">
         <label>Usuario</label>
@@ -144,16 +145,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div class="field-row">
       <div class="field">
-        <label>Contraseña</label>
-        <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+        <label>ContraseÃ±a</label>
+        <input type="password" name="password" placeholder="MÃ­nimo 6 caracteres" required minlength="6">
       </div>
       <div class="field">
-        <label>Confirmar contraseña</label>
-        <input type="password" name="confirmar_password" placeholder="Repite la contraseña" required minlength="6">
+        <label>Confirmar contraseÃ±a</label>
+        <input type="password" name="confirmar_password" placeholder="Repite la contraseÃ±a" required minlength="6">
       </div>
     </div>
     <div class="field">
-      <label>Correo electrónico (opcional)</label>
+      <label>Correo electrÃ³nico (opcional)</label>
       <input type="email" name="email" placeholder="rector@colegio.edu.co">
     </div>
     <div style="margin-top:16px;display:flex;gap:10px;">
@@ -180,16 +181,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div class="field-row">
       <div class="field">
-        <label>Nueva contraseña (dejar vacío para mantener)</label>
+        <label>Nueva contraseÃ±a (dejar vacÃ­o para mantener)</label>
         <input type="password" name="password" placeholder="Solo si deseas cambiarla" minlength="6">
       </div>
       <div class="field">
-        <label>Confirmar nueva contraseña</label>
-        <input type="password" name="confirmar_password" placeholder="Repite la nueva contraseña">
+        <label>Confirmar nueva contraseÃ±a</label>
+        <input type="password" name="confirmar_password" placeholder="Repite la nueva contraseÃ±a">
       </div>
     </div>
     <div class="field">
-      <label>Correo electrónico</label>
+      <label>Correo electrÃ³nico</label>
       <input type="email" name="email" value="{{ editar.email or '' }}">
     </div>
     <div style="margin-top:16px;display:flex;gap:10px;">
@@ -218,10 +219,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <tr>
         <td>
           <strong>{{ rec.nombre }}</strong>
-          {% if rec.id == rector.id %}<span class="you-tag">(tú)</span>{% endif %}
+          {% if rec.id == rector.id %}<span class="you-tag">(tÃº)</span>{% endif %}
         </td>
         <td style="color:var(--muted);font-size:12px;">{{ rec.usuario }}</td>
-        <td style="color:var(--sub);font-size:12px;">{{ rec.email or '—' }}</td>
+        <td style="color:var(--sub);font-size:12px;">{{ rec.email or 'â€”' }}</td>
         <td>
           {% if rec.es_principal %}
           <span class="principal-badge"><i class="fas fa-crown"></i> Principal</span>
@@ -242,19 +243,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
               </button>
             </form>
             {% if not rec.es_principal %}
-            <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/eliminar" style="display:inline;" onsubmit="return confirm('¿Eliminar permanentemente a {{ rec.nombre }}?');">
+            <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/eliminar" style="display:inline;" onsubmit="return confirm('Â¿Eliminar permanentemente a {{ rec.nombre }}?');">
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
               <button class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></button>
             </form>
             {% endif %}
             {% if rec.activo and not rec.es_principal %}
-            <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/hacer-principal" style="display:inline;" onsubmit="return confirm('¿Transferir el rol de Rector Principal a {{ rec.nombre }}? Tú perderás el acceso administrativo.');">
+            <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/hacer-principal" style="display:inline;" onsubmit="return confirm('Â¿Transferir el rol de Rector Principal a {{ rec.nombre }}? TÃº perderÃ¡s el acceso administrativo.');">
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
               <button class="btn btn-sm" style="background:rgba(109,40,217,.1);border:1px solid rgba(109,40,217,.2);color:var(--accent);" title="Hacer Rector Principal"><i class="fas fa-crown"></i></button>
             </form>
             {% endif %}
             {% else %}
-            <span style="color:var(--sub);font-size:11px;padding:5px 8px;">—</span>
+            <span style="color:var(--sub);font-size:11px;padding:5px 8px;">â€”</span>
             {% endif %}
           </div>
         </td>
@@ -269,7 +270,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <i class="fas fa-info-circle" style="color:var(--accent);"></i>
   Solo el <strong>Rector Principal</strong> puede gestionar otros rectores.
   Para eliminar o transferir el rol, el rector objetivo debe estar activo.
-  El Rector Principal no puede eliminarse a sí mismo ni desactivar su propia cuenta.
+  El Rector Principal no puede eliminarse a sÃ­ mismo ni desactivar su propia cuenta.
 </div>
 {% endif %}
 
@@ -283,5 +284,6 @@ function toggleSidebar(){
 </script>
 <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 </html>

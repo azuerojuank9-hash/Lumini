@@ -6,7 +6,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — Transferir Curso</title>
+<title>Lumini â€” Transferir Curso</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
@@ -64,7 +64,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 @media(max-width:480px){.card-body{padding:12px 14px;}.card-head{padding:10px 14px;}.field select,.field input{font-size:15px;padding:10px 12px;}.btn-submit{font-size:14px;min-height:44px;padding:11px;}.periodo-check{padding:7px 10px;}.periodo-check span{font-size:12px;}.main{padding:20px 24px;}.page-title{font-size:1.1rem;}}
 @media(max-width:375px){.card-body{padding:12px 14px;}.field label{font-size:9px;}.field select,.field input{font-size:14px;padding:8px 10px;}.btn-submit{font-size:13px;min-height:42px;padding:10px;}.btn-back{font-size:13px;padding:10px;}}
 </style>
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -79,25 +80,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         {% endif %}
         <div>
             <div class="sidebar-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
-            <div class="sidebar-brand-sub">{{ profesor.nombre }} · {{ materia }}</div>
+            <div class="sidebar-brand-sub">{{ profesor.nombre }} Â· {{ materia }}</div>
         </div>
     </div>
     </a>
     <nav class="sidebar-nav">
         <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i class="fas fa-chart-bar"></i></span> Dashboard</a>
         <a href="/{{ slug }}/horarios" class="sidebar-link"><span class="icon"><i class="fas fa-calendar-alt"></i></span> Horarios</a>
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i class="fas fa-cog"></i>ï¸</span> Mi Perfil</a>
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i class="fas fa-cog"></i>Ã¯Â¸</span> Mi Perfil</a>
         <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon"><i class="fas fa-archive"></i></span> Archivados</a>
     </nav>
     <div class="sidebar-footer">
         <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema"><i class="fas fa-moon"></i> Cambiar tema</button>
-        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesión</a>
+        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesiÃ³n</a>
     </div>
 </aside>
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â’°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">Ã¢â€™Â°</button>
 
     <div class="page-title"><i class="fas fa-sync-alt"></i> Transferir Curso</div>
     <p class="page-sub">Pasa el historial completo de un curso a otro profesor de la misma materia</p>
@@ -106,7 +107,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         {% if '<i class="fas fa-check-circle"></i>' in error %}
         <div class="alert alert-success">{{ error }}</div>
         {% else %}
-        <div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i>ï¸ {{ error }}</div>
+        <div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i>Ã¯Â¸ {{ error }}</div>
         {% endif %}
     {% endif %}
     {% if exito %}
@@ -114,14 +115,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     {% endif %}
 
     <div class="info-badge">
-        <i class="fas fa-books"></i> Materia: <strong>{{ materia }}</strong> &nbsp;·&nbsp; • Jornada: <strong>{{ jornada }}</strong>
+        <i class="fas fa-books"></i> Materia: <strong>{{ materia }}</strong> &nbsp;Â·&nbsp; â€¢ Jornada: <strong>{{ jornada }}</strong>
     </div>
 
     {% if not profesores_destino %}
     <div class="card">
         <div class="card-body">
             <div class="empty-state">
-                <div class="icon">👥</div>
+                <div class="icon">ðŸ‘¥</div>
                 <p>No hay otros profesores activos con la materia <strong>{{ materia }}</strong> en la jornada <strong>{{ jornada }}</strong> para recibir el curso.<br><br>El nuevo profesor debe registrarse primero y tener esta materia asignada.</p>
             </div>
         </div>
@@ -132,7 +133,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="card-body">
             <div class="empty-state">
                 <div class="icon"><i class="fas fa-folder"></i></div>
-                <p>No tienes cursos asignados en <strong>{{ materia }}</strong> · <strong>{{ jornada }}</strong>.</p>
+                <p>No tienes cursos asignados en <strong>{{ materia }}</strong> Â· <strong>{{ jornada }}</strong>.</p>
             </div>
         </div>
     </div>
@@ -140,11 +141,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     {% else %}
 
     <div class="card">
-        <div class="card-head"><span class="card-title"><i class="fas fa-info-circle"></i>ï¸ ¿Cómo funciona?</span></div>
+        <div class="card-head"><span class="card-title"><i class="fas fa-info-circle"></i>Ã¯Â¸ Â¿CÃ³mo funciona?</span></div>
         <div class="card-body">
-            <div class="step"><div class="step-num">1</div><div class="step-text">Selecciona el <strong>curso</strong> que quieres transferir y el <strong>profesor</strong> que lo recibirá.</div></div>
+            <div class="step"><div class="step-num">1</div><div class="step-text">Selecciona el <strong>curso</strong> que quieres transferir y el <strong>profesor</strong> que lo recibirÃ¡.</div></div>
             <div class="step"><div class="step-num">2</div><div class="step-text">Elige los <strong>periodos</strong> cuyas actividades, notas y evaluaciones quieres pasar al nuevo profesor.</div></div>
-            <div class="step"><div class="step-num">3</div><div class="step-text">El nuevo profesor verá todo el historial como propio. El curso <strong>se quitará de tu lista</strong>.</div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-text">El nuevo profesor verÃ¡ todo el historial como propio. El curso <strong>se quitarÃ¡ de tu lista</strong>.</div></div>
         </div>
     </div>
 
@@ -181,7 +182,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
                         <label class="periodo-check checked" id="label-p{{ i }}">
                             <input type="checkbox" name="periodos" value="{{ i }}" checked
                                    onchange="toggleChecked(this,'label-p{{ i }}');actualizarResumen()">
-                            <span>{{ i }}° Periodo</span>
+                            <span>{{ i }}Â° Periodo</span>
                         </label>
                         {% endfor %}
                     </div>
@@ -193,14 +194,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
                 </div>
 
                 <div class="alert alert-warn" style="margin-bottom:16px;">
-                    <i class="fas fa-exclamation-triangle"></i>ï¸ Esta acción <strong>no se puede deshacer</strong>. Todas las actividades, notas y evaluaciones de los periodos seleccionados quedarán bajo el nuevo profesor.
+                    <i class="fas fa-exclamation-triangle"></i>Ã¯Â¸ Esta acciÃ³n <strong>no se puede deshacer</strong>. Todas las actividades, notas y evaluaciones de los periodos seleccionados quedarÃ¡n bajo el nuevo profesor.
                 </div>
 
                 <button type="submit" class="btn-submit" onclick="return confirmarTransferencia()">
                     <i class="fas fa-sync-alt"></i> Transferir curso
                 </button>
             </form>
-            <a href="/{{ slug }}" class="btn-back">â† Volver al inicio</a>
+            <a href="/{{ slug }}" class="btn-back">Ã¢â€  Volver al inicio</a>
         </div>
     </div>
     {% endif %}
@@ -221,7 +222,7 @@ function actualizarResumen(){
     const curso = document.getElementById('selectCurso').value;
     const prof  = document.getElementById('selectProf');
     const profNombre = prof.options[prof.selectedIndex]?.text || '';
-    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'°');
+    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'Â°');
     const resumen  = document.getElementById('resumen');
     const resumenT = document.getElementById('resumenTexto');
     if(curso && profNombre && periodos.length){
@@ -236,16 +237,17 @@ function confirmarTransferencia(){
     const curso = document.getElementById('selectCurso').value;
     const prof  = document.getElementById('selectProf');
     const profNombre = prof.options[prof.selectedIndex]?.text || '';
-    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'°');
+    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'Â°');
     if(!curso || !profNombre || !periodos.length){
         alert('Por favor completa todos los campos y selecciona al menos un periodo.');
         return false;
     }
-    return confirm(`¿Confirmas transferir el curso ${curso} (periodos ${periodos.join(', ')}) a ${profNombre}?\n\nEsta acción no se puede deshacer.`);
+    return confirm(`Â¿Confirmas transferir el curso ${curso} (periodos ${periodos.join(', ')}) a ${profNombre}?\n\nEsta acciÃ³n no se puede deshacer.`);
 }
 </script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 </html>
 
 

@@ -6,7 +6,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Horarios — {{ colegio.nombre if colegio else slug }}</title>
+<title>Horarios â€” {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--danger:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
@@ -78,7 +78,8 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
 </style>
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -100,21 +101,21 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
     <nav class="sidebar-nav">
         <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i class="fas fa-chart-bar"></i></span> Dashboard</a>
         <a href="/{{ slug }}/horarios" class="sidebar-link active"><span class="icon"><i class="fas fa-calendar-alt"></i></span> Horarios</a>
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i class="fas fa-cog"></i>ï¸</span> Mi Perfil</a>
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i class="fas fa-cog"></i>Ã¯Â¸</span> Mi Perfil</a>
         <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon"><i class="fas fa-archive"></i></span> Archivados</a>
     </nav>
     <div class="sidebar-footer">
         <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema"><i class="fas fa-moon"></i> Cambiar tema</button>
-        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesión</a>
+        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesiÃ³n</a>
     </div>
 </aside>
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â’°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">Ã¢â€™Â°</button>
 
   <h1><i class="fas fa-calendar-alt"></i> Horarios</h1>
-  <p class="subtitle">Haz clic en cualquier celda para editar · Se guarda automáticamente</p>
+  <p class="subtitle">Haz clic en cualquier celda para editar Â· Se guarda automÃ¡ticamente</p>
 
   <div class="curso-tabs">
     {% for c in mis_cursos %}
@@ -128,17 +129,17 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
         <thead>
           <tr>
             <th></th>
-            <th><span class="hl">1a Hora</span><span class="ht">6:10 – 7:05</span></th>
-            <th><span class="hl">2a Hora</span><span class="ht">7:05 – 8:00</span></th>
-            <th><span class="hl">3a Hora</span><span class="ht">8:00 – 8:55</span></th>
-            <th><span class="hl">4a Hora</span><span class="ht">8:55 – 9:50</span></th>
-            <th><span class="hl">Descanso</span><span class="ht">9:50 – 10:20</span></th>
-            <th><span class="hl">5a Hora</span><span class="ht">10:20 – 11:10</span></th>
-            <th><span class="hl">6a Hora</span><span class="ht">11:10 – 12:00</span></th>
+            <th><span class="hl">1a Hora</span><span class="ht">6:10 â€“ 7:05</span></th>
+            <th><span class="hl">2a Hora</span><span class="ht">7:05 â€“ 8:00</span></th>
+            <th><span class="hl">3a Hora</span><span class="ht">8:00 â€“ 8:55</span></th>
+            <th><span class="hl">4a Hora</span><span class="ht">8:55 â€“ 9:50</span></th>
+            <th><span class="hl">Descanso</span><span class="ht">9:50 â€“ 10:20</span></th>
+            <th><span class="hl">5a Hora</span><span class="ht">10:20 â€“ 11:10</span></th>
+            <th><span class="hl">6a Hora</span><span class="ht">11:10 â€“ 12:00</span></th>
           </tr>
         </thead>
         <tbody>
-          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','Miércoles'),('Ju','Jueves'),('Vi','Viernes')] %}
+          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','MiÃ©rcoles'),('Ju','Jueves'),('Vi','Viernes')] %}
           {% for ds, df in dias_list %}
           <tr>
             <td class="dia-col">{{ ds }}</td>
@@ -164,7 +165,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
               </td>
             {% endfor %}
             {# Descanso #}
-            <td class="des-col">â’• Descanso</td>
+            <td class="des-col">Ã¢â€™â€¢ Descanso</td>
             {% for f in ['5','6'] %}
               {% set k = df ~ '_' ~ f %}
               {% set e = horario_map.get(k, {}) %}
@@ -191,7 +192,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
         </tbody>
       </table>
     </div>
-    <p class="hint">Clic en + para agregar · Clic en celda para editar</p>
+    <p class="hint">Clic en + para agregar Â· Clic en celda para editar</p>
   </div>
 </div>
 
@@ -201,19 +202,19 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
     <h3 id="mTitulo">Editar</h3>
     <p class="modal-sub" id="mSub"></p>
     <div class="field">
-      <label>Número / Código</label>
+      <label>NÃºmero / CÃ³digo</label>
       <input class="inp" type="text" id="iNum" placeholder="ej: 31">
     </div>
     <div class="field">
       <label>Materia</label>
-      <input class="inp" type="text" id="iMat" placeholder="ej: Matemáticas">
+      <input class="inp" type="text" id="iMat" placeholder="ej: MatemÃ¡ticas">
     </div>
     <div class="field">
       <label>Profesor</label>
       <input class="inp" type="text" id="iProf" placeholder="ej: Alberth">
     </div>
     <div class="btn-row">
-      <button class="btn btn-clear" onclick="limpiar()" title="Borrar">🗑</button>
+      <button class="btn btn-clear" onclick="limpiar()" title="Borrar">ðŸ—‘</button>
       <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
       <button class="btn btn-primary" onclick="guardar()">Guardar</button>
     </div>
@@ -231,9 +232,9 @@ function toggleSidebar(){
 const SLUG = "{{ slug }}";
 const CURSO = "{{ curso_sel }}";
 const HORAS = {
-  '1':'1a Hora · 6:10-7:05', '2':'2a Hora · 7:05-8:00',
-  '3':'3a Hora · 8:00-8:55', '4':'4a Hora · 8:55-9:50',
-  '5':'5a Hora · 10:20-11:10', '6':'6a Hora · 11:10-12:00'
+  '1':'1a Hora Â· 6:10-7:05', '2':'2a Hora Â· 7:05-8:00',
+  '3':'3a Hora Â· 8:00-8:55', '4':'4a Hora Â· 8:55-9:50',
+  '5':'5a Hora Â· 10:20-11:10', '6':'6a Hora Â· 11:10-12:00'
 };
 let _dia='', _franja='';
 
@@ -271,7 +272,7 @@ function guardar(){
 }
 
 function limpiar(){
-  if(!confirm('¿Borrar esta celda?')) return;
+  if(!confirm('Â¿Borrar esta celda?')) return;
   _send('','','');
 }
 
@@ -286,7 +287,7 @@ function _send(num, mat, prof){
   fd.append('curso',    CURSO);
   fetch('/'+SLUG+'/horarios', {method:'POST', body:fd})
     .then(()=>{ cerrar(); showToast('<i class="fas fa-check-circle"></i> Guardado'); setTimeout(()=>location.reload(), 700); })
-    .catch(()=>{ showToast('â“ Error de conexión'); });
+    .catch(()=>{ showToast('Ã¢â€œ Error de conexiÃ³n'); });
 }
 
 document.addEventListener('keydown', e=>{
@@ -295,7 +296,8 @@ document.addEventListener('keydown', e=>{
 });
 </script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 </html>
 
 

@@ -54,7 +54,7 @@
 
 
 
-<title>Mi Boletín — {{ alumno.nombre }}</title>
+<title>Mi BoletÃ­n â€” {{ alumno.nombre }}</title>
 
 
 
@@ -779,7 +779,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 .typing-dots span:nth-child(3){animation-delay:.4s;}
 @keyframes typingDot{0%,60%,100%{opacity:0;}30%{opacity:1;}}
 
-/* ── Fase 5 – Comunicación v2 ────────────────────────────────────────── */
+/* â”€â”€ Fase 5 â€“ ComunicaciÃ³n v2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .canales-fijados,.canales-biblioteca{flex:1;overflow-y:auto;padding:4px;}
 .msg-edit-badge{font-size:9px;color:var(--sub);margin-left:3px;cursor:default;}
 .canal-msg-footer{display:flex;align-items:center;gap:6px;margin-top:2px;flex-wrap:wrap;}
@@ -843,7 +843,8 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 
 
 
@@ -969,7 +970,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menú" style="position:static;">â’°</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="MenÃº" style="position:static;">Ã¢â€™Â°</button>
 
 
 
@@ -1018,14 +1019,14 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-  <a href="/{{ slug }}/estudiante"><i class="fas fa-chart-bar"></i> Mi Boletín</a>
+  <a href="/{{ slug }}/estudiante"><i class="fas fa-chart-bar"></i> Mi BoletÃ­n</a>
 
 
 
 
 
 
-  <a href="/{{ slug }}/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+  <a href="/{{ slug }}/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Cerrar sesiÃ³n</a>
 
 
 
@@ -1047,20 +1048,8 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 <div class="main">
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <div class="est-header">
+<div class="dashboard-grid">
+  <div class="est-header"><div class="est-header">
 
 
 
@@ -1088,7 +1077,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-      <div class="est-meta">Curso {{ alumno.curso }} · {{ alumno.jornada }} · {{ colegio.nombre if colegio else slug }}</div>
+      <div class="est-meta">Curso {{ alumno.curso }} Â· {{ alumno.jornada }} Â· {{ colegio.nombre if colegio else slug }}</div>
 
 
 
@@ -1123,7 +1112,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-        {{ promedio_general if promedio_general is not none else '—' }}
+        {{ promedio_general if promedio_general is not none else 'â€”' }}
 
 
 
@@ -1254,7 +1243,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
   <a href="/{{ slug }}/directora/boletin_pdf?aid={{ alumno.id }}"
      style="display:inline-block;margin-bottom:20px;padding:10px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-radius:var(--rsm);text-decoration:none;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);transition:all var(--tr);">
-      📥 Descargar boletín PDF
+      ðŸ“¥ Descargar boletÃ­n PDF
   </a>
 
 
@@ -1326,7 +1315,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-        <span class="ag-fecha">📆 {{ t.fecha }}</span>
+        <span class="ag-fecha">ðŸ“† {{ t.fecha }}</span>
 
 
 
@@ -1473,7 +1462,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-            {{ prom if prom is not none else '—' }}
+            {{ prom if prom is not none else 'â€”' }}
 
 
 
@@ -1585,7 +1574,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-          <div class="eval-item"><div class="eval-label">Evaluación docente</div><div class="eval-val">{{ ev.evaluacion }}</div></div>
+          <div class="eval-item"><div class="eval-label">EvaluaciÃ³n docente</div><div class="eval-val">{{ ev.evaluacion }}</div></div>
 
 
 
@@ -1606,7 +1595,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-          <div class="eval-item"><div class="eval-label">Autoevaluación</div><div class="eval-val">{{ ev.autoevaluacion }}</div></div>
+          <div class="eval-item"><div class="eval-label">AutoevaluaciÃ³n</div><div class="eval-val">{{ ev.autoevaluacion }}</div></div>
 
 
 
@@ -1690,7 +1679,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-    <div class="card-title">📆 Asistencia</div>
+    <div class="card-title">ðŸ“† Asistencia</div>
 
 
 
@@ -1802,7 +1791,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-        <div class="lbl">Total días</div>
+        <div class="lbl">Total dÃ­as</div>
 
 
 
@@ -1977,7 +1966,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-    <div class="card-title">“ Observaciones</div>
+    <div class="card-title">â€œ Observaciones</div>
 
 
 
@@ -2110,7 +2099,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-    <div class="card-title"><i class="fas fa-calendar-alt"></i> Horario — Curso {{ alumno.curso }}</div>
+    <div class="card-title"><i class="fas fa-calendar-alt"></i> Horario â€” Curso {{ alumno.curso }}</div>
 
 
 
@@ -2152,49 +2141,49 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-            <th><span class="hl">1a Hora</span><span class="ht">6:10–7:05</span></th>
+            <th><span class="hl">1a Hora</span><span class="ht">6:10â€“7:05</span></th>
 
 
 
 
 
 
-            <th><span class="hl">2a Hora</span><span class="ht">7:05–8:00</span></th>
+            <th><span class="hl">2a Hora</span><span class="ht">7:05â€“8:00</span></th>
 
 
 
 
 
 
-            <th><span class="hl">3a Hora</span><span class="ht">8:00–8:55</span></th>
+            <th><span class="hl">3a Hora</span><span class="ht">8:00â€“8:55</span></th>
 
 
 
 
 
 
-            <th><span class="hl">4a Hora</span><span class="ht">8:55–9:50</span></th>
+            <th><span class="hl">4a Hora</span><span class="ht">8:55â€“9:50</span></th>
 
 
 
 
 
 
-            <th><span class="hl">Descanso</span><span class="ht">9:50–10:20</span></th>
+            <th><span class="hl">Descanso</span><span class="ht">9:50â€“10:20</span></th>
 
 
 
 
 
 
-            <th><span class="hl">5a Hora</span><span class="ht">10:20–11:10</span></th>
+            <th><span class="hl">5a Hora</span><span class="ht">10:20â€“11:10</span></th>
 
 
 
 
 
 
-            <th><span class="hl">6a Hora</span><span class="ht">11:10–12:00</span></th>
+            <th><span class="hl">6a Hora</span><span class="ht">11:10â€“12:00</span></th>
 
 
 
@@ -2222,7 +2211,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','Miércoles'),('Ju','Jueves'),('Vi','Viernes')] %}
+          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','MiÃ©rcoles'),('Ju','Jueves'),('Vi','Viernes')] %}
 
 
 
@@ -2285,7 +2274,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-                {% else %}<div class="c-empty">·</div>{% endif %}
+                {% else %}<div class="c-empty">Â·</div>{% endif %}
 
 
 
@@ -2306,7 +2295,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-            <td class="des-col">â’•</td>
+            <td class="des-col">Ã¢â€™â€¢</td>
 
 
 
@@ -2348,7 +2337,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 
 
-                {% else %}<div class="c-empty">·</div>{% endif %}
+                {% else %}<div class="c-empty">Â·</div>{% endif %}
 
 
 
@@ -2575,7 +2564,7 @@ function renderComunicacionesEst(){
         var pn=PRIO_NAMES[c.prioridad]||c.prioridad.charAt(0).toUpperCase()+c.prioridad.slice(1);
         var fecha=(c.fecha_publicacion||c.fecha_creacion||'').slice(0,10);
         var contenido=(c.contenido||'').slice(0,120);
-        if(c.contenido&&c.contenido.length>120)contenido+='…';
+        if(c.contenido&&c.contenido.length>120)contenido+='â€¦';
         var div=document.createElement('div');
         div.className='ag-item';
         div.innerHTML='<div style="display:flex;align-items:center;gap:10px;">'
@@ -2627,7 +2616,7 @@ function checkNuevosComunicadosEst(){
 }
 setInterval(checkNuevosComunicadosEst,30000);
 
-// ── Canales (Fase 4 — unified, Estudiante) ───────────────────────
+// â”€â”€ Canales (Fase 4 â€” unified, Estudiante) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function escHtml(s){
     if(!s)return'';
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -2688,7 +2677,7 @@ function crearSistemaCanales(opts){
             cont.innerHTML = '<div class="empty-channel-list">No tienes canales disponibles.</div>';
             return;
         }
-        var icons = {'institucional':'🏫','rectoria':'👔','profesores':'👨‍🏫','director_curso':'📋','curso':'📚','materia':'🔬'};
+        var icons = {'institucional':'ðŸ«','rectoria':'ðŸ‘”','profesores':'ðŸ‘¨â€ðŸ«','director_curso':'ðŸ“‹','curso':'ðŸ“š','materia':'ðŸ”¬'};
         var html = '';
         for(var i=0;i<canales.length;i++){
             var ch = canales[i];
@@ -2696,9 +2685,9 @@ function crearSistemaCanales(opts){
             var fecha = ch.ultima_fecha || ch.fecha_creacion;
             var hora = fecha ? fecha.slice(11,16) : '';
             var ultimo = ch.ultimo_mensaje || 'Sin mensajes';
-            if(ultimo.length > 45) ultimo = ultimo.slice(0,45) + '…';
+            if(ultimo.length > 45) ultimo = ultimo.slice(0,45) + 'â€¦';
             var noLeidos = ch.no_leidos || 0;
-            var avatar = icons[ch.tipo] || '💬';
+            var avatar = icons[ch.tipo] || 'ðŸ’¬';
             var badgeHtml = noLeidos > 0 ? '<span class="canal-list-no-leidos">' + noLeidos + '</span>' : '';
             html += '<div class="canal-list-item' + activoCls + '" data-cid="' + ch.id + '">'
                 + '<div class="canal-list-avatar">' + avatar + '</div>'
@@ -2778,11 +2767,11 @@ function crearSistemaCanales(opts){
 
     function renderUnMensaje(m){
         var esMio = (m.usuario_tipo === TIPO);
-        var autor = m.autor_nombre || (m.usuario_tipo === 'rector' ? 'Rectoría' : m.usuario_tipo);
-        if(esMio) autor = 'Tú';
+        var autor = m.autor_nombre || (m.usuario_tipo === 'rector' ? 'RectorÃ­a' : m.usuario_tipo);
+        if(esMio) autor = 'TÃº';
         var fecha = m.fecha || '';
         var horaStr = fecha.slice(11,16);
-        var editCls = m.editado ? ' <span class="msg-edit-badge" title="Editado">✎</span>' : '';
+        var editCls = m.editado ? ' <span class="msg-edit-badge" title="Editado">âœŽ</span>' : '';
         var replyHtml = '';
         if(m.responde_a_info){
             replyHtml = '<div class="msg-reply-ref" onclick="var e=document.getElementById(\'msg-'+m.responde_a_info.id+'\');if(e)e.scrollIntoView({behavior:\'smooth\',block:\'center\'});">'
@@ -2940,7 +2929,7 @@ function crearSistemaCanales(opts){
     }
 
     function eliminarMensaje(mid){
-        if(!confirm('¿Eliminar este mensaje?')) return;
+        if(!confirm('Â¿Eliminar este mensaje?')) return;
         var fd = new FormData();
         fd.append('_csrf_token', CSRF());
         fetch('/' + SLUG + '/api/canales/' + canalActivo + '/eliminar/' + mid, {method:'POST', body:fd, headers:{'X-CSRF-Token':CSRF()}})
@@ -3222,7 +3211,7 @@ var canales = crearSistemaCanales({prefix:'Est', tipoUsuario:'estudiante', slug:
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
 
 <div id="comToastEst" class="com-toast" onclick="hideComToastEst()">
-  <div class="com-toast-icon">🔔</div>
+  <div class="com-toast-icon">ðŸ””</div>
   <div class="com-toast-body">
     <div class="com-toast-title" id="comToastTitleEst">Nuevo comunicado</div>
     <div class="com-toast-msg" id="comToastMsgEst"></div>
@@ -3230,7 +3219,8 @@ var canales = crearSistemaCanales({prefix:'Est', tipoUsuario:'estudiante', slug:
   </div>
 </div>
 
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 
 
 

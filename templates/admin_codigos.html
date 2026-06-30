@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — Códigos de invitación</title>
+<title>Lumini â€” CÃ³digos de invitaciÃ³n</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 3px rgba(0,0,0,.15);--sidebar:200px;}
@@ -63,27 +63,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--accent);letter-spacing:1px;word-break:break-all;}
 @media(max-width:768px){.main{padding:20px 16px;}.grid-2,.grid-3{grid-template-columns:1fr;}}
 </style>
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 <body>
 <aside class="sidebar">
     <div class="sidebar-logo">
         <img src="/static/lumini_logo.png" alt="Lumini">
         <div>
             <div class="sidebar-brand">LUMINI</div>
-            <div class="sidebar-brand-sub">Panel de Administración</div>
+            <div class="sidebar-brand-sub">Panel de AdministraciÃ³n</div>
         </div>
     </div>
     <nav class="sidebar-nav">
         <a href="/admin" class="sidebar-link"><span class="icon"><i class="fas fa-chart-bar"></i></span> Dashboard</a>
-        <a href="/admin/codigos" class="sidebar-link active"><span class="icon"><i class="fas fa-key"></i></span> Códigos de invitación</a>
-        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesión</a>
+        <a href="/admin/codigos" class="sidebar-link active"><span class="icon"><i class="fas fa-key"></i></span> CÃ³digos de invitaciÃ³n</a>
+        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesiÃ³n</a>
     </nav>
 </aside>
 <div class="main">
     <div class="header">
         <div>
-            <h1><i class="fas fa-key"></i> Códigos de invitación</h1>
-            <p>Gestiona los códigos por rol para cada colegio.</p>
+            <h1><i class="fas fa-key"></i> CÃ³digos de invitaciÃ³n</h1>
+            <p>Gestiona los cÃ³digos por rol para cada colegio.</p>
         </div>
         <a href="/admin" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
     </div>
@@ -104,7 +105,7 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
                 <div class="field">
                     <label>Colegio</label>
                     <select name="slug" onchange="this.form.submit()">
-                        <option value="">— Selecciona un colegio —</option>
+                        <option value="">â€” Selecciona un colegio â€”</option>
                         {% for c in colegios %}
                         <option value="{{ c.slug }}" {% if colegio and colegio.slug == c.slug %}selected{% endif %}>
                             {{ c.nombre }} ({{ c.slug }})
@@ -120,7 +121,7 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
     <div class="card">
         <div class="card-head">
             <span style="font-weight:600;font-size:13px;">
-                <i class="fas fa-edit"></i> Códigos para: {{ colegio.nombre }}
+                <i class="fas fa-edit"></i> CÃ³digos para: {{ colegio.nombre }}
                 <span style="color:var(--muted);font-weight:400;font-size:11px;margin-left:6px;">({{ colegio.slug }})</span>
             </span>
         </div>
@@ -137,9 +138,9 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
                             <input type="text" name="codigo_profesores" id="cod-prof"
                                    value="{{ colegio.codigo_profesores or colegio.codigo_registro or '' }}"
                                    autocomplete="off">
-                            <button type="button" class="eye-btn" onclick="toggleCod('cod-prof',this)" aria-label="Mostrar/ocultar código"><i class="fas fa-eye"></i></button>
+                            <button type="button" class="eye-btn" onclick="toggleCod('cod-prof',this)" aria-label="Mostrar/ocultar cÃ³digo"><i class="fas fa-eye"></i></button>
                         </div>
-                        <p class="hint">Los profesores ingresan este código al registrarse.</p>
+                        <p class="hint">Los profesores ingresan este cÃ³digo al registrarse.</p>
                     </div>
 
                     <div class="codigo-box">
@@ -148,9 +149,9 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
                             <input type="text" name="codigo_directoras" id="cod-dir"
                                    value="{{ colegio.codigo_directoras or colegio.codigo_registro or '' }}"
                                    autocomplete="off">
-                            <button type="button" class="eye-btn" onclick="toggleCod('cod-dir',this)" aria-label="Mostrar/ocultar código"><i class="fas fa-eye"></i></button>
+                            <button type="button" class="eye-btn" onclick="toggleCod('cod-dir',this)" aria-label="Mostrar/ocultar cÃ³digo"><i class="fas fa-eye"></i></button>
                         </div>
-                        <p class="hint">Las directoras ingresan este código al registrarse.</p>
+                        <p class="hint">Las directoras ingresan este cÃ³digo al registrarse.</p>
                     </div>
 
                     <div class="codigo-box">
@@ -159,9 +160,9 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
                             <input type="text" name="codigo_rectores" id="cod-rec"
                                    value="{{ colegio.codigo_rectores or colegio.codigo_registro or '' }}"
                                    autocomplete="off">
-                            <button type="button" class="eye-btn" onclick="toggleCod('cod-rec',this)" aria-label="Mostrar/ocultar código"><i class="fas fa-eye"></i></button>
+                            <button type="button" class="eye-btn" onclick="toggleCod('cod-rec',this)" aria-label="Mostrar/ocultar cÃ³digo"><i class="fas fa-eye"></i></button>
                         </div>
-                        <p class="hint">Los rectores ingresan este código al registrarse.</p>
+                        <p class="hint">Los rectores ingresan este cÃ³digo al registrarse.</p>
                     </div>
                 </div>
 
@@ -174,7 +175,7 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
 
     <div class="card">
         <div class="card-head">
-            <span style="font-weight:600;font-size:13px;"><i class="fas fa-magic"></i> Generar nuevos códigos</span>
+            <span style="font-weight:600;font-size:13px;"><i class="fas fa-magic"></i> Generar nuevos cÃ³digos</span>
         </div>
         <div class="card-body">
             <form method="POST">
@@ -183,14 +184,14 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
                 <input type="hidden" name="slug" value="{{ colegio.slug }}">
 
                 <div class="field">
-                    <label>Prefijo para los códigos</label>
+                    <label>Prefijo para los cÃ³digos</label>
                     <div style="display:flex;gap:8px;align-items:center;">
                         <input type="text" name="prefijo" placeholder="ej: sanjose2025" required autocomplete="off"
                                style="flex:1;max-width:300px;">
                         <button type="submit" class="btn btn-green"><i class="fas fa-sync"></i> Generar</button>
                     </div>
-                    <p class="hint">Se generarán códigos únicos para cada rol: <code>{prefijo}_prof_XXXX</code>, <code>{prefijo}_dir_XXXX</code>, <code>{prefijo}_rec_XXXX</code>.</p>
-                    <p class="hint" style="color:var(--yellow);margin-top:4px;"><i class="fas fa-exclamation-triangle"></i> Al generar nuevos códigos, los anteriores dejarán de funcionar para nuevos registros.</p>
+                    <p class="hint">Se generarÃ¡n cÃ³digos Ãºnicos para cada rol: <code>{prefijo}_prof_XXXX</code>, <code>{prefijo}_dir_XXXX</code>, <code>{prefijo}_rec_XXXX</code>.</p>
+                    <p class="hint" style="color:var(--yellow);margin-top:4px;"><i class="fas fa-exclamation-triangle"></i> Al generar nuevos cÃ³digos, los anteriores dejarÃ¡n de funcionar para nuevos registros.</p>
                 </div>
             </form>
         </div>
@@ -198,26 +199,26 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
 
     <div class="card">
         <div class="card-head">
-            <span style="font-weight:600;font-size:13px;"><i class="fas fa-info-circle"></i> Códigos actuales</span>
+            <span style="font-weight:600;font-size:13px;"><i class="fas fa-info-circle"></i> CÃ³digos actuales</span>
         </div>
         <div class="card-body">
             <div class="grid-3">
                 <div>
                     <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Profesores</span>
-                    <pre class="code-display">{{ colegio.codigo_profesores or colegio.codigo_registro or '(vacío — registro libre)' }}</pre>
+                    <pre class="code-display">{{ colegio.codigo_profesores or colegio.codigo_registro or '(vacÃ­o â€” registro libre)' }}</pre>
                 </div>
                 <div>
                     <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Directoras</span>
-                    <pre class="code-display">{{ colegio.codigo_directoras or colegio.codigo_registro or '(vacío — registro libre)' }}</pre>
+                    <pre class="code-display">{{ colegio.codigo_directoras or colegio.codigo_registro or '(vacÃ­o â€” registro libre)' }}</pre>
                 </div>
                 <div>
                     <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Rectores</span>
-                    <pre class="code-display">{{ colegio.codigo_rectores or colegio.codigo_registro or '(vacío — registro libre)' }}</pre>
+                    <pre class="code-display">{{ colegio.codigo_rectores or colegio.codigo_registro or '(vacÃ­o â€” registro libre)' }}</pre>
                 </div>
             </div>
             <p class="hint" style="margin-top:8px;">
                 <i class="fas fa-info-circle"></i>
-                Si un código específico está vacío, se usará el código general
+                Si un cÃ³digo especÃ­fico estÃ¡ vacÃ­o, se usarÃ¡ el cÃ³digo general
                 <strong>"{{ colegio.codigo_registro or '(ninguno)' }}"</strong> como fallback.
             </p>
         </div>
@@ -236,5 +237,6 @@ function toggleCod(id, btn) {
     }
 }
 </script>
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 </html>

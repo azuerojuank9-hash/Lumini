@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notificaciones — {{ colegio.nombre if colegio else slug }}</title>
+<title>Notificaciones â€” {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);}
@@ -37,7 +37,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .empty-state .icon{font-size:48px;opacity:.2;margin-bottom:16px;color:var(--accent);}
 @media(max-width:480px){body{padding:16px;}}
 </style>
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 <body>
 
 <div class="top-bar">
@@ -59,10 +60,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="notif-title">{{ n.titulo }}</div>
       {% if n.mensaje %}<div class="notif-message">{{ n.mensaje }}</div>{% endif %}
       <div class="notif-time">{{ n.fecha_creacion[:16] }}</div>
-      {% if n.link %}<a href="{{ n.link }}" class="notif-link">Ver más <i class="fas fa-arrow-right"></i></a>{% endif %}
+      {% if n.link %}<a href="{{ n.link }}" class="notif-link">Ver mÃ¡s <i class="fas fa-arrow-right"></i></a>{% endif %}
     </div>
     {% if not n.leida %}
-    <button class="mark-read" onclick="marcarLeida({{ n.id }})" title="Marcar como leída"><i class="fas fa-check"></i></button>
+    <button class="mark-read" onclick="marcarLeida({{ n.id }})" title="Marcar como leÃ­da"><i class="fas fa-check"></i></button>
     {% endif %}
   </div>
   {% endfor %}
@@ -71,7 +72,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="empty-state">
   <div class="icon"><i class="fas fa-bell"></i></div>
   <h3>No hay notificaciones</h3>
-  <p>Cuando recibas notificaciones del sistema, aparecerán aquí.</p>
+  <p>Cuando recibas notificaciones del sistema, aparecerÃ¡n aquÃ­.</p>
 </div>
 {% endif %}
 
@@ -87,5 +88,6 @@ function marcarLeida(nid){
     });
 }
 </script>
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 </html>

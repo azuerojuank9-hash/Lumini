@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -26,7 +26,8 @@
         .back{display:inline-block;margin-top:24px;padding:12px 28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;text-decoration:none;font-size:13px;font-weight:600;transition:all .2s;box-shadow:0 4px 15px rgba(var(--accent-rgb),.3);}
         .back:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(var(--accent-rgb),.4);}
     </style>
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 <body>
 <div class="bg-orb orb1"></div>
 <div class="bg-orb orb2"></div>
@@ -38,7 +39,8 @@
 </div>
 <button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:20px;z-index:9999;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);" aria-label="Cambiar tema">🌙</button>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 </html>
 
 

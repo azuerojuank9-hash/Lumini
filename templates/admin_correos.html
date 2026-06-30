@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -84,7 +84,8 @@
         @media(max-width:375px){.navbar{padding:6px 10px;}.navbar img{height:32px;width:32px;}.navbar-brand .name{font-size:.95rem;letter-spacing:3px;}.nav-link,.logout-btn{font-size:12px;}.container{padding:16px 8px 32px;}.page-header h1{font-size:1.3rem;}.card{padding:16px;}.card-title{font-size:13px;}.tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}.colegios-grid{grid-template-columns:1fr;}.form-row>*{min-width:100%;}.btn{font-size:13px;padding:8px 16px;min-height:40px;}}
     
 </style>
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 <body>
 
 <nav class="navbar">
@@ -452,7 +453,8 @@ function cargarPlantilla(key) {
 }
 </script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 </html>
 
 

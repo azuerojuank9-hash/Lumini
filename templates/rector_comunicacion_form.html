@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% if comunicacion %}Editar{% else %}Nueva{% endif %} comunicación — {{ colegio.nombre if colegio else slug }}</title>
+<title>{% if comunicacion %}Editar{% else %}Nueva{% endif %} comunicaciÃ³n â€” {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
@@ -64,7 +64,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .card{padding:18px;}
 }
 </style>
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -94,11 +95,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i class="fas fa-user-graduate"></i></span><span>Estudiantes</span></a>
     <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i class="fas fa-book"></i></span><span>Cursos</span></a>
     <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i class="fas fa-chart-bar"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i class="fas fa-history"></i></span><span>Auditoría</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i class="fas fa-user-shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i class="fas fa-cog"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span>Cerrar sesión</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i class="fas fa-history"></i></span><span>AuditorÃ­a</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">ConfiguraciÃ³n</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i class="fas fa-user-shield"></i></span><span>GestiÃ³n de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i class="fas fa-cog"></i></span><span>ConfiguraciÃ³n</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span>Cerrar sesiÃ³n</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -107,10 +108,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </nav>
 
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
 
 <div class="topbar">
-  <h1>{% if comunicacion %}Editar comunicación{% else %}Nueva comunicación{% endif %}</h1>
+  <h1>{% if comunicacion %}Editar comunicaciÃ³n{% else %}Nueva comunicaciÃ³n{% endif %}</h1>
   <div class="breadcrumb">{{ colegio.nombre if colegio else slug }}</div>
 </div>
 
@@ -122,7 +123,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 
   <div class="field">
-    <label>Título</label>
+    <label>TÃ­tulo</label>
     <input type="text" name="titulo" placeholder="Ej: Circular No. 001 - Inicio de clases" value="{{ comunicacion.titulo if comunicacion else '' }}" required>
   </div>
 
@@ -155,7 +156,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 
   <div class="field" id="destValorField" style="display:none;">
-    <label>Seleccionar destinatarios específicos</label>
+    <label>Seleccionar destinatarios especÃ­ficos</label>
     <div class="chips" id="destChips"></div>
     <input type="hidden" name="destinatario_valor" id="destinatario_valor" value="{{ comunicacion.destinatario_valor if comunicacion else '' }}">
     <div class="hint" id="destHint"></div>
@@ -163,9 +164,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
   <div class="field-row">
     <div class="field">
-      <label>Programar publicación (opcional)</label>
+      <label>Programar publicaciÃ³n (opcional)</label>
       <input type="date" name="fecha_programada" value="{{ comunicacion.fecha_programada[:10] if comunicacion and comunicacion.fecha_programada else '' }}">
-      <div class="hint">Dejar vacío para publicar manualmente</div>
+      <div class="hint">Dejar vacÃ­o para publicar manualmente</div>
     </div>
     <div class="field" style="display:flex;align-items:flex-end;padding-bottom:6px;">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;text-transform:none;letter-spacing:0;color:var(--text);">
@@ -176,7 +177,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {% if comunicacion %}Guardar cambios{% else %}Crear comunicación{% endif %}</button>
+    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {% if comunicacion %}Guardar cambios{% else %}Crear comunicaciÃ³n{% endif %}</button>
     <a href="/{{ slug }}/rector/comunicaciones" class="btn btn-outline"><i class="fas fa-times"></i> Cancelar</a>
   </div>
 </form>
@@ -203,16 +204,16 @@ function toggleDestValor(){
     if (tipo === 'grado') {
         var grados = [...new Set(cursos.map(function(c){ return c.replace(/[^0-9]/g,''); }).filter(function(g){ return g; }))];
         items = [...new Set(grados)];
-        hint.textContent = 'Selecciona uno o más grados. Se notificará a todos los cursos de esos grados.';
+        hint.textContent = 'Selecciona uno o mÃ¡s grados. Se notificarÃ¡ a todos los cursos de esos grados.';
     } else if (tipo === 'cursos') {
         items = cursos;
-        hint.textContent = 'Selecciona uno o más cursos específicos.';
+        hint.textContent = 'Selecciona uno o mÃ¡s cursos especÃ­ficos.';
     } else if (tipo === 'profesores') {
         items = profesores.map(function(p){ return {label: p.nombre, val: 'prof_'+p.id}; });
-        hint.textContent = 'Selecciona uno o más profesores.';
+        hint.textContent = 'Selecciona uno o mÃ¡s profesores.';
     } else if (tipo === 'directores') {
         items = directoras.map(function(d){ return {label: d.nombre + ' (' + d.curso + ')', val: 'dir_'+d.id}; });
-        hint.textContent = 'Selecciona uno o más directores.';
+        hint.textContent = 'Selecciona uno o mÃ¡s directores.';
     }
     if (items.length > 0) {
         field.style.display = 'block';
@@ -264,5 +265,6 @@ function toggleSidebar(){
 </script>
 <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 </html>

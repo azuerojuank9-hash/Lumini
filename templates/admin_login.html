@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -46,7 +46,8 @@
     </style>
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
-</head>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
 <body>
 
 <div class="bg-orb orb1"></div>
@@ -95,7 +96,8 @@ function togglePwd(){
 </script>
 <button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:20px;z-index:9999;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);" aria-label="Cambiar tema">🌙</button>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-</body>
+  <script src="/static/js/lumini.js"></script>
+
 </html>
 
 
