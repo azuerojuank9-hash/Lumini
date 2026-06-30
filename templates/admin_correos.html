@@ -138,6 +138,7 @@
             <div class="card-desc">Envía un correo a uno o varios colegios seleccionados. Ideal para noticias, cambios de plataforma o recordatorios generales.</div>
 
             <form method="POST" action="/admin/correos/enviar_anuncio">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <label>Seleccionar destinatarios</label>
                 <div class="select-all-row">
                     <button type="button" class="btn btn-sm" style="background:#2a2a35;color:#e8e8f0;" onclick="toggleAll('chk-anuncio', true)">✓ Todos</button>
@@ -204,6 +205,7 @@
             <div class="card-desc">Envía un recordatorio de vencimiento de suscripción al correo del administrador del colegio.</div>
 
             <form method="POST" action="/admin/recordatorio_pago">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <label>Colegio</label>
                 <select name="slug" required>
                     <option value="">— Selecciona un colegio —</option>
@@ -235,6 +237,7 @@
             {% for c in colegios %}{% if c.vencimiento %}{% set _ = proximos.append(c) %}{% endif %}{% endfor %}
             {% if proximos %}
             <form method="POST" action="/admin/correos/recordatorio_masivo">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <div class="colegios-grid">
                     {% for c in proximos %}
                     <label class="colegio-check" style="display:flex;cursor:pointer;">
@@ -263,6 +266,7 @@
             <div class="card-desc">Informa a todos los colegios sobre una nueva versión o mejora importante en Lumini.</div>
 
             <form method="POST" action="/admin/correos/enviar_actualizacion">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <label>Versión o nombre de la actualización</label>
                 <input type="text" name="version" placeholder="Ej: v2.5 — Horarios mejorados" required>
 
@@ -301,6 +305,7 @@
             <div class="card-desc">Envía correos a instituciones interesadas que aún no están registradas en Lumini.</div>
 
             <form method="POST" action="/admin/correos/enviar_promocional">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <label>Nombre de la institución</label>
                 <input type="text" name="institucion" placeholder="Colegio San Rafael" required>
 
@@ -334,6 +339,7 @@ Miles de profesores ya la usan para:
             <div class="card-title"><i class="fas fa-clipboard-list"></i> Envío masivo a lista de interesados</div>
             <div class="card-desc">Pega una lista de correos (uno por línea) para enviar el mismo mensaje a todos.</div>
             <form method="POST" action="/admin/correos/enviar_lista">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <label>Lista de correos (uno por línea)</label>
                 <textarea name="lista_emails" placeholder="correo1@ejemplo.com&#10;correo2@ejemplo.com&#10;correo3@colegio.edu" style="min-height:100px;" required></textarea>
                 <label>Asunto</label>
@@ -352,6 +358,7 @@ Miles de profesores ya la usan para:
             <div class="card-desc">Envía un mensaje personalizado a cualquier destinatario con formato Lumini.</div>
 
             <form method="POST" action="/admin/correos/enviar_individual">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <div class="form-row">
                     <div>
                         <label>Nombre del destinatario</label>
@@ -386,6 +393,7 @@ Miles de profesores ya la usan para:
             <div class="card-title"><i class="fas fa-sync-alt"></i> Reenviar correo de bienvenida</div>
             <div class="card-desc">Reenvía el correo de bienvenida a un colegio ya registrado (por si no lo recibió).</div>
             <form method="POST" action="/admin/correos/reenviar_bienvenida">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <label>Colegio</label>
                 <select name="slug" required>
                     <option value="">— Selecciona un colegio —</option>

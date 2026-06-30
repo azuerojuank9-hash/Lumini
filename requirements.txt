@@ -4,3 +4,5 @@ python-dotenv
 sendgrid
 reportlab
 pypdf
+bcrypt
+Pillow

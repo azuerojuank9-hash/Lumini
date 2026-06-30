@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, s
 import sqlite3, hashlib, time, secrets, logging, json, uuid, bcrypt
 from datetime import timedelta, datetime
 from io import BytesIO
+import html
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache 24 horas
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
@@ -49,7 +50,16 @@ app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 
 def extension_permitida(filename):
     ext = ('.' + filename.rsplit('.', 1)[-1]).lower() if '.' in filename else ''
-    return ext in ('.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg')
+    return ext in ('.png', '.jpg', '.jpeg', '.gif', '.webp')
+
+def validar_imagen(ruta):
+    try:
+        from PIL import Image
+        img = Image.open(ruta)
+        img.verify()
+        return True
+    except Exception:
+        return False
 
 JORNADAS = ['Mañana', 'Tarde', 'Nocturna']
 
@@ -763,8 +773,8 @@ def init_db(slug):
     ]
     for s in stmts:
         try: conn.execute(s)
-        except Exception: pass
-    # Phase 5 – alteraciones a tablas existentes (ignorar si ya existen)
+        except sqlite3.OperationalError as e:
+            logger.warning(f'init_db table: {e}')
     alter_stmts = [
         "ALTER TABLE mensajes_canal ADD COLUMN responde_a INTEGER REFERENCES mensajes_canal(id)",
         "ALTER TABLE mensajes_canal ADD COLUMN editado_en TEXT",
@@ -774,7 +784,8 @@ def init_db(slug):
     ]
     for stmt in alter_stmts:
         try: conn.execute(stmt)
-        except Exception: pass
+        except sqlite3.OperationalError:
+            pass
     indexes = [
         'CREATE INDEX IF NOT EXISTS idx_notas_aid ON notas(aid)',
         'CREATE INDEX IF NOT EXISTS idx_notas_actividad ON notas(actividad_id)',
@@ -793,7 +804,8 @@ def init_db(slug):
     ]
     for idx in indexes:
         try: conn.execute(idx)
-        except Exception: pass
+        except sqlite3.OperationalError as e:
+            logger.warning(f'init_db index: {e}')
     conn.commit()
     _ejecutar_migraciones(slug, conn)
     conn.close()
@@ -804,8 +816,11 @@ def get_profesor(slug):
     pid = session.get(f'profesor_id_{slug}')
     if not pid: return None
     conn = conectar(slug)
-    p = conn.execute('SELECT * FROM profesores WHERE id=?', (pid,)).fetchone()
+    p = conn.execute('SELECT * FROM profesores WHERE id=? AND activo=1', (pid,)).fetchone()
     conn.close()
+    if not p:
+        session.pop(f'profesor_id_{slug}', None)
+        session.pop(f'rol_{slug}', None)
     return p
 
 def get_sesion_jornada_materia(slug):
@@ -949,6 +964,7 @@ def periodo_cerrado(slug, periodo, conn=None):
 # ── AUDIT HELPER ──────────────────────────────────────────────────────────────
 def audit_log(slug, usuario_id, accion, tabla, registro_id=None, valor_anterior=None, valor_nuevo=None):
     from flask import request as flask_request
+    conn = None
     try:
         conn = conectar(slug)
         conn.execute(
@@ -961,9 +977,10 @@ def audit_log(slug, usuario_id, accion, tabla, registro_id=None, valor_anterior=
              flask_request.user_agent.string if flask_request.user_agent else None)
         )
         conn.commit()
-        conn.close()
     except Exception as e:
         logger.warning(f"[audit] {e}")
+    finally:
+        if conn: conn.close()
 
 # ── CONFIG HELPERS ────────────────────────────────────────────────────────────
 def config_get(slug):
@@ -1080,28 +1097,39 @@ def guardar_archivo_mensaje(slug, canal_id, f, usuario_tipo, usuario_id):
     max_sz = max_tamano_archivo(slug)
     if tamano > max_sz:
         return None, f'Archivo muy grande (máx {max_sz//1048576} MB)'
+    es_img = ext in ('.jpg','.jpeg','.png','.gif','.webp')
+    if es_img:
+        try:
+            from PIL import Image
+            import io
+            img = Image.open(io.BytesIO(f.read()))
+            img.verify()
+            f.seek(0)
+        except Exception:
+            return None, 'Archivo de imagen inválido o corrupto'
     nombre_archivo = f'{uuid.uuid4().hex}{ext}'
     upload_dir = os.path.join(app.root_path, 'static', 'uploads', slug)
     os.makedirs(upload_dir, exist_ok=True)
     ruta = os.path.join(upload_dir, nombre_archivo)
     f.save(ruta)
-    es_img = ext in ('.jpg','.jpeg','.png','.gif','.webp','.svg')
     ancho = alto = None
-    if es_img and ext != '.svg':
+    if es_img:
         try:
             from PIL import Image
             img = Image.open(ruta)
             ancho, alto = img.size
         except Exception: pass
     conn = conectar(slug)
-    fid = conn.execute(
-        '''INSERT INTO mensajes_archivos
-           (canal_id, usuario_tipo, usuario_id, nombre_original, nombre_archivo, tipo_mime, tamano, es_imagen, ancho, alto)
-           VALUES (?,?,?,?,?,?,?,?,?,?)''',
-        (canal_id, usuario_tipo, usuario_id, nombre_original, nombre_archivo,
-         EXTENSIONES_PERMITIDAS[ext], tamano, 1 if es_img else 0, ancho, alto)).lastrowid
-    conn.commit()
-    conn.close()
+    try:
+        fid = conn.execute(
+            '''INSERT INTO mensajes_archivos
+               (canal_id, usuario_tipo, usuario_id, nombre_original, nombre_archivo, tipo_mime, tamano, es_imagen, ancho, alto)
+               VALUES (?,?,?,?,?,?,?,?,?,?)''',
+            (canal_id, usuario_tipo, usuario_id, nombre_original, nombre_archivo,
+             EXTENSIONES_PERMITIDAS[ext], tamano, 1 if es_img else 0, ancho, alto)).lastrowid
+        conn.commit()
+    finally:
+        conn.close()
     return fid, None
 
 def archivos_por_mensaje(conn, mensaje_id):
@@ -1254,6 +1282,7 @@ def admin():
                 error = f'Demasiados intentos. Espera {bloqueado}s.'
                 return render_template('admin_login.html', error=error)
             if request.form.get('password', '') == ADMIN_PASSWORD:
+                session.clear()
                 session.permanent = True
                 session['admin_auth'] = True
                 limpiar_intentos(ip, prefijo='admin')
@@ -1297,7 +1326,12 @@ def admin():
                         else:
                             ext = f.filename.rsplit('.', 1)[-1].lower()
                             logo_filename = f'{slug}.{ext}'
-                            f.save(os.path.join(LOGO_FOLDER, logo_filename))
+                            ruta_logo = os.path.join(LOGO_FOLDER, logo_filename)
+                            f.save(ruta_logo)
+                            if not validar_imagen(ruta_logo):
+                                os.remove(ruta_logo)
+                                error = 'El archivo no es una imagen válida.'
+                                logo_filename = ''
                 if not error:
                     cm = conectar_master()
                     try:
@@ -1345,9 +1379,14 @@ def admin():
                     else:
                         ext = f.filename.rsplit('.', 1)[-1].lower()
                         logo_filename = f'{slug_e}.{ext}'
-                        f.save(os.path.join(LOGO_FOLDER, logo_filename))
-                        cm.execute('UPDATE colegios SET logo=? WHERE slug=?', (logo_filename, slug_e))
-                        cm.commit()
+                        ruta_logo = os.path.join(LOGO_FOLDER, logo_filename)
+                        f.save(ruta_logo)
+                        if not validar_imagen(ruta_logo):
+                            os.remove(ruta_logo)
+                            error = 'El archivo no es una imagen válida.'
+                        else:
+                            cm.execute('UPDATE colegios SET logo=? WHERE slug=?', (logo_filename, slug_e))
+                            cm.commit()
             cm.close()
             exito = f'Colegio "{nombre}" actualizado. Código: {codigo}'
 
@@ -1369,7 +1408,7 @@ def admin():
 
 @app.route('/admin/logout')
 def admin_logout():
-    session.pop('admin_auth', None)
+    session.clear()
     return redirect(url_for('admin'))
 
 # ── RECUPERAR CONTRASEÑA (PROFESORES) ─────────────────────────────────────────
@@ -1520,7 +1559,7 @@ def login(slug):
                 error = 'La contraseña es obligatoria.'
             else:
                 conn = conectar(slug)
-                prof = conn.execute('SELECT * FROM profesores WHERE usuario=?', (u,)).fetchone()
+                prof = conn.execute('SELECT * FROM profesores WHERE usuario=? AND activo=1', (u,)).fetchone()
                 if prof and verificar_pw(p, prof['password']):
                     if necesita_rehash(prof['password']):
                         conn.execute('UPDATE profesores SET password=? WHERE id=?',
@@ -1528,6 +1567,7 @@ def login(slug):
                         conn.commit()
                         logger.info(f'Hash migrado para profesor id={prof["id"]} en {slug}')
                     conn.close()
+                    session.clear()
                     session.permanent = True
                     session[f'rol_{slug}']        = 'profesor'
                     session[f'profesor_id_{slug}'] = prof['id']
@@ -1600,6 +1640,7 @@ def login(slug):
                 if alumno['pin'] and pin_ingresado != alumno['pin']:
                     error = 'PIN incorrecto.'
                 else:
+                    session.clear()
                     session.permanent = True
                     session[f'rol_{slug}']       = 'estudiante'
                     session[f'alumno_id_{slug}'] = alumno['id']
@@ -1615,6 +1656,7 @@ def login(slug):
                 'SELECT * FROM directoras WHERE usuario=? AND activo=1', (u,)).fetchone()
             conn.close()
             if d and verificar_pw(p, d['password']):
+                session.clear()
                 session.permanent = True
                 session[f'directora_id_{slug}'] = d['id']
                 return redirect(url_for('directora_panel', slug=slug))
@@ -1628,6 +1670,7 @@ def login(slug):
                 'SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
             conn.close()
             if rector and verificar_pw(p, rector['password']):
+                session.clear()
                 session.permanent = True
                 session[f'rector_id_{slug}'] = rector['id']
                 return redirect(url_for('rector_panel', slug=slug))
@@ -1672,9 +1715,7 @@ def seleccionar_jornada(slug):
 
 @app.route('/<slug>/logout')
 def logout(slug):
-    for k in [f'rol_{slug}', f'profesor_id_{slug}', f'alumno_id_{slug}',
-              f'materia_{slug}', f'jornada_{slug}', f'rector_id_{slug}']:
-        session.pop(k, None)
+    session.clear()
     return redirect(url_for('login', slug=slug))
 
 # ── HOME ──────────────────────────────────────────────────────────────────────
@@ -1742,6 +1783,25 @@ def home(slug):
         else:
             notas_by_aid = {}
             evals_by_aid = {}
+        # Batch-fetch asistencia and observaciones to avoid N+1 queries
+        asis_all = {}
+        asis_ultimo = {}
+        obs_all = {}
+        if aid_list:
+            rows_asistencia = conn.execute(
+                f'SELECT aid, fecha, estado FROM asistencia WHERE aid IN ({placeholders}) ORDER BY aid, fecha',
+                aid_list).fetchall()
+            for r in rows_asistencia:
+                asis_all.setdefault(r['aid'], []).append(r)
+            rows_ultimo = conn.execute(
+                f'SELECT aid, estado FROM asistencia WHERE id IN (SELECT MAX(id) FROM asistencia WHERE aid IN ({placeholders}) GROUP BY aid)',
+                aid_list).fetchall() if rows_asistencia else []
+            asis_ultimo = {r['aid']: r['estado'] for r in rows_ultimo}
+            rows_obs = conn.execute(
+                f'SELECT id, aid, materia, texto, fecha FROM observaciones WHERE aid IN ({placeholders}) AND materia=? ORDER BY aid, fecha DESC',
+                (*aid_list, materia)).fetchall()
+            for r in rows_obs:
+                obs_all.setdefault(r['aid'], []).append(r)
         for a in alumnos:
             notas_raw = notas_by_aid.get(a['id'], [])
             notas_map = {nr['actividad_id']: {'val': nr['val'], 'id': nr['id']} for nr in notas_raw}
@@ -1752,8 +1812,7 @@ def home(slug):
             if eval_v is not None: todas.append(eval_v)
             if auto_v is not None: todas.append(auto_v)
             prom = round(sum(todas) / len(todas), 2) if todas else None
-            historial_raw = conn.execute(
-                'SELECT fecha, estado FROM asistencia WHERE aid=? ORDER BY fecha', (a['id'],)).fetchall()
+            historial_raw = asis_all.get(a['id'], [])
             hist_meses = {}
             for h in historial_raw:
                 if h['fecha']:
@@ -1761,18 +1820,15 @@ def home(slug):
                     if len(p2) >= 2:
                         label = f"{MESES.get(p2[1], p2[1])} {p2[0]}"
                         hist_meses.setdefault(label, []).append({'fecha': h['fecha'], 'estado': h['estado']})
-            asis = conn.execute(
-                'SELECT estado FROM asistencia WHERE aid=? ORDER BY id DESC LIMIT 1', (a['id'],)).fetchone()
-            obs = conn.execute(
-                'SELECT id, materia, texto, fecha FROM observaciones WHERE aid=? AND materia=? ORDER BY fecha DESC',
-                (a['id'], materia)).fetchall()
+            ult_estado = asis_ultimo.get(a['id'])
+            obs = obs_all.get(a['id'], [])
             datos.append({
                 'id': a['id'], 'num_curso': a['num_curso'],
                 'nombre': a['nombre'], 'curso': a['curso'],
                 'promedio': prom, 'notas_map': notas_map,
                 'evaluacion':     eval_v if eval_v is not None else '',
                 'autoevaluacion': auto_v if auto_v is not None else '',
-                'asistencia': asis['estado'] if asis else '-',
+                'asistencia': ult_estado or '-',
                 'historial_meses': hist_meses,
                 'observaciones': [dict(o) for o in obs],
             })
@@ -1820,14 +1876,14 @@ def home(slug):
                 if e['promedio'] is not None and e['promedio'] < 3.0:
                     alertas.append({'nombre': e['nombre'], 'promedio': e['promedio']})
             alertas = alertas[:5]
+        pendientes = comunicaciones_pendientes(slug, 'profesor', prof['id'])
+        num_periodos = int(colegio['num_periodos']) if colegio and colegio['num_periodos'] else 4
+        pc = periodo_cerrado(slug, periodo_sel) if curso_sel and materia else False
+        solicitudes_pend = conn.execute(
+            'SELECT COUNT(*) as c FROM solicitudes_modificacion WHERE solicitado_por=? AND estado=?',
+            (prof['id'], 'pendiente')).fetchone()['c'] if curso_sel else 0
     finally:
         conn.close()
-    pendientes = comunicaciones_pendientes(slug, 'profesor', prof['id'])
-    num_periodos = int(colegio['num_periodos']) if colegio and colegio['num_periodos'] else 4
-    pc = periodo_cerrado(slug, periodo_sel) if curso_sel and materia else False
-    solicitudes_pend = conn.execute(
-        'SELECT COUNT(*) as c FROM solicitudes_modificacion WHERE solicitado_por=? AND estado=?',
-        (prof['id'], 'pendiente')).fetchone()['c'] if curso_sel else 0
     return render_template('index.html',
                            profesor=prof, mis_cursos=mis_cursos, curso_sel=curso_sel,
                            estudiantes=datos, actividades=actividades, compromisos=agenda,
@@ -1896,11 +1952,19 @@ def guardar_nota(slug):
     if None in (aid, actividad_id, val): return ('', 400)
     conn = conectar(slug)
     act = conn.execute(
-        'SELECT a.id, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
+        'SELECT a.id, a.profesor_id, a.curso, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
         (actividad_id,)).fetchone()
     if not act:
         conn.close()
         return ('', 404)
+    if act['profesor_id'] != prof['id']:
+        conn.close()
+        return ('', 403)
+    alumno = conn.execute('SELECT id FROM alumnos WHERE id=? AND curso=? AND activo=1',
+                          (aid, act['curso'])).fetchone()
+    if not alumno:
+        conn.close()
+        return ('', 403)
     if periodo_cerrado(slug, act['p'], conn):
         conn.close()
         return ('Periodo cerrado', 423)
@@ -1979,7 +2043,8 @@ def solicitar_modificacion(slug):
         periodo = 1
     conn = conectar(slug)
     campo = 'nota'
-    materia = ''
+    jornada_ctx, materia_ctx = get_sesion_jornada_materia(slug)
+    materia = materia_ctx or ''
     nota_actual_val = None
     if actividad_id is not None:
         act = conn.execute(
@@ -1996,11 +2061,15 @@ def solicitar_modificacion(slug):
     else:
         if nombre_actividad == 'Evaluación':
             campo = 'evaluacion'
-            alumno = conn.execute('SELECT evaluacion FROM alumnos WHERE id=?', (aid,)).fetchone()
+            alumno = conn.execute(
+                'SELECT evaluacion FROM evaluaciones WHERE aid=? AND profesor_id=? AND materia=? AND COALESCE(periodo,1)=?',
+                (aid, prof['id'], materia, periodo)).fetchone()
             nota_actual_val = alumno['evaluacion'] if alumno else None
         elif nombre_actividad == 'Autoevaluación':
             campo = 'autoevaluacion'
-            alumno = conn.execute('SELECT autoevaluacion FROM alumnos WHERE id=?', (aid,)).fetchone()
+            alumno = conn.execute(
+                'SELECT autoevaluacion FROM evaluaciones WHERE aid=? AND profesor_id=? AND materia=? AND COALESCE(periodo,1)=?',
+                (aid, prof['id'], materia, periodo)).fetchone()
             nota_actual_val = alumno['autoevaluacion'] if alumno else None
         else:
             conn.close()
@@ -2229,7 +2298,7 @@ def archivar_profesor_con_reasignacion(slug):
     except Exception as e:
         conn.rollback()
         logger.error(f'Error al archivar profesor {profesor_id} en {slug}: {e}')
-        return jsonify({'ok': False, 'mensaje': str(e)})
+        return jsonify({'ok': False, 'mensaje': 'Error al archivar. Intenta de nuevo.'})
     finally:
         conn.close()
 
@@ -2264,9 +2333,20 @@ def marcar_asistencia(slug):
     prof = get_profesor(slug)
     if not prof: return ('', 403)
     if not validar_csrf(): return ('Error CSRF', 403)
-    aid    = request.form.get('aid')
+    aid    = request.form.get('aid', type=int)
     estado = request.form.get('estado')
+    if aid is None or not estado: return ('', 400)
+    jornada, materia = get_sesion_jornada_materia(slug)
     conn = conectar(slug)
+    cursos_prof = get_cursos_profesor(slug, prof['id'], materia, jornada)
+    if not cursos_prof:
+        conn.close(); return ('', 403)
+    alumno = conn.execute(
+        'SELECT id FROM alumnos WHERE id=? AND curso IN ({}) AND jornada=? AND activo=1'.format(
+            ','.join('?' * len(cursos_prof))),
+        (aid, *cursos_prof, jornada)).fetchone()
+    if not alumno:
+        conn.close(); return ('', 403)
     conn.execute('INSERT INTO asistencia (aid,fecha,estado) VALUES (?,date("now"),?)', (aid, estado))
     conn.commit(); conn.close()
     return ('', 204)
@@ -2280,9 +2360,18 @@ def agregar_observacion(slug):
     if not validar_csrf(): return ('Error CSRF', 403)
     jornada, materia = get_sesion_jornada_materia(slug)
     texto = request.form.get('texto', '').strip()
-    aid   = request.form.get('aid')
-    if not texto: return ('', 400)
+    aid   = request.form.get('aid', type=int)
+    if not texto or aid is None: return ('', 400)
     conn = conectar(slug)
+    cursos_prof = get_cursos_profesor(slug, prof['id'], materia, jornada)
+    if not cursos_prof:
+        conn.close(); return ('', 403)
+    alumno = conn.execute(
+        'SELECT id FROM alumnos WHERE id=? AND curso IN ({}) AND jornada=? AND activo=1'.format(
+            ','.join('?' * len(cursos_prof))),
+        (aid, *cursos_prof, jornada)).fetchone()
+    if not alumno:
+        conn.close(); return ('', 403)
     conn.execute('INSERT INTO observaciones (aid,materia,texto,fecha) VALUES (?,?,?,date("now"))',
                  (aid, materia, texto))
     conn.commit()
@@ -2607,16 +2696,20 @@ def get_directora(slug):
     did = session.get(f'directora_id_{slug}')
     if not did: return None
     conn = conectar(slug)
-    d = conn.execute('SELECT * FROM directoras WHERE id=?', (did,)).fetchone()
+    d = conn.execute('SELECT * FROM directoras WHERE id=? AND activo=1', (did,)).fetchone()
     conn.close()
+    if not d:
+        session.pop(f'directora_id_{slug}', None)
     return d
 
 def get_rector(slug):
     rid = session.get(f'rector_id_{slug}')
     if not rid: return None
     conn = conectar(slug)
-    r = conn.execute('SELECT * FROM rectores WHERE id=?', (rid,)).fetchone()
+    r = conn.execute('SELECT * FROM rectores WHERE id=? AND activo=1', (rid,)).fetchone()
     conn.close()
+    if not r:
+        session.pop(f'rector_id_{slug}', None)
     return r
 
 @app.route('/<slug>/rector/login', methods=['GET', 'POST'])
@@ -2641,6 +2734,7 @@ def rector_login(slug):
             'SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
         conn.close()
         if rector and verificar_pw(p, rector['password']):
+            session.clear()
             session.permanent = True
             session[f'rector_id_{slug}'] = rector['id']
             limpiar_intentos(ip, prefijo=f'rector_{slug}')
@@ -2774,7 +2868,7 @@ def rector_panel(slug):
 
 @app.route('/<slug>/rector/logout')
 def rector_logout(slug):
-    session.pop(f'rector_id_{slug}', None)
+    session.clear()
     return redirect(url_for('login', slug=slug))
 
 # ── RECTOR: HORARIOS ───────────────────────────────────────────────────────────
@@ -3039,12 +3133,27 @@ def rector_solicitud_accion(slug, sid, accion):
                 '''INSERT INTO notas (aid,actividad_id,val) VALUES (?,?,?)
                    ON CONFLICT(aid,actividad_id) DO UPDATE SET val=excluded.val''',
                 (sol['aid'], sol['actividad_id'], sol['nota_solicitada']))
-        elif campo == 'evaluacion':
-            conn.execute('UPDATE alumnos SET evaluacion=? WHERE id=?',
-                         (sol['nota_solicitada'], sol['aid']))
-        elif campo == 'autoevaluacion':
-            conn.execute('UPDATE alumnos SET autoevaluacion=? WHERE id=?',
-                         (sol['nota_solicitada'], sol['aid']))
+        elif campo in ('evaluacion', 'autoevaluacion'):
+            profe = conn.execute(
+                'SELECT id, jornada FROM asignaciones_materia WHERE profesor_id=? AND materia=? LIMIT 1',
+                (sol['solicitado_por'], sol['materia'] or '')).fetchone()
+            jornada_eval = profe['jornada'] if profe else ''
+            if campo == 'evaluacion':
+                conn.execute(
+                    '''INSERT INTO evaluaciones (aid,profesor_id,materia,jornada,evaluacion,periodo)
+                       VALUES (?,?,?,?,?,?)
+                       ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
+                       DO UPDATE SET evaluacion=excluded.evaluacion''',
+                    (sol['aid'], sol['solicitado_por'], sol['materia'],
+                     jornada_eval, sol['nota_solicitada'], sol['periodo']))
+            else:
+                conn.execute(
+                    '''INSERT INTO evaluaciones (aid,profesor_id,materia,jornada,autoevaluacion,periodo)
+                       VALUES (?,?,?,?,?,?)
+                       ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
+                       DO UPDATE SET autoevaluacion=excluded.autoevaluacion''',
+                    (sol['aid'], sol['solicitado_por'], sol['materia'],
+                     jornada_eval, sol['nota_solicitada'], sol['periodo']))
         audit_log(slug, rector['id'], 'solicitud_aprobada', 'solicitudes_modificacion',
                   registro_id=sid,
                   valor_anterior={'aid': sol['aid'], 'actividad_id': sol['actividad_id'],
@@ -3092,7 +3201,7 @@ def rector_auditoria(slug):
         ORDER BY a.creado DESC LIMIT ? OFFSET ?
     ''', params + [limit, offset]).fetchall()
 
-    tablas = [r['name'] for r in conn.execute(
+    tablas = [r['tabla'] for r in conn.execute(
         "SELECT DISTINCT tabla FROM audit_log ORDER BY tabla"
     ).fetchall()]
     conn.close()
@@ -3475,8 +3584,23 @@ def notificaciones(slug):
 def notificacion_leer(slug, nid):
     require_colegio(slug)
     if not validar_csrf(): return 'Error de seguridad', 400
+    usuario_tipo = None; usuario_id = None
+    rector = get_rector(slug)
+    if rector: usuario_tipo, usuario_id = 'rector', rector['id']
+    if not usuario_id:
+        prof = get_profesor(slug)
+        if prof: usuario_tipo, usuario_id = 'profesor', prof['id']
+    if not usuario_id:
+        directora = get_directora(slug)
+        if directora: usuario_tipo, usuario_id = 'directora', directora['id']
+    if not usuario_id:
+        aid = session.get(f'alumno_id_{slug}')
+        if aid: usuario_tipo, usuario_id = 'estudiante', aid
+    if not usuario_id:
+        return jsonify({'ok': False, 'mensaje': 'No autorizado'}), 403
     conn = conectar(slug)
-    conn.execute('UPDATE notificaciones SET leida=1 WHERE id=?', (nid,))
+    conn.execute('UPDATE notificaciones SET leida=1 WHERE id=? AND usuario_tipo=? AND usuario_id=?',
+                 (nid, usuario_tipo, usuario_id))
     conn.commit()
     conn.close()
     return jsonify({'ok': True})
@@ -3960,7 +4084,10 @@ def api_canales_editar(slug, cid, mid):
         conn.close(); return jsonify({'ok':False,'error':'No puedes editar este mensaje'}), 403
     if msg['eliminado']:
         conn.close(); return jsonify({'ok':False,'error':'Mensaje eliminado'}), 400
-    creado = datetime.strptime(msg['fecha'], '%Y-%m-%d %H:%M:%S')
+    try:
+        creado = datetime.strptime(msg['fecha'], '%Y-%m-%d %H:%M:%S') if msg['fecha'] else datetime.min
+    except (ValueError, TypeError):
+        creado = datetime.min
     if (datetime.now() - creado).total_seconds() > TIEMPO_EDICION_SEGUNDOS:
         conn.close(); return jsonify({'ok':False,'error':'Tiempo de edición expirado'}), 400
     nuevo_texto = request.form.get('mensaje','').strip()
@@ -4292,6 +4419,7 @@ def directora_login(slug):
             'SELECT * FROM directoras WHERE usuario=? AND activo=1', (u,)).fetchone()
         conn.close()
         if d and verificar_pw(p, d['password']):
+            session.clear()
             session.permanent = True
             session[f'directora_id_{slug}'] = d['id']
             limpiar_intentos(ip, prefijo=f'directora_{slug}')
@@ -4393,11 +4521,14 @@ def directora_panel(slug):
     notas_by = {}
     for r in notas_all:
         notas_by.setdefault((r['aid'], r['materia']), []).append(r['val'])
-    evals_all = conn.execute(
-        '''SELECT aid, materia, evaluacion, autoevaluacion FROM evaluaciones
-           WHERE aid IN ({}) AND COALESCE(periodo,1)=?'''.format(
-               ','.join('?' * len(aid_alumno))),
-        (*aid_alumno, periodo)).fetchall()
+    if aid_alumno:
+        evals_all = conn.execute(
+            '''SELECT aid, materia, evaluacion, autoevaluacion FROM evaluaciones
+               WHERE aid IN ({}) AND COALESCE(periodo,1)=?'''.format(
+                   ','.join('?' * len(aid_alumno))),
+            (*aid_alumno, periodo)).fetchall()
+    else:
+        evals_all = []
     evals_by = {}
     for r in evals_all:
         evals_by[(r['aid'], r['materia'])] = r
@@ -4482,7 +4613,7 @@ def directora_boletin_pdf(slug):
 
 @app.route('/<slug>/directora/logout')
 def directora_logout(slug):
-    session.pop(f'directora_id_{slug}', None)
+    session.clear()
     return redirect(url_for('directora_login', slug=slug))
 
 @app.route('/<slug>/directora/enviar_correos', methods=['POST'])
@@ -4532,11 +4663,11 @@ def directora_enviar_correos(slug):
                 html_content=f'''<div style="font-family:sans-serif;max-width:500px;margin:0 auto;">
                     <h2 style="color:{pri_hex};">LUMINI — Boletín de Notas</h2>
                     <p>Estimado acudiente,</p>
-                    <p>Adjunto encontrará el boletín de notas de <strong>{alumno["nombre"]}</strong>
+                    <p>Adjunto encontrará el boletín de notas de <strong>{html.escape(str(alumno['nombre']))}</strong>
                        correspondiente al <strong>Periodo {periodo}</strong>.</p>
                     <p><strong>Promedio general: {prom_general}</strong></p>
                     <p style="color:#888;font-size:12px;">
-                       {colegio["nombre"] if colegio else slug} · {curso} · {jornada}</p>
+                       {html.escape(str(colegio['nombre'] if colegio else slug))} · {curso} · {jornada}</p>
                 </div>'''
             )
             adjunto = Attachment(
@@ -4611,24 +4742,55 @@ def index():
     conn.close()
     return render_template("index_root.html", colegios=colegios)
 
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    if app.config.get('SESSION_COOKIE_SECURE'):
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'"
+    return response
+
+@app.errorhandler(400)
+def bad_request(e):
+    return render_template('error.html', codigo=400, mensaje='Solicitud inválida.'), 400
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('error.html', codigo=403, mensaje='Acceso denegado.'), 403
+
 @app.errorhandler(404)
 def not_found(e):
     return render_template('error.html', codigo=404, mensaje='Página no encontrada.'), 404
 
-@app.errorhandler(403)
-def forbidden(e):
-    return render_template('error.html', codigo=403, mensaje='Este colegio está inactivo.'), 403
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return render_template('error.html', codigo=405, mensaje='Método no permitido.'), 405
 
 @app.errorhandler(413)
 def too_large(e):
     return render_template('error.html', codigo=413,
                            mensaje='El archivo es demasiado grande. Máximo permitido: 2 MB.'), 413
 
+@app.errorhandler(429)
+def too_many_requests(e):
+    return render_template('error.html', codigo=429,
+                           mensaje='Demasiadas solicitudes. Intenta de nuevo más tarde.'), 429
+
 @app.errorhandler(500)
 def server_error(e):
     logger.error(f'Error interno: {e}')
     return render_template('error.html', codigo=500,
                            mensaje='Error interno del servidor. Intenta de nuevo más tarde.'), 500
+
+@app.errorhandler(502)
+def bad_gateway(e):
+    return render_template('error.html', codigo=502, mensaje='Servicio temporalmente no disponible.'), 502
+
+@app.errorhandler(503)
+def service_unavailable(e):
+    return render_template('error.html', codigo=503, mensaje='Servicio en mantenimiento.'), 503
 
 # ── FILTRO DÍAS RESTANTES ─────────────────────────────────────────────────────
 from datetime import date as _date

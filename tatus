@@ -1,0 +1,15 @@
+* [33m851d428[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;33mtag: [m[1;33mpre-auditoria-v1[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Pre-auditoria general: respaldo antes de revisión completa del proyecto
+* [33mea8ac58[m[33m ([m[1;33mtag: [m[1;33mv0.8.1[m[33m)[m Fase 5: mejora interfaz del chat, soporte para adjuntos y acciones seguras
+* [33md6cc64e[m[33m ([m[1;33mtag: [m[1;33mv0.8.0[m[33m)[m Implementa cierre de períodos académicos y flujo de solicitudes de modificación
+* [33m1ca5444[m Estabilización completa del módulo de calificaciones
+* [33m10cf292[m Fase B: Corrección completa del sistema de promedios y manejo de notas sin calificar
+* [33mfe1ab6b[m P0 Estabilidad: CSRF completo, rate limiting, auditoría y migraciones
+* [33me21a6c4[m Fase 4 - Chat completo y mejoras de canales
+* [33m01d9e17[m Fase 3 - Canales institucionales
+* [33m10f2758[m[33m ([m[1;33mtag: [m[1;33mv2.0-centro-avisos[m[33m)[m Fase 2 Centro de Avisos: API, polling y notificaciones
+* [33mf399406[m LUMINI v2.1 - Correcciones de estabilidad
+* [33m35e178c[m fix: proteger generar_destinatarios contra crashes y datos corruptos
+* [33m3a28133[m fix: wrap generar_destinatarios in try/except in new/publish routes; log insert errors
+* [33mef6c335[m fix: varios bugs en sistema de avisos - modal oculto, colores invalidos, sqlite3.Row.get(), generar_destinatarios
+* [33m321d7a5[m feat: sistema de avisos automaticos con centro de avisos y modal de lectura
+* [33m41230c8[m Centro de Avisos Fase 1
