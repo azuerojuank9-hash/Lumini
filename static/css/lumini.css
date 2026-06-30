@@ -1,10 +1,11 @@
 /* ============================================================
-   LUMINI — Refinements
+   LUMINI — Refinements Visuales
    ============================================================
-   Cargado después del <style> inline para pulir sin rediseñar.
-   Solo ajusta espaciado, alineación, jerarquía y usabilidad.
-   No añade componentes nuevos ni cambia la identidad visual.
-   Los prefijos `body` aseguran cascada sobre inline <style>.
+   Cargado después del <style> inline.
+   Enriquece la interfaz con iconografía, micro-animaciones,
+   ilustraciones de estados vacíos y calidad visual profesional.
+   No cambia la identidad visual original de LUMINI.
+   Prefijo `body` para asegurar cascada sobre inline <style>.
    ============================================================ */
 
 /* ── Scrollbar sutil ── */
@@ -24,64 +25,87 @@ body textarea:focus-visible {
   outline-offset: 2px;
 }
 
-/* ── Sidebar ── */
-body .sidebar-item {
-  padding: 9px 12px;
-  gap: 10px;
-  font-size: 12.5px;
-  margin-bottom: 2px;
-}
+/* ══════════════════════════════════════════════════════════════
+   SIDEBAR
+   ══════════════════════════════════════════════════════════════ */
+body .sidebar-item { padding: 9px 12px; gap: 10px; font-size: 12.5px; margin-bottom: 2px; }
 body .sidebar-item i,
-body .sidebar-item .icon {
-  font-size: 14px;
-  width: 20px;
-  text-align: center;
-}
-body .sidebar-item:hover {
-  background: rgba(var(--accent-rgb), 0.08);
-  color: var(--text);
-}
+body .sidebar-item .icon { font-size: 14px; width: 20px; text-align: center; }
+body .sidebar-item:hover { background: rgba(var(--accent-rgb), 0.08); color: var(--text); }
 body .sidebar-item.activa,
-body .sidebar-item.active {
-  background: var(--accent);
-  color: #fff;
-  font-weight: 700;
-}
+body .sidebar-item.active { background: var(--accent); color: #fff; font-weight: 700; }
 body .sidebar-item.activa i,
-body .sidebar-item.active i {
-  color: #fff;
-}
-body .sidebar-section {
-  padding: 12px 12px 6px;
-  font-size: 9.5px;
-}
-body .sidebar-user {
-  padding: 14px;
-  font-size: 12.5px;
-}
+body .sidebar-item.active i { color: #fff; }
+body .sidebar-section { padding: 12px 12px 6px; font-size: 9.5px; }
+body .sidebar-user { padding: 14px; font-size: 12.5px; }
 body .sidebar-user .role { font-size: 10px; margin-top: 2px; }
 body .sidebar-nav { padding: 8px 8px; }
 body .sidebar-header { padding: 18px 16px 14px; }
 
-/* ── Cards ── */
-body .card {
-  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-  margin-bottom: 18px;
-}
+/* ══════════════════════════════════════════════════════════════
+   CARDS
+   ══════════════════════════════════════════════════════════════ */
+body .card { box-shadow: 0 1px 4px rgba(0,0,0,0.12); margin-bottom: 18px; }
 body .card-head { padding: 14px 18px; min-height: 46px; }
 body .card-body { padding: 16px 18px; }
 body .card-title { font-size: 12.5px; }
 body .dash-cards { gap: 16px; margin-bottom: 26px; }
-body .dash-card { padding: 22px 20px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-body .dash-card:hover { border-color: rgba(var(--accent-rgb), 0.15); }
+
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD CARDS — Iconos y Color
+   ══════════════════════════════════════════════════════════════ */
+body .dash-card {
+  padding: 22px 20px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  transition: all 0.25s ease;
+}
+body .dash-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  border-color: rgba(var(--accent-rgb), 0.2);
+}
 body .dash-card .sval { font-size: 1.5rem; }
 body .dash-card .slabel { font-size: 9.5px; margin-bottom: 6px; }
 
-/* ── Estadísticas ── */
+/* Icon wrapper — contenedor moderno con color de fondo */
+body .icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  font-size: 19px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+body .dash-card:hover .icon-wrap {
+  transform: scale(1.05);
+}
+
+/* Colores por tipo de tarjeta */
+body .dash-card.purple .icon-wrap { background: rgba(109,40,217,0.15); color: #8B5CF6; }
+body .dash-card.blue .icon-wrap { background: rgba(37,99,235,0.15); color: #60A5FA; }
+body .dash-card.green .icon-wrap { background: rgba(34,197,94,0.15); color: #4ADE80; }
+body .dash-card.orange .icon-wrap { background: rgba(249,115,22,0.15); color: #FB923C; }
+body .dash-card.teal .icon-wrap { background: rgba(20,184,166,0.15); color: #5EEAD4; }
+body .dash-card.pink .icon-wrap { background: rgba(236,72,153,0.15); color: #F472B6; }
+
+/* Valores y etiquetas */
+body .dval { font-size: 1.9rem; margin-top: 2px; }
+body .dlabel { font-size: 11.5px; margin-top: 8px; letter-spacing: 0.04em; }
+body .dtag { font-size: 11.5px; margin-top: 4px; }
+
+/* ══════════════════════════════════════════════════════════════
+   ESTADÍSTICAS
+   ══════════════════════════════════════════════════════════════ */
 body .stats { gap: 12px; margin-bottom: 22px; }
 body .sval { font-size: 1.45rem; }
 
-/* ── Botones ── */
+/* ══════════════════════════════════════════════════════════════
+   BOTONES
+   ══════════════════════════════════════════════════════════════ */
 body .abtn { padding: 6px 12px; font-size: 10.5px; min-height: 30px; border-radius: 8px; }
 body .bsm { padding: 9px 18px; font-size: 12.5px; border-radius: var(--rsm, 6px); }
 body .bp { box-shadow: 0 3px 10px rgba(34,197,94,0.2); }
@@ -89,18 +113,24 @@ body .primary { box-shadow: 0 3px 10px rgba(var(--accent-rgb), 0.2); }
 body .qaction { padding: 11px 20px; font-size: 12.5px; gap: 9px; }
 body .qaction:hover { background: var(--bg4, #334155); border-color: rgba(var(--accent-rgb), 0.2); }
 
-/* ── Formularios ── */
+/* ══════════════════════════════════════════════════════════════
+   FORMULARIOS
+   ══════════════════════════════════════════════════════════════ */
 body .finput { padding: 10px 14px; font-size: 12.5px; }
 body .finput:focus { border-color: var(--accent, #6D28D9); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12); }
 body .dlabel { font-size: 11.5px; margin-top: 8px; margin-bottom: 4px; }
 
-/* ── Tablas ── */
+/* ══════════════════════════════════════════════════════════════
+   TABLAS
+   ══════════════════════════════════════════════════════════════ */
 body table { border-collapse: collapse; width: 100%; }
 body table th { padding: 10px 10px; font-size: 10.5px; letter-spacing: 0.06em; }
 body table td { padding: 9px 8px; font-size: 12.5px; }
 body table tbody tr:hover { background: rgba(var(--accent-rgb), 0.04); }
 
-/* ── Dashboard sections ── */
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD SECTIONS
+   ══════════════════════════════════════════════════════════════ */
 body .dash-wrap { padding: 26px 30px; margin-bottom: 30px; }
 body .dash-greeting { margin-bottom: 24px; }
 body .dash-grid { gap: 16px; }
@@ -108,28 +138,158 @@ body .dash-divider { margin: 22px 0; }
 body .topbar { margin-bottom: 22px; }
 body .quick-actions { gap: 12px; margin-bottom: 10px; }
 
-/* ── Breadcrumb ── */
+/* ══════════════════════════════════════════════════════════════
+   COMPONENTES
+   ══════════════════════════════════════════════════════════════ */
 body .breadcrumb { font-size: 12.5px; margin-top: 3px; }
-
-/* ── Toast ── */
 body .toast { padding: 12px 18px; font-size: 12.5px; border-radius: 10px; gap: 8px; }
-
-/* ── Scroll top ── */
 body .scroll-top { bottom: 80px; right: 22px; }
 body .scroll-top:hover { background: var(--bg3); transform: scale(1.05); }
-
-/* ── Modal ── */
 body .modal { padding: 26px; max-width: 440px; }
-
-/* ── Schedule ── */
 body .schedule-item { padding: 10px 0; gap: 14px; }
 body .schedule-time { font-size: 11px; }
 body .schedule-subj { font-size: 12.5px; }
-
-/* ── Empty state ── */
 body .empty-state { padding: 28px; font-size: 12.5px; }
 
-/* ── Responsive ── */
+/* ══════════════════════════════════════════════════════════════
+   ESTADOS VACÍOS — ilustración, mensaje, acción
+   ══════════════════════════════════════════════════════════════ */
+body .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  min-height: 180px;
+  background: var(--bg2, #0F172A);
+  border: 1px dashed var(--border);
+  border-radius: var(--rlg, 14px);
+}
+body .empty-state .icon {
+  font-size: 40px;
+  margin-bottom: 14px;
+  opacity: 0.6;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--accent-rgb), 0.06);
+  border-radius: 20px;
+}
+body .empty-state .icon i { font-size: 32px; }
+body .empty-state .empty-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 8px 18px;
+  border-radius: var(--rsm, 6px);
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+body .empty-state .empty-action:hover {
+  background: rgba(var(--accent-rgb), 0.18);
+  transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MICRO-ANIMACIONES
+   ══════════════════════════════════════════════════════════════ */
+
+/* Fade-in de tarjetas al cargar */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+body .dash-card,
+body .card,
+body .dash-wrap {
+  animation: fadeSlideIn 0.35s ease both;
+}
+body .dash-card:nth-child(2) { animation-delay: 0.05s; }
+body .dash-card:nth-child(3) { animation-delay: 0.1s; }
+body .dash-card:nth-child(4) { animation-delay: 0.15s; }
+body .dash-card:nth-child(5) { animation-delay: 0.2s; }
+body .dash-card:nth-child(6) { animation-delay: 0.25s; }
+
+/* Hover suave en tarjetas de contenido */
+body .card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+}
+
+/* Transición suave en botones de acción */
+body .bsm:hover,
+body .abtn:hover,
+body .qaction:hover {
+  transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SKELETON LOADING
+   ══════════════════════════════════════════════════════════════ */
+@keyframes shimmer {
+  0%   { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+body .skeleton {
+  background: linear-gradient(90deg, var(--bg3, #1E293B) 25%, var(--bg4, #334155) 50%, var(--bg3, #1E293B) 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--rsm, 6px);
+}
+body .skeleton-text { height: 14px; margin-bottom: 8px; width: 60%; }
+body .skeleton-title { height: 10px; margin-bottom: 12px; width: 40%; }
+body .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
+body .skeleton-card { height: 120px; margin-bottom: 16px; }
+
+/* ══════════════════════════════════════════════════════════════
+   MINI GRÁFICOS / INDICADORES
+   ══════════════════════════════════════════════════════════════ */
+body .mini-bar {
+  display: flex; gap: 3px; align-items: flex-end; height: 32px;
+  margin-top: 10px;
+}
+body .mini-bar span {
+  width: 6px; border-radius: 3px 3px 0 0;
+  background: var(--bg4, #334155);
+  transition: height 0.4s ease;
+}
+body .mini-bar span:nth-child(1) { height: 12px; }
+body .mini-bar span:nth-child(2) { height: 20px; }
+body .mini-bar span:nth-child(3) { height: 28px; }
+body .mini-bar span:nth-child(4) { height: 16px; }
+body .mini-bar span:nth-child(5) { height: 24px; }
+
+/* ══════════════════════════════════════════════════════════════
+   STAT BADGE — indicador pequeño dentro de tarjetas
+   ══════════════════════════════════════════════════════════════ */
+body .stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 6px;
+}
+body .stat-badge.up { background: rgba(34,197,94,0.12); color: #4ADE80; }
+body .stat-badge.down { background: rgba(239,68,68,0.12); color: #F87171; }
+body .stat-badge.neutral { background: rgba(148,163,184,0.12); color: #94A3B8; }
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   body .sidebar { width: 200px; }
   body .dash-cards { grid-template-columns: repeat(2, 1fr); }
