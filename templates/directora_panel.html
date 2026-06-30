@@ -27,6 +27,7 @@
 
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/static/css/lumini.css">
 
 
 
@@ -54,7 +55,7 @@
 
 
 
-<title>Panel Directora â€” {{ colegio.nombre if colegio else slug }}</title>
+<title>Panel Directora — {{ colegio.nombre if colegio else slug }}</title>
 
 
 
@@ -698,8 +699,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-  <link rel="stylesheet" href="/static/css/lumini.css">
-
+</head>
 
 
 
@@ -804,7 +804,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-            <div class="sidebar-brand-sub">ðŸ‘©Ã¢â‚¬ðŸ’¼ {{ directora.nombre }} Â· Curso {{ curso }} Â· {{ jornada }}</div>
+            <div class="sidebar-brand-sub">👩â€💼 {{ directora.nombre }} · Curso {{ curso }} · {{ jornada }}</div>
 
 
 
@@ -846,7 +846,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="sidebar-link"><span class="icon"><i class="fas fa-file-alt"></i></span> BoletÃ­n PDF</a>
+        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="sidebar-link"><span class="icon"><i class="fas fa-file-alt"></i></span> Boletín PDF</a>
 
 
 
@@ -860,7 +860,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-        <a href="{{ url_for('directora_logout', slug=slug) }}" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesiÃ³n</a>
+        <a href="{{ url_for('directora_logout', slug=slug) }}" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesión</a>
 
 
 
@@ -917,7 +917,6 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 <div class="main">
-<div class="dashboard-grid fill-screen">
 
 
 
@@ -931,7 +930,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">Ã¢â€™Â°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â’°</button>
 
 
 
@@ -966,7 +965,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-        <a href="?periodo={{ p }}" class="ptab {% if p==periodo %}active{% endif %}">{{ p }}Â° Periodo</a>
+        <a href="?periodo={{ p }}" class="ptab {% if p==periodo %}active{% endif %}">{{ p }}° Periodo</a>
 
 
 
@@ -1008,7 +1007,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-            <span class="card-title"><i class="fas fa-clipboard-list"></i> Estado de notas â€” Periodo {{ periodo }}</span>
+            <span class="card-title"><i class="fas fa-clipboard-list"></i> Estado de notas — Periodo {{ periodo }}</span>
 
 
 
@@ -1064,7 +1063,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-                    {% if p.enviado %}<i class="fas fa-check-circle"></i>{% else %}Ã¢Â³{% endif %} {{ p.materia }} Â· {{ p.nombre }}
+                    {% if p.enviado %}<i class="fas fa-check-circle"></i>{% else %}â³{% endif %} {{ p.materia }} · {{ p.nombre }}
 
 
 
@@ -1099,7 +1098,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-            <p style="color:var(--muted);font-size:13px;">NingÃºn profesor ha registrado actividades en el periodo {{ periodo }}.</p>
+            <p style="color:var(--muted);font-size:13px;">Ningún profesor ha registrado actividades en el periodo {{ periodo }}.</p>
 
 
 
@@ -1141,14 +1140,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-        <button onclick="enviarCorreosTodos()" class="nbtn nbtn-green">ðŸ“§ Enviar boletines por correo (todos)</button>
+        <button onclick="enviarCorreosTodos()" class="nbtn nbtn-green">📧 Enviar boletines por correo (todos)</button>
 
 
 
 
 
 
-        <span style="font-size:11px;color:var(--muted);">Solo se envÃ­a a estudiantes con correo registrado.</span>
+        <span style="font-size:11px;color:var(--muted);">Solo se envía a estudiantes con correo registrado.</span>
 
 
 
@@ -1183,7 +1182,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-            <span class="card-title"><i class="fas fa-chart-bar"></i> Notas consolidadas â€” {{ curso }} Â· {{ jornada }} Â· Periodo {{ periodo }}</span>
+            <span class="card-title"><i class="fas fa-chart-bar"></i> Notas consolidadas — {{ curso }} · {{ jornada }} · Periodo {{ periodo }}</span>
 
 
 
@@ -1197,7 +1196,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-                <span class="tag-apr">Ã¢â€°Â¥ 3.0 Aprobado</span>
+                <span class="tag-apr">â‰¥ 3.0 Aprobado</span>
 
 
 
@@ -1274,7 +1273,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-                            {{ mat }}{% if mat not in materias_enviadas %} <span style="color:var(--yellow);font-size:9px;">Ã¢Â³</span>{% endif %}
+                            {{ mat }}{% if mat not in materias_enviadas %} <span style="color:var(--yellow);font-size:9px;">â³</span>{% endif %}
 
 
 
@@ -1351,14 +1350,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-                        <th style="font-size:9px;color:#64748B;" title="EvaluaciÃ³n 25%">Eval</th>
+                        <th style="font-size:9px;color:#64748B;" title="Evaluación 25%">Eval</th>
 
 
 
 
 
 
-                        <th style="font-size:9px;color:#64748B;" title="AutoevaluaciÃ³n 10%">Auto</th>
+                        <th style="font-size:9px;color:#64748B;" title="Autoevaluación 10%">Auto</th>
 
 
 
@@ -1442,28 +1441,28 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-                    <td style="border-left:2px solid rgba(var(--accent-rgb),.1);" class="nota-none">{{ d.act if d.act is not none else 'â€”' }}</td>
+                    <td style="border-left:2px solid rgba(var(--accent-rgb),.1);" class="nota-none">{{ d.act if d.act is not none else '—' }}</td>
 
 
 
 
 
 
-                    <td class="nota-none">{{ d.eval if d.eval is not none else 'â€”' }}</td>
+                    <td class="nota-none">{{ d.eval if d.eval is not none else '—' }}</td>
 
 
 
 
 
 
-                    <td class="nota-none">{{ d.auto if d.auto is not none else 'â€”' }}</td>
+                    <td class="nota-none">{{ d.auto if d.auto is not none else '—' }}</td>
 
 
 
 
 
 
-                    <td class="{% if d.final is not none %}{% if d.final >= 3.0 %}nota-ok{% else %}nota-mal{% endif %}{% else %}nota-none{% endif %}">{{ d.final if d.final is not none else 'â€”' }}</td>
+                    <td class="{% if d.final is not none %}{% if d.final >= 3.0 %}nota-ok{% else %}nota-mal{% endif %}{% else %}nota-none{% endif %}">{{ d.final if d.final is not none else '—' }}</td>
 
 
 
@@ -1484,7 +1483,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-                        {{ fila.promedio if fila.promedio is not none else 'â€”' }}
+                        {{ fila.promedio if fila.promedio is not none else '—' }}
 
 
 
@@ -1519,7 +1518,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-                        {% else %}<span style="color:#64748B;font-size:11px;">â€”</span>{% endif %}
+                        {% else %}<span style="color:#64748B;font-size:11px;">—</span>{% endif %}
 
 
 
@@ -1554,7 +1553,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-                            <button class="email-save-btn" onclick="guardarEmail({{ fila.id }})">ðŸ’¾</button>
+                            <button class="email-save-btn" onclick="guardarEmail({{ fila.id }})">💾</button>
 
 
 
@@ -1589,7 +1588,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-                        <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre }}')" title="Enviar boletÃ­n" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);cursor:pointer;font-weight:600;">ðŸ“§</button>
+                        <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre }}')" title="Enviar boletín" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);cursor:pointer;font-weight:600;">📧</button>
 
 
 
@@ -1659,28 +1658,28 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-            <strong style="color:var(--muted);">PonderaciÃ³n:</strong>
+            <strong style="color:var(--muted);">Ponderación:</strong>
 
 
 
 
 
 
-            Act = Actividades <strong style="color:var(--accent);">65%</strong> Â·
+            Act = Actividades <strong style="color:var(--accent);">65%</strong> ·
 
 
 
 
 
 
-            Eval = EvaluaciÃ³n docente <strong style="color:var(--accent);">25%</strong> Â·
+            Eval = Evaluación docente <strong style="color:var(--accent);">25%</strong> ·
 
 
 
 
 
 
-            Auto = AutoevaluaciÃ³n <strong style="color:var(--accent);">10%</strong>
+            Auto = Autoevaluación <strong style="color:var(--accent);">10%</strong>
 
 
 
@@ -1701,7 +1700,6 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-</div><!-- end dashboard-grid -->
 </div>
 
 
@@ -1737,14 +1735,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-            <h3 style="font-size:15px;">ðŸ‘©Ã¢â‚¬ðŸ’¼ Crear cuenta de directora</h3>
+            <h3 style="font-size:15px;">👩â€💼 Crear cuenta de directora</h3>
 
 
 
 
 
 
-            <button onclick="cerrarModalRegistro()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">âœ•</button>
+            <button onclick="cerrarModalRegistro()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
 
 
 
@@ -1800,14 +1798,14 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-        <label class="flabel">ContraseÃ±a</label>
+        <label class="flabel">Contraseña</label>
 
 
 
 
 
 
-        <input class="finput" type="password" id="reg-password" placeholder="MÃ­nimo 6 caracteres">
+        <input class="finput" type="password" id="reg-password" placeholder="Mínimo 6 caracteres">
 
 
 
@@ -1849,7 +1847,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-            Crear cuenta â†’
+            Crear cuenta →
 
 
 
@@ -1884,7 +1882,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 
 
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">â†‘</button>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
 
 
 
@@ -2073,7 +2071,7 @@ function guardarEmail(aid){
 
 
 
-    }).catch(()=>showToast('Ã¢â€œ Error al guardar.',false));
+    }).catch(()=>showToast('â“ Error al guardar.',false));
 
 
 
@@ -2094,14 +2092,14 @@ function enviarCorreosTodos(){
 
 
 
-    if(!confirm('Â¿Enviar boletines a todos los estudiantes con correo registrado?')) return;
+    if(!confirm('¿Enviar boletines a todos los estudiantes con correo registrado?')) return;
 
 
 
 
 
 
-    const btn=event.target; btn.disabled=true; btn.textContent='Ã¢Â³ Enviando...';
+    const btn=event.target; btn.disabled=true; btn.textContent='â³ Enviando...';
 
 
 
@@ -2122,14 +2120,14 @@ function enviarCorreosTodos(){
 
 
 
-        showToast(d.mensaje,d.ok); btn.disabled=false; btn.textContent='ðŸ“§ Enviar boletines por correo (todos)';
+        showToast(d.mensaje,d.ok); btn.disabled=false; btn.textContent='📧 Enviar boletines por correo (todos)';
 
 
 
 
 
 
-    }).catch(()=>{showToast('Ã¢â€œ Error al enviar.',false);btn.disabled=false;btn.textContent='ðŸ“§ Enviar boletines por correo (todos)';});
+    }).catch(()=>{showToast('â“ Error al enviar.',false);btn.disabled=false;btn.textContent='📧 Enviar boletines por correo (todos)';});
 
 
 
@@ -2164,14 +2162,14 @@ function enviarCorreoUno(aid,nombre){
 
 
 
-    if(!email){showToast('<i class="fas fa-exclamation-triangle"></i>Ã¯Â¸ Primero guarda el correo del acudiente.',false);emailInp&&emailInp.focus();return;}
+    if(!email){showToast('<i class="fas fa-exclamation-triangle"></i>ï¸ Primero guarda el correo del acudiente.',false);emailInp&&emailInp.focus();return;}
 
 
 
 
 
 
-    if(!confirm(`Â¿Enviar boletÃ­n de ${nombre} a ${email}?`)) return;
+    if(!confirm(`¿Enviar boletín de ${nombre} a ${email}?`)) return;
 
 
 
@@ -2185,7 +2183,7 @@ function enviarCorreoUno(aid,nombre){
 
 
 
-    fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>showToast(d.mensaje,d.ok)).catch(()=>showToast('Ã¢â€œ Error al enviar.',false));
+    fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>showToast(d.mensaje,d.ok)).catch(()=>showToast('â“ Error al enviar.',false));
 
 
 
@@ -2304,14 +2302,14 @@ function crearDirectora(){
 
 
 
-    if(!nombre||!usuario||!password||!curso){errDiv.textContent='<i class="fas fa-exclamation-triangle"></i>Ã¯Â¸ Completa todos los campos.';errDiv.style.display='block';return;}
+    if(!nombre||!usuario||!password||!curso){errDiv.textContent='<i class="fas fa-exclamation-triangle"></i>ï¸ Completa todos los campos.';errDiv.style.display='block';return;}
 
 
 
 
 
 
-    if(password.length<6){errDiv.textContent='<i class="fas fa-exclamation-triangle"></i>Ã¯Â¸ MÃ­nimo 6 caracteres.';errDiv.style.display='block';return;}
+    if(password.length<6){errDiv.textContent='<i class="fas fa-exclamation-triangle"></i>ï¸ Mínimo 6 caracteres.';errDiv.style.display='block';return;}
 
 
 
@@ -2339,14 +2337,14 @@ function crearDirectora(){
 
 
 
-        else{errDiv.textContent=`<i class="fas fa-exclamation-triangle"></i>Ã¯Â¸ ${d.mensaje}`;errDiv.style.display='block';}
+        else{errDiv.textContent=`<i class="fas fa-exclamation-triangle"></i>ï¸ ${d.mensaje}`;errDiv.style.display='block';}
 
 
 
 
 
 
-    }).catch(()=>{errDiv.textContent='<i class="fas fa-exclamation-triangle"></i>Ã¯Â¸ Error de conexiÃ³n.';errDiv.style.display='block';});
+    }).catch(()=>{errDiv.textContent='<i class="fas fa-exclamation-triangle"></i>ï¸ Error de conexión.';errDiv.style.display='block';});
 
 
 
@@ -2479,14 +2477,14 @@ addDataLabels();
 
 
 
+</body>
+
+
+
+
+
+
   <script src="/static/js/lumini.js"></script>
-
-
-
-
-
-
-
 </html>
 
 

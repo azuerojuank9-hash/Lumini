@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/static/css/lumini.css">
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <link rel="manifest" href="/static/manifest.json">
@@ -392,8 +393,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   .dash-greeting h1{font-size:19px;}
 }
 </style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-
+</head>
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -437,54 +437,52 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 
 
-<div class="dashboard-grid fill-screen">
-<div class="stats-row">
-    <div class="stat-tile">
-        <div class="stat-tile-icon purple"><i class="fas fa-users"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value">{{ estudiantes|length }}</div>
-            <div class="stat-tile-label">Estudiantes</div>
-        </div>
+<div class="dash-wrap">
+<div class="dash-greeting">
+    <div>
+        <h1>Bienvenido, {{ profesor.nombre }}</h1>
+        <div class="date">{{ hoy_fecha }} &middot; {{ jornada }} &middot; {{ materia }}</div>
     </div>
-    <div class="stat-tile">
-        <div class="stat-tile-icon blue"><i class="fas fa-book-open"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value">{{ mis_cursos|length }}</div>
-            <div class="stat-tile-label">Cursos asignados</div>
-        </div>
-    </div>
-    <div class="stat-tile">
-        <div class="stat-tile-icon green"><i class="fas fa-calendar-check"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value">{{ asistencia_hoy }}</div>
-            <div class="stat-tile-label">Asistencia hoy</div>
-        </div>
-    </div>
-    <div class="stat-tile">
-        <div class="stat-tile-icon orange"><i class="fas fa-tasks"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value">{{ notas_pend if notas_pend else 0 }}</div>
-            <div class="stat-tile-label">Notas pendientes</div>
-        </div>
-    </div>
-    <div class="stat-tile">
-        <div class="stat-tile-icon teal"><i class="fas fa-chart-line"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value">{{ "%.1f"|format(prom_general) if prom_general else "—" }}</div>
-            <div class="stat-tile-label">Promedio general</div>
-        </div>
-    </div>
-    <div class="stat-tile">
-        <div class="stat-tile-icon pink"><i class="fas fa-bell"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value">{{ alertas|length if alertas else 0 }}</div>
-            <div class="stat-tile-label">Alertas activas</div>
-        </div>
+    <div class="school-badge">
+        <i class="fas fa-school"></i> {{ colegio.nombre if colegio else slug }}
     </div>
 </div>
 
-<div class="dash-sidebar-right">
-    <div class="dash-main">
+<div class="dash-cards">
+    <div class="dash-card purple">
+        <div class="icon-wrap"><i class="fas fa-users"></i></div>
+        <div class="dval">{{ estudiantes|length }}</div>
+        <div class="dlabel">Estudiantes</div>
+        <div class="dtag">{{ curso_sel if curso_sel else '&mdash;' }}</div>
+    </div>
+    <div class="dash-card blue">
+        <div class="icon-wrap"><i class="fas fa-book-open"></i></div>
+        <div class="dval">{{ mis_cursos|length }}</div>
+        <div class="dlabel">Cursos</div>
+        <div class="dtag">asignados</div>
+    </div>
+    <div class="dash-card green">
+        <div class="icon-wrap"><i class="fas fa-calendar-check"></i></div>
+        <div class="dval">{{ asistencia_hoy }}</div>
+        <div class="dlabel">Asistencia hoy</div>
+        <div class="dtag">registros</div>
+    </div>
+    <div class="dash-card orange">
+        <div class="icon-wrap"><i class="fas fa-tasks"></i></div>
+        <div class="dval">{{ notas_pend if notas_pend else '0' }}</div>
+        <div class="dlabel">Notas pendientes</div>
+        <div class="dtag">por registrar</div>
+    </div>
+</div>
+
+<div class="quick-actions">
+    <a href="#notas-card" class="qaction primary"><i class="fas fa-plus-circle icon"></i> Registrar notas</a>
+    <a href="#agenda-card" class="qaction"><i class="fas fa-tasks icon"></i> Agregar trabajo</a>
+    <a href="/{{ slug }}/horarios" class="qaction"><i class="fas fa-calendar-alt icon"></i> Ver horario</a>
+    <a href="/{{ slug }}/archivados" class="qaction"><i class="fas fa-archive icon"></i> Archivados</a>
+</div>
+
+<hr class="dash-divider">
 
 <div class="dash-grid">
     <div class="dash-section" id="centroComunicacion">
@@ -1854,6 +1852,6 @@ function cerrarComunicado(){
     <div class="com-toast-time">Reci&eacute;n publicado</div>
   </div>
 </div>
+</body>
   <script src="/static/js/lumini.js"></script>
-
 </html>

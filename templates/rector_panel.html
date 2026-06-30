@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="/static/css/lumini.css">
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rector â€” {{ colegio.nombre if colegio else slug }}</title>
+<title>Rector — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--blue-rgb:37,99,235;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;--shadow:0 1px 3px rgba(0,0,0,.15);--shadow-lg:0 4px 20px rgba(0,0,0,.2);}
@@ -90,8 +91,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .dash-greeting h1{font-size:19px;}
 }
 </style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-
+</head>
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -121,11 +121,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i class="fas fa-user-graduate"></i></span><span>Estudiantes</span></a>
     <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i class="fas fa-book"></i></span><span>Cursos</span></a>
     <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i class="fas fa-chart-bar"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i class="fas fa-history"></i></span><span>AuditorÃ­a</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">ConfiguraciÃ³n</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i class="fas fa-user-shield"></i></span><span>GestiÃ³n de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i class="fas fa-cog"></i></span><span>ConfiguraciÃ³n</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span>Cerrar sesiÃ³n</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i class="fas fa-history"></i></span><span>Auditoría</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i class="fas fa-user-shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i class="fas fa-cog"></i></span><span>Configuración</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -133,171 +133,110 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </nav>
 
-<div class="main" style="margin-left:var(--sidebar);">
+<div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 
-<div class="dashboard-grid fill-screen">
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>Panel del Rector</h1>
+    <div class="breadcrumb">{{ colegio.nombre if colegio else slug }} · {{ rector.nombre }}</div>
+  </div>
+  <div class="topbar-actions" style="display:flex;gap:8px;">
+    <a href="/{{ slug }}/notificaciones" style="position:relative;color:var(--muted);font-size:18px;text-decoration:none;padding:6px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);transition:all var(--tr);">
+      <i class="fas fa-bell"></i>
+      {% if notif_count > 0 %}<span style="position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px;min-width:16px;text-align:center;">{{ notif_count }}</span>{% endif %}
+    </a>
+  </div>
+</div>
 
-<div class="stats-row">
-    <div class="stat-tile">
-        <div class="stat-tile-icon purple"><i class="fas fa-user-graduate"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value" {% if total_estudiantes == 0 %}style="color:var(--sub);"{% endif %}>{{ total_estudiantes if total_estudiantes > 0 else '--' }}</div>
-            <div class="stat-tile-label">Estudiantes</div>
-        </div>
+<div class="dash-wrap">
+<div class="dash-greeting">
+    <div>
+        <h1>Bienvenido, {{ rector.nombre }}</h1>
+        <div class="date">Panel de control institucional</div>
     </div>
-    <div class="stat-tile">
-        <div class="stat-tile-icon blue"><i class="fas fa-chalkboard-teacher"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value" {% if total_profesores == 0 %}style="color:var(--sub);"{% endif %}>{{ total_profesores if total_profesores > 0 else '--' }}</div>
-            <div class="stat-tile-label">Profesores</div>
-        </div>
-    </div>
-    <div class="stat-tile">
-        <div class="stat-tile-icon green"><i class="fas fa-book"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value" {% if total_cursos == 0 %}style="color:var(--sub);"{% endif %}>{{ total_cursos if total_cursos > 0 else '--' }}</div>
-            <div class="stat-tile-label">Cursos</div>
-        </div>
-    </div>
-    <div class="stat-tile">
-        <div class="stat-tile-icon orange"><i class="fas fa-flask"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value" {% if total_materias == 0 %}style="color:var(--sub);"{% endif %}>{{ total_materias if total_materias > 0 else '--' }}</div>
-            <div class="stat-tile-label">Materias</div>
-        </div>
-    </div>
-    <div class="stat-tile">
-        <div class="stat-tile-icon teal"><i class="fas fa-users"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value" {% if total_directoras == 0 %}style="color:var(--sub);"{% endif %}>{{ total_directoras if total_directoras > 0 else '--' }}</div>
-            <div class="stat-tile-label">Directores</div>
-        </div>
-    </div>
-    <div class="stat-tile">
-        <div class="stat-tile-icon pink"><i class="fas fa-calendar-check"></i></div>
-        <div class="stat-tile-info">
-            <div class="stat-tile-value" {% if asistencia_hoy == 0 %}style="color:var(--sub);"{% endif %}>{{ asistencia_hoy if asistencia_hoy > 0 else '--' }}</div>
-            <div class="stat-tile-label">Asistencia hoy</div>
-        </div>
+    <div class="school-badge">
+        <i class="fas fa-graduation-cap"></i> Rectoría
     </div>
 </div>
 
-<div class="dash-sidebar-right">
-    <div class="dash-main">
-        <div class="widget">
-            <div class="widget-header">
-                <span class="widget-title"><i class="fas fa-bullhorn"></i> Ãšltimas comunicaciones</span>
-                <a href="/{{ slug }}/rector/comunicaciones" class="widget-action">Ver todas <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="widget-body">
-                {% if comunicaciones %}
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                    {% for c in comunicaciones %}
-                    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rmd);transition:var(--tr);">
-                        <div style="width:3px;height:28px;border-radius:2px;flex-shrink:0;background:{% if c.prioridad == 'urgente' %}var(--red){% elif c.prioridad == 'alta' %}var(--yellow){% elif c.prioridad == 'normal' %}var(--blue){% else %}var(--sub){% endif %};"></div>
-                        <div style="flex:1;min-width:0;">
-                            <div style="font-size:13px;font-weight:600;color:var(--text);">{{ c.titulo[:50] }}{% if c.titulo|length > 50 %}â€¦{% endif %}</div>
-                            <div style="font-size:11px;color:var(--sub);margin-top:2px;display:flex;align-items:center;gap:6px;">
-                                <span>{{ c.fecha_creacion[:10] }}</span>
-                                <span style="font-size:3px;color:var(--bg4);">â—‹</span>
-                                <span style="font-size:9px;padding:1px 6px;border-radius:99px;background:{% if c.estado == 'publicado' %}rgba(34,197,94,.1){% elif c.estado == 'programado' %}rgba(37,99,235,.1){% else %}rgba(100,116,139,.1){% endif %};color:{% if c.estado == 'publicado' %}var(--green){% elif c.estado == 'programado' %}var(--blue){% else %}var(--sub){% endif %};">{{ c.estado | capitalize }}</span>
-                            </div>
-                        </div>
-                        <a href="/{{ slug }}/rector/comunicaciones/{{ c.id }}" style="color:var(--muted);font-size:14px;transition:var(--tr);"><i class="fas fa-chevron-right"></i></a>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="empty-compact">
-                    <i class="fas fa-bullhorn"></i>
-                    No hay comunicaciones aÃºn.
-                    <div style="margin-top:10px;"><a href="/{{ slug }}/rector/comunicaciones/nueva" class="btn" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:var(--accent-gradient);color:#fff;font-size:13px;font-weight:500;text-decoration:none;"><i class="fas fa-plus"></i> Crear primera</a></div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+<div class="dash-cards">
+    <div class="dash-card purple">
+        <div class="icon-wrap"><i class="fas fa-user-graduate"></i></div>
+        <div class="dval {% if total_estudiantes == 0 and total_estudiantes is not none %}na{% endif %}">{{ total_estudiantes if total_estudiantes > 0 else '--' }}</div>
+        <div class="dlabel">Estudiantes</div>
+        <div class="dtag">activos en el sistema</div>
     </div>
-
-    <div style="display:flex;flex-direction:column;gap:16px;">
-        <div class="widget">
-            <div class="widget-header">
-                <span class="widget-title"><i class="fas fa-rocket"></i> AcciÃ³n rÃ¡pida</span>
-            </div>
-            <div class="widget-body" style="padding:12px;">
-                <div class="quick-grid">
-                    <a href="/{{ slug }}/rector/comunicaciones/nueva" class="quick-btn"><i class="fas fa-bullhorn"></i><span>Comunicar</span></a>
-                    <a href="/{{ slug }}/rector/horarios" class="quick-btn"><i class="fas fa-calendar-alt"></i><span>Horarios</span></a>
-                    <a href="/{{ slug }}/rector/profesores" class="quick-btn"><i class="fas fa-chalkboard-teacher"></i><span>Profesores</span></a>
-                    <a href="/{{ slug }}/rector/estudiantes" class="quick-btn"><i class="fas fa-user-graduate"></i><span>Estudiantes</span></a>
-                    <a href="/{{ slug }}/rector/cursos" class="quick-btn"><i class="fas fa-book"></i><span>Cursos</span></a>
-                    <a href="/{{ slug }}/rector/reportes" class="quick-btn"><i class="fas fa-chart-bar"></i><span>Reportes</span></a>
-                    <a href="/{{ slug }}/rector/configuracion" class="quick-btn"><i class="fas fa-cog"></i><span>Configurar</span></a>
-                    <a href="/{{ slug }}/rector/auditoria" class="quick-btn"><i class="fas fa-history"></i><span>AuditorÃ­a</span></a>
-                </div>
-            </div>
-        </div>
-
-        <div class="widget">
-            <div class="widget-header">
-                <span class="widget-title"><i class="fas fa-info-circle"></i> Resumen institucional</span>
-            </div>
-            <div class="widget-body compact">
-                <div class="info-list">
-                    <div class="info-row">
-                        <span class="info-label"><i class="fas fa-school" style="width:16px;color:var(--accent);"></i> InstituciÃ³n</span>
-                        <span class="info-value">{{ colegio.nombre if colegio else slug }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label"><i class="fas fa-user-tie" style="width:16px;color:var(--blue);"></i> Rector</span>
-                        <span class="info-value">{{ rector.nombre }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label"><i class="fas fa-flag" style="width:16px;color:var(--green);"></i> Rol</span>
-                        <span class="info-value" style="font-size:11px;padding:1px 8px;border-radius:99px;background:rgba(16,185,129,.1);color:var(--green);">{% if rector.es_principal %}Principal{% else %}Rector{% endif %}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label"><i class="fas fa-clock" style="width:16px;color:var(--orange);"></i> Asistencia hoy</span>
-                        <span class="info-value" style="font-weight:700;">{{ asistencia_hoy if asistencia_hoy > 0 else '0' }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="widget" style="border-color:rgba(var(--accent-rgb),.15);">
-            <div class="widget-header" style="border-bottom-color:rgba(var(--accent-rgb),.1);">
-                <span class="widget-title" style="color:var(--accent);"><i class="fas fa-chart-line"></i> DistribuciÃ³n</span>
-            </div>
-            <div class="widget-body">
-                <div style="display:flex;gap:8px;align-items:flex-end;height:90px;">
-                    {% set max_val = [total_estudiantes|default(0), total_profesores|default(0), total_cursos|default(0), total_materias|default(0), total_directoras|default(0)]|max %}
-                    {% set max_val = max_val if max_val > 0 else 1 %}
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                        <div style="width:100%;background:linear-gradient(to top,var(--accent),#8B5CF6);border-radius:4px 4px 0 0;transition:var(--tr);height:{{ (total_estudiantes/max_val*70)|round }}px;min-height:4px;"></div>
-                        <span style="font-size:9px;color:var(--muted);white-space:nowrap;">Est.</span>
-                    </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                        <div style="width:100%;background:linear-gradient(to top,var(--blue),#60A5FA);border-radius:4px 4px 0 0;transition:var(--tr);height:{{ (total_profesores/max_val*70)|round }}px;min-height:4px;"></div>
-                        <span style="font-size:9px;color:var(--muted);white-space:nowrap;">Prof.</span>
-                    </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                        <div style="width:100%;background:linear-gradient(to top,var(--green),#34D399);border-radius:4px 4px 0 0;transition:var(--tr);height:{{ (total_cursos/max_val*70)|round }}px;min-height:4px;"></div>
-                        <span style="font-size:9px;color:var(--muted);white-space:nowrap;">Cur.</span>
-                    </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                        <div style="width:100%;background:linear-gradient(to top,var(--orange),#FB923C);border-radius:4px 4px 0 0;transition:var(--tr);height:{{ (total_materias/max_val*70)|round }}px;min-height:4px;"></div>
-                        <span style="font-size:9px;color:var(--muted);white-space:nowrap;">Mat.</span>
-                    </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                        <div style="width:100%;background:linear-gradient(to top,var(--teal),#2DD4BF);border-radius:4px 4px 0 0;transition:var(--tr);height:{{ (total_directoras/max_val*70)|round }}px;min-height:4px;"></div>
-                        <span style="font-size:9px;color:var(--muted);white-space:nowrap;">Dir.</span>
-                    </div>
-                </div>
-                <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--sub);">DistribuciÃ³n de recursos institucionales</div>
-            </div>
-        </div>
+    <div class="dash-card blue">
+        <div class="icon-wrap"><i class="fas fa-chalkboard-teacher"></i></div>
+        <div class="dval {% if total_profesores == 0 %}na{% endif %}">{{ total_profesores if total_profesores > 0 else '--' }}</div>
+        <div class="dlabel">Profesores</div>
+        <div class="dtag">activos</div>
     </div>
+    <div class="dash-card green">
+        <div class="icon-wrap"><i class="fas fa-book"></i></div>
+        <div class="dval {% if total_cursos == 0 %}na{% endif %}">{{ total_cursos if total_cursos > 0 else '--' }}</div>
+        <div class="dlabel">Cursos</div>
+        <div class="dtag">en la institución</div>
+    </div>
+    <div class="dash-card orange">
+        <div class="icon-wrap"><i class="fas fa-flask"></i></div>
+        <div class="dval {% if total_materias == 0 %}na{% endif %}">{{ total_materias if total_materias > 0 else '--' }}</div>
+        <div class="dlabel">Materias</div>
+        <div class="dtag">asignadas</div>
+    </div>
+    <div class="dash-card teal">
+        <div class="icon-wrap"><i class="fas fa-users"></i></div>
+        <div class="dval {% if total_directoras == 0 %}na{% endif %}">{{ total_directoras if total_directoras > 0 else '--' }}</div>
+        <div class="dlabel">Directores</div>
+        <div class="dtag">de curso</div>
+    </div>
+    <div class="dash-card pink">
+        <div class="icon-wrap"><i class="fas fa-calendar-check"></i></div>
+        <div class="dval {% if asistencia_hoy == 0 %}na{% endif %}">{{ asistencia_hoy if asistencia_hoy > 0 else '--' }}</div>
+        <div class="dlabel">Asistencia hoy</div>
+        <div class="dtag">registros del día</div>
+    </div>
+</div>
+
+<div class="quick-actions">
+    <a href="/{{ slug }}/rector/comunicaciones/nueva" class="qaction primary"><i class="fas fa-bullhorn"></i> Nueva comunicación</a>
+    <a href="/{{ slug }}/rector/horarios" class="qaction"><i class="fas fa-calendar-alt"></i> Ver horarios</a>
+    <a href="/{{ slug }}/rector/profesores" class="qaction"><i class="fas fa-chalkboard-teacher"></i> Profesores</a>
+    <a href="/{{ slug }}/rector/estudiantes" class="qaction"><i class="fas fa-user-graduate"></i> Estudiantes</a>
+    <a href="/{{ slug }}/rector/cursos" class="qaction"><i class="fas fa-book"></i> Cursos</a>
+</div>
+
+<hr class="dash-divider">
+
+<div class="placeholder-section" style="text-align:left;padding:0;background:none;border:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h3 style="font-size:15px;font-weight:700;color:var(--text);"><i class="fas fa-bullhorn" style="color:var(--accent);"></i> Últimas comunicaciones</h3>
+        <a href="/{{ slug }}/rector/comunicaciones" class="qaction" style="font-size:11px;padding:6px 12px;">Ver todas</a>
+    </div>
+    {% if comunicaciones %}
+    <div style="display:flex;flex-direction:column;gap:6px;">
+        {% for c in comunicaciones %}
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rmd);">
+            <div style="width:3px;height:28px;border-radius:2px;flex-shrink:0;background:{% if c.prioridad == 'urgente' %}var(--red){% elif c.prioridad == 'alta' %}var(--yellow){% elif c.prioridad == 'normal' %}var(--blue){% else %}var(--sub){% endif %};"></div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:600;">{{ c.titulo[:50] }}{% if c.titulo|length > 50 %}…{% endif %}</div>
+                <div style="font-size:11px;color:var(--sub);margin-top:2px;">
+                    <span>{{ c.fecha_creacion[:10] }}</span>
+                    <span style="margin:0 4px;">·</span>
+                    <span class="status-badge status-{{ c.estado }}" style="display:inline;font-size:9px;padding:1px 6px;border-radius:99px;background:{% if c.estado == 'publicado' %}rgba(34,197,94,.1){% elif c.estado == 'programado' %}rgba(37,99,235,.1){% else %}rgba(100,116,139,.1){% endif %};color:{% if c.estado == 'publicado' %}var(--green){% elif c.estado == 'programado' %}var(--blue){% else %}var(--sub){% endif %};">{{ c.estado | capitalize }}</span>
+                </div>
+            </div>
+            <a href="/{{ slug }}/rector/comunicaciones/{{ c.id }}" style="color:var(--muted);font-size:14px;"><i class="fas fa-chevron-right"></i></a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">
+        No hay comunicaciones aún. <a href="/{{ slug }}/rector/comunicaciones/nueva" style="color:var(--accent);">Crear primera</a>
+    </div>
+    {% endif %}
 </div>
 
 </div>
@@ -312,6 +251,6 @@ function toggleSidebar(){
 </script>
 <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
+</body>
   <script src="/static/js/lumini.js"></script>
-
 </html>
