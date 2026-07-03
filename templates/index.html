@@ -5,6 +5,7 @@
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <link rel="manifest" href="/static/manifest.json">
@@ -448,7 +449,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     </div>
 </div>
 
-<div class="dash-cards">
+<div class="dash-cards fade-in fade-in-d1">
     <div class="dash-card purple">
         <div class="icon-wrap"><i data-lucide="users" style="width:20px;height:20px;"></i></div>
         <div class="dval">{{ estudiantes|length }}</div>
@@ -883,7 +884,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
             <button type="submit" class="bsm badd">+ Actividad</button>
         </form>
     </div>
-    <div class="tw">
+    <div class="tw zebra">
         <table>
             <thead>
                 <tr>

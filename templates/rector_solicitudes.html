@@ -58,6 +58,7 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
 }
 </style>
   <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>
@@ -108,7 +109,11 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
 </div>
 
 {% if solicitudes %}
-<div class="card" style="overflow-x:auto;">
+<div class="card" style="padding:0;overflow:hidden;">
+  <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
+    <span style="font-size:12px;font-weight:600;"><i data-lucide="clipboard-list" style="width:14px;height:14px;color:var(--accent);"></i> Solicitudes recibidas</span>
+  </div>
+  <div class="tw zebra">
   <table>
     <thead>
       <tr>
@@ -159,7 +164,15 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
     </tbody>
   </table>
 </div>
+</div>
 {% else %}
+<div class="card" style="text-align:center;padding:40px;">
+  <div class="empty-state has-action">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:10px;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <div class="empty-title">Sin solicitudes pendientes</div>
+    <div class="empty-desc">No hay solicitudes de modificación de notas en este momento.</div>
+  </div>
+</div>
 <div class="card" style="text-align:center;padding:40px;">
   <i data-lucide="clipboard-check" style="font-size:40px;color:var(--muted);margin-bottom:12px;"></i>
   <p style="color:var(--muted);font-size:14px;">No hay solicitudes de modificacion pendientes.</p>

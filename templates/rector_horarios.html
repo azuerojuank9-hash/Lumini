@@ -57,6 +57,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 }
 </style>
   <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>
@@ -104,22 +105,24 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="breadcrumb">Consulta los horarios de cada curso</div>
 </div>
 <div class="card">
-  <div class="field">
-    <label>Seleccionar curso</label>
-    <select id="cursoSelect" onchange="cargarHorario()">
-      <option value="">â€” Selecciona un curso â€”</option>
-      {% for c in cursos %}
-      <option value="{{ c }}">{{ c }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="field">
-    <label>Jornada</label>
-    <select id="jornadaSelect" onchange="cargarHorario()">
-      {% for j in jornadas %}
-      <option value="{{ j }}">{{ j }}</option>
-      {% endfor %}
-    </select>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div class="form-group">
+      <label class="form-label" for="cursoSelect"><i data-lucide="book" style="width:10px;height:10px;"></i> Curso</label>
+      <select id="cursoSelect" class="form-select" onchange="cargarHorario()">
+        <option value="">— Selecciona un curso —</option>
+        {% for c in cursos %}
+        <option value="{{ c }}">{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="jornadaSelect"><i data-lucide="clock" style="width:10px;height:10px;"></i> Jornada</label>
+      <select id="jornadaSelect" class="form-select" onchange="cargarHorario()">
+        {% for j in jornadas %}
+        <option value="{{ j }}">{{ j }}</option>
+        {% endfor %}
+      </select>
+    </div>
   </div>
 </div>
 <div id="horarioContainer"></div>

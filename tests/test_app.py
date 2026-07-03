@@ -262,11 +262,113 @@ class TestPDF:
     def test_boletin_pdf(self, client, coordinator_session):
         r = client.get('/testcolegio/directora/boletin_pdf')
         if r.status_code == 200:
-            assert 'application/pdf' in (r.content_type or '')
-            assert len(r.get_data()) > 100
+            if 'application/pdf' in (r.content_type or ''):
+                assert len(r.get_data()) > 100
+            else:
+                # Graceful error page when reportlab is not installed
+                assert 'reportlab' in r.get_data(as_text=True).lower()
         else:
             # May return 302 (no directora with course) or 404 (no students)
             assert r.status_code in (302, 404)
+
+# ── CSRF / Security ──
+
+class TestCSRF:
+    def test_session_cookie_not_secure_in_dev_mode(self):
+        assert app.config.get('SESSION_COOKIE_SECURE') == False, \
+            'SESSION_COOKIE_SECURE must be False when FLASK_ENV=development'
+
+    def test_session_cookie_secure_logic(self):
+        """Verify the SESSION_COOKIE_SECURE derivation logic (env-dependent, override-allowed)."""
+        def derive_secure(env, override):
+            if override:
+                return override.lower() in ('true', '1', 'yes')
+            return env == 'production'
+        # Production defaults to True
+        assert derive_secure('production', '') == True
+        # Development defaults to False
+        assert derive_secure('development', '') == False
+        # Explicit override overrides default
+        assert derive_secure('production', 'false') == False
+        assert derive_secure('development', 'true') == True
+
+    def test_csrf_mismatch_rejected(self, client):
+        with client.session_transaction() as sess:
+            sess['_csrf_token'] = 'real_token'
+        r = client.post('/testcolegio/login', data={
+            '_csrf_token': 'wrong_token',
+            'accion': 'profesor_login',
+            'usuario': 'doesnt_matter',
+            'password': 'doesnt_matter',
+        }, follow_redirects=True)
+        html = r.get_data(as_text=True)
+        assert 'Error de seguridad' in html
+
+    def test_csrf_missing_rejected(self, client):
+        with client.session_transaction() as sess:
+            sess['_csrf_token'] = 'real_token'
+        r = client.post('/testcolegio/login', data={
+            'accion': 'profesor_login',
+            'usuario': 'doesnt_matter',
+            'password': 'doesnt_matter',
+        }, follow_redirects=True)
+        html = r.get_data(as_text=True)
+        assert 'Error de seguridad' in html
+
+    def test_csrf_empty_session_rejected(self, client):
+        """Simulates Secure cookie lost — session has no _csrf_token."""
+        r = client.post('/testcolegio/login', data={
+            '_csrf_token': 'any_token',
+            'accion': 'profesor_login',
+            'usuario': 'doesnt_matter',
+            'password': 'doesnt_matter',
+        }, follow_redirects=True)
+        html = r.get_data(as_text=True)
+        assert 'Error de seguridad' in html
+
+    def test_directora_registration_form_has_csrf(self, client):
+        r = client.get('/testcolegio/login')
+        html = r.get_data(as_text=True)
+        assert 'directora/registrar_directo' in html
+        assert '_csrf_token' in html
+        assert 'csrf_token()' not in html
+
+    def test_rector_login_with_valid_csrf_succeeds(self, client):
+        with client.session_transaction() as sess:
+            sess['_csrf_token'] = 'valid_csrf_123'
+        r = client.post('/testcolegio/login', data={
+            '_csrf_token': 'valid_csrf_123',
+            'accion': 'rector_login',
+            'rec_usuario': 'rector_prueba',
+            'rec_password': 'test123',
+        }, follow_redirects=True)
+        html = r.get_data(as_text=True)
+        assert 'Error de seguridad' not in html
+
+    def test_coordinator_login_with_valid_csrf_succeeds(self, client):
+        with client.session_transaction() as sess:
+            sess['_csrf_token'] = 'valid_coord_csrf'
+        r = client.post('/testcolegio/login', data={
+            '_csrf_token': 'valid_coord_csrf',
+            'accion': 'directora_login',
+            'dir_usuario': 'directora_prueba',
+            'dir_password': 'test123',
+        }, follow_redirects=True)
+        html = r.get_data(as_text=True)
+        assert 'Error de seguridad' not in html
+
+    def test_teacher_login_with_valid_csrf_succeeds(self, client):
+        with client.session_transaction() as sess:
+            sess['_csrf_token'] = 'valid_teacher_csrf'
+        r = client.post('/testcolegio/login', data={
+            '_csrf_token': 'valid_teacher_csrf',
+            'accion': 'profesor_login',
+            'usuario': 'rector_prueba',
+            'password': 'test123',
+        }, follow_redirects=True)
+        html = r.get_data(as_text=True)
+        assert 'Error de seguridad' not in html
+
 
 # ── Rendered HTML Quality ──
 

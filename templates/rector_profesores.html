@@ -53,6 +53,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 }
 </style>
   <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>
@@ -101,11 +102,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </div>
 <div class="card" style="padding:0;overflow:hidden;">
   <div style="padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-    <span style="font-size:12px;color:var(--muted);">{{ total }} profesor{{ 'es' if total != 1 }}</span>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span style="font-size:12px;color:var(--muted);">{{ total }} profesor{{ 'es' if total != 1 }}</span>
+      <span style="font-size:11px;color:var(--green);display:flex;align-items:center;gap:4px;"><i data-lucide="check-circle" style="width:12px;height:12px;"></i> {{ total }} registrados</span>
+    </div>
+    <div class="table-search" style="display:flex;align-items:center;gap:6px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchProf" placeholder="Buscar profesor..." oninput="filtrarProfesores()" style="padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;width:200px;">
+    </div>
   </div>
   <div style="overflow-x:auto;">
   {% if profesores %}
-  <table class="prof-table">
+  <table class="prof-table" id="profTable">
     <thead>
       <tr>
         <th>Nombre</th>
@@ -124,20 +132,31 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </tbody>
   </table>
   {% if total_pages > 1 %}
-  <div style="display:flex;justify-content:center;align-items:center;gap:8px;padding:16px;border-top:1px solid var(--border);font-size:13px;">
-    {% if page > 1 %}<a href="?page={{ page - 1 }}&per_page={{ per_page }}" style="padding:6px 12px;border-radius:6px;background:var(--bg);color:var(--text);text-decoration:none;border:1px solid var(--border);">Anterior</a>{% endif %}
-    <span style="color:var(--muted);">P&aacute;gina {{ page }} de {{ total_pages }}</span>
-    {% if page < total_pages %}<a href="?page={{ page + 1 }}&per_page={{ per_page }}" style="padding:6px 12px;border-radius:6px;background:var(--bg);color:var(--text);text-decoration:none;border:1px solid var(--border);">Siguiente</a>{% endif %}
+  <div class="table-pagination">
+    {% if page > 1 %}<a href="?page={{ page - 1 }}&per_page={{ per_page }}" class="page-btn">Anterior</a>{% endif %}
+    <span class="page-info">Página {{ page }} de {{ total_pages }}</span>
+    {% if page < total_pages %}<a href="?page={{ page + 1 }}&per_page={{ per_page }}" class="page-btn">Siguiente</a>{% endif %}
   </div>
   {% endif %}
   {% else %}
-  <div class="empty-state">
-    <div class="icon"><i data-lucide="presentation"></i></div>
-    <h3>No hay profesores registrados</h3>
+  <div class="empty-state" style="min-height:160px;padding:40px 20px;">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.2;margin-bottom:12px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    <div class="empty-title">No hay profesores registrados</div>
+    <div class="empty-desc">Los docentes aparecerán aquí una vez que sean agregados al sistema.</div>
   </div>
   {% endif %}
   </div>
 </div>
+<script>
+function filtrarProfesores(){
+  var q=document.getElementById('searchProf').value.toLowerCase();
+  var rows=document.querySelectorAll('#profTable tbody tr');
+  rows.forEach(function(r){
+    var name=r.querySelector('td:first-child');
+    r.style.display=(name&&name.textContent.toLowerCase().includes(q))?'':'none';
+  });
+}
+</script>
 </div>
 <script>
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }

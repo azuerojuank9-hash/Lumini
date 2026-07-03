@@ -1,4 +1,4 @@
-import os
+import os, sys
 from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file, abort, jsonify, g
@@ -10,18 +10,39 @@ import html
 app = Flask(__name__)
 ENV = os.environ.get('FLASK_ENV', 'production')
 
-# ── Production-optimized config ────────────────────────────────────────────
+# ── Environment-aware config ──────────────────────────────────────────────
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400 * 7 if ENV == 'production' else 86400
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 app.permanent_session_lifetime = timedelta(hours=4)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = True if ENV == 'production' else False
+
+# SESSION_COOKIE_SECURE: environment-appropriate default, explicit override OK
+_secure_override = os.environ.get('SESSION_COOKIE_SECURE', '')
+if _secure_override:
+    app.config['SESSION_COOKIE_SECURE'] = _secure_override.lower() in ('true', '1', 'yes')
+else:
+    app.config['SESSION_COOKIE_SECURE'] = (ENV == 'production')
+
+# Safety: refuse explicitly insecure production config
+if ENV == 'production' and not app.config['SESSION_COOKIE_SECURE']:
+    msg = (
+        "\n" + "=" * 60 + "\n"
+        "ERROR: Refusing to run in production mode without secure cookies.\n"
+        "  Production requires SESSION_COOKIE_SECURE=True and HTTPS.\n"
+        "  Set FLASK_ENV=development for local development, or configure HTTPS.\n"
+        "=" * 60 + "\n"
+    )
+    print(msg, file=sys.stderr)
+    sys.exit(1)
+
+if ENV == 'production':
+    print(f"[LUMINI] Production mode — SESSION_COOKIE_SECURE={app.config['SESSION_COOKIE_SECURE']}, ensure HTTPS is configured.")
+
 app.config['JSON_AS_ASCII'] = False
 app.config['TEMPLATES_AUTO_RELOAD'] = ENV != 'production'
 
 if ENV == 'production':
-    app.config['SESSION_COOKIE_SECURE'] = True
     try:
         from flask_compress import Compress
         Compress(app)
@@ -1189,11 +1210,17 @@ def reacciones_por_mensaje(conn, mensaje_id):
 
 # ── PDF REUTILIZABLE ──────────────────────────────────────────────────────────
 def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib import colors
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.units import cm
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib import colors
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import cm
+    except ImportError:
+        raise ImportError(
+            'reportlab no está instalado. '
+            'PDF no disponible. Instálelo con: pip install reportlab'
+        )
 
     lista_materias = [r['materia'] for r in conn.execute(
         'SELECT DISTINCT materia FROM actividades WHERE curso=? AND jornada=? AND COALESCE(periodo,1)=? ORDER BY materia',
@@ -2922,6 +2949,29 @@ def rector_panel(slug):
     notif_count = conn.execute(
         'SELECT COUNT(*) as c FROM notificaciones WHERE usuario_tipo=? AND usuario_id=? AND leida=0',
         ('rector', rector['id'])).fetchone()['c']
+
+    # ── Dashboard extras ─────────────────────────────────────────────────────
+    actividad_reciente = conn.execute(
+        '''SELECT accion, tabla, creado
+           FROM audit_log ORDER BY creado DESC LIMIT 8''').fetchall()
+    actividad_reciente = [dict(r) for r in actividad_reciente]
+
+    ultimos_estudiantes = conn.execute(
+        '''SELECT id, nombre, curso, jornada FROM alumnos
+           WHERE activo=1 ORDER BY id DESC LIMIT 5''').fetchall()
+    ultimos_estudiantes = [dict(r) for r in ultimos_estudiantes]
+
+    ultimos_profesores = conn.execute(
+        '''SELECT id, nombre, email FROM profesores
+           WHERE activo=1 ORDER BY id DESC LIMIT 5''').fetchall()
+    ultimos_profesores = [dict(r) for r in ultimos_profesores]
+
+    proximos_eventos = conn.execute(
+        '''SELECT titulo, fecha, materia, curso, jornada
+           FROM compromisos WHERE fecha >= ?
+           ORDER BY fecha LIMIT 5''', (hoy,)).fetchall()
+    proximos_eventos = [dict(r) for r in proximos_eventos]
+
     conn.close()
     prom_general = 0
     return render_template('rector_panel.html',
@@ -2933,7 +2983,11 @@ def rector_panel(slug):
                            total_directoras=total_directoras,
                            asistencia_hoy=asistencia_hoy,
                            comunicaciones=comunicaciones,
-                           notif_count=notif_count)
+                           notif_count=notif_count,
+                           actividad_reciente=actividad_reciente,
+                           ultimos_estudiantes=ultimos_estudiantes,
+                           ultimos_profesores=ultimos_profesores,
+                           proximos_eventos=proximos_eventos)
 
 @app.route('/<slug>/rector/logout')
 def rector_logout(slug):
@@ -3029,16 +3083,24 @@ def rector_cursos(slug):
     rector = get_rector(slug)
     if not rector: return redirect(url_for('login', slug=slug))
     colegio = get_colegio(slug)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 12, type=int)
     conn = conectar(slug)
     rows = conn.execute(
         '''SELECT curso, jornada, COUNT(*) as total,
                   SUM(CASE WHEN activo=1 THEN 1 ELSE 0 END) as activos
            FROM alumnos GROUP BY curso, jornada ORDER BY curso''').fetchall()
     cursos = [dict(r) for r in rows]
+    total = len(cursos)
+    total_pages = max(1, (total + per_page - 1) // per_page)
+    page = max(1, min(page, total_pages))
+    start = (page - 1) * per_page
+    cursos_page = cursos[start:start + per_page]
     conn.close()
     return render_template('rector_cursos.html',
                            slug=slug, colegio=colegio, rector=rector,
-                           cursos=cursos,
+                           cursos=cursos_page, total=total,
+                           page=page, per_page=per_page, total_pages=total_pages,
                            notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
 
 # ── RECTOR: REPORTES ───────────────────────────────────────────────────────────
@@ -4639,6 +4701,21 @@ def directora_panel(slug):
             if final is not None: todos_finales.append(final)
         fila['promedio'] = round(sum(todos_finales) / len(todos_finales), 2) if todos_finales else None
         tabla.append(fila)
+
+    # ── Dashboard extras ────────────────────────────────────────────────
+    actividad_reciente = conn.execute(
+        '''SELECT accion, tabla, creado
+           FROM audit_log ORDER BY creado DESC LIMIT 6''').fetchall()
+    actividad_reciente = [dict(r) for r in actividad_reciente]
+
+    notif_count = conn.execute(
+        'SELECT COUNT(*) as c FROM notificaciones WHERE usuario_tipo=? AND usuario_id=? AND leida=0',
+        ('directora', directora['id'])).fetchone()['c']
+
+    aprobados = sum(1 for f in tabla if f['promedio'] is not None and f['promedio'] >= 3.0)
+    reprobados = sum(1 for f in tabla if f['promedio'] is not None and f['promedio'] < 3.0)
+    sin_notas = sum(1 for f in tabla if f['promedio'] is None)
+
     conn.close()
     return render_template('directora_panel.html',
                            slug=slug, colegio=colegio, directora=directora,
@@ -4646,7 +4723,11 @@ def directora_panel(slug):
                            num_periodos=num_periodos,
                            lista_materias=lista_materias,
                            materias_enviadas=materias_enviadas,
-                           profesores=profesores, tabla=tabla)
+                           profesores=profesores, tabla=tabla,
+                           actividad_reciente=actividad_reciente,
+                           notif_count=notif_count,
+                           aprobados=aprobados, reprobados=reprobados,
+                           sin_notas=sin_notas)
 
 @app.route('/<slug>/directora/boletin_pdf')
 def directora_boletin_pdf(slug):
@@ -4669,7 +4750,13 @@ def directora_boletin_pdf(slug):
             (curso, jornada)).fetchall()
     all_pdfs = []
     for alumno in alumnos:
-        pdf_bytes, _ = generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn)
+        try:
+            pdf_bytes, _ = generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn)
+        except ImportError:
+            return render_template('error.html',
+                                   codigo=501,
+                                   mensaje='La generación de PDF requiere la librería <strong>reportlab</strong>. '
+                                           'Consulte al administrador del sistema para instalarla.')
         all_pdfs.append(pdf_bytes)
     conn.close()
     if not all_pdfs: return ('Sin alumnos', 404)

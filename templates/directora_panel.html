@@ -9,6 +9,7 @@
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 
@@ -266,53 +267,120 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
     </div>
 
-    <div class="dashboard-modules" style="margin-bottom:24px;">
-        <div class="module-card">
-            <div class="module-header">
-                <i data-lucide="zap" style="width:18px;height:18px;color:var(--accent);"></i>
-                <span class="module-title">Accesos rápidos</span>
+    <div class="dash-modules">
+        <div class="dash-module">
+            <div class="dash-module-head">
+                <span class="icon"><i data-lucide="zap" style="width:15px;height:15px;"></i></span>
+                Accesos rápidos
             </div>
-            <div class="quick-actions">
-                <a href="?periodo={{ periodo }}#table-consolidada" class="qa-item">
-                    <span class="qa-icon" style="background:rgba(124,58,237,.12);color:var(--accent);"><i data-lucide="clipboard-list"></i></span>
-                    <span class="qa-label">Notas</span>
-                </a>
-                <button onclick="enviarCorreosTodos()" class="qa-item" style="border:none;background:none;cursor:pointer;text-align:left;">
-                    <span class="qa-icon" style="background:rgba(16,185,129,.12);color:var(--green);"><i data-lucide="send"></i></span>
-                    <span class="qa-label">Enviar boletines</span>
-                </button>
-                <button onclick="abrirModalRegistro()" class="qa-item" style="border:none;background:none;cursor:pointer;text-align:left;">
-                    <span class="qa-icon" style="background:rgba(245,158,11,.12);color:var(--yellow);"><i data-lucide="user-plus"></i></span>
-                    <span class="qa-label">Crear directora</span>
-                </button>
-                <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="qa-item">
-                    <span class="qa-icon" style="background:rgba(59,130,246,.12);color:var(--blue);"><i data-lucide="file-text"></i></span>
-                    <span class="qa-label">PDF todos</span>
-                </a>
+            <div class="dash-module-body" style="display:flex;flex-wrap:wrap;gap:8px;padding:14px 16px;">
+                <a href="?periodo={{ periodo }}#table-consolidada" class="qaction"><i data-lucide="clipboard-list"></i> Notas</a>
+                <button onclick="enviarCorreosTodos()" class="qaction" style="border:none;background:var(--bg3);cursor:pointer;"><i data-lucide="send"></i> Enviar boletines</button>
+                <button onclick="abrirModalRegistro()" class="qaction" style="border:none;background:var(--bg3);cursor:pointer;"><i data-lucide="user-plus"></i> Crear directora</button>
+                <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="qaction"><i data-lucide="file-text"></i> PDF todos</a>
             </div>
         </div>
-        {% set promedios = tabla|selectattr("promedio","ne",None)|map(attribute="promedio")|list %}
-        <div class="module-card">
-            <div class="module-header">
-                <i data-lucide="activity" style="width:18px;height:18px;color:var(--green);"></i>
-                <span class="module-title">Resumen</span>
+        <div class="dash-module">
+            <div class="dash-module-head">
+                <span class="icon"><i data-lucide="activity" style="width:15px;height:15px;"></i></span>
+                Resumen académico
             </div>
-            <div style="padding:16px;">
+            <div class="dash-module-body">
+                {% set promedios = tabla|selectattr("promedio","ne",None)|map(attribute="promedio")|list %}
                 {% if promedios %}
                 {% set avg = (promedios|sum / promedios|length)|round(2) %}
-                <div class="stat-row" style="gap:8px;margin-bottom:0;">
-                    <div class="stat-item" style="flex:1;padding:12px;min-width:0;">
-                        <div class="stat-label" style="font-size:10px;">Estudiantes</div>
-                        <div class="stat-value dval" style="font-size:1.2rem;">{{ tabla|length }}</div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Estudiantes</span>
+                        <span class="info-value">{{ tabla|length }}</span>
                     </div>
-                    <div class="stat-item" style="flex:1;padding:12px;min-width:0;">
-                        <div class="stat-label" style="font-size:10px;">Promedio</div>
-                        <div class="stat-value dval" style="font-size:1.2rem;color:{% if avg >= 3.5 %}var(--green){% elif avg >= 3.0 %}var(--yellow){% else %}var(--red){% endif %};">{{ avg }}</div>
+                    <div class="info-item">
+                        <span class="info-label">Promedio</span>
+                        <span class="info-value" style="color:{% if avg >= 3.5 %}var(--green){% elif avg >= 3.0 %}var(--yellow){% else %}var(--red){% endif %};">{{ avg }}</span>
                     </div>
-                    <div class="stat-item" style="flex:1;padding:12px;min-width:0;">
-                        <div class="stat-label" style="font-size:10px;">Materias</div>
-                        <div class="stat-value dval" style="font-size:1.2rem;">{{ lista_materias|length }}</div>
+                    <div class="info-item">
+                        <span class="info-label">Materias</span>
+                        <span class="info-value">{{ lista_materias|length }}</span>
                     </div>
+                    <div class="info-item">
+                        <span class="info-label">Profesores</span>
+                        <span class="info-value">{{ profesores|length }}</span>
+                    </div>
+                </div>
+                <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:8px;">
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                        <span style="color:var(--muted);">Aprobados (&ge;3.0)</span>
+                        <span style="font-weight:600;color:var(--green);">{{ aprobados }}</span>
+                    </div>
+                    <div class="progress-bar green"><div class="fill" style="width:{{ (aprobados / promedios|length * 100)|round|int if promedios|length > 0 else 0 }}%;"></div></div>
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin:8px 0 4px;">
+                        <span style="color:var(--muted);">Reprobados (&lt;3.0)</span>
+                        <span style="font-weight:600;color:var(--red);">{{ reprobados }}</span>
+                    </div>
+                    <div class="progress-bar red"><div class="fill" style="width:{{ (reprobados / promedios|length * 100)|round|int if promedios|length > 0 else 0 }}%;"></div></div>
+                    {% if sin_notas > 0 %}
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin:8px 0 4px;">
+                        <span style="color:var(--muted);">Sin notas</span>
+                        <span style="font-weight:600;color:var(--sub);">{{ sin_notas }}</span>
+                    </div>
+                    <div class="progress-bar"><div class="fill" style="width:{{ (sin_notas / promedios|length * 100)|round|int if promedios|length > 0 else 0 }}%;"></div></div>
+                    {% endif %}
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);">
+                        <span style="color:var(--muted);">Profesores con notas</span>
+                        <span style="font-weight:600;">{{ profesores|selectattr('enviado')|list|length }}/{{ profesores|length }}</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state" style="min-height:100px;padding:20px;">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                    <div class="empty-title">Sin notas registradas</div>
+                    <div class="empty-desc">Ningún profesor ha registrado actividades en el periodo {{ periodo }}.</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="dash-module">
+            <div class="dash-module-head">
+                <span class="icon"><i data-lucide="clock" style="width:14px;height:14px;"></i></span>
+                Actividad reciente
+            </div>
+            <div class="dash-module-body compact">
+                {% if actividad_reciente %}
+                {% for a in actividad_reciente %}
+                <div class="activity-item">
+                    <div class="av purple"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i></div>
+                    <div class="act-content">
+                        <div class="act-text"><strong>{{ a.accion | capitalize }}</strong> en {{ a.tabla }}</div>
+                        <div class="act-meta">{{ a.creado[:16] if a.creado else '' }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state" style="min-height:80px;padding:16px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:6px;"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                    <div class="empty-title" style="font-size:12px;">Sin actividad reciente</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="dash-module">
+            <div class="dash-module-head">
+                <span class="icon"><i data-lucide="bell" style="width:14px;height:14px;"></i></span>
+                Notificaciones
+            </div>
+            <div class="dash-module-body compact">
+                {% if notif_count > 0 %}
+                <div class="activity-item">
+                    <div class="av blue"><i data-lucide="bell" style="width:13px;height:13px;"></i></div>
+                    <div class="act-content">
+                        <div class="act-text">Tienes <strong>{{ notif_count }}</strong> notificación(es) sin leer</div>
+                        <div class="act-meta">Pendientes de revisión</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state" style="min-height:80px;padding:16px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:6px;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    <div class="empty-title" style="font-size:12px;">Sin notificaciones</div>
                 </div>
                 {% endif %}
             </div>
@@ -349,10 +417,10 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
             {% else %}
 
-            <div class="empty-state" style="padding:32px 16px;">
-                <i data-lucide="clipboard-list" style="width:40px;height:40px;color:var(--muted);"></i>
-                <h3 style="font-size:14px;font-weight:600;color:var(--muted);margin:8px 0 4px;">Sin actividades registradas</h3>
-                <p style="font-size:13px;color:var(--muted);margin:0;">Ningún profesor ha registrado actividades en el periodo {{ periodo }}.</p>
+            <div class="empty-state" style="min-height:100px;padding:24px;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+                <div class="empty-title">Sin actividades registradas</div>
+                <div class="empty-desc">Ningún profesor ha registrado actividades en el periodo {{ periodo }}.</div>
             </div>
 
             {% endif %}
@@ -377,7 +445,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
             <div style="display:flex;gap:8px;font-size:11px;">
 
-                <span class="tag-apr">â‰¥ 3.0 Aprobado</span>
+                <span class="tag-apr">&ge; 3.0 Aprobado</span>
 
                 <span class="tag-rep">&lt; 3.0 Reprobado</span>
 
@@ -385,9 +453,15 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
         </div>
 
-        <div class="tw">
+        <div class="table-search" style="padding:8px 16px;border-bottom:1px solid var(--border);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;flex-shrink:0;color:var(--muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchEstudiante" placeholder="Buscar estudiante..." oninput="filtrarTabla()" style="flex:1;padding:6px 0;background:none;border:none;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+            <span style="font-size:10px;color:var(--sub);" id="tableCount">{{ tabla|length }} estudiantes</span>
+        </div>
 
-            <table>
+        <div class="tw zebra fade-in fade-in-d2">
+
+            <table id="table-consolidada">
 
                 <thead>
 
@@ -497,7 +571,10 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
                 {% else %}
 
-                <tr><td colspan="{{ lista_materias|length * 4 + 5 }}" style="padding:32px;text-align:center;color:var(--muted);"><i data-lucide="users" style="width:32px;height:32px;display:block;margin:0 auto 8px;color:var(--muted);"></i>No hay estudiantes en el curso <strong>{{ curso }}</strong>.</td></tr>
+                <tr><td colspan="{{ lista_materias|length * 4 + 5 }}" style="padding:32px;text-align:center;color:var(--muted);">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;display:block;margin:0 auto 8px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    No hay estudiantes en el curso <strong>{{ curso }}</strong>.
+                </td></tr>
 
                 {% endfor %}
 
@@ -819,6 +896,18 @@ window.addEventListener('scroll',function(){
 });
 
 addDataLabels();
+
+function filtrarTabla(){
+    var q=document.getElementById('searchEstudiante').value.toLowerCase();
+    var rows=document.querySelectorAll('#table-consolidada tbody tr');
+    var visible=0;
+    rows.forEach(function(r){
+        var nombre=r.querySelector('td:first-child');
+        if(nombre&&nombre.textContent.toLowerCase().includes(q)){r.style.display='';visible++;}
+        else{r.style.display='none';}
+    });
+    document.getElementById('tableCount').textContent=visible+' estudiantes';
+}
 
 </script>
 

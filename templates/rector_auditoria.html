@@ -60,6 +60,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 }
 </style>
   <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>
@@ -107,23 +108,26 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   <div class="breadcrumb">Registro de cambios y accesos al sistema</div>
 </div>
 
-<div class="card">
-  <div class="filter-bar">
-    <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <select name="tabla" onchange="this.form.submit()">
-        <option value="">Todas las tablas</option>
-        {% for t in tablas %}
-        <option value="{{ t }}" {% if tabla == t %}selected{% endif %}>{{ t }}</option>
-        {% endfor %}
-      </select>
-      <span style="font-size:11px;color:var(--sub);">{{ total }} registro(s)</span>
-      {% if tabla %}
-      <a href="/{{ slug }}/rector/auditoria" style="font-size:11px;color:var(--accent);">Limpiar filtro</a>
-      {% endif %}
-    </form>
+  <div class="card" style="padding:0;overflow:hidden;">
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+    <div class="table-top">
+      <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select name="tabla" onchange="this.form.submit()" class="form-select" style="width:auto;font-size:11px;padding:6px 10px;">
+          <option value="">Todas las tablas</option>
+          {% for t in tablas %}
+          <option value="{{ t }}" {% if tabla == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+        <span style="font-size:11px;color:var(--sub);">{{ total }} registro(s)</span>
+        {% if tabla %}
+        <a href="/{{ slug }}/rector/auditoria" style="font-size:11px;color:var(--accent);">Limpiar filtro</a>
+        {% endif %}
+      </form>
+    </div>
   </div>
 
   {% if registros %}
+  <div class="tw zebra">
   <table>
     <thead>
       <tr>
@@ -165,9 +169,12 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
       {% endfor %}
     </tbody>
   </table>
+  </div>
 
   {% if total_pages > 1 %}
-  <div class="pagination">
+  <div class="table-footer">
+    <span>{{ total }} registro(s)</span>
+    <div class="pagination">
     <span class="info">Página {{ page }} de {{ total_pages }}</span>
     {% if page > 1 %}
     <a href="?page={{ page - 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">â€¹ Anterior</a>
@@ -185,6 +192,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     <a href="?page={{ page + 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">Siguiente â€º</a>
     {% endif %}
   </div>
+</div>
   {% endif %}
 
   {% else %}

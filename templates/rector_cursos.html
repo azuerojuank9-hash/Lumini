@@ -55,6 +55,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 }
 </style>
   <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>
@@ -101,8 +102,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <h1><i data-lucide="book" style="color:var(--accent);"></i> Cursos</h1>
   <div class="breadcrumb">Vista general de los cursos de la institución</div>
 </div>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+  <span style="font-size:12px;color:var(--muted);">{{ total }} curso{{ 's' if total != 1 }}</span>
+  <div style="display:flex;align-items:center;gap:6px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="buscarCurso" placeholder="Buscar curso..." onkeyup="filtrarCursos()" style="padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;width:200px;">
+  </div>
+</div>
 {% if cursos %}
-<div class="curso-grid">
+<div class="curso-grid" id="cursoGrid">
   {% for c in cursos %}
   <a href="/{{ slug }}/rector/horarios?curso={{ c.curso }}&jornada={{ c.jornada }}" class="curso-card" style="{% if c.activos == 0 %}opacity:.5;{% endif %}">
     <div class="curso-nombre">{{ c.curso }}</div>
@@ -114,15 +122,41 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </a>
   {% endfor %}
 </div>
+{% if total_pages > 1 %}
+<div style="display:flex;justify-content:center;align-items:center;gap:8px;padding:16px 0;font-size:13px;">
+  {% if page > 1 %}<a href="?page={{ page - 1 }}&per_page={{ per_page }}" class="page-btn">Anterior</a>{% endif %}
+  <span class="page-info">Página {{ page }} de {{ total_pages }}</span>
+  {% if page < total_pages %}<a href="?page={{ page + 1 }}&per_page={{ per_page }}" class="page-btn">Siguiente</a>{% endif %}
+</div>
+{% endif %}
 {% else %}
-<div class="empty-state">
-  <div class="icon"><i data-lucide="book"></i></div>
-  <h3>No hay cursos registrados</h3>
+<div class="empty-state" style="min-height:160px;padding:40px 20px;">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.2;margin-bottom:12px;"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><path d="M9 7h7"/><path d="M9 11h7"/><path d="M9 15h4"/></svg>
+  <div class="empty-title">No hay cursos registrados</div>
+  <div class="empty-desc">Los cursos aparecerán aquí una vez que sean configurados en el sistema.</div>
 </div>
 {% endif %}
 </div>
+<div style="display:none;" id="sinResultadosCurso">
+<div class="empty-state" style="min-height:160px;padding:40px 20px;">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.2;margin-bottom:12px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <div class="empty-title">Ningún curso coincide con tu búsqueda</div>
+  <div class="empty-desc">Intenta con otro término de búsqueda.</div>
+</div>
+</div>
 <script>
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
+function filtrarCursos(){
+  var q = document.getElementById('buscarCurso').value.toLowerCase();
+  var cards = document.querySelectorAll('#cursoGrid .curso-card');
+  var vis = 0;
+  cards.forEach(function(c){
+    if(c.textContent.toLowerCase().indexOf(q) > -1){c.style.display='';vis++;}
+    else{c.style.display='none';}
+  });
+  document.getElementById('sinResultadosCurso').style.display = (vis===0&&q.trim()!=='')?'block':'none';
+  document.getElementById('cursoGrid').style.display = (vis===0&&q.trim()!=='')?'none':'';
+}
 </script>
 <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
