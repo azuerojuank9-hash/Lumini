@@ -101,11 +101,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
     <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
     <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>AuditorÃ­a</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">ConfiguraciÃ³n</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>GestiÃ³n de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>ConfiguraciÃ³n</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesiÃ³n</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -114,11 +114,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </nav>
 
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
 
 <div class="topbar">
-  <h1>Detalle de comunicaciÃ³n</h1>
-  <div class="breadcrumb"><a href="/{{ slug }}/rector/comunicaciones" style="color:var(--accent);text-decoration:none;">Comunicaciones</a> Â· {{ com.titulo[:40] }}{% if com.titulo|length > 40 %}â€¦{% endif %}</div>
+  <h1>Detalle de comunicación</h1>
+  <div class="breadcrumb"><a href="/{{ slug }}/rector/comunicaciones" style="color:var(--accent);text-decoration:none;">Comunicaciones</a> · {{ com.titulo[:40] }}{% if com.titulo|length > 40 %}â€¦{% endif %}</div>
 </div>
 
 <div class="card">
@@ -144,11 +144,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <div class="stat">
       <div class="num" style="color:var(--green);">{{ leidas }}</div>
-      <div class="lab">LeÃ­dos</div>
+      <div class="lab">Leídos</div>
     </div>
     <div class="stat">
       <div class="num" style="color:var(--red);">{{ no_leidas }}</div>
-      <div class="lab">No leÃ­dos</div>
+      <div class="lab">No leídos</div>
     </div>
     <div class="stat">
       <div class="num">{{ com.prioridad | capitalize }}</div>
@@ -177,7 +177,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <button class="btn btn-outline"><i data-lucide="archive"></i> Archivar</button>
     </form>
     {% endif %}
-    <form method="POST" action="/{{ slug }}/rector/comunicaciones/{{ com.id }}/eliminar" style="display:inline;" onsubmit="return confirm('Â¿Eliminar permanentemente?');">
+    <form method="POST" action="/{{ slug }}/rector/comunicaciones/{{ com.id }}/eliminar" style="display:inline;" onsubmit="return confirm('¿Eliminar permanentemente?');">
       <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <button class="btn btn-danger"><i data-lucide="trash-2"></i> Eliminar</button>
     </form>

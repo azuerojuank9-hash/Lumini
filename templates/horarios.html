@@ -107,16 +107,16 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
     </nav>
     <div class="sidebar-footer">
         <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
-        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesiÃ³n</a>
+        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
     </div>
 </aside>
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">Ã¢â€™Â°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">Ã¢â€™Â°</button>
 
   <h1><i data-lucide="calendar"></i> Horarios</h1>
-  <p class="subtitle">Haz clic en cualquier celda para editar Â· Se guarda automÃ¡ticamente</p>
+  <p class="subtitle">Haz clic en cualquier celda para editar · Se guarda automáticamente</p>
 
   <div class="curso-tabs">
     {% for c in mis_cursos %}
@@ -140,7 +140,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
           </tr>
         </thead>
         <tbody>
-          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','MiÃ©rcoles'),('Ju','Jueves'),('Vi','Viernes')] %}
+          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','Miércoles'),('Ju','Jueves'),('Vi','Viernes')] %}
           {% for ds, df in dias_list %}
           <tr>
             <td class="dia-col">{{ ds }}</td>
@@ -193,7 +193,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
         </tbody>
       </table>
     </div>
-    <p class="hint">Clic en + para agregar Â· Clic en celda para editar</p>
+    <p class="hint">Clic en + para agregar · Clic en celda para editar</p>
   </div>
 </div>
 
@@ -203,12 +203,12 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
     <h3 id="mTitulo">Editar</h3>
     <p class="modal-sub" id="mSub"></p>
     <div class="field">
-      <label>NÃºmero / CÃ³digo</label>
+      <label>Número / Código</label>
       <input class="inp" type="text" id="iNum" placeholder="ej: 31">
     </div>
     <div class="field">
       <label>Materia</label>
-      <input class="inp" type="text" id="iMat" placeholder="ej: MatemÃ¡ticas">
+      <input class="inp" type="text" id="iMat" placeholder="ej: Matemáticas">
     </div>
     <div class="field">
       <label>Profesor</label>
@@ -233,9 +233,9 @@ function toggleSidebar(){
 const SLUG = "{{ slug }}";
 const CURSO = "{{ curso_sel }}";
 const HORAS = {
-  '1':'1a Hora Â· 6:10-7:05', '2':'2a Hora Â· 7:05-8:00',
-  '3':'3a Hora Â· 8:00-8:55', '4':'4a Hora Â· 8:55-9:50',
-  '5':'5a Hora Â· 10:20-11:10', '6':'6a Hora Â· 11:10-12:00'
+  '1':'1a Hora · 6:10-7:05', '2':'2a Hora · 7:05-8:00',
+  '3':'3a Hora · 8:00-8:55', '4':'4a Hora · 8:55-9:50',
+  '5':'5a Hora · 10:20-11:10', '6':'6a Hora · 11:10-12:00'
 };
 let _dia='', _franja='';
 
@@ -273,7 +273,7 @@ function guardar(){
 }
 
 function limpiar(){
-  if(!confirm('Â¿Borrar esta celda?')) return;
+  if(!confirm('¿Borrar esta celda?')) return;
   _send('','','');
 }
 
@@ -288,7 +288,7 @@ function _send(num, mat, prof){
   fd.append('curso',    CURSO);
   fetch('/'+SLUG+'/horarios', {method:'POST', body:fd})
     .then(()=>{ cerrar(); showToast('<i data-lucide="check-circle"></i> Guardado'); setTimeout(()=>location.reload(), 700); })
-    .catch(()=>{ showToast('Ã¢â€œ Error de conexiÃ³n'); });
+    .catch(()=>{ showToast('Ã¢â€œ Error de conexión'); });
 }
 
 document.addEventListener('keydown', e=>{

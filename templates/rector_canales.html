@@ -109,8 +109,8 @@ select.form-control{cursor:pointer;}
     <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
     <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
     <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>AuditorÃ­a</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">ConfiguraciÃ³n</div>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
     {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gesti&oacute;n de Rectores</span></a>{% endif %}
     <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuraci&oacute;n</span></a>
     <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesi&oacute;n</span></a>
@@ -122,12 +122,12 @@ select.form-control{cursor:pointer;}
 </nav>
 
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
 
 <div class="topbar">
   <div class="topbar-left">
-    <h1>Canales de ComunicaciÃ³n</h1>
-    <div class="breadcrumb">Gestiona los canales institucionales de mensajerÃ­a</div>
+    <h1>Canales de Comunicación</h1>
+    <div class="breadcrumb">Gestiona los canales institucionales de mensajería</div>
   </div>
   <div class="topbar-actions">
     <button class="btn btn-primary" onclick="mostrarFormCrear()"><i data-lucide="plus"></i> Nuevo canal</button>
@@ -144,7 +144,7 @@ select.form-control{cursor:pointer;}
       <label>Tipo de canal</label>
       <select class="form-control" id="tipoCanal" onchange="onTipoChange()">
         <option value="institucional">Institucional (toda la comunidad)</option>
-        <option value="rectoria">RectorÃ­a (todos los profesores)</option>
+        <option value="rectoria">Rectoría (todos los profesores)</option>
         <option value="profesores">Profesores (solo profesores)</option>
         <option value="director_curso">Director de curso</option>
         <option value="curso">Curso</option>
@@ -153,11 +153,11 @@ select.form-control{cursor:pointer;}
     </div>
     <div class="form-group">
       <label>Nombre del canal (opcional)</label>
-      <input class="form-control" id="nombreCanal" placeholder="Se generarÃ¡ automÃ¡ticamente segÃºn el tipo">
+      <input class="form-control" id="nombreCanal" placeholder="Se generará automáticamente según el tipo">
     </div>
     <div class="form-group">
-      <label>DescripciÃ³n (opcional)</label>
-      <input class="form-control" id="descCanal" placeholder="PropÃ³sito del canal">
+      <label>Descripción (opcional)</label>
+      <input class="form-control" id="descCanal" placeholder="Propósito del canal">
     </div>
     <div class="form-group d-none" id="grupoCurso">
       <label>Curso</label>
@@ -205,7 +205,7 @@ select.form-control{cursor:pointer;}
 <div class="empty-state">
   <div class="icon"><i data-lucide="message-square"></i></div>
   <h3>No hay canales</h3>
-  <p>Crea el primer canal de comunicaciÃ³n institucional para tu comunidad educativa.</p>
+  <p>Crea el primer canal de comunicación institucional para tu comunidad educativa.</p>
   <button class="btn btn-primary" style="margin-top:16px;" onclick="mostrarFormCrear()"><i data-lucide="plus"></i> Crear canal</button>
 </div>
 {% endif %}
@@ -252,11 +252,11 @@ function crearCanal(){
         if(d.ok){location.reload();}
         else{alert('Error: '+d.error);}
     })
-    .catch(function(){alert('Error de conexiÃ³n');});
+    .catch(function(){alert('Error de conexión');});
 }
 
 function eliminarCanal(cid){
-    if(!confirm('Â¿Eliminar este canal? Se desactivarÃ¡ para todos los miembros.'))return;
+    if(!confirm('¿Eliminar este canal? Se desactivará para todos los miembros.'))return;
     var fd=new FormData();
     fd.append('_csrf_token','{{ csrf_token() }}');
     fetch('/{{ slug }}/rector/canales/'+cid+'/eliminar',{method:'POST',body:fd})
@@ -265,7 +265,7 @@ function eliminarCanal(cid){
         if(d.ok){location.reload();}
         else{alert('Error: '+d.error);}
     })
-    .catch(function(){alert('Error de conexiÃ³n');});
+    .catch(function(){alert('Error de conexión');});
 }
 
 function verMiembros(cid){
@@ -279,7 +279,7 @@ function verMiembros(cid){
         });
         alert(msg);
     })
-    .catch(function(){alert('Error de conexiÃ³n');});
+    .catch(function(){alert('Error de conexión');});
 }
 
 document.addEventListener('DOMContentLoaded',function(){

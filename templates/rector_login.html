@@ -110,15 +110,15 @@
                 <input type="text" name="usuario" placeholder="Tu usuario" required autocomplete="username" autofocus>
             </div>
             <div class="field">
-                <label>ContraseÃ±a</label>
+                <label>Contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required autocomplete="current-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseÃ±a"><i data-lucide="eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
             <button type="submit" class="btn-submit">Ingresar <i data-lucide="arrow-right"></i></button>
         </form>
-        <a class="forgot-link" onclick="switchTabById('recuperar');return false;">Â¿Olvidaste tu contraseÃ±a?</a>
+        <a class="forgot-link" onclick="switchTabById('recuperar');return false;">¿Olvidaste tu contraseña?</a>
     </div>
 
     <div id="tab-registro" class="section">
@@ -136,28 +136,28 @@
             </div>
 
             <div class="field">
-                <label>Correo electrÃ³nico (opcional)</label>
+                <label>Correo electrónico (opcional)</label>
                 <input type="email" name="email" placeholder="tu@correo.com">
             </div>
 
             <div class="field">
-                <label>ContraseÃ±a</label>
+                <label>Contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="password" id="reg-pwd"
-                           placeholder="MÃ­nimo 6 caracteres" required minlength="6"
+                           placeholder="Mínimo 6 caracteres" required minlength="6"
                            oninput="checkPwd(this)">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseÃ±a"><i data-lucide="eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
                 <div class="pwd-strength" id="pwd-bar"></div>
                 <div class="pwd-label" id="pwd-label"></div>
             </div>
 
             <div class="field">
-                <label>Confirmar contraseÃ±a</label>
+                <label>Confirmar contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="confirmar_password" id="reg-pwd2"
-                           placeholder="Repite tu contraseÃ±a" required minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseÃ±a"><i data-lucide="eye"></i></button>
+                           placeholder="Repite tu contraseña" required minlength="6">
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
 
@@ -165,40 +165,40 @@
                 <label>Jornada</label>
                 <select name="jornada" id="reg-jornada" required>
                     <option value="" disabled selected>Selecciona tu jornada</option>
-                    <option value="MaÃ±ana">MaÃ±ana</option>
+                    <option value="Mañana">Mañana</option>
                     <option value="Tarde">Tarde</option>
                     <option value="Nocturna">Nocturna</option>
                 </select>
             </div>
 
             <div class="codigo-field">
-                <label><i data-lucide="key"></i> CÃ³digo de invitaciÃ³n</label>
+                <label><i data-lucide="key"></i> Código de invitación</label>
                 <input type="text" name="codigo_registro_rec" id="reg-codigo"
-                       placeholder="CÃ³digo dado por el administrador" required autocomplete="off">
-                <p class="hint">El cÃ³digo lo entrega el administrador del colegio.</p>
+                       placeholder="Código dado por el administrador" required autocomplete="off">
+                <p class="hint">El código lo entrega el administrador del colegio.</p>
             </div>
 
-            <div class="divider">Pregunta secreta â€” para recuperar contraseÃ±a</div>
+            <div class="divider">Pregunta secreta â€” para recuperar contraseña</div>
 
             <div class="field">
                 <label>Pregunta secreta</label>
                 <select name="pregunta_secreta" id="reg-pregunta" required>
                     <option value="" disabled selected>Selecciona una pregunta</option>
-                    <option>Â¿CuÃ¡l es el nombre de tu mascota?</option>
-                    <option>Â¿En quÃ© ciudad naciste?</option>
-                    <option>Â¿CuÃ¡l es el nombre de tu colegio favorito?</option>
-                    <option>Â¿CuÃ¡l es tu comida favorita?</option>
-                    <option>Â¿CuÃ¡l es el nombre de tu mejor amigo(a)?</option>
-                    <option>Â¿CuÃ¡l es tu color favorito?</option>
-                    <option>Â¿CuÃ¡l es el nombre de tu madre?</option>
-                    <option>Â¿CuÃ¡l es tu deporte favorito?</option>
+                    <option>¿Cuál es el nombre de tu mascota?</option>
+                    <option>¿En qué ciudad naciste?</option>
+                    <option>¿Cuál es el nombre de tu colegio favorito?</option>
+                    <option>¿Cuál es tu comida favorita?</option>
+                    <option>¿Cuál es el nombre de tu mejor amigo(a)?</option>
+                    <option>¿Cuál es tu color favorito?</option>
+                    <option>¿Cuál es el nombre de tu madre?</option>
+                    <option>¿Cuál es tu deporte favorito?</option>
                 </select>
             </div>
 
             <div class="field">
                 <label>Respuesta secreta</label>
                 <input type="text" name="respuesta_secreta" id="reg-respuesta"
-                       placeholder="Tu respuesta (recuÃ©rdala bien)" required autocomplete="off">
+                       placeholder="Tu respuesta (recuérdala bien)" required autocomplete="off">
             </div>
 
             <div id="reg-err" class="msg-error"></div>
@@ -209,7 +209,7 @@
 
     <div id="tab-recuperar" class="section">
         <p style="font-size:13px;color:#94A3B8;margin-bottom:18px;line-height:1.6;">
-            Ingresa tu usuario, responde tu pregunta secreta y crea una nueva contraseÃ±a.
+            Ingresa tu usuario, responde tu pregunta secreta y crea una nueva contraseña.
         </p>
 
         <div id="rec-paso1">
@@ -228,20 +228,20 @@
                 <input type="text" id="rec-respuesta" placeholder="Escribe tu respuesta..." autocomplete="off">
             </div>
             <div class="field">
-                <label>Nueva contraseÃ±a</label>
+                <label>Nueva contraseña</label>
                 <div class="pass-wrapper">
-                    <input type="password" id="rec-nueva" placeholder="MÃ­nimo 6 caracteres" minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseÃ±a"><i data-lucide="eye"></i></button>
+                    <input type="password" id="rec-nueva" placeholder="Mínimo 6 caracteres" minlength="6">
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
             <div class="field">
-                <label>Confirmar contraseÃ±a</label>
+                <label>Confirmar contraseña</label>
                 <div class="pass-wrapper">
-                    <input type="password" id="rec-confirmar" placeholder="Repite la contraseÃ±a">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseÃ±a"><i data-lucide="eye"></i></button>
+                    <input type="password" id="rec-confirmar" placeholder="Repite la contraseña">
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
-            <button type="button" class="btn-submit" onclick="recCambiar()">Guardar nueva contraseÃ±a</button>
+            <button type="button" class="btn-submit" onclick="recCambiar()">Guardar nueva contraseña</button>
             <div id="rec-err2" class="msg-error"></div>
             <div id="rec-ok2"  class="msg-ok"></div>
             <button type="button" onclick="recReset()"
@@ -278,9 +278,9 @@ function checkPwd(inp){
     if(!val){ bar.className='pwd-strength'; lbl.textContent=''; return; }
     var strong = val.length>=8 && /[A-Z]/.test(val) && /[0-9]/.test(val);
     var medium = val.length>=6;
-    if(strong){ bar.className='pwd-strength strong'; lbl.textContent='ContraseÃ±a fuerte'; lbl.style.color='#10B981'; }
-    else if(medium){ bar.className='pwd-strength medium'; lbl.textContent='ContraseÃ±a aceptable'; lbl.style.color='#F59E0B'; }
-    else{ bar.className='pwd-strength weak'; lbl.textContent='ContraseÃ±a dÃ©bil'; lbl.style.color='#EF4444'; }
+    if(strong){ bar.className='pwd-strength strong'; lbl.textContent='Contraseña fuerte'; lbl.style.color='#10B981'; }
+    else if(medium){ bar.className='pwd-strength medium'; lbl.textContent='Contraseña aceptable'; lbl.style.color='#F59E0B'; }
+    else{ bar.className='pwd-strength weak'; lbl.textContent='Contraseña débil'; lbl.style.color='#EF4444'; }
 }
 
 function validarRegistro(){
@@ -298,10 +298,10 @@ function validarRegistro(){
 
     if(!nombre){ mostrarErr('Escribe tu nombre completo.'); return false; }
     if(!usuario){ mostrarErr('Escribe un nombre de usuario.'); return false; }
-    if(pwd.length < 6){ mostrarErr('La contraseÃ±a debe tener al menos 6 caracteres.'); return false; }
-    if(pwd !== pwd2){ mostrarErr('Las contraseÃ±as no coinciden.'); return false; }
+    if(pwd.length < 6){ mostrarErr('La contraseña debe tener al menos 6 caracteres.'); return false; }
+    if(pwd !== pwd2){ mostrarErr('Las contraseñas no coinciden.'); return false; }
     if(!jornada){ mostrarErr('Selecciona una jornada.'); return false; }
-    if(!codigo){ mostrarErr('Ingresa el cÃ³digo de invitaciÃ³n.'); return false; }
+    if(!codigo){ mostrarErr('Ingresa el código de invitación.'); return false; }
     if(!pregunta){ mostrarErr('Selecciona una pregunta secreta.'); return false; }
     if(!respuesta){ mostrarErr('Escribe tu respuesta secreta.'); return false; }
     return true;
@@ -332,7 +332,7 @@ function recBuscar(){
                 err.style.display = 'block';
             }
         })
-        .catch(function(){ err.textContent='<i data-lucide="alert-triangle"></i> Error de conexiÃ³n.'; err.style.display='block'; });
+        .catch(function(){ err.textContent='<i data-lucide="alert-triangle"></i> Error de conexión.'; err.style.display='block'; });
 }
 
 function recCambiar(){
@@ -345,8 +345,8 @@ function recCambiar(){
     err.style.display = ok.style.display = 'none';
 
     if(!respuesta){ err.textContent='<i data-lucide="alert-triangle"></i> Escribe tu respuesta.'; err.style.display='block'; return; }
-    if(nueva.length < 6){ err.textContent='<i data-lucide="alert-triangle"></i> MÃ­nimo 6 caracteres.'; err.style.display='block'; return; }
-    if(nueva !== confirmar){ err.textContent='<i data-lucide="alert-triangle"></i> Las contraseÃ±as no coinciden.'; err.style.display='block'; return; }
+    if(nueva.length < 6){ err.textContent='<i data-lucide="alert-triangle"></i> Mínimo 6 caracteres.'; err.style.display='block'; return; }
+    if(nueva !== confirmar){ err.textContent='<i data-lucide="alert-triangle"></i> Las contraseñas no coinciden.'; err.style.display='block'; return; }
 
     var f = new FormData();
     f.append('usuario', usuario);
@@ -365,7 +365,7 @@ function recCambiar(){
                 err.style.display = 'block';
             }
         })
-        .catch(function(){ err.textContent='<i data-lucide="alert-triangle"></i> Error de conexiÃ³n.'; err.style.display='block'; });
+        .catch(function(){ err.textContent='<i data-lucide="alert-triangle"></i> Error de conexión.'; err.style.display='block'; });
 }
 
 function recReset(){
@@ -380,7 +380,7 @@ switchTabById('login');
 {% endif %}
 {% if error %}
 {% set e = error|lower %}
-{% if 'usuario ya' in e or 'completa' in e or 'caracteres' in e or 'pregunta' in e or 'invitaciÃ³n' in e or 'contraseÃ±a' in e or 'jornada' in e %}
+{% if 'usuario ya' in e or 'completa' in e or 'caracteres' in e or 'pregunta' in e or 'invitación' in e or 'contraseña' in e or 'jornada' in e %}
 switchTabById('registro');
 {% endif %}
 {% endif %}

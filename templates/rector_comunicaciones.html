@@ -109,11 +109,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
     <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
     <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>AuditorÃ­a</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">ConfiguraciÃ³n</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>GestiÃ³n de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>ConfiguraciÃ³n</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesiÃ³n</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -122,7 +122,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </nav>
 
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
 
 <div class="topbar">
   <div class="topbar-left">
@@ -131,7 +131,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   <div class="topbar-actions">
     <a href="/{{ slug }}/notificaciones" class="btn btn-outline"><i data-lucide="bell"></i> Notificaciones {% if notif_count > 0 %}({{ notif_count }}){% endif %}</a>
-    <a href="/{{ slug }}/rector/comunicaciones/nueva" class="btn btn-primary"><i data-lucide="plus"></i> Nueva comunicaciÃ³n</a>
+    <a href="/{{ slug }}/rector/comunicaciones/nueva" class="btn btn-primary"><i data-lucide="plus"></i> Nueva comunicación</a>
   </div>
 </div>
 
@@ -169,7 +169,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <button class="btn btn-outline btn-sm"><i data-lucide="archive"></i> Archivar</button>
       </form>
       {% endif %}
-      <form method="POST" action="/{{ slug }}/rector/comunicaciones/{{ c.id }}/eliminar" style="display:inline;" onsubmit="return confirm('Â¿Eliminar esta comunicaciÃ³n? Esta acciÃ³n no se puede deshacer.');">
+      <form method="POST" action="/{{ slug }}/rector/comunicaciones/{{ c.id }}/eliminar" style="display:inline;" onsubmit="return confirm('¿Eliminar esta comunicación? Esta acción no se puede deshacer.');">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <button class="btn btn-danger btn-sm"><i data-lucide="trash-2"></i> Eliminar</button>
       </form>
@@ -181,8 +181,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="empty-state">
   <div class="icon"><i data-lucide="megaphone"></i></div>
   <h3>No hay comunicaciones</h3>
-  <p>Crea la primera comunicaciÃ³n institucional para mantener informada a la comunidad educativa.</p>
-  <a href="/{{ slug }}/rector/comunicaciones/nueva" class="btn btn-primary" style="margin-top:16px;"><i data-lucide="plus"></i> Crear comunicaciÃ³n</a>
+  <p>Crea la primera comunicación institucional para mantener informada a la comunidad educativa.</p>
+  <a href="/{{ slug }}/rector/comunicaciones/nueva" class="btn btn-primary" style="margin-top:16px;"><i data-lucide="plus"></i> Crear comunicación</a>
 </div>
 {% endif %}
 </div>

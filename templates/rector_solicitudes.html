@@ -87,13 +87,13 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
     <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
     <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
     <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>AuditorÃ­a</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">AcadÃ©mico</div>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Académico</div>
     <a href="/{{ slug }}/rector/solicitudes" class="sidebar-item active"><span class="icon"><i data-lucide="clipboard-list"></i></span><span>Solicitudes</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">ConfiguraciÃ³n</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>GestiÃ³n de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>ConfiguraciÃ³n</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesiÃ³n</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -103,7 +103,7 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
 <div class="main">
 <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menu">â˜°</button>
 <div class="topbar">
-  <h1><i data-lucide="clipboard-list" style="color:var(--accent);"></i> Solicitudes de modificaciÃ³n</h1>
+  <h1><i data-lucide="clipboard-list" style="color:var(--accent);"></i> Solicitudes de modificación</h1>
   <div class="breadcrumb">Solicitudes de docentes para modificar notas en periodos cerrados</div>
 </div>
 
@@ -121,7 +121,7 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
         <th>Solicitada</th>
         <th>Motivo</th>
         <th>Estado</th>
-        <th>AcciÃ³n</th>
+        <th>Acción</th>
       </tr>
     </thead>
     <tbody>

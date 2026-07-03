@@ -465,8 +465,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         <div class="dlabel">Cursos</div>
         <div class="dtag">asignados este periodo</div>
         <div class="dash-progress">
-            <div class="dp-label"><span>Avance curricular</span><span>{{ (mis_cursos|length * 25)|min(100) }}%</span></div>
-            <div class="dp-bar"><div class="dp-fill" style="width:{{ (mis_cursos|length * 25)|min(100) }}%;"></div></div>
+            {% set cur_avance = mis_cursos|length * 25 %}{% set cur_avance_clamped = cur_avance if cur_avance < 100 else 100 %}
+            <div class="dp-label"><span>Avance curricular</span><span>{{ cur_avance_clamped }}%</span></div>
+            <div class="dp-bar"><div class="dp-fill" style="width:{{ cur_avance_clamped }}%;"></div></div>
         </div>
     </div>
     <div class="dash-card green">

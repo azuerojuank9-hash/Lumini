@@ -61,10 +61,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="notif-title">{{ n.titulo }}</div>
       {% if n.mensaje %}<div class="notif-message">{{ n.mensaje }}</div>{% endif %}
       <div class="notif-time">{{ n.fecha_creacion[:16] }}</div>
-      {% if n.link %}<a href="{{ n.link }}" class="notif-link">Ver mÃ¡s <i data-lucide="arrow-right"></i></a>{% endif %}
+      {% if n.link %}<a href="{{ n.link }}" class="notif-link">Ver más <i data-lucide="arrow-right"></i></a>{% endif %}
     </div>
     {% if not n.leida %}
-    <button class="mark-read" onclick="marcarLeida({{ n.id }})" title="Marcar como leÃ­da"><i data-lucide="check"></i></button>
+    <button class="mark-read" onclick="marcarLeida({{ n.id }})" title="Marcar como leída"><i data-lucide="check"></i></button>
     {% endif %}
   </div>
   {% endfor %}
@@ -73,7 +73,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="empty-state">
   <div class="icon"><i data-lucide="bell"></i></div>
   <h3>No hay notificaciones</h3>
-  <p>Cuando recibas notificaciones del sistema, aparecerÃ¡n aquÃ­.</p>
+  <p>Cuando recibas notificaciones del sistema, aparecerán aquí.</p>
 </div>
 {% endif %}
 

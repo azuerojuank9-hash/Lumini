@@ -1,4 +1,4 @@
-﻿import os
+import os
 from dotenv import load_dotenv
 load_dotenv()
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file, abort, jsonify, g
@@ -400,10 +400,6 @@ def get_colegio(slug):
     except (RuntimeError, AttributeError):
         pass
     return r
-
-def colegio_activo(slug):
-    c = get_colegio(slug)
-    return c and c['activo'] == 1
 
 def get_codigo_registro(slug, rol=None):
     """Devuelve el código de invitación del colegio para un rol específico.
@@ -1046,17 +1042,6 @@ def config_get(slug):
     setattr(g, cache_key, val)
     return val
 
-def config_get_nombre_rol(slug, codigo):
-    config = config_get(slug)
-    roles = {}
-    try: roles = json.loads(config.get('roles_json', '{}'))
-    except (json.JSONDecodeError, TypeError): pass
-    return roles.get(codigo, codigo.capitalize())
-
-def config_get_nombre_institucion(slug):
-    inst = get_colegio(slug)
-    return inst['nombre'] if inst else slug
-
 # ── CANALES HELPERS ─────────────────────────────────────────────────────────────
 def canales_usuario(slug, usuario_tipo, usuario_id):
     conn = conectar(slug)
@@ -1307,16 +1292,24 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
     return buf.read(), prom_general
 
 # ── ENVIAR CORREO ─────────────────────────────────────────────────────────────
-def enviar_correo(destino, asunto, cuerpo_html):
+def enviar_correo(destino, asunto, cuerpo_html, adjunto_bytes=None, adjunto_nombre=None, adjunto_tipo=None):
     if not SENDGRID_API_KEY:
-        logger.error('Intento de envío sin SENDGRID_API_KEY configurado.')
+        logger.error(f'Intento de envío a {destino} sin SENDGRID_API_KEY configurado.')
         return False
     try:
         import sendgrid
-        from sendgrid.helpers.mail import Mail
+        from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+        import base64
         sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
         mensaje = Mail(from_email=EMAIL_ORIGEN, to_emails=destino,
                        subject=asunto, html_content=cuerpo_html)
+        if adjunto_bytes and adjunto_nombre and adjunto_tipo:
+            adjunto = Attachment(
+                FileContent(base64.b64encode(adjunto_bytes).decode()),
+                FileName(adjunto_nombre),
+                FileType(adjunto_tipo),
+                Disposition('attachment'))
+            mensaje.attachment = adjunto
         sg.client.mail.send.post(request_body=mensaje.get())
         return True
     except Exception as e:
@@ -1676,7 +1669,8 @@ def login(slug):
                                 conn.execute(
                                     'INSERT OR IGNORE INTO asignaciones_materia (profesor_id,materia,jornada) VALUES (?,?,?)',
                                     (pid, mat, jor))
-                            except Exception: pass
+                            except Exception as e:
+                                logger.warning(f'Error al asignar materia={mat} jornada={jor} a profesor={pid} en {slug}: {e}')
                     conn.commit(); conn.close()
                     error = '✅ Registro exitoso. Ya puedes ingresar.'
 
@@ -3393,8 +3387,8 @@ def generar_destinatarios(slug, comunicacion_id):
             cursos_grado = {}
             for row in conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1').fetchall():
                 c = row['curso']
-                g = ''.join(filter(str.isdigit, c))
-                cursos_grado.setdefault(g, []).append(c)
+                grade_num = ''.join(filter(str.isdigit, c))
+                cursos_grado.setdefault(grade_num, []).append(c)
             for grado in val_arr:
                 for curso in cursos_grado.get(str(grado), []):
                     for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():
@@ -4737,39 +4731,25 @@ def directora_enviar_correos(slug):
         except Exception as e:
             logger.error(f'Error generando PDF para {alumno["nombre"]}: {e}')
             fallidos += 1; continue
+        asunto = f'Boletín de Notas — {alumno["nombre"]} · Periodo {periodo}'
         try:
             pri_hex = colegio['primary_color'] if colegio and colegio['primary_color'] else '#6c63ff'
         except (KeyError, AttributeError, TypeError):
             pri_hex = '#6c63ff'
-        try:
-            import sendgrid
-            from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
-            sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
-            mensaje = Mail(
-                from_email=EMAIL_ORIGEN,
-                to_emails=email_dest,
-                subject=f'Boletín de Notas — {alumno["nombre"]} · Periodo {periodo}',
-                html_content=f'''<div style="font-family:sans-serif;max-width:500px;margin:0 auto;">
-                    <h2 style="color:{pri_hex};">LUMINI — Boletín de Notas</h2>
-                    <p>Estimado acudiente,</p>
-                    <p>Adjunto encontrará el boletín de notas de <strong>{html.escape(str(alumno['nombre']))}</strong>
-                       correspondiente al <strong>Periodo {periodo}</strong>.</p>
-                    <p><strong>Promedio general: {prom_general}</strong></p>
-                    <p style="color:#888;font-size:12px;">
-                       {html.escape(str(colegio['nombre'] if colegio else slug))} · {curso} · {jornada}</p>
-                </div>'''
-            )
-            adjunto = Attachment(
-                FileContent(base64.b64encode(pdf_bytes).decode()),
-                FileName(f'boletin_{alumno["nombre"].replace(" ", "_")}_P{periodo}.pdf'),
-                FileType('application/pdf'),
-                Disposition('attachment'))
-            mensaje.attachment = adjunto
-            sg.client.mail.send.post(request_body=mensaje.get())
+        cuerpo = f'''<div style="font-family:sans-serif;max-width:500px;margin:0 auto;">
+            <h2 style="color:{pri_hex};">LUMINI — Boletín de Notas</h2>
+            <p>Estimado acudiente,</p>
+            <p>Adjunto encontrará el boletín de notas de <strong>{html.escape(str(alumno['nombre']))}</strong>
+               correspondiente al <strong>Periodo {periodo}</strong>.</p>
+            <p><strong>Promedio general: {prom_general}</strong></p>
+            <p style="color:#888;font-size:12px;">
+               {html.escape(str(colegio['nombre'] if colegio else slug))} · {curso} · {jornada}</p>
+        </div>'''
+        adj_nombre = f'boletin_{alumno["nombre"].replace(" ", "_")}_P{periodo}.pdf'
+        if enviar_correo(email_dest, asunto, cuerpo, pdf_bytes, adj_nombre, 'application/pdf'):
             enviados += 1
             logger.info(f'Boletín enviado a {email_dest} para {alumno["nombre"]}')
-        except Exception as e:
-            logger.error(f'Error correo {email_dest}: {e}')
+        else:
             fallidos += 1
     conn.close()
     partes = []

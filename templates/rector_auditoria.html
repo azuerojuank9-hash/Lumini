@@ -5,7 +5,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AuditorÃ­a â€” {{ colegio.nombre if colegio else slug }}</title>
+<title>Auditoría â€” {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
@@ -89,11 +89,11 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
     <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
     <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>AuditorÃ­a</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">ConfiguraciÃ³n</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>GestiÃ³n de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>ConfiguraciÃ³n</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesiÃ³n</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -101,9 +101,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   </div>
 </nav>
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
 <div class="topbar">
-  <h1><i data-lucide="clock-rewind" style="color:var(--accent);"></i> AuditorÃ­a</h1>
+  <h1><i data-lucide="clock-rewind" style="color:var(--accent);"></i> Auditoría</h1>
   <div class="breadcrumb">Registro de cambios y accesos al sistema</div>
 </div>
 
@@ -129,7 +129,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
       <tr>
         <th>Fecha</th>
         <th>Usuario</th>
-        <th>AcciÃ³n</th>
+        <th>Acción</th>
         <th>Tabla</th>
         <th>ID</th>
         <th>Cambio</th>
@@ -168,7 +168,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 
   {% if total_pages > 1 %}
   <div class="pagination">
-    <span class="info">PÃ¡gina {{ page }} de {{ total_pages }}</span>
+    <span class="info">Página {{ page }} de {{ total_pages }}</span>
     {% if page > 1 %}
     <a href="?page={{ page - 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">â€¹ Anterior</a>
     {% endif %}
@@ -190,7 +190,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   {% else %}
   <p style="text-align:center;padding:40px 0;color:var(--sub);font-size:14px;">
     <i data-lucide="inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-    No hay registros de auditorÃ­a aÃºn.
+    No hay registros de auditoría aún.
   </p>
   {% endif %}
 </div>
