@@ -1,3427 +1,784 @@
 <!DOCTYPE html>
 
-
-
-
-
-
-
 <html lang="es">
 
-
-
-
-
-
-
 <head>
-
-
-
-
-
-
 
 <meta charset="UTF-8">
 
 
-
-
-
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 
-
-
-
-
-
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-
-
-
 
 <title>Archivados — {{ colegio.nombre if colegio else slug }}</title>
 
-
-
-
-
-
-
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-
-
-
-
-
 
 <style>
 
-
-
-
-
-
-
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
-
-
-
-
-
-
 
 [data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.15);}
 
-
-
-
-
-
-
 *{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
-
-
-
-
-
-
 
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
 
-
-
-
-
-
-
 .sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-
-
-
-
-
-
 
 .sidebar-logo{padding:14px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
 
-
-
-
-
-
-
 .sidebar-logo img{height:30px;width:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
-
-
-
-
-
-
 
 .sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 
-
-
-
-
-
-
 .sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
-
-
-
-
-
-
 
 .sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}
 
-
-
-
-
-
-
 .sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}
-
-
-
-
-
-
 
 .sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
 
-
-
-
-
-
-
 .sidebar-link.active{background:var(--accent);color:#fff;}
-
-
-
-
-
-
 
 .sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
 
-
-
-
-
-
-
 .sidebar-footer{padding:8px 10px;border-top:1px solid var(--border);}
-
-
-
-
-
-
 
 .main{margin-left:var(--sidebar);padding:20px 24px;width:calc(100% - var(--sidebar));min-height:100vh;max-width:960px;}
 
-
-
-
-
-
-
 h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;}
-
-
-
-
-
-
 
 .subtitle{color:var(--muted);font-size:13px;margin-bottom:20px;}
 
-
-
-
-
-
-
 .curso-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
-
-
-
-
-
-
 
 .ctab{padding:7px 14px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:12px;cursor:pointer;text-decoration:none;transition:all var(--tr);}
 
-
-
-
-
-
-
 .ctab:hover,.ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
-
-
-
-
-
-
 
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
 
-
-
-
-
-
-
 .card-head{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;}
-
-
-
-
-
-
 
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
-
-
-
-
-
-
 table{border-collapse:collapse;width:100%;font-size:13px;}
-
-
-
-
-
-
 
 th{padding:7px 5px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);background:var(--bg2);}
 
-
-
-
-
-
-
 td{padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
-
-
-
-
-
-
 
 tr:last-child td{border-bottom:none;}
 
-
-
-
-
-
-
 tr:hover td{background:rgba(var(--accent-rgb),.04);}
-
-
-
-
-
-
 
 .bsm{padding:7px 13px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all var(--tr);}
 
-
-
-
-
-
-
 .bsm:active{transform:scale(.96);}
-
-
-
-
-
-
 
 .breact{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);}
 
-
-
-
-
-
-
 .breact:hover{background:rgba(16,185,129,.2);}
-
-
-
-
-
-
 
 .bdel{background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.2);}
 
-
-
-
-
-
-
 .bdel:hover{background:rgba(239,68,68,.18);}
-
-
-
-
-
-
 
 .barch{background:rgba(245,158,11,.08);color:var(--yellow);border:1px solid rgba(245,158,11,.2);}
 
-
-
-
-
-
-
 .barch:hover{background:rgba(245,158,11,.18);}
-
-
-
-
-
-
 
 .empty{text-align:center;padding:28px;color:var(--muted);font-size:13px;}
 
-
-
-
-
-
-
 .badge-mat{background:rgba(var(--accent-rgb),.08);color:var(--accent);padding:2px 8px;border-radius:5px;font-size:11px;margin:2px;display:inline-block;}
-
-
-
-
-
-
 
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;animation:fadeIn .2s ease;}
 
-
-
-
-
-
-
 .overlay.open{display:flex;}
-
-
-
-
-
-
 
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 
-
-
-
-
-
-
 .modal{background:rgba(15,23,42,.96);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
-
-
-
-
-
-
 
 @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 
-
-
-
-
-
-
 .modal-title{font-size:15px;font-weight:600;margin-bottom:6px;}
-
-
-
-
-
-
 
 .modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5;}
 
-
-
-
-
-
-
 .flabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;margin-top:14px;font-weight:600;}
-
-
-
-
-
-
 
 .finput,.fselect{padding:10px 13px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;width:100%;transition:border-color var(--tr),box-shadow var(--tr);}
 
-
-
-
-
-
-
 .fselect:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-
-
-
-
-
-
 
 .fselect option{background:var(--bg2);}
 
-
-
-
-
-
-
 .btn-modal-pri{width:100%;padding:11px;border-radius:var(--rsm);border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:16px;transition:all var(--tr);box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
-
-
-
-
-
-
 
 .btn-modal-pri:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
 
-
-
-
-
-
-
 .btn-modal-ghost{width:100%;padding:10px;border-radius:var(--rsm);border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;transition:background var(--tr);}
-
-
-
-
-
-
 
 .btn-modal-ghost:hover{background:rgba(255,255,255,.08);}
 
-
-
-
-
-
-
 .cursos-lista{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-
-
-
-
-
-
 
 .curso-item{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:8px 12px;font-size:13px;cursor:pointer;transition:background var(--tr);}
 
-
-
-
-
-
-
 .curso-item:hover{background:var(--bg4);}
-
-
-
-
-
-
 
 .curso-item input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;}
 
-
-
-
-
-
-
 .alert-warn-box{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.18);color:var(--yellow);border-radius:var(--rsm);padding:10px 13px;font-size:12px;margin-top:12px;line-height:1.5;}
-
-
-
-
-
-
 
 .scroll-top{display:none;position:fixed;bottom:80px;right:16px;z-index:2000;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:50%;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);}
 
-
-
-
-
-
-
 .scroll-top.show{display:flex;}
-
-
-
-
-
-
 
 .toast{position:fixed;bottom:20px;right:20px;padding:8px 14px;border-radius:var(--rmd);font-size:12px;font-weight:600;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.3);}
 
-
-
-
-
-
-
 .toast.ok{background:rgba(16,185,129,.95);color:#fff;}
-
-
-
-
-
-
 
 .toast.err{background:rgba(239,68,68,.95);color:#fff;}
 
-
-
-
-
-
-
 .toast.show{opacity:1;transform:translateY(0);}
-
-
-
-
-
-
 
 .hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:36px;height:36px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
 
-
-
-
-
-
-
 .hamburger:hover{background:var(--bg3);border-color:var(--accent);}
-
-
-
-
-
-
 
 .sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);}
 
-
-
-
-
-
-
 @media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 24px;}}
-
-
-
-
-
-
 
 @media(max-width:600px){
 
-
-
-
-
-
-
   table,thead,tbody,tr,td,th{display:block;}
-
-
-
-
-
-
 
   thead{display:none;}
 
-
-
-
-
-
-
   tr{border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px;background:var(--bg2);}
-
-
-
-
-
-
 
   td{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border:none;text-align:right;gap:6px;min-height:36px;}
 
-
-
-
-
-
-
   td::before{content:attr(data-label);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;flex-shrink:0;text-align:left;min-width:70px;}
-
-
-
-
-
-
 
   td:last-child{border-bottom:none;}
 
-
-
-
-
-
-
   .bsm{min-height:44px;font-size:13px;padding:8px 14px;}
-
-
-
-
-
-
 
   tr:hover td{background:none;}
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
 
 @media(max-width:375px){.main{padding:20px 24px;}.card-head{padding:10px 14px;}.card-title{font-size:12px;}.card-body{padding:12px;}.h1{font-size:1.3rem;}.bsm{font-size:12px;min-height:40px;padding:6px 12px;}.curso-tabs{gap:4px;}.hamburger{width:36px;height:36px;}}
 
-
-
-
-
-
-
 </style>
-
-
-
-
-
-
 
 <!-- Datadog RUM -->
 
-
-
-
-
-
-
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
-
-
-
-
-
-
 
   <link rel="stylesheet" href="/static/css/lumini.css">
 
 
-
-
-
-
-
-
 <body>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <aside class="sidebar" id="sidebar">
 
-
-
-
-
-
-
     <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
-
-
-
-
-
-
 
     <div class="sidebar-logo">
 
-
-
-
-
-
-
         {% if colegio and colegio.logo %}
-
-
-
-
-
-
 
         <img src="/static/logos/{{ colegio.logo }}" alt="">
 
-
-
-
-
-
-
         {% else %}
 
-
-
-
-
-
-
-        <img src="/static/lumini_logo.png" alt="">
-
-
-
-
-
-
+        <img src="/static/lumini_logo.webp" alt="">
 
         {% endif %}
 
-
-
-
-
-
-
         <div>
-
-
-
-
-
-
 
             <div class="sidebar-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
 
-
-
-
-
-
-
             <div class="sidebar-brand-sub">{{ profesor.nombre }} · Archivados</div>
-
-
-
-
-
-
 
         </div>
 
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
 
     </a>
 
-
-
-
-
-
-
     <nav class="sidebar-nav">
 
+        <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
 
+        <a href="/{{ slug }}/horarios" class="sidebar-link"><span class="icon"><i data-lucide="calendar"></i></span> Horarios</a>
 
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>ï¸</span> Mi Perfil</a>
 
-
-
-
-        <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i class="fas fa-chart-bar"></i></span> Dashboard</a>
-
-
-
-
-
-
-
-        <a href="/{{ slug }}/horarios" class="sidebar-link"><span class="icon"><i class="fas fa-calendar-alt"></i></span> Horarios</a>
-
-
-
-
-
-
-
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i class="fas fa-cog"></i>ï¸</span> Mi Perfil</a>
-
-
-
-
-
-
-
-        <a href="/{{ slug }}/archivados" class="sidebar-link active"><span class="icon"><i class="fas fa-archive"></i></span> Archivados</a>
-
-
-
-
-
-
+        <a href="/{{ slug }}/archivados" class="sidebar-link active"><span class="icon"><i data-lucide="archive"></i></span> Archivados</a>
 
     </nav>
 
-
-
-
-
-
-
     <div class="sidebar-footer">
 
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
 
-
-
-
-
-
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema"><i class="fas fa-moon"></i> Cambiar tema</button>
-
-
-
-
-
-
-
-        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> Cerrar sesión</a>
-
-
-
-
-
-
+        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
 
     </div>
-
-
-
-
-
-
 
 </aside>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="main">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â’°</button>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <h1><i class="fas fa-archive"></i> Gestión de usuarios</h1>
-
-
-
-
-
-
+  <h1><i data-lucide="archive"></i> Gestión de usuarios</h1>
 
   <p class="subtitle">Administra profesores y estudiantes · Los datos archivados se conservan</p>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   {% if mis_cursos %}
-
-
-
-
-
-
 
   <div class="curso-tabs">
 
-
-
-
-
-
-
     {% for c in mis_cursos %}
-
-
-
-
-
-
 
     <a href="?curso={{ c }}" class="ctab {% if c==curso_sel %}active{% endif %}">{{ c }}</a>
 
-
-
-
-
-
-
     {% endfor %}
 
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
 
   {% endif %}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   <div class="card">
-
-
-
-
-
-
 
     <div class="card-head">👨â€« Profesores activos</div>
 
-
-
-
-
-
-
     {% if profesores_activos %}
-
-
-
-
-
-
 
     <div class="tw">
 
-
-
-
-
-
-
       <table>
-
-
-
-
-
-
 
         <thead>
 
-
-
-
-
-
-
           <tr>
 
-
-
-
-
-
-
             <th>Nombre</th>
-
-
-
-
-
-
 
             <th>Materias</th>
 
-
-
-
-
-
-
             <th>Usuario</th>
-
-
-
-
-
-
 
             <th>Correo</th>
 
-
-
-
-
-
-
             <th>Acción</th>
-
-
-
-
-
-
 
           </tr>
 
-
-
-
-
-
-
         </thead>
 
-
-
-
-
-
-
         <tbody>
-
-
-
-
-
-
 
           {% for p in profesores_activos %}
 
-
-
-
-
-
-
           <tr>
 
-
-
-
-
-
-
             <td style="font-weight:500;">{{ p.nombre }}</td>
-
-
-
-
-
-
 
             <td>
 
-
-
-
-
-
-
               {% for mj in p.materias_jornadas %}
-
-
-
-
-
-
 
               <span class="badge-mat">{{ mj.materia }} · {{ mj.jornada }}</span>
 
-
-
-
-
-
-
               {% endfor %}
-
-
-
-
-
-
 
             </td>
 
-
-
-
-
-
-
             <td style="color:var(--muted);font-size:12px;">{{ p.usuario }}</td>
-
-
-
-
-
-
 
             <td style="color:var(--muted);font-size:12px;">{{ p.email or '—' }}</td>
 
-
-
-
-
-
-
             <td style="white-space:nowrap;">
-
-
-
-
-
-
 
               <button class="bsm barch"
 
-
-
-
-
-
-
                 onclick="abrirModalArchivar({{ p.id }}, '{{ p.nombre|replace("'","\\'")|replace('"','\\"') }}', {{ p.cursos_info|tojson }}, {{ p.otros_profesores|tojson }})">
 
-
-
-
-
-
-
-                <i class="fas fa-archive"></i> Archivar
-
-
-
-
-
-
+                <i data-lucide="archive"></i> Archivar
 
               </button>
-
-
-
-
-
-
 
               <button class="bsm bdel" style="margin-left:4px;"
 
-
-
-
-
-
-
                 onclick="eliminarProfesor({{ p.id }}, '{{ p.nombre|replace("'","\\'")|replace('"','\\"') }}')">
-
-
-
-
-
-
 
                 🗑 Eliminar
 
-
-
-
-
-
-
               </button>
-
-
-
-
-
-
 
             </td>
 
-
-
-
-
-
-
           </tr>
-
-
-
-
-
-
 
           {% endfor %}
 
-
-
-
-
-
-
         </tbody>
-
-
-
-
-
-
 
       </table>
 
-
-
-
-
-
-
     </div>
 
-
-
-
-
-
-
     {% else %}
-
-
-
-
-
-
 
     <div class="empty">No hay profesores activos.</div>
 
-
-
-
-
-
-
     {% endif %}
-
-
-
-
-
-
 
   </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   <div class="card">
 
-
-
-
-
-
-
-    <div class="card-head"><i class="fas fa-archive"></i> Profesores archivados</div>
-
-
-
-
-
-
+    <div class="card-head"><i data-lucide="archive"></i> Profesores archivados</div>
 
     {% if profesores_archivados %}
 
-
-
-
-
-
-
     <div class="tw">
-
-
-
-
-
-
 
       <table>
 
-
-
-
-
-
-
         <thead>
-
-
-
-
-
-
 
           <tr>
 
-
-
-
-
-
-
             <th>Nombre</th>
-
-
-
-
-
-
 
             <th>Usuario</th>
 
-
-
-
-
-
-
             <th>Acción</th>
-
-
-
-
-
-
 
           </tr>
 
-
-
-
-
-
-
         </thead>
 
-
-
-
-
-
-
         <tbody>
-
-
-
-
-
-
 
           {% for p in profesores_archivados %}
 
-
-
-
-
-
-
           <tr>
-
-
-
-
-
-
 
             <td style="font-weight:500;">{{ p.nombre }}</td>
 
-
-
-
-
-
-
             <td style="color:var(--muted);font-size:12px;">{{ p.usuario }}</td>
 
-
-
-
-
-
-
             <td style="white-space:nowrap;">
-
-
-
-
-
-
 
               <button class="bsm breact"
 
-
-
-
-
-
-
                 onclick="reactivarProfesor({{ p.id }}, '{{ p.nombre|replace("'","\\'")|replace('"','\\"') }}')">
 
-
-
-
-
-
-
-                <i class="fas fa-recycle"></i>ï¸ Reactivar
-
-
-
-
-
-
+                <i data-lucide="recycle"></i>ï¸ Reactivar
 
               </button>
-
-
-
-
-
-
 
               <button class="bsm bdel" style="margin-left:4px;"
 
-
-
-
-
-
-
                 onclick="eliminarProfesor({{ p.id }}, '{{ p.nombre|replace("'","\\'")|replace('"','\\"') }}')">
-
-
-
-
-
-
 
                 🗑 Eliminar
 
-
-
-
-
-
-
               </button>
-
-
-
-
-
-
 
             </td>
 
-
-
-
-
-
-
           </tr>
-
-
-
-
-
-
 
           {% endfor %}
 
-
-
-
-
-
-
         </tbody>
-
-
-
-
-
-
 
       </table>
 
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
 
     {% else %}
 
-
-
-
-
-
-
     <div class="empty">No hay profesores archivados.</div>
-
-
-
-
-
-
 
     {% endif %}
 
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   <div class="card">
 
-
-
-
-
-
-
     <div class="card-head">🎒 Estudiantes archivados — {{ curso_sel or 'sin curso' }}</div>
-
-
-
-
-
-
 
     {% if alumnos_archivados %}
 
-
-
-
-
-
-
     <div class="tw">
-
-
-
-
-
-
 
       <table>
 
-
-
-
-
-
-
         <thead>
 
-
-
-
-
-
-
           <tr>
-
-
-
-
-
-
 
             <th>Nombre</th>
 
-
-
-
-
-
-
             <th>Curso</th>
-
-
-
-
-
-
 
             <th>Acción</th>
 
-
-
-
-
-
-
           </tr>
-
-
-
-
-
-
 
         </thead>
 
-
-
-
-
-
-
         <tbody>
-
-
-
-
-
-
 
           {% for a in alumnos_archivados %}
 
-
-
-
-
-
-
           <tr>
-
-
-
-
-
-
 
             <td>{{ a.nombre }}</td>
 
-
-
-
-
-
-
             <td>{{ a.curso }}</td>
-
-
-
-
-
-
 
             <td style="white-space:nowrap;">
 
-
-
-
-
-
-
               <form action="/{{ slug }}/reactivar_alumno/{{ a.id }}" method="POST" style="display:inline" onsubmit="return confirm('Reactivar a {{ a.nombre }}?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm breact">
-
-
-
-
-
-
 
                  class="bsm breact"
 
-
-
-
-
-
-
                  onclick="return confirm('¿Reactivar a {{ a.nombre }}?')">
 
-
-
-
-
-
-
-                <i class="fas fa-recycle"></i>ï¸ Reactivar
-
-
-
-
-
-
+                <i data-lucide="recycle"></i>ï¸ Reactivar
 
               </button></form>
-
-
-
-
-
-
 
               <form action="/{{ slug }}/eliminar_alumno/{{ a.id }}" method="POST" style="display:inline;margin-left:4px;" onsubmit="return confirm('Eliminar a {{ a.nombre }} PERMANENTEMENTE?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel"
 ></button></form>
 
-
-
-
-
-
-
             </td>
-
-
-
-
-
-
 
           </tr>
 
-
-
-
-
-
-
           {% endfor %}
-
-
-
-
-
-
 
         </tbody>
 
-
-
-
-
-
-
       </table>
 
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
 
     {% else %}
 
-
-
-
-
-
-
     <div class="empty">No hay estudiantes archivados en este curso.</div>
-
-
-
-
-
-
 
     {% endif %}
 
-
-
-
-
-
-
   </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <div class="overlay" id="modalArchivar" onclick="if(event.target===this)cerrarModal()">
 
-
-
-
-
-
-
   <div class="modal">
-
-
-
-
-
-
 
     <div class="modal-title" id="modal-prof-nombre">Archivar profesor</div>
 
-
-
-
-
-
-
     <div class="modal-sub"   id="modal-prof-sub"></div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <div id="paso-cursos">
 
-
-
-
-
-
-
       <p style="font-size:13px;font-weight:500;margin-bottom:8px;">Cursos con historial activo:</p>
-
-
-
-
-
-
 
       <div class="cursos-lista" id="lista-cursos-modal"></div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       <div id="bloque-reasignar" style="display:none;">
-
-
-
-
-
-
 
         <label class="flabel">Reasignar cursos seleccionados a:</label>
 
-
-
-
-
-
-
         <select class="fselect" id="select-prof-destino">
-
-
-
-
-
-
 
           <option value="">— Solo archivar (sin reasignar) —</option>
 
-
-
-
-
-
-
         </select>
-
-
-
-
-
-
 
         <p style="font-size:11px;color:var(--muted);margin-top:6px;">
 
-
-
-
-
-
-
           Si no seleccionas un profesor, los cursos quedan archivados y el historial se conserva.
-
-
-
-
-
-
 
         </p>
 
-
-
-
-
-
-
       </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       <div class="alert-warn-box">
 
-
-
-
-
-
-
-        <i class="fas fa-exclamation-triangle"></i>ï¸ Al archivar, el profesor no podrá iniciar sesión. Sus datos e historial quedan guardados.
-
-
-
-
-
-
+        <i data-lucide="alert-triangle"></i>ï¸ Al archivar, el profesor no podrá iniciar sesión. Sus datos e historial quedan guardados.
 
       </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      <button class="btn-modal-pri" onclick="confirmarArchivar()"><i class="fas fa-archive"></i> Archivar profesor</button>
-
-
-
-
-
-
+      <button class="btn-modal-pri" onclick="confirmarArchivar()"><i data-lucide="archive"></i> Archivar profesor</button>
 
       <button class="btn-modal-ghost" onclick="cerrarModal()">Cancelar</button>
 
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
 
   </div>
 
-
-
-
-
-
-
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
 
-
-
-
-
-
-
 <div class="toast" id="toast"></div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <script>
 
-
-
-
-
-
-
 function toggleSidebar(){
-
-
-
-
-
-
 
     document.getElementById('sidebar').classList.toggle('open');
 
-
-
-
-
-
-
     document.getElementById('sidebarOverlay').classList.toggle('open');
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
 
 const SLUG = "{{ slug }}";
 
-
-
-
-
-
-
 const CURSO_SEL = "{{ curso_sel or '' }}";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function getCsrf(){
 
-
-
-
-
-
-
     return document.getElementById('csrf-global').value;
-
-
-
-
-
-
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function showToast(msg, ok){
-
-
-
-
-
-
 
     var t = document.getElementById('toast');
     t.innerHTML = msg;
     t.className = 'toast ' + (ok !== false ? 'ok' : 'err');
 
-
-
-
-
-
-
     t.classList.add('show');
-
-
-
-
-
-
 
     setTimeout(function(){ t.classList.remove('show'); }, 2200);
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function eliminarProfesor(id, nombre){
 
-
-
-
-
-
-
-    if(!confirm('<i class="fas fa-exclamation-triangle"></i>ï¸ ¿Eliminar a ' + nombre + ' PERMANENTEMENTE?\nSe borran sus cursos asignados y no se puede deshacer.')){
-
-
-
-
-
-
+    if(!confirm('<i data-lucide="alert-triangle"></i>ï¸ ¿Eliminar a ' + nombre + ' PERMANENTEMENTE?\nSe borran sus cursos asignados y no se puede deshacer.')){
 
         return;
 
-
-
-
-
-
-
     }
-
-
-
-
-
-
 
     fetch('/' + SLUG + '/eliminar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':csrfToken}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function reactivarProfesor(id, nombre){
 
-
-
-
-
-
-
     if(!confirm('¿Reactivar a ' + nombre + '?')){
-
-
-
-
-
-
 
         return;
 
-
-
-
-
-
-
     }
-
-
-
-
-
-
 
     fetch('/' + SLUG + '/reactivar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':csrfToken}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 var _profId = null;
 
-
-
-
-
-
-
 var _cursosInfo = [];
-
-
-
-
-
-
 
 var _otrosProfesores = [];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function abrirModalArchivar(profId, nombre, cursosInfo, otrosProfesores){
-
-
-
-
-
-
 
     _profId = profId;
 
-
-
-
-
-
-
     _cursosInfo = cursosInfo;
-
-
-
-
-
-
 
     _otrosProfesores = otrosProfesores;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    document.getElementById('modal-prof-nombre').textContent = '<i class="fas fa-archive"></i> Archivar a ' + nombre;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    document.getElementById('modal-prof-nombre').textContent = '<i data-lucide="archive"></i> Archivar a ' + nombre;
 
     var listaCursos = document.getElementById('lista-cursos-modal');
 
-
-
-
-
-
-
     listaCursos.innerHTML = '';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     if(!cursosInfo || cursosInfo.length === 0){
 
-
-
-
-
-
-
         document.getElementById('modal-prof-sub').textContent =
-
-
-
-
-
-
 
             'Este profesor no tiene cursos asignados actualmente.';
 
-
-
-
-
-
-
         document.getElementById('bloque-reasignar').style.display = 'none';
-
-
-
-
-
-
 
         listaCursos.innerHTML = '<p style="font-size:12px;color:var(--muted);padding:8px;">Sin cursos asignados.</p>';
 
-
-
-
-
-
-
     } else {
-
-
-
-
-
-
 
         document.getElementById('modal-prof-sub').textContent =
 
-
-
-
-
-
-
             'Antes de archivar, puedes reasignar sus cursos a otro profesor activo de la misma materia.';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         cursosInfo.forEach(function(c){
 
-
-
-
-
-
-
             var label = document.createElement('label');
-
-
-
-
-
-
 
             label.className = 'curso-item';
 
-
-
-
-
-
-
             label.innerHTML =
-
-
-
-
-
-
 
                 '<input type="checkbox" value="' + c.curso + '|' + c.materia + '|' + c.jornada + '" checked>'
 
-
-
-
-
-
-
                 + '<span><strong>' + c.curso + '</strong> · ' + c.materia + ' · ' + c.jornada + '</span>';
-
-
-
-
-
-
 
             listaCursos.appendChild(label);
 
-
-
-
-
-
-
         });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         var sel = document.getElementById('select-prof-destino');
 
-
-
-
-
-
-
         sel.innerHTML = '<option value="">— Solo archivar (sin reasignar) —</option>';
-
-
-
-
-
-
 
         otrosProfesores.forEach(function(p){
 
-
-
-
-
-
-
             var opt = document.createElement('option');
-
-
-
-
-
-
 
             opt.value = p.id;
 
-
-
-
-
-
-
             opt.textContent = p.nombre + ' · ' + p.materia + ' · ' + p.jornada;
-
-
-
-
-
-
 
             sel.appendChild(opt);
 
-
-
-
-
-
-
         });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         document.getElementById('bloque-reasignar').style.display =
 
-
-
-
-
-
-
             otrosProfesores.length > 0 ? 'block' : 'none';
-
-
-
-
-
-
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     document.getElementById('modalArchivar').classList.add('open');
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function cerrarModal(){
 
-
-
-
-
-
-
     document.getElementById('modalArchivar').classList.remove('open');
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function confirmarArchivar(){
 
-
-
-
-
-
-
     var checkboxes = document.querySelectorAll('#lista-cursos-modal input[type=checkbox]:checked');
-
-
-
-
-
-
 
     var cursosSeleccionados = [];
 
-
-
-
-
-
-
     checkboxes.forEach(function(c){ cursosSeleccionados.push(c.value); });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     var profDestino = document.getElementById('select-prof-destino').value;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     var f = new FormData();
-
-
-
-
-
-
 
     f.append('_csrf_token', getCsrf());
 
-
-
-
-
-
-
     f.append('profesor_id', _profId);
-
-
-
-
-
-
 
     f.append('prof_destino_id', profDestino);
 
-
-
-
-
-
-
     cursosSeleccionados.forEach(function(c){ f.append('cursos_reasignar', c); });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     fetch('/' + SLUG + '/archivar_profesor_con_reasignacion', {method:'POST', body:f})
 
-
-
-
-
-
-
         .then(function(r){ return r.json(); })
-
-
-
-
-
-
 
         .then(function(d){
 
-
-
-
-
-
-
             cerrarModal();
-
-
-
-
-
-
 
             if(d.ok){
 
-
-
-
-
-
-
-                showToast('<i class="fas fa-check-circle"></i> ' + d.mensaje, true);
-
-
-
-
-
-
+                showToast('<i data-lucide="check-circle"></i> ' + d.mensaje, true);
 
                 setTimeout(function(){ location.reload(); }, 1200);
 
-
-
-
-
-
-
             } else {
-
-
-
-
-
-
 
                 showToast('â“ ' + d.mensaje, false);
 
-
-
-
-
-
-
             }
-
-
-
-
-
-
 
         })
 
-
-
-
-
-
-
         .catch(function(){
-
-
-
-
-
-
 
             cerrarModal();
 
-
-
-
-
-
-
             showToast('â“ Error de conexión.', false);
-
-
-
-
-
-
 
         });
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
 
 function addDataLabels(){
 
-
-
-
-
-
-
     document.querySelectorAll('table').forEach(function(t){
-
-
-
-
-
-
 
         var ths = t.querySelectorAll('thead th');
 
-
-
-
-
-
-
         t.querySelectorAll('tbody tr').forEach(function(tr){
-
-
-
-
-
-
 
             tr.querySelectorAll('td').forEach(function(td,i){
 
-
-
-
-
-
-
                 if(ths[i]) td.setAttribute('data-label', ths[i].textContent.trim());
-
-
-
-
-
-
 
             });
 
-
-
-
-
-
-
         });
-
-
-
-
-
-
 
     });
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
 
 window.addEventListener('scroll',function(){
 
-
-
-
-
-
-
     var st = document.getElementById('scrollTop');
-
-
-
-
-
-
 
     if(st) st.classList.toggle('show', window.scrollY > 400);
 
-
-
-
-
-
-
 });
-
-
-
-
-
-
 
 addDataLabels();
 
-
-
-
-
-
-
 </script>
 
-
-
-
-
-
-
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-
-
-
-
-
-
 
   <script src="/static/js/lumini.js"></script>
 
 
-
-
-
-
-
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

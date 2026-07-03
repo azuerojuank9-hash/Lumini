@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,7 +63,7 @@
     <div class="sub">Acceso administrativo</div>
 
     {% if error %}
-    <div class="error"><i class="fas fa-exclamation-triangle"></i> {{ error }}</div>
+    <div class="error"><i data-lucide="alert-triangle"></i> {{ error }}</div>
     {% endif %}
 
     <form method="POST" autocomplete="off">
@@ -71,9 +72,9 @@
         <div class="input-wrap">
             <input type="password" name="password" id="pwdInput"
                    placeholder="••••••••" autofocus autocomplete="current-password">
-            <button type="button" class="eye-btn" onclick="togglePwd()" id="eyeBtn" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+            <button type="button" class="eye-btn" onclick="togglePwd()" id="eyeBtn" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
         </div>
-        <button type="submit" class="btn">Ingresar <i class="fas fa-arrow-right"></i></button>
+        <button type="submit" class="btn">Ingresar <i data-lucide="arrow-right"></i></button>
     </form>
 
     <div class="footer">
@@ -90,7 +91,7 @@ function togglePwd(){
         btn.textContent = '🙈';
     } else {
         inp.type = 'password';
-        btn.innerHTML = '<i class="fas fa-eye"></i>';
+        btn.innerHTML = '<i data-lucide="eye"></i>';
     }
 }
 </script>
@@ -99,6 +100,7 @@ function togglePwd(){
   <script src="/static/js/lumini.js"></script>
 
 </html>
+
 
 
 

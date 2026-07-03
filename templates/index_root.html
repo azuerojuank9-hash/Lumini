@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,12 +42,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 </style>
   <link rel="stylesheet" href="/static/css/lumini.css">
 
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>
 <div class="bg-orb orb1"></div>
 <div class="bg-orb orb2"></div>
 <div class="header">
     <a href="/" style="text-decoration:none;color:inherit;display:inline-block;">
-    <img class="logo" src="/static/lumini_logo.png" alt="Lumini">
+    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
     <div class="brand">LUMINI</div>
     </a>
     <p class="sub">Selecciona tu colegio para acceder al sistema de gestión educativa</p>
@@ -58,7 +59,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   {% set pri = c.primary_color if c.primary_color else '#7C3AED' %}
   {% set sec = c.secondary_color if c.secondary_color else '#7C3AED' %}
   <a href="/{{ c.slug }}/login" class="card" style="border-left:4px solid {{ pri }};">
-    {% if c.logo %}<img src="/static/logos/{{ c.logo }}" alt="">{% else %}<img src="/static/lumini_logo.png" alt="">{% endif %}
+    {% if c.logo %}<img src="/static/logos/{{ c.logo }}" alt="">{% else %}<img src="/static/lumini_logo.webp" alt="">{% endif %}
     <div>
       <div class="name">
         <span class="color-dot" style="background:{{ pri }};color:{{ pri }};"></span>{{ c.nombre }}
@@ -78,5 +79,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <script src="/static/js/lumini.js"></script>
 
 </html>
+
+
+
 
 

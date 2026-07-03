@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,6 +50,7 @@
         @media(max-width:480px){.card{padding:24px 18px;}.logo-wrap img{height:72px;width:72px;}.brand{font-size:1.3rem;letter-spacing:4px;}}
         @media(max-width:375px){.card{padding:18px 14px;}.logo-wrap img{height:60px;width:60px;}.brand{font-size:1.1rem;letter-spacing:2px;}.card-title{font-size:1rem;}.field input{font-size:15px;padding:10px 12px;}.btn-submit{font-size:14px;min-height:44px;padding:10px;}}
     </style>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>
 
 <div class="bg-orb orb1"></div>
@@ -60,7 +61,7 @@
     {% if colegio and colegio.logo %}
     <img src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
     {% else %}
-    <img src="/static/lumini_logo.png" alt="Lumini">
+    <img src="/static/lumini_logo.webp" alt="Lumini">
     {% endif %}
 </div>
 <div class="brand">LUMINI</div>
@@ -68,14 +69,14 @@
 <p class="colegio-nombre">{{ colegio.nombre if colegio else slug }}</p>
 
 <div class="card">
-    <div class="card-icon"><i class="fas fa-lock"></i></div>
+    <div class="card-icon"><i data-lucide="lock"></i></div>
     <div class="card-title">Recuperar contraseña</div>
 
-    {% if error %}<div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i> {{ error }}</div>{% endif %}
+    {% if error %}<div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>{% endif %}
     {% if exito %}<div class="alert alert-success">{{ exito }}</div>{% endif %}
 
     {% if exito %}
-        <a href="/{{ slug }}/login" class="btn-submit">Ir al inicio de sesión <i class="fas fa-arrow-right"></i></a>
+        <a href="/{{ slug }}/login" class="btn-submit">Ir al inicio de sesión <i data-lucide="arrow-right"></i></a>
 
     {% elif paso == 1 %}
         <p class="card-desc">Ingresa tu usuario para continuar.</p>
@@ -86,12 +87,12 @@
                 <label>Usuario</label>
                 <input type="text" name="usuario" value="{{ usuario_val }}" placeholder="ej: prof_matematicas" required autocomplete="username" autofocus>
             </div>
-            <button type="submit" class="btn-submit">Continuar <i class="fas fa-arrow-right"></i></button>
+            <button type="submit" class="btn-submit">Continuar <i data-lucide="arrow-right"></i></button>
         </form>
 
     {% elif paso == 2 %}
         <p class="card-desc">Responde tu pregunta secreta y crea una nueva contraseña.</p>
-        <div class="pregunta-box"><i class="fas fa-key"></i> {{ pregunta }}</div>
+        <div class="pregunta-box"><i data-lucide="key"></i> {{ pregunta }}</div>
             <form method="POST">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="accion" value="cambiar_password">
@@ -104,28 +105,28 @@
                 <label>Nueva contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="nueva" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
             <div class="field">
                 <label>Confirmar contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="confirmar" placeholder="Repite la contraseña" required minlength="6" autocomplete="new-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
             <button type="submit" class="btn-submit">Guardar nueva contraseña</button>
         </form>
     {% endif %}
 
-    <a href="/{{ slug }}/login" class="back-link"><i class="fas fa-arrow-left"></i> Volver al inicio de sesión</a>
+    <a href="/{{ slug }}/login" class="back-link"><i data-lucide="arrow-left"></i> Volver al inicio de sesión</a>
 </div>
 
 <script>
 function togglePass(btn) {
     const input = btn.previousElementSibling;
     input.type = input.type === 'password' ? 'text' : 'password';
-    btn.innerHTML = input.type === 'password' ? '<i class="fas fa-eye"></i>' : '🙈';
+    btn.innerHTML = input.type === 'password' ? '<i data-lucide="eye"></i>' : '🙈';
 }
 </script>
 <button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:20px;z-index:9999;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);" aria-label="Cambiar tema">🌙</button>
@@ -133,6 +134,9 @@ function togglePass(btn) {
   <script src="/static/js/lumini.js"></script>
 
 </html>
+
+
+
 
 
 

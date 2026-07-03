@@ -1,18 +1,35 @@
 ﻿import os
 from dotenv import load_dotenv
 load_dotenv()
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file, abort, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file, abort, jsonify, g
 import sqlite3, hashlib, time, secrets, logging, json, uuid, bcrypt
 from datetime import timedelta, datetime
 from io import BytesIO
 import html
+
 app = Flask(__name__)
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache 24 horas
+ENV = os.environ.get('FLASK_ENV', 'production')
+
+# ── Production-optimized config ────────────────────────────────────────────
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400 * 7 if ENV == 'production' else 86400
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 app.permanent_session_lifetime = timedelta(hours=4)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = os.environ.get('SESSION_COOKIE_SECURE', 'false').lower() == 'true'
+app.config['SESSION_COOKIE_SECURE'] = True if ENV == 'production' else False
+app.config['JSON_AS_ASCII'] = False
+app.config['TEMPLATES_AUTO_RELOAD'] = ENV != 'production'
+
+if ENV == 'production':
+    app.config['SESSION_COOKIE_SECURE'] = True
+    try:
+        from flask_compress import Compress
+        Compress(app)
+        app.config['COMPRESS_ALGORITHM'] = 'gzip'
+        app.config['COMPRESS_LEVEL'] = 6
+        app.config['COMPRESS_MIN_SIZE'] = 500
+    except ImportError:
+        pass
 
 @app.template_filter('parse_json')
 def parse_json_filter(val):
@@ -369,9 +386,19 @@ def init_master_db():
     conn.close()
 
 def get_colegio(slug):
+    try:
+        cache = g.setdefault('_colegios', {})
+        if slug in cache:
+            return cache[slug]
+    except (RuntimeError, AttributeError):
+        pass
     c = conectar_master()
     r = c.execute('SELECT * FROM colegios WHERE slug=?', (slug,)).fetchone()
     c.close()
+    try:
+        cache[slug] = r
+    except (RuntimeError, AttributeError):
+        pass
     return r
 
 def colegio_activo(slug):
@@ -801,6 +828,28 @@ def init_db(slug):
         'CREATE INDEX IF NOT EXISTS idx_fijados_canal ON mensajes_fijados(canal_id)',
         'CREATE INDEX IF NOT EXISTS idx_enlaces_canal ON canal_enlaces(canal_id)',
         'CREATE INDEX IF NOT EXISTS idx_actividad_canal ON canal_actividad(canal_id)',
+        # ── Performance indexes ─────────────────────────────────────────
+        'CREATE INDEX IF NOT EXISTS idx_alumnos_curso_jornada ON alumnos(curso, jornada, activo)',
+        'CREATE INDEX IF NOT EXISTS idx_asistencia_aid_fecha ON asistencia(aid, fecha)',
+        'CREATE INDEX IF NOT EXISTS idx_compromisos_materia ON compromisos(materia, curso, jornada)',
+        'CREATE INDEX IF NOT EXISTS idx_horarios_materia ON horarios_curso(materia, jornada, dia)',
+        'CREATE INDEX IF NOT EXISTS idx_notificaciones_usuario ON notificaciones(usuario_tipo, usuario_id, leida)',
+        'CREATE INDEX IF NOT EXISTS idx_solicitudes_prof ON solicitudes_modificacion(solicitado_por, estado)',
+        'CREATE INDEX IF NOT EXISTS idx_comunicaciones_rector ON comunicaciones(rector_id, activo)',
+        'CREATE INDEX IF NOT EXISTS idx_asignaciones_curso_prof ON asignaciones_curso(profesor_id, materia, jornada)',
+        'CREATE INDEX IF NOT EXISTS idx_canal_miembros_usuario ON canal_miembros(usuario_tipo, usuario_id)',
+        'CREATE INDEX IF NOT EXISTS idx_canales_slug ON canales(slug)',
+        'CREATE INDEX IF NOT EXISTS idx_evaluaciones_aid_periodo ON evaluaciones(aid, periodo)',
+        'CREATE INDEX IF NOT EXISTS idx_actividades_curso ON actividades(curso, jornada, periodo)',
+        'CREATE INDEX IF NOT EXISTS idx_asignaciones_materia_prof ON asignaciones_materia(profesor_id)',
+        'CREATE INDEX IF NOT EXISTS idx_profesores_usuario ON profesores(usuario, activo)',
+        'CREATE INDEX IF NOT EXISTS idx_directoras_usuario ON directoras(usuario, activo)',
+        'CREATE INDEX IF NOT EXISTS idx_rectores_usuario ON rectores(usuario, activo)',
+        'CREATE INDEX IF NOT EXISTS idx_comunicaciones_leidas_user ON comunicaciones_leidas(usuario_tipo, usuario_id, leido)',
+        'CREATE INDEX IF NOT EXISTS idx_periodos_estado_periodo ON periodos_estado(periodo)',
+        'CREATE INDEX IF NOT EXISTS idx_config_institucion_slug ON config_institucion(slug)',
+        'CREATE INDEX IF NOT EXISTS idx_alumnos_id_curso ON alumnos(id, curso)',
+        'CREATE INDEX IF NOT EXISTS idx_comunicaciones_estado ON comunicaciones(rector_id, activo, estado)',
     ]
     for idx in indexes:
         try: conn.execute(idx)
@@ -813,14 +862,18 @@ def init_db(slug):
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
 def get_profesor(slug):
+    cache_key = f'_prof_{slug}'
+    if hasattr(g, cache_key):
+        return getattr(g, cache_key)
     pid = session.get(f'profesor_id_{slug}')
-    if not pid: return None
+    if not pid: setattr(g, cache_key, None); return None
     conn = conectar(slug)
     p = conn.execute('SELECT * FROM profesores WHERE id=? AND activo=1', (pid,)).fetchone()
     conn.close()
     if not p:
         session.pop(f'profesor_id_{slug}', None)
         session.pop(f'rol_{slug}', None)
+    setattr(g, cache_key, p)
     return p
 
 def get_sesion_jornada_materia(slug):
@@ -845,8 +898,10 @@ def get_cursos_profesor(slug, pid, materia, jornada):
     return [r['curso'] for r in rows]
 
 def require_colegio(slug):
-    if not get_colegio(slug): abort(404)
-    if not colegio_activo(slug): abort(403)
+    colegio = get_colegio(slug)
+    if not colegio: abort(404)
+    if not colegio['activo']: abort(403)
+    return colegio
 
 # ── CANALES HELPERS ─────────────────────────────────────────────────────────────
 def get_usuario_actual(slug):
@@ -951,15 +1006,13 @@ def requiere_permiso(permiso, obtener_entidad=None):
     return decorator
 
 # ── PERIOD HELPERS ────────────────────────────────────────────────────────────
-def periodo_cerrado(slug, periodo, conn=None):
-    cerrar_propia = conn or conectar(slug)
-    try:
-        row = cerrar_propia.execute(
-            'SELECT estado FROM periodos_estado WHERE periodo=?',
-            (periodo,)).fetchone()
-        return row is not None and row['estado'] == 'cerrado'
-    finally:
-        if not conn: cerrar_propia.close()
+def periodo_cerrado(slug, periodo):
+    conn = conectar(slug)
+    row = conn.execute(
+        'SELECT estado FROM periodos_estado WHERE periodo=?',
+        (periodo,)).fetchone()
+    conn.close()
+    return row is not None and row['estado'] == 'cerrado'
 
 # ── AUDIT HELPER ──────────────────────────────────────────────────────────────
 def audit_log(slug, usuario_id, accion, tabla, registro_id=None, valor_anterior=None, valor_nuevo=None):
@@ -984,10 +1037,14 @@ def audit_log(slug, usuario_id, accion, tabla, registro_id=None, valor_anterior=
 
 # ── CONFIG HELPERS ────────────────────────────────────────────────────────────
 def config_get(slug):
+    cache_key = f'_cfg_{slug}'
+    if hasattr(g, cache_key): return getattr(g, cache_key)
     conn = conectar(slug)
     c = conn.execute('SELECT * FROM config_institucion WHERE slug=?', (slug,)).fetchone()
     conn.close()
-    return dict(c) if c else {}
+    val = dict(c) if c else {}
+    setattr(g, cache_key, val)
+    return val
 
 def config_get_nombre_rol(slug, codigo):
     config = config_get(slug)
@@ -1743,9 +1800,19 @@ def home(slug):
             alumnos = conn.execute(
                 'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
                 (curso_sel, jornada)).fetchall()
-            for i, a in enumerate(alumnos, 1):
-                conn.execute('UPDATE alumnos SET num_curso=? WHERE id=?', (i, a['id']))
-            conn.commit()
+            # Batch update num_curso in a single query instead of N individual UPDATES
+            if alumnos:
+                case_parts = [f'WHEN ? THEN ?' for _ in alumnos]
+                id_list = [a['id'] for a in alumnos]
+                params = []
+                for i, a in enumerate(alumnos, 1):
+                    params.extend([a['id'], i])
+                params.extend(id_list)
+                conn.execute(
+                    f'UPDATE alumnos SET num_curso = CASE id {" ".join(case_parts)} END WHERE id IN ({",".join("?" * len(alumnos))})',
+                    params
+                )
+                conn.commit()
             alumnos = conn.execute(
                 'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
                 (curso_sel, jornada)).fetchall()
@@ -1842,12 +1909,10 @@ def home(slug):
         hoy_idx = datetime.today().weekday()
         hoy_nombre = DIAS[hoy_idx] if hoy_idx < 7 else ''
         hoy_fecha = datetime.today().strftime('%Y-%m-%d')
-        total_alumnos = sum(
-            conn.execute(
-                'SELECT COUNT(*) as c FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
-                (c, jornada)
-            ).fetchone()['c'] for c in mis_cursos
-        ) if mis_cursos else 0
+        total_alumnos = conn.execute(
+            f'SELECT COUNT(*) as c FROM alumnos WHERE curso IN ({",".join("?" * len(mis_cursos))}) AND jornada=? AND activo=1',
+            (*mis_cursos, jornada)
+        ).fetchone()['c'] if mis_cursos else 0
         horario_hoy = conn.execute(
             'SELECT * FROM horarios_curso WHERE materia=? AND jornada=? AND dia=? ORDER BY franja',
             (materia, jornada, hoy_nombre)
@@ -1859,12 +1924,18 @@ def home(slug):
         asistencia_hoy = asis_hoy['total'] if asis_hoy else 0
         notas_pend = 0
         if curso_sel and actividades:
-            for act in actividades:
-                count = conn.execute(
-                    'SELECT COUNT(*) as c FROM alumnos WHERE curso=? AND jornada=? AND activo=1 AND id NOT IN (SELECT aid FROM notas WHERE actividad_id=?)',
-                    (curso_sel, jornada, act['id'])
-                ).fetchone()
-                notas_pend += count['c'] if count else 0
+            act_ids = [a['id'] for a in actividades]
+            placeholders = ','.join('?' * len(act_ids))
+            rows_present = conn.execute(
+                f'SELECT actividad_id, COUNT(DISTINCT aid) as cnt FROM notas n JOIN alumnos al ON al.id=n.aid AND al.activo=1 WHERE n.actividad_id IN ({placeholders}) GROUP BY n.actividad_id',
+                act_ids
+            ).fetchall()
+            present_sum = sum(r['cnt'] for r in rows_present)
+            total_alumnos_curso = conn.execute(
+                'SELECT COUNT(*) as c FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
+                (curso_sel, jornada)
+            ).fetchone()['c']
+            notas_pend = total_alumnos_curso * len(act_ids) - present_sum
         alertas = []
         if curso_sel:
             rows = conn.execute(
@@ -1965,7 +2036,7 @@ def guardar_nota(slug):
     if not alumno:
         conn.close()
         return ('', 403)
-    if periodo_cerrado(slug, act['p'], conn):
+    if periodo_cerrado(slug, act['p']):
         conn.close()
         return ('Periodo cerrado', 423)
     old = conn.execute(
@@ -1997,7 +2068,7 @@ def guardar_evaluacion(slug):
     periodo = request.form.get('periodo', 1, type=int)
     if aid is None: return ('', 400)
     conn = conectar(slug)
-    if periodo_cerrado(slug, periodo, conn):
+    if periodo_cerrado(slug, periodo):
         conn.close()
         return ('Periodo cerrado', 423)
     existing = conn.execute(
@@ -2693,23 +2764,27 @@ def vista_estudiante(slug):
 
 # ── DIRECTORA ─────────────────────────────────────────────────────────────────
 def get_directora(slug):
+    cache_key = f'_direc_{slug}'
+    if hasattr(g, cache_key): return getattr(g, cache_key)
     did = session.get(f'directora_id_{slug}')
-    if not did: return None
+    if not did: setattr(g, cache_key, None); return None
     conn = conectar(slug)
     d = conn.execute('SELECT * FROM directoras WHERE id=? AND activo=1', (did,)).fetchone()
     conn.close()
-    if not d:
-        session.pop(f'directora_id_{slug}', None)
+    if not d: session.pop(f'directora_id_{slug}', None)
+    setattr(g, cache_key, d)
     return d
 
 def get_rector(slug):
+    cache_key = f'_rector_{slug}'
+    if hasattr(g, cache_key): return getattr(g, cache_key)
     rid = session.get(f'rector_id_{slug}')
-    if not rid: return None
+    if not rid: setattr(g, cache_key, None); return None
     conn = conectar(slug)
     r = conn.execute('SELECT * FROM rectores WHERE id=? AND activo=1', (rid,)).fetchone()
     conn.close()
-    if not r:
-        session.pop(f'rector_id_{slug}', None)
+    if not r: session.pop(f'rector_id_{slug}', None)
+    setattr(g, cache_key, r)
     return r
 
 @app.route('/<slug>/rector/login', methods=['GET', 'POST'])
@@ -2913,13 +2988,20 @@ def rector_profesores(slug):
     rector = get_rector(slug)
     if not rector: return redirect(url_for('login', slug=slug))
     colegio = get_colegio(slug)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 50, type=int)
+    per_page = min(max(per_page, 10), 200)
     conn = conectar(slug)
+    total = conn.execute(
+        'SELECT COUNT(*) as c FROM profesores').fetchone()['c']
     profesores = [dict(r) for r in conn.execute(
-        'SELECT id, nombre, email, activo FROM profesores ORDER BY nombre').fetchall()]
+        'SELECT id, nombre, email, activo FROM profesores ORDER BY nombre LIMIT ? OFFSET ?',
+        (per_page, (page - 1) * per_page)).fetchall()]
     conn.close()
     return render_template('rector_profesores.html',
                            slug=slug, colegio=colegio, rector=rector,
-                           profesores=profesores,
+                           profesores=profesores, page=page, per_page=per_page,
+                           total=total, total_pages=(total + per_page - 1) // per_page,
                            notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
 
 # ── RECTOR: ESTUDIANTES ────────────────────────────────────────────────────────
@@ -2929,14 +3011,21 @@ def rector_estudiantes(slug):
     rector = get_rector(slug)
     if not rector: return redirect(url_for('login', slug=slug))
     colegio = get_colegio(slug)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 50, type=int)
+    per_page = min(max(per_page, 10), 200)
     conn = conectar(slug)
+    total = conn.execute(
+        'SELECT COUNT(*) as c FROM alumnos WHERE activo=1').fetchone()['c']
     estudiantes = [dict(r) for r in conn.execute(
-        '''SELECT id, nombre, curso, jornada, activo FROM alumnos WHERE activo=1
-           ORDER BY curso, nombre''').fetchall()]
+        '''SELECT id, nombre, curso, jornada FROM alumnos WHERE activo=1
+           ORDER BY curso, nombre LIMIT ? OFFSET ?''',
+        (per_page, (page - 1) * per_page)).fetchall()]
     conn.close()
     return render_template('rector_estudiantes.html',
                            slug=slug, colegio=colegio, rector=rector,
-                           estudiantes=estudiantes,
+                           estudiantes=estudiantes, page=page, per_page=per_page,
+                           total=total, total_pages=(total + per_page - 1) // per_page,
                            notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
 
 # ── RECTOR: CURSOS ─────────────────────────────────────────────────────────────
@@ -3223,12 +3312,12 @@ def crear_notificacion(slug, usuario_tipo, usuario_id, titulo, mensaje='', tipo=
     conn.commit()
     conn.close()
 
-def notificaciones_no_leidas(slug, usuario_tipo, usuario_id):
-    conn = conectar(slug)
-    c = conn.execute(
+def notificaciones_no_leidas(slug, usuario_tipo, usuario_id, conn=None):
+    cerrar = conn or conectar(slug)
+    c = cerrar.execute(
         'SELECT COUNT(*) as c FROM notificaciones WHERE usuario_tipo=? AND usuario_id=? AND leida=0',
         (usuario_tipo, usuario_id)).fetchone()['c']
-    conn.close()
+    if not conn: cerrar.close()
     return c
 
 def generar_destinatarios(slug, comunicacion_id):
@@ -3325,13 +3414,13 @@ def generar_destinatarios(slug, comunicacion_id):
     conn.commit()
     conn.close()
 
-def comunicaciones_pendientes(slug, usuario_tipo, usuario_id):
-    conn = conectar(slug)
-    cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
+def comunicaciones_pendientes(slug, usuario_tipo, usuario_id, conn=None):
+    cerrar = conn or conectar(slug)
+    cols_cl = [r[1] for r in cerrar.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
     if 'leido' not in cols_cl:
-        conn.close()
+        if not conn: cerrar.close()
         return []
-    rows = conn.execute(
+    rows = cerrar.execute(
         '''SELECT c.*, cl.leido, cl.fecha_lectura
            FROM comunicaciones c
            JOIN comunicaciones_leidas cl ON cl.comunicacion_id=c.id
@@ -3339,7 +3428,7 @@ def comunicaciones_pendientes(slug, usuario_tipo, usuario_id):
            AND c.estado='publicado' AND c.activo=1
            ORDER BY c.fecha_publicacion DESC''',
         (usuario_tipo, usuario_id)).fetchall()
-    conn.close()
+    if not conn: cerrar.close()
     return [dict(r) for r in rows]
 
 # ── COMUNICACIONES (RECTOR) ────────────────────────────────────────────────────
@@ -4732,8 +4821,10 @@ def directora_crear_desde_panel(slug):
 # ── STATIC / ROOT / ERRORS ────────────────────────────────────────────────────
 @app.route('/static/<path:filename>')
 def static_files(filename):
-    return send_from_directory(
+    resp = send_from_directory(
         os.path.join(os.path.dirname(__file__), 'static'), filename)
+    resp.headers['Cache-Control'] = 'public, max-age=604800, immutable'
+    return resp
 
 @app.route("/")
 def index():
@@ -4749,7 +4840,7 @@ def add_security_headers(response):
     response.headers['X-XSS-Protection'] = '1; mode=block'
     if app.config.get('SESSION_COOKIE_SECURE'):
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'"
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://www.datadoghq-browser-agent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'"
     return response
 
 @app.errorhandler(400)
@@ -4910,3 +5001,15 @@ def programar_backup():
 
 init_master_db()
 threading.Timer(30, programar_backup).start()
+
+if __name__ == '__main__':
+    if ENV == 'production':
+        try:
+            from waitress import serve
+            logger.info('🌐 Servidor Waitress en http://0.0.0.0:8000')
+            serve(app, host='0.0.0.0', port=int(os.environ.get('PORT', 8000)), threads=8)
+        except ImportError:
+            logger.warning('waitress no instalado. Usando Flask dev server. Instala: pip install waitress')
+            app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)), debug=True)
+    else:
+        app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)

@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <link rel="manifest" href="/static/manifest.json">
@@ -82,7 +83,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     {% if colegio and colegio.logo %}
     <img src="/static/logos/{{ colegio.logo }}" alt="Logo {{ colegio.nombre }}">
     {% else %}
-    <img src="/static/lumini_logo.png" alt="Lumini">
+    <img src="/static/lumini_logo.webp" alt="Lumini">
     {% endif %}
 </div>
 <div class="brand">LUMINI</div>
@@ -99,7 +100,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 <div class="card">
     {% if error %}
-        {% if '<i class="fas fa-check-circle"></i>' in error %}
+        {% if '<i data-lucide="check-circle"></i>' in error %}
         <div class="alert alert-success">{{ error }}</div>
         {% else %}
         <div class="alert alert-error">{{ error }}</div>
@@ -118,7 +119,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                 <label>Contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="password" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
             <button type="submit" class="btn-submit">Entrar</button>
@@ -146,14 +147,14 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                 <label>Contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="reg_password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
             <div class="field">
                 <label>Confirmar contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
 
@@ -244,7 +245,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                     <label>Contraseña</label>
                     <div class="pass-wrapper">
                         <input type="password" name="dir_password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                     </div>
                 </div>
                 <button type="submit" class="btn-submit">Entrar al panel</button>
@@ -270,14 +271,14 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                     <label>Contraseña</label>
                     <div class="pass-wrapper">
                         <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                     </div>
                 </div>
                 <div class="field">
                     <label>Confirmar contraseña</label>
                     <div class="pass-wrapper">
                         <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                     </div>
                 </div>
                 <div class="field">
@@ -338,7 +339,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                     <label>Contraseña</label>
                     <div class="pass-wrapper">
                         <input type="password" name="rec_password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                     </div>
                 </div>
                 <button type="submit" class="btn-submit">Entrar al panel</button>
@@ -365,14 +366,14 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
                     <label>Contraseña</label>
                     <div class="pass-wrapper">
                         <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                     </div>
                 </div>
                 <div class="field">
                     <label>Confirmar contraseña</label>
                     <div class="pass-wrapper">
                         <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                     </div>
                 </div>
                 <div class="field">
@@ -458,7 +459,7 @@ function agregarMateria() {
         + '<option value="" disabled selected>Jornada</option>'
         + JORNADAS.map(function(j){ return '<option value="' + j + '">' + j + '</option>'; }).join('')
         + '</select>'
-        + '<button type="button" class="btn-remove" onclick="document.getElementById(\'mat-row-' + idx + '\').remove()"><i class="fas fa-times"></i></button>';
+        + '<button type="button" class="btn-remove" onclick="document.getElementById(\'mat-row-' + idx + '\').remove()"><i data-lucide="x"></i></button>';
     container.appendChild(div);
     matCount++;
 }
@@ -466,12 +467,12 @@ function agregarMateria() {
 function togglePass(btn) {
     var input = btn.previousElementSibling;
     if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
-    else { input.type = 'password'; btn.innerHTML = '<i class="fas fa-eye"></i>'; }
+    else { input.type = 'password'; btn.innerHTML = '<i data-lucide="eye"></i>'; }
 }
 
 {% if error %}
 {% set e = error %}
-{% if '<i class="fas fa-check-circle"></i>' not in e %}
+{% if '<i data-lucide="check-circle"></i>' not in e %}
 {% if 'Registro' in e or 'usuario ya existe' in e or 'Completa' in e or 'caracteres' in e or 'materia' in e or 'pregunta' in e or 'contraseñas' in e or 'invitación' in e %}
 document.querySelectorAll('.tabs .tab-btn')[1].click();
 {% elif 'director' in e or 'Director' in e %}
@@ -494,5 +495,6 @@ document.querySelectorAll('.tabs .tab-btn')[2].click();
   <script src="/static/js/lumini.js"></script>
 
 </html>
+
 
 

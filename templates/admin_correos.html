@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -82,7 +83,7 @@
         .badge-enviado{background:rgba(46,204,113,.12);color:var(--green);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
         @media(max-width:640px){.navbar{padding:8px 16px;}.container{padding:20px 12px 40px;}.tabs{gap:2px;}.tab-btn{padding:8px 12px;font-size:12px;}.form-row{flex-direction:column;}}
         @media(max-width:375px){.navbar{padding:6px 10px;}.navbar img{height:32px;width:32px;}.navbar-brand .name{font-size:.95rem;letter-spacing:3px;}.nav-link,.logout-btn{font-size:12px;}.container{padding:16px 8px 32px;}.page-header h1{font-size:1.3rem;}.card{padding:16px;}.card-title{font-size:13px;}.tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}.colegios-grid{grid-template-columns:1fr;}.form-row>*{min-width:100%;}.btn{font-size:13px;padding:8px 16px;min-height:40px;}}
-    
+
 </style>
   <link rel="stylesheet" href="/static/css/lumini.css">
 
@@ -90,7 +91,7 @@
 
 <nav class="navbar">
     <div class="navbar-left">
-        <img src="/static/lumini_logo.png" alt="Lumini">
+        <img src="/static/lumini_logo.webp" alt="Lumini">
         <div class="navbar-brand">
             <div class="name">LUMINI</div>
             <div class="tagline">Centro de correos</div>
@@ -98,7 +99,7 @@
         <span class="admin-badge">Admin</span>
     </div>
     <div class="navbar-right">
-        <a href="/admin" class="nav-link"><i class="fas fa-arrow-left"></i> Panel principal</a>
+        <a href="/admin" class="nav-link"><i data-lucide="arrow-left"></i> Panel principal</a>
         <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;padding:6px 12px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;" aria-label="Cambiar tema">🌙</button>
         <a href="/admin/logout" class="logout-btn">🚪 Salir</a>
     </div>
@@ -106,26 +107,26 @@
 
 <div class="container">
     <div class="page-header">
-        <h1><i class="fas fa-envelope"></i> Centro de Correos</h1>
+        <h1><i data-lucide="mail"></i> Centro de Correos</h1>
         <p>Gestiona todos los correos automáticos y masivos de Lumini desde un solo lugar.</p>
     </div>
 
-    {% if error %}<div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i> {{ error }}</div>{% endif %}
-    {% if exito %}<div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ exito }}</div>{% endif %}
+    {% if error %}<div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>{% endif %}
+    {% if exito %}<div class="alert alert-success"><i data-lucide="check-circle"></i> {{ exito }}</div>{% endif %}
 
     <!-- TABS -->
     <div class="tabs">
         <button class="tab-btn active" onclick="showTab('anuncios', this)">
-            <span class="tab-dot" style="background:var(--accent)"></span> <i class="fas fa-bullhorn"></i> Anuncios
+            <span class="tab-dot" style="background:var(--accent)"></span> <i data-lucide="megaphone"></i> Anuncios
         </button>
         <button class="tab-btn" onclick="showTab('pagos', this)">
-            <span class="tab-dot" style="background:#f39c12"></span> <i class="fas fa-credit-card"></i> Pagos
+            <span class="tab-dot" style="background:#f39c12"></span> <i data-lucide="credit-card"></i> Pagos
         </button>
         <button class="tab-btn" onclick="showTab('actualizacion', this)">
             <span class="tab-dot" style="background:#2ecc71"></span> 🚀 Actualización
         </button>
         <button class="tab-btn" onclick="showTab('promocional', this)">
-            <span class="tab-dot" style="background:#3498db"></span> <i class="fas fa-bullhorn"></i> Promocional
+            <span class="tab-dot" style="background:#3498db"></span> <i data-lucide="megaphone"></i> Promocional
         </button>
         <button class="tab-btn" onclick="showTab('individual', this)">
             <span class="tab-dot" style="background:#e74c3c"></span> 🎯 Individual
@@ -135,7 +136,7 @@
     <!-- ── PANEL: ANUNCIOS A TODOS ── -->
     <div class="panel active" id="panel-anuncios">
         <div class="card">
-            <div class="card-title"><i class="fas fa-bullhorn"></i> Anuncio a todos los colegios</div>
+            <div class="card-title"><i data-lucide="megaphone"></i> Anuncio a todos los colegios</div>
             <div class="card-desc">Envía un correo a uno o varios colegios seleccionados. Ideal para noticias, cambios de plataforma o recordatorios generales.</div>
 
             <form method="POST" action="/admin/correos/enviar_anuncio">
@@ -167,7 +168,7 @@
                 <label>Mensaje</label>
                 <textarea name="mensaje" placeholder="Escribe el mensaje principal aquí..." required></textarea>
 
-                <button type="submit" class="btn btn-primary mt"><i class="fas fa-paper-plane"></i> Enviar anuncio</button>
+                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar anuncio</button>
             </form>
         </div>
 
@@ -176,7 +177,7 @@
             <div class="card-title">⚡ Plantillas rápidas</div>
             <div class="card-desc">Haz clic en una plantilla para cargar el texto automáticamente en el formulario de arriba.</div>
             <button class="plantilla-btn" onclick="cargarPlantilla('mantenimiento')">
-                <span class="picon"><i class="fas fa-wrench"></i></span>
+                <span class="picon"><i data-lucide="wrench"></i></span>
                 <div class="pinfo">
                     <div class="ptitle">Mantenimiento programado</div>
                     <div class="pdesc">Aviso de ventana de mantenimiento con fecha y hora</div>
@@ -190,7 +191,7 @@
                 </div>
             </button>
             <button class="plantilla-btn" onclick="cargarPlantilla('novedad')">
-                <span class="picon"><i class="fas fa-magic"></i></span>
+                <span class="picon"><i data-lucide="wand-sparkles"></i></span>
                 <div class="pinfo">
                     <div class="ptitle">Nueva funcionalidad</div>
                     <div class="pdesc">Anuncio de una característica nueva en la plataforma</div>
@@ -202,7 +203,7 @@
     <!-- ── PANEL: RECORDATORIO DE PAGO ── -->
     <div class="panel" id="panel-pagos">
         <div class="card">
-            <div class="card-title"><i class="fas fa-credit-card"></i> Recordatorio de pago</div>
+            <div class="card-title"><i data-lucide="credit-card"></i> Recordatorio de pago</div>
             <div class="card-desc">Envía un recordatorio de vencimiento de suscripción al correo del administrador del colegio.</div>
 
             <form method="POST" action="/admin/recordatorio_pago">
@@ -220,19 +221,19 @@
 
                 <div class="preview-box" style="margin-top:16px;">
                     <b style="color:#f39c12;">Vista previa del correo:</b><br><br>
-                    <i class="fas fa-exclamation-triangle"></i> <b>Recordatorio de pago</b><br>
+                    <i data-lucide="alert-triangle"></i> <b>Recordatorio de pago</b><br>
                     Hola, el acceso de <i>[Nombre del colegio]</i> vence el <i>[fecha de vencimiento]</i>.<br>
                     Para renovar su suscripción y mantener el acceso a Lumini, por favor realice el pago antes de la fecha indicada.<br><br>
                     <span style="color:#555;">— Equipo Lumini</span>
                 </div>
 
-                <button type="submit" class="btn btn-warning mt"><i class="fas fa-paper-plane"></i> Enviar recordatorio</button>
+                <button type="submit" class="btn btn-warning mt"><i data-lucide="send"></i> Enviar recordatorio</button>
             </form>
         </div>
 
         <!-- ENVÍO MASIVO DE RECORDATORIOS -->
         <div class="card">
-            <div class="card-title"><i class="fas fa-clipboard-list"></i> Recordatorios masivos por vencimiento</div>
+            <div class="card-title"><i data-lucide="clipboard-list"></i> Recordatorios masivos por vencimiento</div>
             <div class="card-desc">Selecciona todos los colegios con vencimiento próximo y envíales un recordatorio a la vez.</div>
             {% set proximos = [] %}
             {% for c in colegios %}{% if c.vencimiento %}{% set _ = proximos.append(c) %}{% endif %}{% endfor %}
@@ -252,7 +253,7 @@
                 </div>
                 <label style="margin-top:14px;">Email de contacto (si no está en el sistema)</label>
                 <input type="email" name="email_fallback" placeholder="correo@ejemplo.com">
-                <button type="submit" class="btn btn-warning mt"><i class="fas fa-paper-plane"></i> Enviar a seleccionados</button>
+                <button type="submit" class="btn btn-warning mt"><i data-lucide="send"></i> Enviar a seleccionados</button>
             </form>
             {% else %}
             <p style="color:#555;font-size:13px;">No hay colegios con fecha de vencimiento registrada.</p>
@@ -302,7 +303,7 @@
     <!-- ── PANEL: CORREO PROMOCIONAL ── -->
     <div class="panel" id="panel-promocional">
         <div class="card">
-            <div class="card-title"><i class="fas fa-bullhorn"></i> Correo promocional</div>
+            <div class="card-title"><i data-lucide="megaphone"></i> Correo promocional</div>
             <div class="card-desc">Envía correos a instituciones interesadas que aún no están registradas en Lumini.</div>
 
             <form method="POST" action="/admin/correos/enviar_promocional">
@@ -331,13 +332,13 @@ Miles de profesores ya la usan para:
 
 — Equipo Lumini</textarea>
 
-                <button type="submit" class="btn btn-primary mt"><i class="fas fa-paper-plane"></i> Enviar correo promocional</button>
+                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar correo promocional</button>
             </form>
         </div>
 
         <!-- LISTA CONTACTOS INTERESADOS -->
         <div class="card">
-            <div class="card-title"><i class="fas fa-clipboard-list"></i> Envío masivo a lista de interesados</div>
+            <div class="card-title"><i data-lucide="clipboard-list"></i> Envío masivo a lista de interesados</div>
             <div class="card-desc">Pega una lista de correos (uno por línea) para enviar el mismo mensaje a todos.</div>
             <form method="POST" action="/admin/correos/enviar_lista">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
@@ -347,7 +348,7 @@ Miles de profesores ya la usan para:
                 <input type="text" name="asunto" value="Lumini — La plataforma educativa que tu institución necesita" required>
                 <label>Mensaje</label>
                 <textarea name="mensaje" placeholder="Mensaje para todos los contactos..." required></textarea>
-                <button type="submit" class="btn btn-primary mt"><i class="fas fa-paper-plane"></i> Enviar a todos</button>
+                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar a todos</button>
             </form>
         </div>
     </div>
@@ -385,13 +386,13 @@ Miles de profesores ya la usan para:
                     <option value="soporte">Soporte técnico</option>
                 </select>
 
-                <button type="submit" class="btn btn-primary mt"><i class="fas fa-paper-plane"></i> Enviar correo</button>
+                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar correo</button>
             </form>
         </div>
 
         <!-- REENVIAR BIENVENIDA -->
         <div class="card">
-            <div class="card-title"><i class="fas fa-sync-alt"></i> Reenviar correo de bienvenida</div>
+            <div class="card-title"><i data-lucide="refresh-cw"></i> Reenviar correo de bienvenida</div>
             <div class="card-desc">Reenvía el correo de bienvenida a un colegio ya registrado (por si no lo recibió).</div>
             <form method="POST" action="/admin/correos/reenviar_bienvenida">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
@@ -404,7 +405,7 @@ Miles de profesores ya la usan para:
                 </select>
                 <label>Correo del administrador</label>
                 <input type="email" name="email" placeholder="admin@colegio.com" required>
-                <button type="submit" class="btn btn-success mt"><i class="fas fa-paper-plane"></i> Reenviar bienvenida</button>
+                <button type="submit" class="btn btn-success mt"><i data-lucide="send"></i> Reenviar bienvenida</button>
             </form>
         </div>
     </div>
@@ -456,7 +457,6 @@ function cargarPlantilla(key) {
   <script src="/static/js/lumini.js"></script>
 
 </html>
-
 
 
 

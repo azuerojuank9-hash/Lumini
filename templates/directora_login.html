@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,6 +73,7 @@
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
   <link rel="stylesheet" href="/static/css/lumini.css">
 
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>
 
 <div class="bg-orb orb1"></div>
@@ -83,22 +84,22 @@
     {% if colegio and colegio.logo %}
     <img src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
     {% else %}
-    <img src="/static/lumini_logo.png" alt="Lumini">
+    <img src="/static/lumini_logo.webp" alt="Lumini">
     {% endif %}
 </div>
 <div class="brand">LUMINI</div>
 </a>
 <p class="subtitle">{{ colegio.nombre if colegio else slug }}</p>
-<div class="badge-dir"><i class="fas fa-user-tie"></i> Portal Directora de Curso</div>
+<div class="badge-dir"><i data-lucide="user-check"></i> Portal Directora de Curso</div>
 
 <div class="tabs">
-    <button class="tab-btn active" id="btn-login"     onclick="switchTab('login',this)"><i class="fas fa-lock"></i> Ingresar</button>
-    <button class="tab-btn"        id="btn-registro"  onclick="switchTab('registro',this)"><i class="fas fa-pen"></i> Registrarse</button>
-    <button class="tab-btn"        id="btn-recuperar" onclick="switchTab('recuperar',this)"><i class="fas fa-key"></i> Recuperar</button>
+    <button class="tab-btn active" id="btn-login"     onclick="switchTab('login',this)"><i data-lucide="lock"></i> Ingresar</button>
+    <button class="tab-btn"        id="btn-registro"  onclick="switchTab('registro',this)"><i data-lucide="pen"></i> Registrarse</button>
+    <button class="tab-btn"        id="btn-recuperar" onclick="switchTab('recuperar',this)"><i data-lucide="key"></i> Recuperar</button>
 </div>
 
 <div class="card">
-    {% if error %}<div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i> {{ error }}</div>{% endif %}
+    {% if error %}<div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>{% endif %}
     {% if exito %}<div class="alert alert-success">{{ exito }}</div>{% endif %}
 
     <div id="tab-login" class="section active">
@@ -112,10 +113,10 @@
                 <label>Contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Ingresar <i class="fas fa-arrow-right"></i></button>
+            <button type="submit" class="btn-submit">Ingresar <i data-lucide="arrow-right"></i></button>
         </form>
         <a class="forgot-link" onclick="switchTabById('recuperar');return false;">¿Olvidaste tu contraseña?</a>
     </div>
@@ -145,7 +146,7 @@
                     <input type="password" name="password" id="reg-pwd"
                            placeholder="Mínimo 6 caracteres" required minlength="6"
                            oninput="checkPwd(this)">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
                 <div class="pwd-strength" id="pwd-bar"></div>
                 <div class="pwd-label" id="pwd-label"></div>
@@ -156,7 +157,7 @@
                 <div class="pass-wrapper">
                     <input type="password" name="confirmar_password" id="reg-pwd2"
                            placeholder="Repite tu contraseña" required minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
 
@@ -176,7 +177,7 @@
             </div>
 
             <div class="codigo-field">
-                <label><i class="fas fa-key"></i> Código de invitación</label>
+                <label><i data-lucide="key"></i> Código de invitación</label>
                 <input type="text" name="codigo_registro_dir" id="reg-codigo"
                        placeholder="Código dado por el administrador" required autocomplete="off">
                 <p class="hint">El código lo entrega el administrador del colegio.</p>
@@ -207,7 +208,7 @@
 
             <div id="reg-err" class="msg-error"></div>
 
-            <button type="submit" class="btn-submit" style="margin-top:8px;">Crear cuenta <i class="fas fa-arrow-right"></i></button>
+            <button type="submit" class="btn-submit" style="margin-top:8px;">Crear cuenta <i data-lucide="arrow-right"></i></button>
         </form>
     </div>
 
@@ -221,12 +222,12 @@
                 <label>Tu usuario</label>
                 <input type="text" id="rec-usuario" placeholder="ej: directora_10a" autocomplete="username">
             </div>
-            <button type="button" class="btn-submit" onclick="recBuscar()">Continuar <i class="fas fa-arrow-right"></i></button>
+            <button type="button" class="btn-submit" onclick="recBuscar()">Continuar <i data-lucide="arrow-right"></i></button>
             <div id="rec-err1" class="msg-error"></div>
         </div>
 
         <div id="rec-paso2" style="display:none;">
-            <div class="pregunta-box" id="rec-pregunta-txt"><i class="fas fa-key"></i> ...</div>
+            <div class="pregunta-box" id="rec-pregunta-txt"><i data-lucide="key"></i> ...</div>
             <div class="field">
                 <label>Tu respuesta</label>
                 <input type="text" id="rec-respuesta" placeholder="Escribe tu respuesta..." autocomplete="off">
@@ -235,14 +236,14 @@
                 <label>Nueva contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" id="rec-nueva" placeholder="Mínimo 6 caracteres" minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
             <div class="field">
                 <label>Confirmar contraseña</label>
                 <div class="pass-wrapper">
                     <input type="password" id="rec-confirmar" placeholder="Repite la contraseña">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
                 </div>
             </div>
             <button type="button" class="btn-submit" onclick="recCambiar()">Guardar nueva contraseña</button>
@@ -250,13 +251,13 @@
             <div id="rec-ok2"  class="msg-ok"></div>
             <button type="button" onclick="recReset()"
                 style="background:none;border:none;color:#94A3B8;font-size:12px;margin-top:12px;cursor:pointer;width:100%;text-align:center;">
-                <i class="fas fa-arrow-left"></i> Volver
+                <i data-lucide="arrow-left"></i> Volver
             </button>
         </div>
     </div>
 </div>
 
-<a href="/{{ slug }}/login" class="back-link"><i class="fas fa-arrow-left"></i> Volver al login principal</a>
+<a href="/{{ slug }}/login" class="back-link"><i data-lucide="arrow-left"></i> Volver al login principal</a>
 
 <script>
 const SLUG = "{{ slug }}";
@@ -272,7 +273,7 @@ function switchTabById(tab){ switchTab(tab, document.getElementById('btn-'+tab))
 function togglePass(btn){
     var inp = btn.previousElementSibling;
     inp.type = inp.type==='password' ? 'text' : 'password';
-    btn.innerHTML = inp.type==='password' ? '<i class="fas fa-eye"></i>' : '🙈';
+    btn.innerHTML = inp.type==='password' ? '<i data-lucide="eye"></i>' : '🙈';
 }
 
 function checkPwd(inp){
@@ -315,7 +316,7 @@ function validarRegistro(){
 
 function mostrarErr(msg){
     var err = document.getElementById('reg-err');
-    err.textContent = '<i class="fas fa-exclamation-triangle"></i> ' + msg;
+    err.textContent = '<i data-lucide="alert-triangle"></i> ' + msg;
     err.style.display = 'block';
     err.scrollIntoView({behavior:'smooth', block:'center'});
 }
@@ -324,21 +325,21 @@ function recBuscar(){
     var usuario = document.getElementById('rec-usuario').value.trim();
     var err = document.getElementById('rec-err1');
     err.style.display = 'none';
-    if(!usuario){ err.textContent='<i class="fas fa-exclamation-triangle"></i> Escribe tu usuario.'; err.style.display='block'; return; }
+    if(!usuario){ err.textContent='<i data-lucide="alert-triangle"></i> Escribe tu usuario.'; err.style.display='block'; return; }
     var f = new FormData(); f.append('usuario', usuario); f.append('_csrf_token', '{{ csrf_token() }}');
     fetch('/'+SLUG+'/directora/buscar_usuario_recuperar', {method:'POST', body:f})
         .then(function(r){ return r.json(); })
         .then(function(d){
             if(d.ok){
-                document.getElementById('rec-pregunta-txt').textContent = '<i class="fas fa-key"></i> '+d.pregunta;
+                document.getElementById('rec-pregunta-txt').textContent = '<i data-lucide="key"></i> '+d.pregunta;
                 document.getElementById('rec-paso1').style.display = 'none';
                 document.getElementById('rec-paso2').style.display = 'block';
             } else {
-                err.textContent = '<i class="fas fa-exclamation-triangle"></i> '+d.mensaje;
+                err.textContent = '<i data-lucide="alert-triangle"></i> '+d.mensaje;
                 err.style.display = 'block';
             }
         })
-        .catch(function(){ err.textContent='<i class="fas fa-exclamation-triangle"></i> Error de conexión.'; err.style.display='block'; });
+        .catch(function(){ err.textContent='<i data-lucide="alert-triangle"></i> Error de conexión.'; err.style.display='block'; });
 }
 
 function recCambiar(){
@@ -350,9 +351,9 @@ function recCambiar(){
     var ok  = document.getElementById('rec-ok2');
     err.style.display = ok.style.display = 'none';
 
-    if(!respuesta){ err.textContent='<i class="fas fa-exclamation-triangle"></i> Escribe tu respuesta.'; err.style.display='block'; return; }
-    if(nueva.length < 6){ err.textContent='<i class="fas fa-exclamation-triangle"></i> Mínimo 6 caracteres.'; err.style.display='block'; return; }
-    if(nueva !== confirmar){ err.textContent='<i class="fas fa-exclamation-triangle"></i> Las contraseñas no coinciden.'; err.style.display='block'; return; }
+    if(!respuesta){ err.textContent='<i data-lucide="alert-triangle"></i> Escribe tu respuesta.'; err.style.display='block'; return; }
+    if(nueva.length < 6){ err.textContent='<i data-lucide="alert-triangle"></i> Mínimo 6 caracteres.'; err.style.display='block'; return; }
+    if(nueva !== confirmar){ err.textContent='<i data-lucide="alert-triangle"></i> Las contraseñas no coinciden.'; err.style.display='block'; return; }
 
     var f = new FormData();
     f.append('usuario', usuario);
@@ -363,15 +364,15 @@ function recCambiar(){
         .then(function(r){ return r.json(); })
         .then(function(d){
             if(d.ok){
-                ok.textContent = '<i class="fas fa-check-circle"></i> '+d.mensaje;
+                ok.textContent = '<i data-lucide="check-circle"></i> '+d.mensaje;
                 ok.style.display = 'block';
                 setTimeout(function(){ switchTabById('login'); }, 2000);
             } else {
-                err.textContent = '<i class="fas fa-exclamation-triangle"></i> '+d.mensaje;
+                err.textContent = '<i data-lucide="alert-triangle"></i> '+d.mensaje;
                 err.style.display = 'block';
             }
         })
-        .catch(function(){ err.textContent='<i class="fas fa-exclamation-triangle"></i> Error de conexión.'; err.style.display='block'; });
+        .catch(function(){ err.textContent='<i data-lucide="alert-triangle"></i> Error de conexión.'; err.style.display='block'; });
 }
 
 function recReset(){
@@ -396,6 +397,10 @@ switchTabById('registro');
   <script src="/static/js/lumini.js"></script>
 
 </html>
+
+
+
+
 
 
 

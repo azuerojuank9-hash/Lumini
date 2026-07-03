@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reportes â€” {{ colegio.nombre if colegio else slug }}</title>
@@ -53,6 +53,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </style>
   <link rel="stylesheet" href="/static/css/lumini.css">
 
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <nav class="sidebar" id="sidebar">
@@ -61,7 +62,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     {% if colegio and colegio.logo %}
     <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
     {% else %}
-    <img class="sidebar-logo" src="/static/lumini_logo.png" alt="Lumini">
+    <img class="sidebar-logo" src="/static/lumini_logo.webp" alt="Lumini">
     {% endif %}
     <div>
       <div class="sidebar-brand">LUMINI</div>
@@ -71,20 +72,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </a>
   <div class="sidebar-nav">
     <div class="sidebar-section">Rector</div>
-    <a href="/{{ slug }}/rector" class="sidebar-item"><span class="icon"><i class="fas fa-chart-pie"></i></span><span>Dashboard</span></a>
-    <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item"><span class="icon"><i class="fas fa-bullhorn"></i></span><span>Comunicaciones</span></a>
-    <a href="/{{ slug }}/rector/canales" class="sidebar-item"><span class="icon"><i class="fas fa-comments"></i></span><span>Canales</span></a>
-    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i class="fas fa-bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
-    <a href="/{{ slug }}/rector/horarios" class="sidebar-item"><span class="icon"><i class="fas fa-calendar-alt"></i></span><span>Horarios</span></a>
-    <a href="/{{ slug }}/rector/profesores" class="sidebar-item"><span class="icon"><i class="fas fa-chalkboard-teacher"></i></span><span>Profesores</span></a>
-    <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i class="fas fa-user-graduate"></i></span><span>Estudiantes</span></a>
-    <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i class="fas fa-book"></i></span><span>Cursos</span></a>
-    <a href="/{{ slug }}/rector/reportes" class="sidebar-item active"><span class="icon"><i class="fas fa-chart-bar"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i class="fas fa-history"></i></span><span>AuditorÃ­a</span></a>
+    <a href="/{{ slug }}/rector" class="sidebar-item"><span class="icon"><i data-lucide="pie-chart"></i></span><span>Dashboard</span></a>
+    <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item"><span class="icon"><i data-lucide="megaphone"></i></span><span>Comunicaciones</span></a>
+    <a href="/{{ slug }}/rector/canales" class="sidebar-item"><span class="icon"><i data-lucide="message-square"></i></span><span>Canales</span></a>
+    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i data-lucide="bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+    <a href="/{{ slug }}/rector/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horarios</span></a>
+    <a href="/{{ slug }}/rector/profesores" class="sidebar-item"><span class="icon"><i data-lucide="presentation"></i></span><span>Profesores</span></a>
+    <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
+    <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
+    <a href="/{{ slug }}/rector/reportes" class="sidebar-item active"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>AuditorÃ­a</span></a>
     <div class="sidebar-section" style="margin-top:12px;">ConfiguraciÃ³n</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i class="fas fa-user-shield"></i></span><span>GestiÃ³n de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i class="fas fa-cog"></i></span><span>ConfiguraciÃ³n</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i class="fas fa-sign-out-alt"></i></span><span>Cerrar sesiÃ³n</span></a>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>GestiÃ³n de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>ConfiguraciÃ³n</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesiÃ³n</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -94,33 +95,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="main">
 <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="MenÃº">â˜°</button>
 <div class="topbar">
-  <h1><i class="fas fa-chart-bar" style="color:var(--accent);"></i> Reportes</h1>
+  <h1><i data-lucide="bar-chart-3" style="color:var(--accent);"></i> Reportes</h1>
   <div class="breadcrumb">EstadÃ­sticas generales de la instituciÃ³n</div>
 </div>
 <div class="stats-grid">
   <div class="stat-card purple">
-    <div class="icon"><i class="fas fa-user-graduate"></i></div>
+    <div class="icon"><i data-lucide="graduation-cap"></i></div>
     <div class="num">{{ total_est }}</div>
     <div class="label">Estudiantes activos</div>
   </div>
   <div class="stat-card blue">
-    <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
+    <div class="icon"><i data-lucide="presentation"></i></div>
     <div class="num">{{ total_prof }}</div>
     <div class="label">Profesores activos</div>
   </div>
   <div class="stat-card green">
-    <div class="icon"><i class="fas fa-book"></i></div>
+    <div class="icon"><i data-lucide="book"></i></div>
     <div class="num">{{ total_cursos }}</div>
     <div class="label">Cursos</div>
   </div>
   <div class="stat-card purple">
-    <div class="icon"><i class="fas fa-user-tie"></i></div>
+    <div class="icon"><i data-lucide="user-check"></i></div>
     <div class="num">{{ total_directoras }}</div>
     <div class="label">Directoras de curso</div>
   </div>
 </div>
 <div class="card">
-  <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;"><i class="fas fa-info-circle" style="color:var(--accent);"></i> InformaciÃ³n institucional</h3>
+  <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;"><i data-lucide="info" style="color:var(--accent);"></i> InformaciÃ³n institucional</h3>
   <p style="font-size:13px;color:var(--muted);line-height:1.7;">Total de estudiantes activos en el sistema: <strong style="color:var(--text);">{{ total_est }}</strong></p>
   <p style="font-size:13px;color:var(--muted);line-height:1.7;">Profesores registrados: <strong style="color:var(--text);">{{ total_prof }}</strong></p>
   <p style="font-size:13px;color:var(--muted);line-height:1.7;">Cursos disponibles: <strong style="color:var(--text);">{{ total_cursos }}</strong></p>
@@ -135,3 +136,8 @@ function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('o
   <script src="/static/js/lumini.js"></script>
 
 </html>
+
+
+
+
+

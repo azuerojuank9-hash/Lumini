@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notificaciones â€” {{ colegio.nombre if colegio else slug }}</title>
@@ -39,11 +39,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </style>
   <link rel="stylesheet" href="/static/css/lumini.css">
 
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>
 
 <div class="top-bar">
-  <h1><i class="fas fa-bell" style="color:var(--accent);"></i> Notificaciones</h1>
-  <a href="javascript:history.back()" class="back"><i class="fas fa-arrow-left"></i> Volver</a>
+  <h1><i data-lucide="bell" style="color:var(--accent);"></i> Notificaciones</h1>
+  <a href="javascript:history.back()" class="back"><i data-lucide="arrow-left"></i> Volver</a>
 </div>
 
 {% if notificaciones %}
@@ -51,26 +52,26 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   {% for n in notificaciones %}
   <div class="notif-item {% if not n.leida %}unread{% endif %}" id="notif-{{ n.id }}">
     <div class="notif-icon {{ n.tipo }}">
-      {% if n.tipo == 'success' %}<i class="fas fa-check-circle"></i>
-      {% elif n.tipo == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
-      {% elif n.tipo == 'danger' %}<i class="fas fa-times-circle"></i>
-      {% else %}<i class="fas fa-info-circle"></i>{% endif %}
+      {% if n.tipo == 'success' %}<i data-lucide="check-circle"></i>
+      {% elif n.tipo == 'warning' %}<i data-lucide="alert-triangle"></i>
+      {% elif n.tipo == 'danger' %}<i data-lucide="x-circle"></i>
+      {% else %}<i data-lucide="info"></i>{% endif %}
     </div>
     <div class="notif-body">
       <div class="notif-title">{{ n.titulo }}</div>
       {% if n.mensaje %}<div class="notif-message">{{ n.mensaje }}</div>{% endif %}
       <div class="notif-time">{{ n.fecha_creacion[:16] }}</div>
-      {% if n.link %}<a href="{{ n.link }}" class="notif-link">Ver mÃ¡s <i class="fas fa-arrow-right"></i></a>{% endif %}
+      {% if n.link %}<a href="{{ n.link }}" class="notif-link">Ver mÃ¡s <i data-lucide="arrow-right"></i></a>{% endif %}
     </div>
     {% if not n.leida %}
-    <button class="mark-read" onclick="marcarLeida({{ n.id }})" title="Marcar como leÃ­da"><i class="fas fa-check"></i></button>
+    <button class="mark-read" onclick="marcarLeida({{ n.id }})" title="Marcar como leÃ­da"><i data-lucide="check"></i></button>
     {% endif %}
   </div>
   {% endfor %}
 </div>
 {% else %}
 <div class="empty-state">
-  <div class="icon"><i class="fas fa-bell"></i></div>
+  <div class="icon"><i data-lucide="bell"></i></div>
   <h3>No hay notificaciones</h3>
   <p>Cuando recibas notificaciones del sistema, aparecerÃ¡n aquÃ­.</p>
 </div>
@@ -91,3 +92,8 @@ function marcarLeida(nid){
   <script src="/static/js/lumini.js"></script>
 
 </html>
+
+
+
+
+
