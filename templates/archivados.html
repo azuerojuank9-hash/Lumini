@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="es">
 
@@ -189,6 +189,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 <link rel="stylesheet" href="/static/css/enhanced.css">
 
 
+</head>
 <body>
 
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
@@ -463,15 +464,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
             <td style="white-space:nowrap;">
 
-              <form action="/{{ slug }}/reactivar_alumno/{{ a.id }}" method="POST" style="display:inline" onsubmit="return confirm('Reactivar a {{ a.nombre }}?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm breact">
-
-                 class="bsm breact"
-
-                 onclick="return confirm('¿Reactivar a {{ a.nombre }}?')">
-
-                <i data-lucide="recycle"></i>ï¸ Reactivar
-
-              </button></form>
+              <form action="/{{ slug }}/reactivar_alumno/{{ a.id }}" method="POST" style="display:inline" onsubmit="return confirm('Reactivar a {{ a.nombre }}?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm breact"><i data-lucide="recycle"></i> Reactivar</button></form>
 
               <form action="/{{ slug }}/eliminar_alumno/{{ a.id }}" method="POST" style="display:inline;margin-left:4px;" onsubmit="return confirm('Eliminar a {{ a.nombre }} PERMANENTEMENTE?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel"
 ></button></form>
@@ -590,7 +583,7 @@ function eliminarProfesor(id, nombre){
 
     }
 
-    fetch('/' + SLUG + '/eliminar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':csrfToken}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
+    fetch('/' + SLUG + '/eliminar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':getCsrf()}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
 
 }
 
@@ -602,7 +595,7 @@ function reactivarProfesor(id, nombre){
 
     }
 
-    fetch('/' + SLUG + '/reactivar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':csrfToken}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
+    fetch('/' + SLUG + '/reactivar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':getCsrf()}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
 
 }
 
@@ -779,6 +772,7 @@ addDataLabels();
   <script src="/static/js/lumini.js"></script>
 
 
+</body>
 </html>
 
 

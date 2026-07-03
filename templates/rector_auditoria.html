@@ -63,6 +63,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 <link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
 <body>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <nav class="sidebar" id="sidebar">
@@ -103,28 +104,31 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 </nav>
 <div class="main">
 <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
-<div class="topbar">
-  <h1><i data-lucide="clock-rewind" style="color:var(--accent);"></i> Auditoría</h1>
-  <div class="breadcrumb">Registro de cambios y accesos al sistema</div>
+<div class="section-header">
+  <h2><span class="sh-icon"><i data-lucide="clock-rewind" style="width:16px;height:16px;"></i></span> Auditoría</h2>
+  <div class="sh-actions"></div>
+</div>
+<div class="breadcrumb" style="font-size:12px;color:var(--muted);margin-bottom:16px;">Registro de cambios y accesos al sistema</div>
+
+<div class="filter-bar">
+  <div class="filter-group">
+    <label>Tabla</label>
+    <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <select name="tabla" onchange="this.form.submit()" class="form-select" style="width:auto;font-size:11px;padding:6px 10px;">
+        <option value="">Todas las tablas</option>
+        {% for t in tablas %}
+        <option value="{{ t }}" {% if tabla == t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+      <span style="font-size:11px;color:var(--sub);">{{ total }} registro(s)</span>
+      {% if tabla %}
+      <a href="/{{ slug }}/rector/auditoria" style="font-size:11px;color:var(--accent);">Limpiar filtro</a>
+      {% endif %}
+    </form>
+  </div>
 </div>
 
   <div class="card" style="padding:0;overflow:hidden;">
-  <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
-    <div class="table-top">
-      <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <select name="tabla" onchange="this.form.submit()" class="form-select" style="width:auto;font-size:11px;padding:6px 10px;">
-          <option value="">Todas las tablas</option>
-          {% for t in tablas %}
-          <option value="{{ t }}" {% if tabla == t %}selected{% endif %}>{{ t }}</option>
-          {% endfor %}
-        </select>
-        <span style="font-size:11px;color:var(--sub);">{{ total }} registro(s)</span>
-        {% if tabla %}
-        <a href="/{{ slug }}/rector/auditoria" style="font-size:11px;color:var(--accent);">Limpiar filtro</a>
-        {% endif %}
-      </form>
-    </div>
-  </div>
 
   {% if registros %}
   <div class="tw zebra">
@@ -210,6 +214,7 @@ function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('o
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
   <script src="/static/js/lumini.js"></script>
 
+</body>
 </html>
 
 

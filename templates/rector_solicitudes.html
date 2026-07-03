@@ -61,6 +61,7 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
 <link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
 <body>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <nav class="sidebar" id="sidebar">
@@ -103,16 +104,32 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
 </nav>
 <div class="main">
 <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menu">â˜°</button>
-<div class="topbar">
-  <h1><i data-lucide="clipboard-list" style="color:var(--accent);"></i> Solicitudes de modificación</h1>
-  <div class="breadcrumb">Solicitudes de docentes para modificar notas en periodos cerrados</div>
+<div class="section-header">
+  <h2><span class="sh-icon"><i data-lucide="clipboard-list" style="width:16px;height:16px;"></i></span> Solicitudes de modificación</h2>
+  <div class="sh-actions"></div>
+</div>
+<div class="breadcrumb" style="font-size:12px;color:var(--muted);margin-bottom:16px;">Solicitudes de docentes para modificar notas en periodos cerrados</div>
+
+<div class="quick-actions-grid" style="margin-bottom:20px;">
+  <a href="/{{ slug }}/rector" class="qa-card">
+    <div class="qa-icon purple"><i data-lucide="pie-chart" style="width:22px;height:22px;"></i></div>
+    <div class="qa-title">Dashboard</div>
+    <div class="qa-desc">Panel principal de rectoría</div>
+  </a>
+  <a href="/{{ slug }}/rector/auditoria" class="qa-card">
+    <div class="qa-icon orange"><i data-lucide="clock-rewind" style="width:22px;height:22px;"></i></div>
+    <div class="qa-title">Auditoría</div>
+    <div class="qa-desc">Registro de cambios y accesos</div>
+  </a>
+  <a href="/{{ slug }}/rector/comunicaciones" class="qa-card">
+    <div class="qa-icon blue"><i data-lucide="megaphone" style="width:22px;height:22px;"></i></div>
+    <div class="qa-title">Comunicaciones</div>
+    <div class="qa-desc">Gestiona avisos y comunicados</div>
+  </a>
 </div>
 
 {% if solicitudes %}
 <div class="card" style="padding:0;overflow:hidden;">
-  <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
-    <span style="font-size:12px;font-weight:600;"><i data-lucide="clipboard-list" style="width:14px;height:14px;color:var(--accent);"></i> Solicitudes recibidas</span>
-  </div>
   <div class="tw zebra">
   <table>
     <thead>
@@ -148,12 +165,12 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
           <form method="POST" action="/{{ slug }}/rector/solicitudes/{{ s.id }}/aprobar" style="display:inline-block;margin-bottom:4px;">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <textarea name="respuesta" placeholder="Comentario (opcional)" rows="1" style="width:120px;font-size:10px;padding:4px 6px;margin-bottom:4px;display:block;"></textarea>
-            <button type="submit" class="btn btn-ok" style="font-size:10px;padding:4px 10px;"><i data-lucide="check"></i> Aprobar</button>
+            <button type="submit" class="btn btn-ok btn-sm" style="font-size:10px;padding:4px 10px;"><i data-lucide="check"></i> Aprobar</button>
           </form>
           <form method="POST" action="/{{ slug }}/rector/solicitudes/{{ s.id }}/rechazar" style="display:inline-block;">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <textarea name="respuesta" placeholder="Motivo del rechazo" rows="1" style="width:120px;font-size:10px;padding:4px 6px;margin-bottom:4px;display:block;" required></textarea>
-            <button type="submit" class="btn btn-danger" style="font-size:10px;padding:4px 10px;"><i data-lucide="x"></i> Rechazar</button>
+            <button type="submit" class="btn btn-danger btn-sm" style="font-size:10px;padding:4px 10px;"><i data-lucide="x"></i> Rechazar</button>
           </form>
           {% else %}
           <span style="font-size:11px;color:var(--sub);">{{ s.respuesta or 'â€”' }}</span>
@@ -173,10 +190,6 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
     <div class="empty-desc">No hay solicitudes de modificación de notas en este momento.</div>
   </div>
 </div>
-<div class="card" style="text-align:center;padding:40px;">
-  <i data-lucide="clipboard-check" style="font-size:40px;color:var(--muted);margin-bottom:12px;"></i>
-  <p style="color:var(--muted);font-size:14px;">No hay solicitudes de modificacion pendientes.</p>
-</div>
 {% endif %}
 </div>
 <script>
@@ -186,6 +199,7 @@ function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('o
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
   <script src="/static/js/lumini.js"></script>
 
+</body>
 </html>
 
 
