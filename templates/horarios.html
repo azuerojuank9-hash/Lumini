@@ -1,312 +1,312 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Horarios â€” {{ colegio.nombre if colegio else slug }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--danger:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.15);}
-*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.sidebar-logo{padding:14px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-.sidebar-logo img{height:30px;width:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
-.sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}
-.sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}
-.sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
-.sidebar-link.active{background:var(--accent);color:#fff;}
-.sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
-.sidebar-footer{padding:8px 10px;border-top:1px solid var(--border);}
-.main{margin-left:var(--sidebar);padding:20px 24px;width:calc(100% - var(--sidebar));min-height:100vh;}
-h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;}
-.subtitle{color:var(--muted);font-size:13px;margin-bottom:20px;}
-.curso-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
-.curso-tab{padding:6px 14px;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;text-decoration:none;background:var(--bg2);border:1px solid var(--border);color:var(--muted);transition:all var(--tr);}
-.curso-tab.active,.curso-tab:hover{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;box-shadow:var(--shadow);}
-.tabla-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-th{padding:7px 5px;text-align:center;background:var(--bg2);border:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;}
-th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:2px;}
-th .ht{font-size:10px;color:var(--muted);}
-td{border:1px solid var(--border);vertical-align:middle;}
-td.dia-col{padding:10px 14px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--accent);background:rgba(15,23,42,.6);white-space:nowrap;min-width:55px;position:sticky;left:0;z-index:2;}
-td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:12px 8px;color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
-td.edit-col{cursor:pointer;transition:background var(--tr);}
-td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
-.celda{padding:8px 6px;min-height:48px;text-align:center;}
-@media(max-width:600px){.celda{min-height:48px;padding:8px 6px;}.c-mat{font-size:13px;}.tabla-wrap{overflow-x:auto;}.inp{font-size:13px;}}
-.c-num{font-size:11px;color:var(--muted);margin-bottom:2px;}
-.c-mat{font-weight:700;font-size:14px;color:var(--text);margin-bottom:3px;line-height:1.3;}
-.c-prof{font-size:11px;color:var(--muted);}
-.c-empty{color:rgba(var(--accent-rgb),.2);font-size:24px;padding-top:10px;}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal{background:rgba(15,23,42,.95);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;width:100%;max-width:420px;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
-@keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
-.modal h3{font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:4px;}
-.modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
-.field{margin-bottom:10px;}
-.field label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-weight:600;}
-.inp{width:100%;padding:8px 10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color var(--tr),box-shadow var(--tr);}
-.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-.btn-row{display:flex;gap:8px;margin-top:16px;}
-.btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;flex:1;transition:all var(--tr);}
-.btn:active{transform:scale(.97);}
-.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
-.btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border);}
-.btn-ghost:hover{background:rgba(255,255,255,.08);}
-.btn-clear{background:rgba(239,68,68,.08);color:var(--danger);border:1px solid rgba(239,68,68,.2);flex:0;padding:10px 14px;}
-.btn-clear:hover{background:rgba(239,68,68,.18);}
-.toast{position:fixed;bottom:20px;right:20px;background:rgba(16,185,129,.95);color:#fff;padding:8px 14px;border-radius:var(--rmd);font-size:12px;font-weight:600;z-index:3000;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.3);}
-.toast.show{opacity:1;transform:translateY(0);}
-.hint{font-size:11px;color:var(--muted);margin-top:8px;text-align:center;}
-.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:36px;height:36px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
-.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
-.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);}
-@media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 24px;}}
-@media(max-width:480px){.main{padding:20px 24px;}.curso-tabs{gap:6px;}.celda{min-height:48px;padding:8px 6px;}.c-mat{font-size:12px;}.c-num{font-size:10px;}.c-prof{font-size:10px;}.inp{font-size:13px;padding:8px 10px;}}
-@media(max-width:375px){.main{padding:20px 24px;}.h1{font-size:1.3rem;}.subtitle{font-size:11px;}.celda{min-height:48px;padding:8px 6px;}.c-mat{font-size:11px;}.c-prof{font-size:9px;}.modal{padding:20px;}.inp{font-size:13px;}}
-</style>
-<!-- Datadog RUM -->
-<script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-
-</head>
-<body>
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<aside class="sidebar" id="sidebar">
-    <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
-    <div class="sidebar-logo">
-{% if colegio and colegio.logo %}
-        <img src="/static/logos/{{ colegio.logo }}" alt="Logo">
-        {% else %}
-        <img src="/static/lumini_logo.webp" alt="Lumini">
-        {% endif %}
-        <div>
-            <div class="sidebar-brand">LUMINI</div>
-            <div class="sidebar-brand-sub">{{ colegio.nombre if colegio else slug }}</div>
-        </div>
-    </div>
-    </a>
-    <nav class="sidebar-nav">
-        <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
-        <a href="/{{ slug }}/horarios" class="sidebar-link active"><span class="icon"><i data-lucide="calendar"></i></span> Horarios</a>
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>Ã¯Â¸</span> Mi Perfil</a>
-        <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon"><i data-lucide="archive"></i></span> Archivados</a>
-    </nav>
-    <div class="sidebar-footer">
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
-        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
-    </div>
-</aside>
-
-<div class="main">
-
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">Ã¢â€™Â°</button>
-
-  <h1><i data-lucide="calendar"></i> Horarios</h1>
-  <p class="subtitle">Haz clic en cualquier celda para editar · Se guarda automáticamente</p>
-
-  <div class="curso-tabs">
-    {% for c in mis_cursos %}
-    <a href="?curso={{ c }}" class="curso-tab {% if c == curso_sel %}active{% endif %}">{{ c }}</a>
-    {% endfor %}
-  </div>
-
-  <div class="card">
-    <div class="tabla-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th><span class="hl">1a Hora</span><span class="ht">6:10 â€“ 7:05</span></th>
-            <th><span class="hl">2a Hora</span><span class="ht">7:05 â€“ 8:00</span></th>
-            <th><span class="hl">3a Hora</span><span class="ht">8:00 â€“ 8:55</span></th>
-            <th><span class="hl">4a Hora</span><span class="ht">8:55 â€“ 9:50</span></th>
-            <th><span class="hl">Descanso</span><span class="ht">9:50 â€“ 10:20</span></th>
-            <th><span class="hl">5a Hora</span><span class="ht">10:20 â€“ 11:10</span></th>
-            <th><span class="hl">6a Hora</span><span class="ht">11:10 â€“ 12:00</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','Miércoles'),('Ju','Jueves'),('Vi','Viernes')] %}
-          {% for ds, df in dias_list %}
-          <tr>
-            <td class="dia-col">{{ ds }}</td>
-            {% for f in ['1','2','3','4'] %}
-              {% set k = df ~ '_' ~ f %}
-              {% set e = horario_map.get(k, {}) %}
-              <td class="edit-col"
-                  data-dia="{{ df }}"
-                  data-franja="{{ f }}"
-                  data-num="{{ e.get('num','') }}"
-                  data-mat="{{ e.get('materia','') }}"
-                  data-prof="{{ e.get('profesor','') }}"
-                  onclick="abrirDesde(this)">
-                <div class="celda">
-                  {% if e.get('materia') %}
-                    {% if e.get('num') %}<div class="c-num">{{ e.num }}</div>{% endif %}
-                    <div class="c-mat">{{ e.materia }}</div>
-                    <div class="c-prof">{{ e.profesor }}</div>
-                  {% else %}
-                    <div class="c-empty">+</div>
-                  {% endif %}
-                </div>
-              </td>
-            {% endfor %}
-            {# Descanso #}
-            <td class="des-col">Ã¢â€™â€¢ Descanso</td>
-            {% for f in ['5','6'] %}
-              {% set k = df ~ '_' ~ f %}
-              {% set e = horario_map.get(k, {}) %}
-              <td class="edit-col"
-                  data-dia="{{ df }}"
-                  data-franja="{{ f }}"
-                  data-num="{{ e.get('num','') }}"
-                  data-mat="{{ e.get('materia','') }}"
-                  data-prof="{{ e.get('profesor','') }}"
-                  onclick="abrirDesde(this)">
-                <div class="celda">
-                  {% if e.get('materia') %}
-                    {% if e.get('num') %}<div class="c-num">{{ e.num }}</div>{% endif %}
-                    <div class="c-mat">{{ e.materia }}</div>
-                    <div class="c-prof">{{ e.profesor }}</div>
-                  {% else %}
-                    <div class="c-empty">+</div>
-                  {% endif %}
-                </div>
-              </td>
-            {% endfor %}
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    <p class="hint">Clic en + para agregar · Clic en celda para editar</p>
-  </div>
-</div>
-
-<!-- Modal -->
-<div class="modal-overlay" id="modalCelda">
-  <div class="modal">
-    <h3 id="mTitulo">Editar</h3>
-    <p class="modal-sub" id="mSub"></p>
-    <div class="field">
-      <label>Número / Código</label>
-      <input class="inp" type="text" id="iNum" placeholder="ej: 31">
-    </div>
-    <div class="field">
-      <label>Materia</label>
-      <input class="inp" type="text" id="iMat" placeholder="ej: Matemáticas">
-    </div>
-    <div class="field">
-      <label>Profesor</label>
-      <input class="inp" type="text" id="iProf" placeholder="ej: Alberth">
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-clear" onclick="limpiar()" title="Borrar">ðŸ—‘</button>
-      <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardar()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
-<div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado</div>
-
-<script>
-function toggleSidebar(){
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
-}
-const SLUG = "{{ slug }}";
-const CURSO = "{{ curso_sel }}";
-const HORAS = {
-  '1':'1a Hora · 6:10-7:05', '2':'2a Hora · 7:05-8:00',
-  '3':'3a Hora · 8:00-8:55', '4':'4a Hora · 8:55-9:50',
-  '5':'5a Hora · 10:20-11:10', '6':'6a Hora · 11:10-12:00'
-};
-let _dia='', _franja='';
-
-function getCsrf(){
-  return document.getElementById('csrf-global').value;
-}
-function showToast(m){
-  const t=document.getElementById('toast');
-  t.innerHTML=m; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2000);
-}
-
-function abrirDesde(td) {
-  _dia    = td.dataset.dia;
-  _franja = td.dataset.franja;
-  document.getElementById('mTitulo').textContent = _dia;
-  document.getElementById('mSub').textContent    = HORAS[_franja] || '';
-  document.getElementById('iNum').value  = td.dataset.num  || '';
-  document.getElementById('iMat').value  = td.dataset.mat  || '';
-  document.getElementById('iProf').value = td.dataset.prof || '';
-  document.getElementById('modalCelda').classList.add('open');
-  setTimeout(()=>document.getElementById('iMat').focus(), 80);
-}
-
-function cerrar(){
-  document.getElementById('modalCelda').classList.remove('open');
-}
-
-function guardar(){
-  _send(
-    document.getElementById('iNum').value.trim(),
-    document.getElementById('iMat').value.trim(),
-    document.getElementById('iProf').value.trim()
-  );
-}
-
-function limpiar(){
-  if(!confirm('¿Borrar esta celda?')) return;
-  _send('','','');
-}
-
-function _send(num, mat, prof){
-  const fd = new FormData();
-  fd.append('_csrf_token', getCsrf());
-  fd.append('dia',      _dia);
-  fd.append('franja',   _franja);
-  fd.append('num',      num);
-  fd.append('materia',  mat);
-  fd.append('profesor', prof);
-  fd.append('curso',    CURSO);
-  fetch('/'+SLUG+'/horarios', {method:'POST', body:fd})
-    .then(()=>{ cerrar(); showToast('<i data-lucide="check-circle"></i> Guardado'); setTimeout(()=>location.reload(), 700); })
-    .catch(()=>{ showToast('Ã¢â€œ Error de conexión'); });
-}
-
-document.addEventListener('keydown', e=>{
-  if(e.key==='Escape') cerrar();
-  if(e.key==='Enter' && document.getElementById('modalCelda').classList.contains('open')) guardar();
-});
-</script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-
-</body>
-</html>
-
-
-
-
-
-
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horarios — {{ colegio.nombre if colegio else slug }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--danger:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.15);}
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sidebar-logo{padding:14px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.sidebar-logo img{height:30px;width:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
+.sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
+.sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}
+.sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
+.sidebar-link.active{background:var(--accent);color:#fff;}
+.sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-footer{padding:8px 10px;border-top:1px solid var(--border);}
+.main{margin-left:var(--sidebar);padding:20px 24px;width:calc(100% - var(--sidebar));min-height:100vh;}
+h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;}
+.subtitle{color:var(--muted);font-size:13px;margin-bottom:20px;}
+.curso-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.curso-tab{padding:6px 14px;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;text-decoration:none;background:var(--bg2);border:1px solid var(--border);color:var(--muted);transition:all var(--tr);}
+.curso-tab.active,.curso-tab:hover{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;box-shadow:var(--shadow);}
+.tabla-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{padding:7px 5px;text-align:center;background:var(--bg2);border:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;}
+th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:2px;}
+th .ht{font-size:10px;color:var(--muted);}
+td{border:1px solid var(--border);vertical-align:middle;}
+td.dia-col{padding:10px 14px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--accent);background:rgba(15,23,42,.6);white-space:nowrap;min-width:55px;position:sticky;left:0;z-index:2;}
+td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:12px 8px;color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+td.edit-col{cursor:pointer;transition:background var(--tr);}
+td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
+.celda{padding:8px 6px;min-height:48px;text-align:center;}
+@media(max-width:600px){.celda{min-height:48px;padding:8px 6px;}.c-mat{font-size:13px;}.tabla-wrap{overflow-x:auto;}.inp{font-size:13px;}}
+.c-num{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.c-mat{font-weight:700;font-size:14px;color:var(--text);margin-bottom:3px;line-height:1.3;}
+.c-prof{font-size:11px;color:var(--muted);}
+.c-empty{color:rgba(var(--accent-rgb),.2);font-size:24px;padding-top:10px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:rgba(15,23,42,.95);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;width:100%;max-width:420px;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.modal h3{font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
+.field{margin-bottom:10px;}
+.field label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-weight:600;}
+.inp{width:100%;padding:8px 10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color var(--tr),box-shadow var(--tr);}
+.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
+.btn-row{display:flex;gap:8px;margin-top:16px;}
+.btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;flex:1;transition:all var(--tr);}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border);}
+.btn-ghost:hover{background:rgba(255,255,255,.08);}
+.btn-clear{background:rgba(239,68,68,.08);color:var(--danger);border:1px solid rgba(239,68,68,.2);flex:0;padding:10px 14px;}
+.btn-clear:hover{background:rgba(239,68,68,.18);}
+.toast{position:fixed;bottom:20px;right:20px;background:rgba(16,185,129,.95);color:#fff;padding:8px 14px;border-radius:var(--rmd);font-size:12px;font-weight:600;z-index:3000;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.toast.show{opacity:1;transform:translateY(0);}
+.hint{font-size:11px;color:var(--muted);margin-top:8px;text-align:center;}
+.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:36px;height:36px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
+.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
+.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);}
+@media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 24px;}}
+@media(max-width:480px){.main{padding:20px 24px;}.curso-tabs{gap:6px;}.celda{min-height:48px;padding:8px 6px;}.c-mat{font-size:12px;}.c-num{font-size:10px;}.c-prof{font-size:10px;}.inp{font-size:13px;padding:8px 10px;}}
+@media(max-width:375px){.main{padding:20px 24px;}.h1{font-size:1.3rem;}.subtitle{font-size:11px;}.celda{min-height:48px;padding:8px 6px;}.c-mat{font-size:11px;}.c-prof{font-size:9px;}.modal{padding:20px;}.inp{font-size:13px;}}
+</style>
+<!-- Datadog RUM -->
+<script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
+
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+    <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
+    <div class="sidebar-logo">
+{% if colegio and colegio.logo %}
+        <img src="/static/logos/{{ colegio.logo }}" alt="Logo">
+        {% else %}
+        <img src="/static/lumini_logo.webp" alt="Lumini">
+        {% endif %}
+        <div>
+            <div class="sidebar-brand">LUMINI</div>
+            <div class="sidebar-brand-sub">{{ colegio.nombre if colegio else slug }}</div>
+        </div>
+    </div>
+    </a>
+    <nav class="sidebar-nav">
+        <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
+        <a href="/{{ slug }}/horarios" class="sidebar-link active"><span class="icon"><i data-lucide="calendar"></i></span> Horarios</a>
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>Ã¯Â¸</span> Mi Perfil</a>
+        <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon"><i data-lucide="archive"></i></span> Archivados</a>
+    </nav>
+    <div class="sidebar-footer">
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
+        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
+    </div>
+</aside>
+
+<div class="main">
+
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">Ã¢â€™Â°</button>
+
+  <h1><i data-lucide="calendar"></i> Horarios</h1>
+  <p class="subtitle">Haz clic en cualquier celda para editar · Se guarda automáticamente</p>
+
+  <div class="curso-tabs">
+    {% for c in mis_cursos %}
+    <a href="?curso={{ c }}" class="curso-tab {% if c == curso_sel %}active{% endif %}">{{ c }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <div class="tabla-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th><span class="hl">1a Hora</span><span class="ht">6:10 — 7:05</span></th>
+            <th><span class="hl">2a Hora</span><span class="ht">7:05 — 8:00</span></th>
+            <th><span class="hl">3a Hora</span><span class="ht">8:00 — 8:55</span></th>
+            <th><span class="hl">4a Hora</span><span class="ht">8:55 — 9:50</span></th>
+            <th><span class="hl">Descanso</span><span class="ht">9:50 — 10:20</span></th>
+            <th><span class="hl">5a Hora</span><span class="ht">10:20 — 11:10</span></th>
+            <th><span class="hl">6a Hora</span><span class="ht">11:10 — 12:00</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set dias_list = [('Lu','Lunes'),('Ma','Martes'),('Mi','Miércoles'),('Ju','Jueves'),('Vi','Viernes')] %}
+          {% for ds, df in dias_list %}
+          <tr>
+            <td class="dia-col">{{ ds }}</td>
+            {% for f in ['1','2','3','4'] %}
+              {% set k = df ~ '_' ~ f %}
+              {% set e = horario_map.get(k, {}) %}
+              <td class="edit-col"
+                  data-dia="{{ df }}"
+                  data-franja="{{ f }}"
+                  data-num="{{ e.get('num','') }}"
+                  data-mat="{{ e.get('materia','') }}"
+                  data-prof="{{ e.get('profesor','') }}"
+                  onclick="abrirDesde(this)">
+                <div class="celda">
+                  {% if e.get('materia') %}
+                    {% if e.get('num') %}<div class="c-num">{{ e.num }}</div>{% endif %}
+                    <div class="c-mat">{{ e.materia }}</div>
+                    <div class="c-prof">{{ e.profesor }}</div>
+                  {% else %}
+                    <div class="c-empty">+</div>
+                  {% endif %}
+                </div>
+              </td>
+            {% endfor %}
+            {# Descanso #}
+            <td class="des-col">Ã¢â€™â€¢ Descanso</td>
+            {% for f in ['5','6'] %}
+              {% set k = df ~ '_' ~ f %}
+              {% set e = horario_map.get(k, {}) %}
+              <td class="edit-col"
+                  data-dia="{{ df }}"
+                  data-franja="{{ f }}"
+                  data-num="{{ e.get('num','') }}"
+                  data-mat="{{ e.get('materia','') }}"
+                  data-prof="{{ e.get('profesor','') }}"
+                  onclick="abrirDesde(this)">
+                <div class="celda">
+                  {% if e.get('materia') %}
+                    {% if e.get('num') %}<div class="c-num">{{ e.num }}</div>{% endif %}
+                    <div class="c-mat">{{ e.materia }}</div>
+                    <div class="c-prof">{{ e.profesor }}</div>
+                  {% else %}
+                    <div class="c-empty">+</div>
+                  {% endif %}
+                </div>
+              </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">Clic en + para agregar · Clic en celda para editar</p>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalCelda">
+  <div class="modal">
+    <h3 id="mTitulo">Editar</h3>
+    <p class="modal-sub" id="mSub"></p>
+    <div class="field">
+      <label>Número / Código</label>
+      <input class="inp" type="text" id="iNum" placeholder="ej: 31">
+    </div>
+    <div class="field">
+      <label>Materia</label>
+      <input class="inp" type="text" id="iMat" placeholder="ej: Matemáticas">
+    </div>
+    <div class="field">
+      <label>Profesor</label>
+      <input class="inp" type="text" id="iProf" placeholder="ej: Alberth">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-clear" onclick="limpiar()" title="Borrar">ðŸ—‘</button>
+      <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
+<div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado</div>
+
+<script>
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+const SLUG = "{{ slug }}";
+const CURSO = "{{ curso_sel }}";
+const HORAS = {
+  '1':'1a Hora · 6:10-7:05', '2':'2a Hora · 7:05-8:00',
+  '3':'3a Hora · 8:00-8:55', '4':'4a Hora · 8:55-9:50',
+  '5':'5a Hora · 10:20-11:10', '6':'6a Hora · 11:10-12:00'
+};
+let _dia='', _franja='';
+
+function getCsrf(){
+  return document.getElementById('csrf-global').value;
+}
+function showToast(m){
+  const t=document.getElementById('toast');
+  t.innerHTML=m; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+function abrirDesde(td) {
+  _dia    = td.dataset.dia;
+  _franja = td.dataset.franja;
+  document.getElementById('mTitulo').textContent = _dia;
+  document.getElementById('mSub').textContent    = HORAS[_franja] || '';
+  document.getElementById('iNum').value  = td.dataset.num  || '';
+  document.getElementById('iMat').value  = td.dataset.mat  || '';
+  document.getElementById('iProf').value = td.dataset.prof || '';
+  document.getElementById('modalCelda').classList.add('open');
+  setTimeout(()=>document.getElementById('iMat').focus(), 80);
+}
+
+function cerrar(){
+  document.getElementById('modalCelda').classList.remove('open');
+}
+
+function guardar(){
+  _send(
+    document.getElementById('iNum').value.trim(),
+    document.getElementById('iMat').value.trim(),
+    document.getElementById('iProf').value.trim()
+  );
+}
+
+function limpiar(){
+  if(!confirm('¿Borrar esta celda?')) return;
+  _send('','','');
+}
+
+function _send(num, mat, prof){
+  const fd = new FormData();
+  fd.append('_csrf_token', getCsrf());
+  fd.append('dia',      _dia);
+  fd.append('franja',   _franja);
+  fd.append('num',      num);
+  fd.append('materia',  mat);
+  fd.append('profesor', prof);
+  fd.append('curso',    CURSO);
+  fetch('/'+SLUG+'/horarios', {method:'POST', body:fd})
+    .then(()=>{ cerrar(); showToast('<i data-lucide="check-circle"></i> Guardado'); setTimeout(()=>location.reload(), 700); })
+    .catch(()=>{ showToast('Ã¢â€œ Error de conexión'); });
+}
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') cerrar();
+  if(e.key==='Enter' && document.getElementById('modalCelda').classList.contains('open')) guardar();
+});
+</script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
+  <script src="/static/js/lumini.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+

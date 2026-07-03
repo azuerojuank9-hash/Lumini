@@ -1,205 +1,205 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profesores â€” {{ colegio.nombre if colegio else slug }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;line-height:1.5;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
-.sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.sidebar-logo{width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0;}
-.sidebar-brand{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sidebar-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;}
-.sidebar-section{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px;font-weight:600;}
-.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);margin-bottom:1px;cursor:pointer;position:relative;}
-.sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text);}
-.sidebar-item.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
-.sidebar-item .icon{width:18px;text-align:center;font-size:13px;flex-shrink:0;}
-.badge-count{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center;}
-.sidebar-user{border-top:1px solid var(--border);padding:12px 14px;font-size:12px;}
-.sidebar-user .name{color:var(--text);font-weight:600;font-size:12px;}
-.sidebar-user .role{color:var(--muted);font-size:10px;margin-top:2px;}
-.main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:1100px;width:100%;}
-.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;}
-.topbar{margin-bottom:20px;}
-.topbar h1{font-size:20px;font-weight:700;}
-.topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
-.prof-table{width:100%;border-collapse:collapse;}
-.prof-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);}
-.prof-table td{padding:12px;font-size:13px;border-bottom:1px solid var(--border);}
-.prof-table tr:last-child td{border-bottom:none;}
-.prof-table tr:hover td{background:rgba(var(--accent-rgb),.02);}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
-.badge-active{background:rgba(34,197,94,.1);color:var(--green);}
-.badge-inactive{background:rgba(239,68,68,.1);color:var(--red);}
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
-.empty-state .icon{font-size:48px;opacity:.2;margin-bottom:16px;color:var(--accent);}
-.empty-state h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;}
-@media(max-width:768px){
-  .hamburger{display:flex;}
-  .sidebar{transform:translateX(-100%);}
-  .sidebar.open{transform:translateX(0);}
-  .sidebar-overlay.open{display:block;}
-  .main{margin-left:0;padding:16px;}
-}
-</style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-</head>
-<body>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-<nav class="sidebar" id="sidebar">
-  <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
-  <div class="sidebar-header">
-    {% if colegio and colegio.logo %}
-    <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
-    {% else %}
-    <img class="sidebar-logo" src="/static/lumini_logo.webp" alt="Lumini">
-    {% endif %}
-    <div>
-      <div class="sidebar-brand">LUMINI</div>
-      <div class="sidebar-sub">{{ colegio.nombre if colegio else slug }}</div>
-    </div>
-  </div>
-  </a>
-  <div class="sidebar-nav">
-    <div class="sidebar-section">Rector</div>
-    <a href="/{{ slug }}/rector" class="sidebar-item"><span class="icon"><i data-lucide="pie-chart"></i></span><span>Dashboard</span></a>
-    <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item"><span class="icon"><i data-lucide="megaphone"></i></span><span>Comunicaciones</span></a>
-    <a href="/{{ slug }}/rector/canales" class="sidebar-item"><span class="icon"><i data-lucide="message-square"></i></span><span>Canales</span></a>
-    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i data-lucide="bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
-    <a href="/{{ slug }}/rector/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horarios</span></a>
-    <a href="/{{ slug }}/rector/profesores" class="sidebar-item active"><span class="icon"><i data-lucide="presentation"></i></span><span>Profesores</span></a>
-    <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
-    <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
-    <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
-  </div>
-  <div class="sidebar-user">
-    <div class="name">{{ rector.nombre }}</div>
-    <div class="role">{% if rector.es_principal %}Rector Principal{% else %}Rector{% endif %}</div>
-  </div>
-</nav>
-<div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
-<div class="topbar">
-  <h1><i data-lucide="presentation" style="color:var(--accent);"></i> Profesores</h1>
-  <div class="breadcrumb">Listado de docentes de la institución</div>
-</div>
-<div class="quick-actions-grid" style="margin-bottom:20px;">
-    <a href="/{{ slug }}/rector/profesores/nuevo" class="qa-card">
-        <div class="qa-icon purple"><i data-lucide="user-plus" style="width:22px;height:22px;"></i></div>
-        <div class="qa-title">Nuevo profesor</div>
-        <div class="qa-desc">Registra un nuevo docente en el sistema</div>
-    </a>
-    <a href="/{{ slug }}/rector/profesores" class="qa-card">
-        <div class="qa-icon blue"><i data-lucide="list" style="width:22px;height:22px;"></i></div>
-        <div class="qa-title">Ver todos</div>
-        <div class="qa-desc">Lista completa de profesores</div>
-    </a>
-    <a href="/{{ slug }}/rector/estudiantes" class="qa-card">
-        <div class="qa-icon green"><i data-lucide="graduation-cap" style="width:22px;height:22px;"></i></div>
-        <div class="qa-title">Estudiantes</div>
-        <div class="qa-desc">Gestiona los estudiantes activos</div>
-    </a>
-    <a href="/{{ slug }}/rector/cursos" class="qa-card">
-        <div class="qa-icon orange"><i data-lucide="book" style="width:22px;height:22px;"></i></div>
-        <div class="qa-title">Cursos</div>
-        <div class="qa-desc">Organiza cursos y jornadas</div>
-    </a>
-</div>
-<div class="card" style="padding:0;overflow:hidden;">
-  <div class="section-header" style="padding:16px 18px 0;margin-bottom:12px;">
-    <h2><span class="sh-icon"><i data-lucide="chalkboard-teacher" style="width:16px;height:16px;"></i></span> Listado de profesores</h2>
-    <div class="sh-actions">
-      <a href="/{{ slug }}/rector/profesores/nuevo" class="btn btn-primary btn-sm"><i data-lucide="plus" style="width:12px;height:12px;"></i> Nuevo</a>
-    </div>
-  </div>
-  <div class="table-top" style="padding:0 18px;">
-    <div class="total-count">{{ total }} profesor{{ 'es' if total != 1 }}</div>
-    <div class="table-search">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="searchProf" placeholder="Buscar profesor..." oninput="filtrarProfesores()">
-    </div>
-  </div>
-  <div class="tw zebra">
-  {% if profesores %}
-  <table class="prof-table" id="profTable">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Email</th>
-        <th>Estado</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for p in profesores %}
-      <tr>
-        <td><strong>{{ p.nombre }}</strong></td>
-        <td style="color:var(--sub);font-size:12px;">{{ p.email or '—' }}</td>
-        <td>{% if p.activo %}<span class="badge badge-active"><i data-lucide="check-circle"></i> Activo</span>{% else %}<span class="badge badge-inactive"><i data-lucide="minus-circle"></i> Inactivo</span>{% endif %}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% if total_pages > 1 %}
-  <div class="table-footer">
-    <div class="pagination">
-      {% if page > 1 %}<a href="?page={{ page - 1 }}&per_page={{ per_page }}">Anterior</a>{% endif %}
-      <span class="active">{{ page }}</span>
-      {% if page < total_pages %}<a href="?page={{ page + 1 }}&per_page={{ per_page }}">Siguiente</a>{% endif %}
-    </div>
-    <span>Página {{ page }} de {{ total_pages }}</span>
-  </div>
-  {% endif %}
-  {% else %}
-  <div class="empty-state" style="border:none;min-height:160px;padding:40px 20px;">
-    <div class="empty-icon has-svg">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-    </div>
-    <div class="empty-title">No hay profesores registrados</div>
-    <div class="empty-desc">Los docentes aparecerán aquí una vez que sean agregados al sistema.</div>
-  </div>
-  {% endif %}
-  </div>
-</div>
-<script>
-function filtrarProfesores(){
-  var q=document.getElementById('searchProf').value.toLowerCase();
-  var rows=document.querySelectorAll('#profTable tbody tr');
-  rows.forEach(function(r){
-    var name=r.querySelector('td:first-child');
-    r.style.display=(name&&name.textContent.toLowerCase().includes(q))?'':'none';
-  });
-}
-</script>
-</div>
-<script>
-function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
-</script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-
-</body>
-</html>
-
-
-
-
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profesores — {{ colegio.nombre if colegio else slug }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;line-height:1.5;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sidebar-logo{width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+.sidebar-brand{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sidebar-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
+.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;}
+.sidebar-section{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px;font-weight:600;}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);margin-bottom:1px;cursor:pointer;position:relative;}
+.sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text);}
+.sidebar-item.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.sidebar-item .icon{width:18px;text-align:center;font-size:13px;flex-shrink:0;}
+.badge-count{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center;}
+.sidebar-user{border-top:1px solid var(--border);padding:12px 14px;font-size:12px;}
+.sidebar-user .name{color:var(--text);font-weight:600;font-size:12px;}
+.sidebar-user .role{color:var(--muted);font-size:10px;margin-top:2px;}
+.main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:1100px;width:100%;}
+.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;}
+.topbar{margin-bottom:20px;}
+.topbar h1{font-size:20px;font-weight:700;}
+.topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.prof-table{width:100%;border-collapse:collapse;}
+.prof-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.prof-table td{padding:12px;font-size:13px;border-bottom:1px solid var(--border);}
+.prof-table tr:last-child td{border-bottom:none;}
+.prof-table tr:hover td{background:rgba(var(--accent-rgb),.02);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
+.badge-active{background:rgba(34,197,94,.1);color:var(--green);}
+.badge-inactive{background:rgba(239,68,68,.1);color:var(--red);}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-state .icon{font-size:48px;opacity:.2;margin-bottom:16px;color:var(--accent);}
+.empty-state h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;}
+@media(max-width:768px){
+  .hamburger{display:flex;}
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay.open{display:block;}
+  .main{margin-left:0;padding:16px;}
+}
+</style>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
+  <div class="sidebar-header">
+    {% if colegio and colegio.logo %}
+    <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    {% else %}
+    <img class="sidebar-logo" src="/static/lumini_logo.webp" alt="Lumini">
+    {% endif %}
+    <div>
+      <div class="sidebar-brand">LUMINI</div>
+      <div class="sidebar-sub">{{ colegio.nombre if colegio else slug }}</div>
+    </div>
+  </div>
+  </a>
+  <div class="sidebar-nav">
+    <div class="sidebar-section">Rector</div>
+    <a href="/{{ slug }}/rector" class="sidebar-item"><span class="icon"><i data-lucide="pie-chart"></i></span><span>Dashboard</span></a>
+    <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item"><span class="icon"><i data-lucide="megaphone"></i></span><span>Comunicaciones</span></a>
+    <a href="/{{ slug }}/rector/canales" class="sidebar-item"><span class="icon"><i data-lucide="message-square"></i></span><span>Canales</span></a>
+    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i data-lucide="bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+    <a href="/{{ slug }}/rector/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horarios</span></a>
+    <a href="/{{ slug }}/rector/profesores" class="sidebar-item active"><span class="icon"><i data-lucide="presentation"></i></span><span>Profesores</span></a>
+    <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
+    <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
+    <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+  </div>
+  <div class="sidebar-user">
+    <div class="name">{{ rector.nombre }}</div>
+    <div class="role">{% if rector.es_principal %}Rector Principal{% else %}Rector{% endif %}</div>
+  </div>
+</nav>
+<div class="main">
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
+<div class="topbar">
+  <h1><i data-lucide="presentation" style="color:var(--accent);"></i> Profesores</h1>
+  <div class="breadcrumb">Listado de docentes de la institución</div>
+</div>
+<div class="quick-actions-grid" style="margin-bottom:20px;">
+    <a href="/{{ slug }}/rector/profesores/nuevo" class="qa-card">
+        <div class="qa-icon purple"><i data-lucide="user-plus" style="width:22px;height:22px;"></i></div>
+        <div class="qa-title">Nuevo profesor</div>
+        <div class="qa-desc">Registra un nuevo docente en el sistema</div>
+    </a>
+    <a href="/{{ slug }}/rector/profesores" class="qa-card">
+        <div class="qa-icon blue"><i data-lucide="list" style="width:22px;height:22px;"></i></div>
+        <div class="qa-title">Ver todos</div>
+        <div class="qa-desc">Lista completa de profesores</div>
+    </a>
+    <a href="/{{ slug }}/rector/estudiantes" class="qa-card">
+        <div class="qa-icon green"><i data-lucide="graduation-cap" style="width:22px;height:22px;"></i></div>
+        <div class="qa-title">Estudiantes</div>
+        <div class="qa-desc">Gestiona los estudiantes activos</div>
+    </a>
+    <a href="/{{ slug }}/rector/cursos" class="qa-card">
+        <div class="qa-icon orange"><i data-lucide="book" style="width:22px;height:22px;"></i></div>
+        <div class="qa-title">Cursos</div>
+        <div class="qa-desc">Organiza cursos y jornadas</div>
+    </a>
+</div>
+<div class="card" style="padding:0;overflow:hidden;">
+  <div class="section-header" style="padding:16px 18px 0;margin-bottom:12px;">
+    <h2><span class="sh-icon"><i data-lucide="chalkboard-teacher" style="width:16px;height:16px;"></i></span> Listado de profesores</h2>
+    <div class="sh-actions">
+      <a href="/{{ slug }}/rector/profesores/nuevo" class="btn btn-primary btn-sm"><i data-lucide="plus" style="width:12px;height:12px;"></i> Nuevo</a>
+    </div>
+  </div>
+  <div class="table-top" style="padding:0 18px;">
+    <div class="total-count">{{ total }} profesor{{ 'es' if total != 1 }}</div>
+    <div class="table-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchProf" placeholder="Buscar profesor..." oninput="filtrarProfesores()">
+    </div>
+  </div>
+  <div class="tw zebra">
+  {% if profesores %}
+  <table class="prof-table" id="profTable">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in profesores %}
+      <tr>
+        <td><strong>{{ p.nombre }}</strong></td>
+        <td style="color:var(--sub);font-size:12px;">{{ p.email or '—' }}</td>
+        <td>{% if p.activo %}<span class="badge badge-active"><i data-lucide="check-circle"></i> Activo</span>{% else %}<span class="badge badge-inactive"><i data-lucide="minus-circle"></i> Inactivo</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if total_pages > 1 %}
+  <div class="table-footer">
+    <div class="pagination">
+      {% if page > 1 %}<a href="?page={{ page - 1 }}&per_page={{ per_page }}">Anterior</a>{% endif %}
+      <span class="active">{{ page }}</span>
+      {% if page < total_pages %}<a href="?page={{ page + 1 }}&per_page={{ per_page }}">Siguiente</a>{% endif %}
+    </div>
+    <span>Página {{ page }} de {{ total_pages }}</span>
+  </div>
+  {% endif %}
+  {% else %}
+  <div class="empty-state" style="border:none;min-height:160px;padding:40px 20px;">
+    <div class="empty-icon has-svg">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    </div>
+    <div class="empty-title">No hay profesores registrados</div>
+    <div class="empty-desc">Los docentes aparecerán aquí una vez que sean agregados al sistema.</div>
+  </div>
+  {% endif %}
+  </div>
+</div>
+<script>
+function filtrarProfesores(){
+  var q=document.getElementById('searchProf').value.toLowerCase();
+  var rows=document.querySelectorAll('#profTable tbody tr');
+  rows.forEach(function(r){
+    var name=r.querySelector('td:first-child');
+    r.style.display=(name&&name.textContent.toLowerCase().includes(q))?'':'none';
+  });
+}
+</script>
+</div>
+<script>
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
+  <script src="/static/js/lumini.js"></script>
+
+</body>
+</html>
+
+
+
+
+
