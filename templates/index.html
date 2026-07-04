@@ -2,26 +2,68 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <link rel="stylesheet" href="/static/css/lumini.css">
 <link rel="stylesheet" href="/static/css/enhanced.css">
+
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <link rel="manifest" href="/static/manifest.json">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini &mdash; {{ colegio.nombre if colegio else slug }}</title>
+<title>Lumini  {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--blue-rgb:37,99,235;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);--shadow-lg:0 4px 20px rgba(0,0,0,.2);}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.06);--shadow-lg:0 4px 16px rgba(0,0,0,.08);}
+/* -- LUMINI Design System --------------------------------------------- */
+:root {
+  --bg: #080B14;
+  --bg2: #0F172A;
+  --bg3: #1E293B;
+  --bg4: #334155;
+  --border: rgba(255,255,255,.06);
+  --accent: #6D28D9;
+  --accent2: #4C1D95;
+  --accent-rgb: 109,40,217;
+  --blue: #2563EB;
+  --blue-rgb: 37,99,235;
+  --text: #F8FAFC;
+  --muted: #94A3B8;
+  --sub: #64748B;
+  --green: #22C55E;
+  --red: #EF4444;
+  --yellow: #EAB308;
+  --rsm: 6px;
+  --rmd: 10px;
+  --rlg: 14px;
+  --tr: .2s cubic-bezier(.4,0,.2,1);
+  --sidebar: 200px;
+  --shadow: 0 1px 3px rgba(0,0,0,.15);
+  --shadow-lg: 0 4px 20px rgba(0,0,0,.2);
+}
+[data-theme="light"] {
+  --bg: #F8FAFC;
+  --bg2: #FFFFFF;
+  --bg3: #F1F5F9;
+  --bg4: #E2E8F0;
+  --border: rgba(0,0,0,.08);
+  --text: #0F172A;
+  --muted: #64748B;
+  --sub: #94A3B8;
+  --shadow: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,.08);
+}
+
+/* -- Reset & Base ----------------------------------------------------- */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{scroll-behavior:smooth;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;line-height:1.5;}
+
+/* -- Sidebar ---------------------------------------------------------- */
 .sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
 .sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
 .sidebar-logo{width:32px;height:32px;border-radius:8px;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.3);flex-shrink:0;}
 .sidebar-brand{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .sidebar-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;}
+.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .sidebar-section{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px;font-weight:600;}
 .sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);margin-bottom:1px;cursor:pointer;}
 .sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text);}
@@ -30,23 +72,127 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .sidebar-user{border-top:1px solid var(--border);padding:12px 14px;font-size:12px;}
 .sidebar-user .name{color:var(--text);font-weight:600;font-size:12px;}
 .sidebar-user .role{color:var(--muted);font-size:10px;margin-top:2px;}
+
+/* -- Layout ----------------------------------------------------------- */
 .main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:1400px;width:100%;}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
 .topbar-left h1{font-size:20px;font-weight:700;letter-spacing:-.4px;}
 .topbar-left .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+/* -- Curso tabs ------------------------------------------------------- */
 .curso-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;}
 .ctab{padding:7px 16px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;transition:all var(--tr);}
 .ctab:hover{background:rgba(var(--accent-rgb),.06);color:var(--text);border-color:rgba(var(--accent-rgb),.2);}
 .ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;}
+
+/* -- Stats bar -------------------------------------------------------- */
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.scard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rmd);padding:14px 18px;flex:1;min-width:120px;transition:all var(--tr);}
+.scard:hover{border-color:rgba(var(--accent-rgb),.15);transform:translateY(-1px);box-shadow:var(--shadow-lg);}
+.slabel{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-weight:600;}
+.sval{font-size:1.4rem;font-weight:700;letter-spacing:-.4px;}
+
+/* -- Cards (unified) -------------------------------------------------- */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:all var(--tr);}
+.card:hover{box-shadow:var(--shadow-lg);}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;min-height:44px;}
+.card-title{font-size:12px;font-weight:600;color:var(--text);}
+.card-body{padding:14px 16px;flex:1;}
+
+/* -- Forms & Inputs --------------------------------------------------- */
+.finput{padding:8px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;transition:all var(--tr);}
+.finput:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
+.fi{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* -- Buttons ---------------------------------------------------------- */
+.bsm{padding:8px 16px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);display:inline-flex;align-items:center;gap:6px;touch-action:manipulation;}
+.bsm:active{transform:scale(.96);}
+.badd{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 12px rgba(var(--accent-rgb),.25);}
+.badd:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(var(--accent-rgb),.35);}
+.bdel{background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.bdel:hover{background:rgba(239,68,68,.2);}
+
+/* -- Dashboard -------------------------------------------------------- */
+.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow);animation:fadeSlideIn .4s ease;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.dash-greeting{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
+.dash-greeting h1{font-size:24px;font-weight:800;letter-spacing:-.6px;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.dash-greeting .date{font-size:12px;color:var(--muted);margin-top:4px;}
+.dash-greeting .school-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);font-size:12px;color:var(--muted);}
+
+.dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+@media(max-width:900px){.dash-cards{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.dash-cards{grid-template-columns:1fr;}}
+.dash-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rlg);padding:20px 18px 18px;transition:all .25s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.dash-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--rlg) var(--rlg) 0 0;}
+.dash-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.2);border-color:rgba(var(--accent-rgb),.2);}
+.dash-card.purple::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.dash-card.blue::before{background:linear-gradient(90deg,var(--blue),#1D4ED8);}
+.dash-card.green::before{background:linear-gradient(90deg,var(--green),#16A34A);}
+.dash-card.orange::before{background:linear-gradient(90deg,#F59E0B,#D97706);}
+.dash-card .icon-wrap{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;}
+.dash-card.purple .icon-wrap{background:rgba(109,40,217,.12);color:var(--accent);}
+.dash-card.blue .icon-wrap{background:rgba(37,99,235,.12);color:var(--blue);}
+.dash-card.green .icon-wrap{background:rgba(34,197,94,.12);color:var(--green);}
+.dash-card.orange .icon-wrap{background:rgba(245,158,11,.12);color:#F59E0B;}
+.dash-card .dval{font-size:1.8rem;font-weight:800;letter-spacing:-.7px;line-height:1.1;}
+.dash-card .dlabel{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+.dash-card .dtag{font-size:11px;color:var(--sub);margin-top:3px;}
+
+.quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.qaction{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .2s ease;font-family:'Inter',sans-serif;touch-action:manipulation;}
+.qaction:hover{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.25);color:var(--accent);transform:translateY(-1px);}
+.qaction.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
+.qaction.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.35);}
+.dash-divider{height:1px;background:var(--border);margin:0 0 18px 0;border:none;}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:700px){.dash-grid{grid-template-columns:1fr;}}
+.dash-section{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rlg);overflow:hidden;transition:all .2s ease;}
+.dash-section:hover{border-color:rgba(var(--accent-rgb),.12);}
+.dash-section-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;}
+.dash-section-head .icon{color:var(--accent);font-size:16px;width:20px;text-align:center;}
+.dash-section-body{padding:12px 18px 14px;}
+.schedule-item{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;}
+.schedule-item:last-child{border-bottom:none;}
+.schedule-time{font-size:10px;color:var(--sub);font-weight:700;min-width:48px;white-space:nowrap;background:var(--bg4);padding:3px 8px;border-radius:4px;text-align:center;}
+.schedule-subj{flex:1;font-weight:500;}
+.schedule-room{font-size:10px;color:var(--muted);}
+.empty-state{padding:24px;text-align:center;color:var(--muted);font-size:12px;}
+.empty-state .icon{font-size:28px;margin-bottom:8px;opacity:.4;}
+.alert-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;}
+.alert-item:last-child{border-bottom:none;}
+.alert-item .icon-badge{flex-shrink:0;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.alert-item .icon-badge.danger{background:rgba(239,68,68,.12);color:var(--red);}
+.alert-item .icon-badge.warning{background:rgba(234,179,8,.12);color:var(--yellow);}
+.alert-item .alert-body{flex:1;}
+.alert-item .alert-name{font-weight:600;font-size:12px;}
+.alert-item .alert-detail{font-size:10px;color:var(--sub);margin-top:2px;}
+
+/* -- Tables ----------------------------------------------------------- */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0 0 var(--rmd) var(--rmd);}
+table{border-collapse:collapse;min-width:100%;font-size:12px;}
+th{padding:8px 6px;text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3);position:sticky;top:0;font-weight:600;}
+th.tnombre{text-align:left;min-width:140px;}
+td{padding:7px 5px;border-bottom:1px solid rgba(255,255,255,.04);text-align:center;vertical-align:middle;transition:background var(--tr);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(var(--accent-rgb),.02);}
+.tnum{color:var(--sub);font-size:10px;width:24px;font-weight:500;}
+.tnombrecell{text-align:left;font-weight:500;cursor:pointer;transition:color var(--tr);font-size:12px;}
+.tnombrecell:hover{color:var(--accent);}
 .ni{width:38px;padding:5px 4px;background:var(--bg3);border:1.5px solid var(--border);border-radius:5px;color:var(--text);font-size:11px;text-align:center;font-family:'Inter',sans-serif;transition:all var(--tr);}
 .ni:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.1);}
 .ni.guardado{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.12);}
 .pc{font-weight:700;font-size:12px;}
 .ph{color:var(--green);}.pm{color:var(--yellow);}.pb{color:var(--red);}
+
+/* -- Locked period ---------------------------------------------------- */
 .td-locked{position:relative;}
 .td-locked .ni{opacity:.5;cursor:not-allowed;background:var(--bg);}
 .lock-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;color:var(--muted);cursor:pointer;opacity:.6;transition:opacity var(--tr);}
 .lock-overlay:hover{opacity:1;color:var(--red);}
+
+/* -- Attendance ------------------------------------------------------- */
 .asist-wrap{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:nowrap;}
 .asist-badge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;font-size:11px;font-weight:800;transition:all .2s ease;}
 .asist-badge.bp{background:linear-gradient(135deg,var(--green),#16A34A);color:#fff;}
@@ -62,10 +208,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .abtn.aa:hover,.abtn.active.aa{background:linear-gradient(135deg,var(--red),#DC2626);color:#fff;border-color:transparent;}
 .abtn.at{background:rgba(234,179,8,.10);color:var(--yellow);border:1px solid rgba(234,179,8,.18);}
 .abtn.at:hover,.abtn.active.at{background:linear-gradient(135deg,var(--yellow),#CA8A04);color:#fff;border-color:transparent;}
+
+/* -- Overlay / Modal -------------------------------------------------- */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;animation:fadeIn .15s ease;}
 .overlay.open{display:flex;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.4);animation:slideUp .2s ease;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 12px 40px rgba(0,0,0,.4);animation:slideUp .2s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 .modal h3{font-size:14px;margin-bottom:12px;font-weight:600;}
 .oitem{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px;margin-bottom:6px;font-size:12px;}
@@ -73,19 +221,26 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .oform{display:flex;gap:8px;margin-top:14px;}
 .oform input{flex:1;padding:8px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;transition:all var(--tr);}
 .oform input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.1);}
+
+/* -- Agenda items ----------------------------------------------------- */
 .agitem{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;gap:8px;}
 .agitem:last-child{border-bottom:none;}
 .agfecha{font-size:11px;color:var(--muted);white-space:nowrap;}
+
+/* -- History (modal) -------------------------------------------------- */
 .hmes{margin-bottom:10px;}
 .hmeslabel{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-weight:600;}
 .hdias{display:flex;flex-wrap:wrap;gap:3px;}
 .hdia{padding:3px 7px;border-radius:4px;font-size:9px;}
+
+/* -- Toast & Scroll-top ----------------------------------------------- */
 .toast{position:fixed;bottom:24px;right:24px;background:rgba(34,197,94,.95);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s ease;pointer-events:none;display:flex;align-items:center;gap:6px;backdrop-filter:blur(8px);}
 .toast.show{opacity:1;transform:translateY(0);}
 .comm-tabs{display:flex;gap:2px;width:100%;}
-.comm-tab{flex:1;padding:6px 8px;border:none;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;transition:all var(--tr);display:flex;align-items:center;justify-content:center;gap:4px;}
+.comm-tab{flex:1;padding:6px 8px;border:none;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;transition:all var(--tr);display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;}
 .comm-tab:hover{background:var(--bg3);color:var(--text);}
 .comm-tab.active{background:rgba(var(--accent-rgb),.12);color:var(--accent);}
+/* -- Canales (Fase 4  split layout + bubbles) ------------------- */
 .canales-split{display:flex;height:420px;border:1px solid var(--border);border-radius:var(--rsm);overflow:hidden;background:var(--bg2);}
 .canales-sidebar{width:260px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);background:var(--bg);}
 .canales-sidebar-header{padding:12px 14px;font-size:13px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
@@ -98,7 +253,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .canal-list-avatar{width:32px;height:32px;border-radius:50%;background:rgba(var(--accent-rgb),.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
 .canal-list-info{flex:1;min-width:0;}
 .canal-list-nombre{font-size:12px;font-weight:600;color:var(--text);}
-.canal-list-ultimo{font-size:10px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.canal-list-ultimo{font-size:10px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .canal-list-meta{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
 .canal-list-hora{font-size:9px;color:var(--sub);}
 .canal-list-no-leidos{font-size:9px;font-weight:700;color:#fff;background:var(--accent);padding:1px 5px;border-radius:99px;display:inline-block;min-width:16px;text-align:center;}
@@ -126,6 +281,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .typing-dots span:nth-child(2){animation-delay:.2s;}
 .typing-dots span:nth-child(3){animation-delay:.4s;}
 @keyframes typingDot{0%,60%,100%{opacity:0;}30%{opacity:1;}}
+
+/* -- Fase 5  Comunicación v2 ------------------------------------------ */
 .canales-fijados,.canales-biblioteca{flex:1;overflow-y:auto;padding:4px;}
 .msg-edit-badge{font-size:9px;color:var(--sub);margin-left:3px;cursor:default;}
 .canal-msg-footer{display:flex;align-items:center;gap:6px;margin-top:2px;flex-wrap:wrap;}
@@ -155,6 +312,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .canal-hdr-btn:hover{background:var(--bg3);color:var(--text) !important;}
 .canal-file-label:hover{color:var(--accent) !important;}
 .canal-msg .canal-msg-texto[contenteditable]{outline:2px solid var(--accent);background:var(--bg2);color:var(--text) !important;}
+
 .canal-input-area{display:flex;gap:6px;padding:8px 14px;border-top:1px solid var(--border);}
 .canal-input{flex:1;padding:7px 10px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;transition:all var(--tr);}
 .canal-input:focus{outline:none;border-color:var(--accent);}
@@ -165,18 +323,77 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .com-toast-icon{font-size:22px;line-height:1;flex-shrink:0;}
 .com-toast-body{flex:1;min-width:0;}
 .com-toast-title{font-weight:700;font-size:13px;color:var(--text);}
-.com-toast-msg{font-size:12px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.com-toast-msg{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .com-toast-time{font-size:10px;color:var(--sub);margin-top:4px;}
-.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);}
-.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
-.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.5);}
 .scroll-top{display:none;position:fixed;bottom:70px;right:20px;z-index:2000;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:50%;color:var(--text);font-size:18px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.3);transition:all var(--tr);}
 .scroll-top.show{display:flex;}
 .scroll-top:hover{background:var(--bg3);border-color:var(--accent);}
-@media(max-width:768px){.hamburger{display:flex;}.canales-split{flex-direction:column;height:auto;min-height:350px;}.canales-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}.canales-sidebar-list{max-height:160px;}.sidebar{transform:translateX(-100%);position:fixed;z-index:100;}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;padding:16px;}}
-@media(max-width:600px){table,thead,tbody,tr,td,th{display:block;}thead{display:none;}tr{border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:10px;background:var(--bg2);}td{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border:none;text-align:right;gap:6px;min-height:36px;border-bottom:1px solid rgba(255,255,255,.04);}td::before{content:attr(data-label);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;flex-shrink:0;text-align:left;min-width:70px;}td:last-child{border-bottom:none;}.asist-wrap{justify-content:flex-end;}.asist-group{padding:2px;gap:2px;}.abtn{padding:7px 12px;min-height:36px;font-size:10px;}.ni{width:44px;font-size:12px;}.stats{flex-direction:column;gap:8px;}.scard{padding:12px 14px;min-width:0;}.sval{font-size:1.2rem;}.curso-tabs{margin-bottom:12px;}.ctab{padding:6px 12px;font-size:11px;}.finput{font-size:16px;padding:10px 12px;}.topbar-left h1{font-size:17px;}.topbar{margin-bottom:14px;}tr:hover td{background:none;}}
-@media(min-width:601px){th.tnombre{position:sticky;left:0;z-index:3;background:var(--bg3);}td:first-child{position:sticky;left:0;z-index:1;background:var(--bg);}tr:hover td:first-child{background:rgba(var(--accent-rgb),.04);}}
-@media(max-width:375px){.main{padding:10px;}.topbar-left h1{font-size:15px;}.abtn{padding:5px 8px;min-height:32px;font-size:9px;}.finput{font-size:15px;padding:8px 10px;}.ctab{padding:5px 8px;font-size:10px;}.ni{width:44px;font-size:12px;}}
+
+/* -- Hamburger -------------------------------------------------------- */
+.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);}
+.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
+.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.5);}
+
+/* -- Responsive: mobile ----------------------------------------------- */
+@media(max-width:768px){
+  .hamburger{display:flex;}
+  .canales-split{flex-direction:column;height:auto;min-height:350px;}
+  .canales-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);}
+  .canales-sidebar-list{max-height:160px;}
+  .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay.open{display:block;}
+  .main{margin-left:0;padding:16px;}
+}
+@media(max-width:600px){
+  table,thead,tbody,tr,td,th{display:block;}
+  thead{display:none;}
+  tr{border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:10px;background:var(--bg2);}
+  td{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border:none;text-align:right;gap:6px;min-height:36px;border-bottom:1px solid rgba(255,255,255,.04);}
+  td::before{content:attr(data-label);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;flex-shrink:0;text-align:left;min-width:70px;}
+  td:last-child{border-bottom:none;}
+  .asist-wrap{justify-content:flex-end;}
+  .asist-group{padding:2px;gap:2px;}
+  .abtn{padding:7px 12px;min-height:36px;font-size:10px;}
+  .ni{width:44px;font-size:12px;}
+  .stats{flex-direction:column;gap:8px;}
+  .scard{padding:12px 14px;min-width:0;}
+  .sval{font-size:1.2rem;}
+  .curso-tabs{margin-bottom:12px;}
+  .ctab{padding:6px 12px;font-size:11px;}
+  .card-head{padding:10px 12px;}
+  .card-body{padding:10px 12px;}
+  .finput{font-size:16px;padding:10px 12px;}
+  .bsm{min-height:40px;font-size:12px;padding:8px 14px;}
+  .topbar-left h1{font-size:17px;}
+  .topbar{margin-bottom:14px;}
+  tr:hover td{background:none;}
+}
+@media(min-width:601px){
+  th.tnombre{position:sticky;left:0;z-index:3;background:var(--bg3);}
+  td:first-child,.tnombrecell{position:sticky;left:0;z-index:1;background:var(--bg);}
+  tr:hover td:first-child{background:rgba(var(--accent-rgb),.04);}
+  .tw{position:relative;}
+}
+@media(max-width:375px){
+  .main{padding:10px;}
+  .topbar-left h1{font-size:15px;}
+  .topbar-right{gap:4px;}
+  .bsm{font-size:11px;padding:6px 10px;min-height:36px;}
+  .abtn{padding:5px 8px;min-height:32px;font-size:9px;}
+  .finput{font-size:15px;padding:8px 10px;}
+  .card-head{padding:8px 10px;}
+  .card-body{padding:8px 10px;}
+  .ctab{padding:5px 8px;font-size:10px;}
+  .scard{padding:10px 12px;}
+  .sval{font-size:1rem;}
+  .stats{gap:6px;}
+  .dash-wrap{padding:16px;}
+  .dash-cards{gap:8px;}
+  .dash-card{padding:16px 14px;}
+  .dash-card .dval{font-size:1.4rem;}
+  .dash-greeting h1{font-size:19px;}
+}
 </style>
 </head>
 <body>
@@ -198,12 +415,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   </a>
   <div class="sidebar-nav">
-    <div class="sidebar-section">Navegaci&oacute;n</div>
+    <div class="sidebar-section">Navegación</div>
     <a href="/{{ slug }}/" class="sidebar-item active"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Notas</span></a>
     <a href="/{{ slug }}/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horario</span></a>
     <a href="/{{ slug }}/archivados" class="sidebar-item"><span class="icon"><i data-lucide="archive"></i></span><span>Archivados</span></a>
     <a href="/{{ slug }}/transferir_curso" class="sidebar-item"><span class="icon"><i data-lucide="refresh-cw"></i></span><span>Transferir</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Configuraci&oacute;n</div>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
     <a href="/{{ slug }}/cambiar_password" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Perfil</span></a>
     {% if materias_jornadas|length > 1 %}
     <a href="/{{ slug }}/seleccionar" class="sidebar-item"><span class="icon"><i data-lucide="refresh-cw"></i></span><span>Cambiar materia</span></a>
@@ -212,15 +429,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   <div class="sidebar-user">
     <div class="name">{{ profesor.nombre }}</div>
-    <div class="role">{{ materia }} &middot; {{ jornada }}</div>
+    <div class="role">{{ materia }} · {{ jornada }}</div>
   </div>
   <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
 </nav>
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Men&uacute;"><i data-lucide="menu"></i></button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">?</button>
 
+<div class="dash-wrap">
 <div class="dash-greeting">
     <div>
         <h1>Bienvenido, {{ profesor.nombre }}</h1>
@@ -231,189 +449,208 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
 </div>
 
-<div class="stats-grid fade-in fade-in-d1">
-    <div class="stat-card">
-        <div class="stat-icon purple"><i data-lucide="users"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ estudiantes|length }}</div>
-            <div class="stat-label">Estudiantes</div>
-            <div class="stat-footer">{{ curso_sel if curso_sel else '&mdash;' }}</div>
+<div class="dash-cards fade-in fade-in-d1">
+    <div class="dash-card purple">
+        <div class="icon-wrap"><i data-lucide="users" style="width:20px;height:20px;"></i></div>
+        <div class="dval">{{ estudiantes|length }}</div>
+        <div class="dlabel">Estudiantes</div>
+        <div class="dash-trend up">+{{ (estudiantes|length * 0.12)|int if estudiantes else 0 }}% vs mes ant.</div>
+        <div class="dash-footer">
+            <span class="dtag">{{ curso_sel if curso_sel else '&mdash;' }}</span>
+            <span style="font-size:10px;color:var(--sub);">{{ notas_pend if notas_pend else '0' }} pendientes</span>
         </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon blue"><i data-lucide="book-open"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ mis_cursos|length }}</div>
-            <div class="stat-label">Cursos</div>
-            <div class="stat-footer">asignados este periodo</div>
+    <div class="dash-card blue">
+        <div class="icon-wrap"><i data-lucide="book-open" style="width:20px;height:20px;"></i></div>
+        <div class="dval">{{ mis_cursos|length }}</div>
+        <div class="dlabel">Cursos</div>
+        <div class="dtag">asignados este periodo</div>
+        <div class="dash-progress">
+            {% set cur_avance = mis_cursos|length * 25 %}{% set cur_avance_clamped = cur_avance if cur_avance < 100 else 100 %}
+            <div class="dp-label"><span>Avance curricular</span><span>{{ cur_avance_clamped }}%</span></div>
+            <div class="dp-bar"><div class="dp-fill" style="width:{{ cur_avance_clamped }}%;"></div></div>
         </div>
-        <div class="progress-bar blue" style="margin:8px 16px 12px;"><div class="fill" style="width:{{ (mis_cursos|length * 25) if mis_cursos|length * 25 < 100 else 100 }}%;"></div></div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon green"><i data-lucide="calendar-check"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ asistencia_hoy }}</div>
-            <div class="stat-label">Asistencia hoy</div>
-            <div class="stat-footer">de {{ estudiantes|length }} estudiantes</div>
+    <div class="dash-card green">
+        <div class="icon-wrap"><i data-lucide="calendar-check" style="width:20px;height:20px;"></i></div>
+        <div class="dval">{{ asistencia_hoy }}</div>
+        <div class="dlabel">Asistencia hoy</div>
+        <div class="dtag">de {{ estudiantes|length }} estudiantes</div>
+        <div class="dash-progress">
+            {% set asis_pct = (asistencia_hoy|int / estudiantes|length * 100) if estudiantes and estudiantes|length > 0 else 0 %}
+            <div class="dp-label"><span>Porcentaje</span><span>{{ '%.0f'|format(asis_pct) }}%</span></div>
+            <div class="dp-bar"><div class="dp-fill" style="width:{{ asis_pct }}%;"></div></div>
         </div>
-        <div class="progress-bar green" style="margin:8px 16px 12px;"><div class="fill" style="width:{{ (asistencia_hoy|int / estudiantes|length * 100) if estudiantes and estudiantes|length > 0 else 0 }}%;"></div></div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon orange"><i data-lucide="clipboard-list"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ notas_pend if notas_pend else '0' }}</div>
-            <div class="stat-label">Notas pendientes</div>
-            <div class="stat-footer">{{ (estudiantes|length * actividades|length) - (notas_pend|int) if estudiantes and actividades else 0 }} registradas</div>
+    <div class="dash-card orange">
+        <div class="icon-wrap"><i data-lucide="clipboard-list" style="width:20px;height:20px;"></i></div>
+        <div class="dval">{{ notas_pend if notas_pend else '0' }}</div>
+        <div class="dlabel">Notas pendientes</div>
+        <div class="dtag">por registrar</div>
+        <div class="dash-footer">
+            {% set notas_reg = (estudiantes|length * actividades|length) - (notas_pend|int) if estudiantes and actividades else 0 %}
+            <span style="font-size:10px;color:var(--sub);">{{ notas_reg }} registradas</span>
+            <span style="font-size:10px;color:var(--green);">
+                {% if notas_pend|int == 0 %}<i data-lucide="check-circle" style="width:12px;height:12px;"></i> Completo{% endif %}
+            </span>
         </div>
     </div>
 </div>
 
-<div class="quick-actions-grid fade-in fade-in-d2">
-    <a href="#notas-card" class="qa-card">
-        <div class="qa-icon purple"><i data-lucide="plus-circle"></i></div>
-        <div class="qa-title">Registrar notas</div>
-        <div class="qa-desc">Ingresar calificaciones del periodo</div>
-    </a>
-    <a href="#agenda-card" class="qa-card">
-        <div class="qa-icon blue"><i data-lucide="list-checks"></i></div>
-        <div class="qa-title">Agregar trabajo</div>
-        <div class="qa-desc">Programar evaluaciones</div>
-    </a>
-    <a href="/{{ slug }}/horarios" class="qa-card">
-        <div class="qa-icon green"><i data-lucide="calendar"></i></div>
-        <div class="qa-title">Ver horario</div>
-        <div class="qa-desc">Consultar horario de clases</div>
-    </a>
-    <a href="/{{ slug }}/archivados" class="qa-card">
-        <div class="qa-icon orange"><i data-lucide="archive"></i></div>
-        <div class="qa-title">Archivados</div>
-        <div class="qa-desc">Estudiantes archivados</div>
-    </a>
+<div class="quick-actions">
+    <a href="#notas-card" class="qaction primary"><i data-lucide="plus-circle"></i> Registrar notas</a>
+    <a href="#agenda-card" class="qaction"><i data-lucide="list-checks"></i> Agregar trabajo</a>
+    <a href="/{{ slug }}/horarios" class="qaction"><i data-lucide="calendar"></i> Ver horario</a>
+    <a href="/{{ slug }}/archivados" class="qaction"><i data-lucide="archive"></i> Archivados</a>
 </div>
 
 <hr class="dash-divider">
 
-<div class="feed-card" id="centroComunicacion">
-    <div class="feed-header" style="padding:6px 14px;">
-        <div class="comm-tabs">
-            <button class="comm-tab active" onclick="switchComTab('avisos')"><i data-lucide="megaphone"></i> Avisos <span id="comCountBadge" style="display:none;font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent);color:#fff;margin-left:4px;font-weight:600;"></span></button>
-            <button class="comm-tab" onclick="switchComTab('canales')"><i data-lucide="message-square"></i> Canales <span id="canalesCountBadge" style="display:none;font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent);color:#fff;margin-left:4px;font-weight:600;"></span></button>
+<div class="dash-grid">
+    <div class="dash-section" id="centroComunicacion">
+        <div class="dash-section-head" style="color:var(--accent);font-weight:700;padding:6px 14px;">
+            <div class="comm-tabs">
+                <button class="comm-tab active" onclick="switchComTab('avisos')"><i data-lucide="megaphone"></i> Avisos <span id="comCountBadge" style="display:none;font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent);color:#fff;margin-left:4px;font-weight:600;"></span></button>
+                <button class="comm-tab" onclick="switchComTab('canales')"><i data-lucide="message-square"></i> Canales <span id="canalesCountBadge" style="display:none;font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent);color:#fff;margin-left:4px;font-weight:600;"></span></button>
+            </div>
+        </div>
+        <div class="dash-section-body" id="panelAvisos">
+            {% if comunicaciones_pendientes %}
+                {% for c in comunicaciones_pendientes[:5] %}
+                {% set prioridad_color = {'baja': '#64748B', 'normal': '#2563EB', 'alta': '#F59E0B', 'urgente': '#EF4444'} %}
+                {% set color = prioridad_color.get(c.prioridad, '#2563EB') %}
+                <div class="schedule-item" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                        <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:{{ color }};flex-shrink:0;"></span>
+                            <span style="font-weight:600;font-size:13px;">{{ c.titulo }}</span>
+                        </div>
+                        <span style="font-size:10px;color:var(--muted);white-space:nowrap;">{{ c.fecha_publicacion[:10] if c.fecha_publicacion else c.fecha_creacion[:10] }}</span>
+                    </div>
+                    <div style="font-size:12px;color:var(--muted);line-height:1.4;margin-left:16px;">{{ (c.contenido or '')[:120] }}{% if c.contenido and c.contenido|length > 120 %}{% endif %}</div>
+                    <div style="display:flex;gap:6px;margin-left:16px;margin-top:4px;">
+                        <span style="font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;background:{{ color }}15;color:{{ color }};">{{ c.prioridad | capitalize }}</span>
+                    </div>
+                    <div style="display:flex;gap:6px;margin-left:16px;margin-top:2px;">
+                        <button onclick="verComunicado({{ c.id }})" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(37,99,235,.1);color:var(--blue);font-family:'Inter',sans-serif;transition:all var(--tr);" onmouseover="this.style.background='rgba(37,99,235,.2)'" onmouseout="this.style.background='rgba(37,99,235,.1)'"><i data-lucide="eye"></i> Ver comunicado</button>
+                        <button onclick="marcarLeidoProf({{ c.id }}, this)" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;transition:all var(--tr);" onmouseover="this.style.background='rgba(var(--accent-rgb),.2)'" onmouseout="this.style.background='rgba(var(--accent-rgb),.1)'"><i data-lucide="check"></i> Marcar como le&iacute;do</button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state" style="min-height:120px;">
+                <div class="empty-icon"><i data-lucide="bell-off" style="width:28px;height:28px;"></i></div>
+                <div class="empty-title">Sin novedades</div>
+                <div class="empty-desc">No tienes avisos ni comunicados nuevos.</div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="dash-section-body" id="panelCanales" style="display:none;">
+            <div class="canales-split">
+                <div class="canales-sidebar" id="canalesSidebar">
+                    <div class="canales-sidebar-header">
+                        <span>Canales</span>
+                        <span class="canales-sidebar-badge" id="canalesCountBadge" style="display:none;"></span>
+                    </div>
+                    <div class="canales-sidebar-tabs" style="display:flex;gap:4px;padding:0 10px 8px;">
+                        <button class="canal-stab active" data-stab="chats" style="flex:1;padding:4px 0;font-size:10px;font-weight:600;border:none;border-radius:4px;background:rgba(var(--accent-rgb),.12);color:var(--accent);cursor:pointer;"><i data-lucide="message-circle"></i> Chats</button>
+                        <button class="canal-stab" data-stab="fijados" style="flex:1;padding:4px 0;font-size:10px;font-weight:600;border:none;border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;"><i data-lucide="pin"></i> Fijados</button>
+                        <button class="canal-stab" data-stab="biblioteca" style="flex:1;padding:4px 0;font-size:10px;font-weight:600;border:none;border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;"><i data-lucide="folder"></i> Archivos</button>
+                    </div>
+                    <div class="canales-sidebar-list" id="canalesLista"></div>
+                    <div class="canales-fijados" id="canalesFijados" style="display:none;"></div>
+                    <div class="canales-biblioteca" id="canalesBiblioteca" style="display:none;"></div>
+                </div>
+                <div class="canales-main">
+                    <div class="canales-empty" id="canalEmpty">
+                        <i data-lucide="message-square"></i>
+                        <p>Selecciona un canal para iniciar la conversaci&oacute;n</p>
+                    </div>
+                    <div class="canales-chat" id="canalChatView" style="display:none;">
+                        <div class="canal-chat-header">
+                            <button class="canal-chat-back" id="canalChatBack"><i data-lucide="arrow-left"></i></button>
+                            <div class="canal-chat-title" id="canalChatTitle"></div>
+                            <div class="canal-chat-actions" style="margin-left:auto;display:flex;gap:4px;">
+                                <button id="canalSearchBtn" class="canal-hdr-btn" title="Buscar" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 6px;font-size:13px;"><i data-lucide="search"></i></button>
+                                <button id="canalInfoBtn" class="canal-hdr-btn" title="Informaci&oacute;n del canal" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 6px;font-size:13px;"><i data-lucide="info"></i></button>
+                            </div>
+                        </div>
+                        <div class="canal-search-bar" id="canalSearchBar" style="display:none;padding:8px 12px;border-bottom:1px solid var(--border);">
+                            <div style="display:flex;gap:6px;align-items:center;">
+                                <input type="text" id="canalSearchInput" placeholder="Buscar mensajes..." style="flex:1;padding:6px 10px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-family:'Inter',sans-serif;">
+                                <select id="canalSearchAutor" style="padding:6px 8px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;font-family:'Inter',sans-serif;">
+                                    <option value="">Todos</option>
+                                </select>
+                                <button id="canalSearchGo" style="padding:6px 12px;border-radius:6px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:600;cursor:pointer;"><i data-lucide="search"></i></button>
+                                <button id="canalSearchClose" style="padding:6px 8px;border-radius:6px;border:none;background:rgba(239,68,68,.1);color:var(--red);font-size:12px;cursor:pointer;"><i data-lucide="x"></i></button>
+                            </div>
+                            <div id="canalSearchResults" style="font-size:11px;color:var(--muted);margin-top:6px;"></div>
+                        </div>
+                        <div class="canal-mensajes" id="canalMensajes"></div>
+                        <div class="canales-typing" id="canalTyping" style="display:none;">
+                            <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span> escribiendo...
+                        </div>
+                        <div class="canal-reply-bar" id="canalReplyBar" style="display:none;padding:6px 12px;background:rgba(var(--accent-rgb),.06);border-top:1px solid var(--border);font-size:11px;color:var(--muted);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span><i data-lucide="reply"></i> Respondiendo a <strong id="canalReplyAutor" style="color:var(--text);"></strong></span>
+                                <span id="canalReplyTexto" style="flex:1;margin:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+                                <button id="canalReplyCancel" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;"><i data-lucide="x"></i></button>
+                            </div>
+                        </div>
+                        <div class="canal-input-area">
+                            <label for="canalFileInput" class="canal-file-label" title="Adjuntar archivo" style="cursor:pointer;padding:8px 6px;color:var(--muted);font-size:16px;"><i data-lucide="paperclip"></i></label>
+                            <input type="file" id="canalFileInput" style="display:none;" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.webp,.svg,.txt,.csv,.zip">
+                            <input type="text" id="canalMsgInput" class="canal-input" placeholder="Escribe un mensaje...">
+                            <button id="canalSendBtn" class="canal-send-btn"><i data-lucide="send"></i></button>
+                        </div>
+                        <div id="canalFilePreview" style="display:none;padding:4px 12px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="feed-body" id="panelAvisos">
-        {% if comunicaciones_pendientes %}
-            {% for c in comunicaciones_pendientes[:5] %}
-            {% set prioridad_color = {'baja': '#64748B', 'normal': '#2563EB', 'alta': '#F59E0B', 'urgente': '#EF4444'} %}
-            {% set color = prioridad_color.get(c.prioridad, '#2563EB') %}
-            <div class="schedule-item" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;">
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-                    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
-                        <span style="width:8px;height:8px;border-radius:50%;background:{{ color }};flex-shrink:0;"></span>
-                        <span style="font-weight:600;font-size:13px;">{{ c.titulo }}</span>
-                    </div>
-                    <span style="font-size:10px;color:var(--muted);white-space:nowrap;">{{ c.fecha_publicacion[:10] if c.fecha_publicacion else c.fecha_creacion[:10] }}</span>
-                </div>
-                <div style="font-size:12px;color:var(--muted);line-height:1.4;margin-left:16px;">{{ (c.contenido or '')[:120] }}{% if c.contenido and c.contenido|length > 120 %}&hellip;{% endif %}</div>
-                <div style="display:flex;gap:6px;margin-left:16px;margin-top:4px;">
-                    <span style="font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;background:{{ color }}15;color:{{ color }};">{{ c.prioridad | capitalize }}</span>
-                </div>
-                <div style="display:flex;gap:6px;margin-left:16px;margin-top:2px;">
-                    <button onclick="verComunicado({{ c.id }})" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(37,99,235,.1);color:var(--blue);font-family:'Inter',sans-serif;"><i data-lucide="eye"></i> Ver comunicado</button>
-                    <button onclick="marcarLeidoProf({{ c.id }}, this)" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;"><i data-lucide="check"></i> Marcar como le&iacute;do</button>
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-icon"><i data-lucide="bell-off" style="width:28px;height:28px;"></i></div>
-            <div class="empty-title">Sin novedades</div>
-            <div class="empty-desc">No tienes avisos ni comunicados nuevos.</div>
+    <div class="dash-section">
+        <div class="dash-section-head">
+            <span class="icon"><i data-lucide="bell"></i></span>
+            Alertas &amp; Pendientes
         </div>
-        {% endif %}
-    </div>
-    <div class="feed-body" id="panelCanales" style="display:none;">
-        <div class="canales-split">
-            <div class="canales-sidebar" id="canalesSidebar">
-                <div class="canales-sidebar-header"><span>Canales</span><span class="canales-sidebar-badge" id="canalesCountBadge" style="display:none;"></span></div>
-                <div class="canales-sidebar-tabs" style="display:flex;gap:4px;padding:0 10px 8px;">
-                    <button class="canal-stab active" data-stab="chats" style="flex:1;padding:4px 0;font-size:10px;font-weight:600;border:none;border-radius:4px;background:rgba(var(--accent-rgb),.12);color:var(--accent);cursor:pointer;"><i data-lucide="message-circle"></i> Chats</button>
-                    <button class="canal-stab" data-stab="fijados" style="flex:1;padding:4px 0;font-size:10px;font-weight:600;border:none;border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;"><i data-lucide="pin"></i> Fijados</button>
-                    <button class="canal-stab" data-stab="biblioteca" style="flex:1;padding:4px 0;font-size:10px;font-weight:600;border:none;border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;"><i data-lucide="folder"></i> Archivos</button>
+        <div class="dash-section-body">
+            {% if alertas %}
+                {% for a in alertas %}
+                <div class="alert-item">
+                    {% if a.faltas is defined %}
+                    <span class="icon-badge danger"><i data-lucide="user-x"></i></span>
+                    <div class="alert-body">
+                        <div class="alert-name">{{ a.nombre }}</div>
+                        <div class="alert-detail">{{ a.faltas }} falta(s) registrada(s)</div>
+                    </div>
+                    {% elif a.promedio is defined %}
+                    <span class="icon-badge warning"><i data-lucide="alert-triangle"></i></span>
+                    <div class="alert-body">
+                        <div class="alert-name">{{ a.nombre }}</div>
+                        <div class="alert-detail">Promedio bajo: {{ a.promedio }}</div>
+                    </div>
+                    {% endif %}
                 </div>
-                <div class="canales-sidebar-list" id="canalesLista"></div>
-                <div class="canales-fijados" id="canalesFijados" style="display:none;"></div>
-                <div class="canales-biblioteca" id="canalesBiblioteca" style="display:none;"></div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"><i data-lucide="check-circle" style="color:var(--green);font-size:32px;"></i></div>
+                <div class="empty-title">Todo al día</div>
+                <div class="empty-desc">No hay alertas pendientes ni novedades que requieran tu atención.</div>
             </div>
-            <div class="canales-main">
-                <div class="canales-empty" id="canalEmpty"><i data-lucide="message-square"></i><p>Selecciona un canal para iniciar la conversaci&oacute;n</p></div>
-                <div class="canales-chat" id="canalChatView" style="display:none;">
-                    <div class="canal-chat-header">
-                        <button class="canal-chat-back" id="canalChatBack"><i data-lucide="arrow-left"></i></button>
-                        <div class="canal-chat-title" id="canalChatTitle"></div>
-                        <div class="canal-chat-actions" style="margin-left:auto;display:flex;gap:4px;">
-                            <button id="canalSearchBtn" class="canal-hdr-btn" title="Buscar" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 6px;font-size:13px;"><i data-lucide="search"></i></button>
-                            <button id="canalInfoBtn" class="canal-hdr-btn" title="Informaci&oacute;n" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 6px;font-size:13px;"><i data-lucide="info"></i></button>
-                        </div>
-                    </div>
-                    <div class="canal-search-bar" id="canalSearchBar" style="display:none;padding:8px 12px;border-bottom:1px solid var(--border);">
-                        <div style="display:flex;gap:6px;align-items:center;">
-                            <input type="text" id="canalSearchInput" placeholder="Buscar mensajes..." style="flex:1;padding:6px 10px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-family:'Inter',sans-serif;">
-                            <select id="canalSearchAutor" style="padding:6px 8px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;font-family:'Inter',sans-serif;"><option value="">Todos</option></select>
-                            <button id="canalSearchGo" style="padding:6px 12px;border-radius:6px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:600;cursor:pointer;"><i data-lucide="search"></i></button>
-                            <button id="canalSearchClose" style="padding:6px 8px;border-radius:6px;border:none;background:rgba(239,68,68,.1);color:var(--red);font-size:12px;cursor:pointer;"><i data-lucide="x"></i></button>
-                        </div>
-                        <div id="canalSearchResults" style="font-size:11px;color:var(--muted);margin-top:6px;"></div>
-                    </div>
-                    <div class="canal-mensajes" id="canalMensajes"></div>
-                    <div class="canales-typing" id="canalTyping" style="display:none;"><span class="typing-dots"><span>.</span><span>.</span><span>.</span></span> escribiendo...</div>
-                    <div class="canal-reply-bar" id="canalReplyBar" style="display:none;padding:6px 12px;background:rgba(var(--accent-rgb),.06);border-top:1px solid var(--border);font-size:11px;color:var(--muted);">
-                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                            <span><i data-lucide="reply"></i> Respondiendo a <strong id="canalReplyAutor" style="color:var(--text);"></strong></span>
-                            <span id="canalReplyTexto" style="flex:1;margin:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-                            <button id="canalReplyCancel" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;"><i data-lucide="x"></i></button>
-                        </div>
-                    </div>
-                    <div class="canal-input-area">
-                        <label for="canalFileInput" class="canal-file-label" title="Adjuntar archivo" style="cursor:pointer;padding:8px 6px;color:var(--muted);font-size:16px;"><i data-lucide="paperclip"></i></label>
-                        <input type="file" id="canalFileInput" style="display:none;" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.webp,.svg,.txt,.csv,.zip">
-                        <input type="text" id="canalMsgInput" class="canal-input" placeholder="Escribe un mensaje...">
-                        <button id="canalSendBtn" class="canal-send-btn"><i data-lucide="send"></i></button>
-                    </div>
-                    <div id="canalFilePreview" style="display:none;padding:4px 12px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);"></div>
-                </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
-<div class="dash-section" style="margin-bottom:20px;">
-    <div class="dash-section-head"><span class="icon"><i data-lucide="bell"></i></span> Alertas &amp; Pendientes</div>
-    <div class="dash-section-body">
-        {% if alertas %}
-            {% for a in alertas %}
-            <div class="alert-item">
-                {% if a.faltas is defined %}
-                <span class="icon-badge danger"><i data-lucide="user-x"></i></span>
-                <div class="alert-body"><div class="alert-name">{{ a.nombre }}</div><div class="alert-detail">{{ a.faltas }} falta(s) registrada(s)</div></div>
-                {% elif a.promedio is defined %}
-                <span class="icon-badge warning"><i data-lucide="alert-triangle"></i></span>
-                <div class="alert-body"><div class="alert-name">{{ a.nombre }}</div><div class="alert-detail">Promedio bajo: {{ a.promedio }}</div></div>
-                {% endif %}
-            </div>
-            {% endfor %}
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-icon"><i data-lucide="check-circle" style="color:var(--green);font-size:32px;"></i></div>
-            <div class="empty-title">Todo al d&iacute;a</div>
-            <div class="empty-desc">No hay alertas pendientes ni novedades que requieran tu atenci&oacute;n.</div>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
+<!-- -- Dashboard Modules -------------------------------------- -->
 <div class="dash-modules">
     <div class="dash-module">
-        <div class="dash-module-head"><span class="icon"><i data-lucide="clock"></i></span> Actividad reciente</div>
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="clock" style="width:15px;height:15px;"></i></span>
+            Actividad reciente
+        </div>
         <div class="dash-module-body compact">
             {% if actividad_reciente %}
                 {% for a in actividad_reciente[:5] %}
@@ -429,19 +666,29 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
             <div class="empty-state" style="min-height:120px;padding:20px;">
                 <div class="empty-icon"><i data-lucide="history" style="width:28px;height:28px;"></i></div>
                 <div class="empty-title">Sin actividad reciente</div>
-                <div class="empty-desc">Las &uacute;ltimas acciones aparecer&aacute;n aqu&iacute;.</div>
+                <div class="empty-desc">Las últimas acciones aparecerán aquí.</div>
             </div>
             {% endif %}
         </div>
     </div>
     <div class="dash-module">
-        <div class="dash-module-head"><span class="icon"><i data-lucide="calendar"></i></span> Pr&oacute;ximas evaluaciones <a href="/{{ slug }}/horarios" class="see-all">Ver todo</a></div>
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="calendar" style="width:15px;height:15px;"></i></span>
+            Próximas evaluaciones
+            <a href="/{{ slug }}/horarios" class="see-all">Ver todo</a>
+        </div>
         <div class="dash-module-body">
             {% if compromisos %}
                 {% for t in compromisos[:3] %}
                 <div class="event-item">
-                    <div class="event-date"><span class="day">{{ t.fecha[-2:] if t.fecha and t.fecha|length >= 2 else '--' }}</span><span class="month">{{ t.fecha[5:7] if t.fecha and t.fecha|length >= 7 else '' }}</span></div>
-                    <div class="event-info"><div class="event-title">{{ t.titulo }}</div><div class="event-detail">{{ t.materia }} &middot; {{ t.fecha }}</div></div>
+                    <div class="event-date">
+                        <span class="day">{{ t.fecha[-2:] if t.fecha and t.fecha|length >= 2 else '--' }}</span>
+                        <span class="month">{{ t.fecha[5:7] if t.fecha and t.fecha|length >= 7 else '' }}</span>
+                    </div>
+                    <div class="event-info">
+                        <div class="event-title">{{ t.titulo }}</div>
+                        <div class="event-detail">{{ t.materia }} · {{ t.fecha }}</div>
+                    </div>
                 </div>
                 {% endfor %}
             {% else %}
@@ -454,31 +701,67 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
     </div>
     <div class="dash-module">
-        <div class="dash-module-head"><span class="icon"><i data-lucide="trending-up"></i></span> Rendimiento del curso</div>
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="trending-up" style="width:15px;height:15px;"></i></span>
+            Rendimiento del curso
+        </div>
         <div class="dash-module-body">
             <div class="info-grid">
-                <div class="info-item"><span class="info-label">Promedio general</span><span class="info-value" style="color:{% if prom_general is not none and prom_general >= 3.5 %}var(--green){% elif prom_general is not none and prom_general >= 3.0 %}var(--yellow){% else %}var(--red){% endif %}">{{ prom_general if prom_general is not none else '--' }}</span></div>
-                <div class="info-item"><span class="info-label">Mejor estudiante</span><span class="info-value" style="font-size:13px;">{{ mejor.nombre if mejor else '--' }}</span></div>
-                <div class="info-item"><span class="info-label">Asistencia promedio</span><span class="info-value">{{ asistencia_hoy }}</span></div>
-                <div class="info-item"><span class="info-label">Notas registradas</span><span class="info-value">{{ (actividades|length * estudiantes|length) - (notas_pend|int) if estudiantes and actividades else 0 }}</span></div>
+                <div class="info-item">
+                    <span class="info-label">Promedio general</span>
+                    <span class="info-value" style="color:{% if prom_general is not none and prom_general >= 3.5 %}var(--green){% elif prom_general is not none and prom_general >= 3.0 %}var(--yellow){% else %}var(--red){% endif %}">{{ prom_general if prom_general is not none else '--' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Mejor estudiante</span>
+                    <span class="info-value" style="font-size:13px;">{{ mejor.nombre if mejor else '--' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Asistencia promedio</span>
+                    <span class="info-value">{{ asistencia_hoy }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Notas registradas</span>
+                    <span class="info-value">{{ (actividades|length * estudiantes|length) - (notas_pend|int) if estudiantes and actividades else 0 }}</span>
+                </div>
             </div>
         </div>
     </div>
     <div class="dash-module">
-        <div class="dash-module-head"><span class="icon"><i data-lucide="zap"></i></span> Accesos r&aacute;pidos</div>
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="zap" style="width:15px;height:15px;"></i></span>
+            Accesos rápidos
+        </div>
         <div class="dash-module-body">
             <div class="quick-actions-grid">
-                <a href="#notas-card" class="qa-card"><div class="qa-icon purple"><i data-lucide="edit-3"></i></div><span class="qa-label">Registrar notas</span></a>
-                <a href="#agenda-card" class="qa-card"><div class="qa-icon blue"><i data-lucide="calendar-plus"></i></div><span class="qa-label">Agregar trabajo</span></a>
-                <a href="/{{ slug }}/horarios" class="qa-card"><div class="qa-icon green"><i data-lucide="clock"></i></div><span class="qa-label">Ver horario</span></a>
-                <a href="/{{ slug }}/archivados" class="qa-card"><div class="qa-icon orange"><i data-lucide="archive"></i></div><span class="qa-label">Archivados</span></a>
+                <a href="#notas-card" class="qa-card">
+                    <div class="qa-icon purple"><i data-lucide="edit-3" style="width:18px;height:18px;"></i></div>
+                    <span class="qa-label">Registrar notas</span>
+                </a>
+                <a href="#agenda-card" class="qa-card">
+                    <div class="qa-icon blue"><i data-lucide="calendar-plus" style="width:18px;height:18px;"></i></div>
+                    <span class="qa-label">Agregar trabajo</span>
+                </a>
+                <a href="/{{ slug }}/horarios" class="qa-card">
+                    <div class="qa-icon green"><i data-lucide="clock" style="width:18px;height:18px;"></i></div>
+                    <span class="qa-label">Ver horario</span>
+                </a>
+                <a href="/{{ slug }}/archivados" class="qa-card">
+                    <div class="qa-icon orange"><i data-lucide="archive" style="width:18px;height:18px;"></i></div>
+                    <span class="qa-label">Archivados</span>
+                </a>
             </div>
         </div>
     </div>
 </div>
+<!-- -- Fin Dashboard Modules ---------------------------------- -->
+
+</div>
 
 <div class="topbar">
-  <div class="topbar-left"><h1>{{ materia }}</h1><div class="breadcrumb">{{ profesor.nombre }} &middot; {{ jornada }} &middot; {{ curso_sel if curso_sel else 'Sin curso' }}</div></div>
+  <div class="topbar-left">
+    <h1>{{ materia }}</h1>
+    <div class="breadcrumb">{{ profesor.nombre }} · {{ jornada }} · {{ curso_sel if curso_sel else 'Sin curso' }}</div>
+  </div>
 </div>
 
 {% if mis_cursos %}
@@ -494,53 +777,56 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 {% endif %}
 
 {% if curso_sel %}
+
 <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
   <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Periodo:</span>
   {% for p in range(1, (num_periodos or 4)+1) %}
   <a href="/{{ slug }}?curso={{ curso_sel }}&periodo={{ p }}"
      style="padding:5px 14px;border-radius:7px;border:1px solid var(--border);background:{% if p==periodo_sel %}linear-gradient(135deg,var(--accent),var(--accent2)){% else %}var(--bg2){% endif %};color:{% if p==periodo_sel %}#fff{% else %}var(--muted){% endif %};font-size:12px;font-weight:600;text-decoration:none;">
-    {{ p }}&deg; P
+    {{ p }}° P
   </a>
   {% endfor %}
   {% if periodo_cerrado %}
-  <span style="margin-left:6px;font-size:10px;padding:3px 8px;border-radius:99px;background:rgba(239,68,68,.1);color:var(--red);font-weight:600;"><i data-lucide="lock"></i> Cerrado</span>
+  <span style="margin-left:6px;font-size:10px;padding:3px 8px;border-radius:99px;background:rgba(239,68,68,.1);color:var(--red);font-weight:600;">
+    <i data-lucide="lock"></i> Cerrado
+  </span>
   {% endif %}
 </div>
 
-<div class="stats-grid fade-in fade-in-d1">
-    <div class="stat-card">
-        <div class="stat-icon purple"><i data-lucide="book"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ curso_sel }}</div>
+<div class="stat-row">
+    <div class="stat-item">
+        <div class="stat-icon purple"><i data-lucide="book" style="width:16px;height:16px;"></i></div>
+        <div class="stat-info">
+            <div class="stat-num">{{ curso_sel }}</div>
             <div class="stat-label">Curso actual</div>
         </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon blue"><i data-lucide="users"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ estudiantes|length }}</div>
+    <div class="stat-item">
+        <div class="stat-icon blue"><i data-lucide="users" style="width:16px;height:16px;"></i></div>
+        <div class="stat-info">
+            <div class="stat-num">{{ estudiantes|length }}</div>
             <div class="stat-label">Estudiantes</div>
-            <div class="stat-trend up">+2</div>
         </div>
+        <span class="stat-trend up">+2</span>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon green"><i data-lucide="trending-up"></i></div>
-        <div class="stat-body">
-            <div class="stat-value {% if prom_general is not none and prom_general>=3.5 %}ph{% elif prom_general is not none and prom_general>=3.0 %}pm{% else %}pb{% endif %}" id="promGrupo">{{ prom_general if prom_general is not none else '&mdash;' }}</div>
+    <div class="stat-item">
+        <div class="stat-icon green"><i data-lucide="trending-up" style="width:16px;height:16px;"></i></div>
+        <div class="stat-info">
+            <div class="stat-num {% if prom_general is not none and prom_general>=3.5 %}ph{% elif prom_general is not none and prom_general>=3.0 %}pm{% else %}pb{% endif %}" id="promGrupo">{{ prom_general if prom_general is not none else '' }}</div>
             <div class="stat-label">Prom. grupo</div>
         </div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon orange"><i data-lucide="star"></i></div>
-        <div class="stat-body">
-            <div class="stat-value" style="font-size:13px;">{{ mejor.nombre if mejor else '&mdash;' }}</div>
+    <div class="stat-item">
+        <div class="stat-icon orange"><i data-lucide="star" style="width:16px;height:16px;"></i></div>
+        <div class="stat-info">
+            <div class="stat-num" style="font-size:13px;">{{ mejor.nombre if mejor else '' }}</div>
             <div class="stat-label">Destacado</div>
         </div>
     </div>
 </div>
 
 <div class="card">
-    <div class="card-head"><span class="card-title"><i data-lucide="user-plus"></i> Agregar estudiante</span></div>
+    <div class="card-head"><span class="card-title">Agregar estudiante</span></div>
     <div class="card-body">
         <form method="POST" action="/{{ slug }}/registrar">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
@@ -548,23 +834,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
             <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
             <div class="fi">
                 <input class="finput" type="text" name="nombre" placeholder="Nombre completo" required style="flex:1;min-width:140px;">
-                <button type="submit" class="bsm badd"><i data-lucide="plus"></i> Agregar</button>
+                <button type="submit" class="bsm badd">Agregar</button>
             </div>
         </form>
-        <p style="font-size:11px;color:var(--muted);margin-top:5px;">Se ordenan alfab&eacute;ticamente autom&aacute;ticamente.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:5px;">Se ordenan alfabéticamente automáticamente.</p>
     </div>
 </div>
 
 <div class="card" id="agenda-card">
-    <div class="card-head"><span class="card-title"><i data-lucide="clipboard-list"></i> Agenda de trabajos &mdash; {{ curso_sel }}</span></div>
+    <div class="card-head"><span class="card-title">Agenda de trabajos  {{ curso_sel }}</span></div>
     <div class="card-body">
         <form method="POST" action="/{{ slug }}/nuevo_trabajo">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
             <div class="fi" style="margin-bottom:12px;">
-                <input class="finput" type="text" name="titulo" placeholder="T&iacute;tulo del trabajo/evaluaci&oacute;n" required style="flex:1;min-width:150px;">
+                <input class="finput" type="text" name="titulo" placeholder="Título del trabajo/evaluación" required style="flex:1;min-width:150px;">
                 <input class="finput" type="date" name="fecha" required>
-                <button type="submit" class="bsm badd"><i data-lucide="plus"></i> Agregar</button>
+                <button type="submit" class="bsm badd">Agregar</button>
             </div>
         </form>
         {% if compromisos %}
@@ -573,7 +859,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
                 <div><span style="font-weight:500">{{ t.titulo }}</span><span style="font-size:10px;color:var(--muted);margin-left:7px">{{ t.materia }}</span></div>
                 <div style="display:flex;align-items:center;gap:7px;">
                     <span class="agfecha">{{ t.fecha }}</span>
-                    <form action="/{{ slug }}/borrar_trabajo/{{ t.id }}" method="POST" style="display:inline"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="bsm bdel" style="font-size:10px;padding:3px 8px;border:none;cursor:pointer;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></form>
+                    <form action="/{{ slug }}/borrar_trabajo/{{ t.id }}" method="POST" style="display:inline"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="bsm bdel" style="font-size:10px;padding:3px 8px;border:none;cursor:pointer;">??</button></form>
                 </div>
             </div>
             {% endfor %}
@@ -589,7 +875,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <div class="card" id="notas-card">
     <div class="card-head">
-        <span class="card-title"><i data-lucide="book"></i> Notas &mdash; {{ curso_sel }} &middot; {{ materia }}</span>
+        <span class="card-title">Notas  {{ curso_sel }} · {{ materia }}</span>
         <form method="POST" action="/{{ slug }}/nueva_actividad" style="display:flex;gap:7px;">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
@@ -605,9 +891,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
                     <th style="width:28px">#</th>
                     <th class="tnombre">Estudiante</th>
                     {% for act in actividades %}
-                    <th>{{ act.nombre }}<form action="/{{ slug }}/borrar_actividad/{{ act.id }}" method="POST" style="display:inline;margin-left:3px;" onsubmit="return confirm('&iquest;Borrar actividad?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" style="color:var(--red);font-size:9px;border:none;background:none;cursor:pointer;padding:0;"><i data-lucide="x" style="width:10px;height:10px;"></i></button></form></th>
+                    <th>{{ act.nombre }}<form action="/{{ slug }}/borrar_actividad/{{ act.id }}" method="POST" style="display:inline;margin-left:3px;" onsubmit="return confirm('¿Borrar actividad?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" style="color:var(--red);font-size:9px;border:none;background:none;cursor:pointer;padding:0;">?</button></form></th>
                     {% endfor %}
-                    <th>Eval.</th><th>Autoev.</th><th>Prom.</th><th>Asist.</th><th>Obs.</th><th>Del</th>
+                    <th>Eval.</th>
+                    <th>Autoev.</th>
+                    <th>Prom.</th>
+                    <th>Asist.</th>
+                    <th>Obs.</th>
+                    <th>Del</th>
                 </tr>
             </thead>
             <tbody>
@@ -618,16 +909,26 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
                 {% for act in actividades %}
                 <td class="{% if periodo_cerrado %}td-locked{% endif %}">
                     {% set nota = e.notas_map.get(act.id) %}
-                    <input class="ni nota-input" type="number" min="0" max="5" step="0.1" value="{{ nota.val if nota else '' }}" placeholder="&mdash;" data-aid="{{ e.id }}" data-actid="{{ act.id }}" {% if periodo_cerrado %}disabled{% endif %} onchange="guardarNota(this)">
-                    {% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},{{ act.id }},{{ nota.val if nota else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','{{ act.nombre|replace("'", "\\'") }}')" title="Solicitar modificaci&oacute;n"><i data-lucide="lock"></i></span>{% endif %}
+                    <input class="ni nota-input" type="number" min="0" max="5" step="0.1"
+                           value="{{ nota.val if nota else '' }}" placeholder=""
+                           data-aid="{{ e.id }}" data-actid="{{ act.id }}"
+                           {% if periodo_cerrado %}disabled{% endif %}
+                           onchange="guardarNota(this)">
+                    {% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},{{ act.id }},{{ nota.val if nota else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','{{ act.nombre|replace("'", "\\'") }}')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}
                 </td>
                 {% endfor %}
-                <td class="{% if periodo_cerrado %}td-locked{% endif %}"><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="&mdash;" data-aid="{{ e.id }}" data-campo="evaluacion" {% if periodo_cerrado %}disabled{% endif %} onchange="guardarEval(this)">{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.evaluacion if e.evaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Evaluaci&oacute;n')" title="Solicitar modificaci&oacute;n"><i data-lucide="lock"></i></span>{% endif %}</td>
-                <td class="{% if periodo_cerrado %}td-locked{% endif %}"><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="&mdash;" data-aid="{{ e.id }}" data-campo="autoevaluacion" {% if periodo_cerrado %}disabled{% endif %} onchange="guardarEval(this)">{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.autoevaluacion if e.autoevaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Autoevaluaci&oacute;n')" title="Solicitar modificaci&oacute;n"><i data-lucide="lock"></i></span>{% endif %}</td>
-                <td class="pc prom-cell" id="prom-{{ e.id }}"><span class="{% if e.promedio is not none and e.promedio>=3.5 %}ph{% elif e.promedio is not none and e.promedio>=3.0 %}pm{% elif e.promedio is not none %}pb{% endif %}">{{ e.promedio if e.promedio is not none else '&mdash;' }}</span></td>
+                <td class="{% if periodo_cerrado %}td-locked{% endif %}"><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="" data-aid="{{ e.id }}" data-campo="evaluacion" {% if periodo_cerrado %}disabled{% endif %} onchange="guardarEval(this)">{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.evaluacion if e.evaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Evaluación')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
+                <td class="{% if periodo_cerrado %}td-locked{% endif %}"><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="" data-aid="{{ e.id }}" data-campo="autoevaluacion" {% if periodo_cerrado %}disabled{% endif %} onchange="guardarEval(this)">{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.autoevaluacion if e.autoevaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Autoevaluación')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
+                <td class="pc prom-cell" id="prom-{{ e.id }}">
+                    <span class="{% if e.promedio is not none and e.promedio>=3.5 %}ph{% elif e.promedio is not none and e.promedio>=3.0 %}pm{% elif e.promedio is not none %}pb{% endif %}">
+                        {{ e.promedio if e.promedio is not none else '' }}
+                    </span>
+                </td>
                 <td>
                     <div class="asist-wrap">
-                        <span class="asist-badge {% if e.asistencia=='P' %}bp{% elif e.asistencia=='A' %}ba{% elif e.asistencia=='T' %}bt{% else %}bn{% endif %}" id="asist-{{ e.id }}">{% if e.asistencia=='P' %}P{% elif e.asistencia=='A' %}A{% elif e.asistencia=='T' %}T{% else %}&mdash;{% endif %}</span>
+                        <span class="asist-badge {% if e.asistencia=='P' %}bp{% elif e.asistencia=='A' %}ba{% elif e.asistencia=='T' %}bt{% else %}bn{% endif %}" id="asist-{{ e.id }}">
+                            {% if e.asistencia=='P' %}P{% elif e.asistencia=='A' %}A{% elif e.asistencia=='T' %}T{% else %}{% endif %}
+                        </span>
                         <div class="asist-group">
                             <button onclick="marcarAsist({{ e.id }},'P')" class="abtn ap {% if e.asistencia=='P' %}active{% endif %}" aria-label="Presente" data-estado="P"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></button>
                             <button onclick="marcarAsist({{ e.id }},'A')" class="abtn aa {% if e.asistencia=='A' %}active{% endif %}" aria-label="Ausente" data-estado="A"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.71L12 12l6.3 6.29-1.42 1.42L12 13.41l-5.88 5.88-1.42-1.42L10.59 12 4.7 5.71 6.12 4.29 12 10.59l5.88-5.88z"/></svg></button>
@@ -636,10 +937,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
                     </div>
                 </td>
                 <td><button class="bsm badd" style="font-size:10px;padding:4px 9px;" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">{{ e.observaciones|length }}</button></td>
-                <td><form action="/{{ slug }}/archivar_alumno/{{ e.id }}" method="POST" style="display:inline" onsubmit="return confirm('&iquest;Archivar a {{ e.nombre }}? Sus datos se conservan.')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel" style="font-size:10px;padding:4px 9px;border:none;cursor:pointer;"><i data-lucide="archive"></i></button></form></td>
+                <td><form action="/{{ slug }}/archivar_alumno/{{ e.id }}" method="POST" style="display:inline" onsubmit="return confirm('¿Archivar a {{ e.nombre }}? Sus datos se conservan.')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel" style="font-size:10px;padding:4px 9px;border:none;cursor:pointer;"><i data-lucide="archive"></i></button></form></td>
             </tr>
             {% else %}
-            <tr><td colspan="20" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes todav&iacute;a.</td></tr>
+            <tr><td colspan="20" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes todavía.</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -648,36 +949,47 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 {% endif %}
 
-<div class="kpi-grid">
-  <div class="kpi-card">
-    <div class="kpi-top"><div class="kpi-icon blue"><i data-lucide="bar-chart-3"></i></div></div>
-    <div class="kpi-value" style="color:{% if prom_general is not none and prom_general >= 3.5 %}var(--green){% elif prom_general is not none and prom_general >= 3.0 %}var(--yellow){% else %}var(--red){% endif %}">{{ prom_general if prom_general else '--' }}</div>
-    <div class="kpi-label">Promedio general</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-top"><div class="kpi-icon orange"><i data-lucide="edit-3"></i></div></div>
-    <div class="kpi-value">{{ notas_pend if notas_pend else '0' }}</div>
-    <div class="kpi-label">Notas pendientes</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-top"><div class="kpi-icon green"><i data-lucide="users"></i></div></div>
-    <div class="kpi-value">{{ estudiantes|length if estudiantes else '0' }}</div>
-    <div class="kpi-label">Estudiantes activos</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-top"><div class="kpi-icon purple"><i data-lucide="calendar-check"></i></div></div>
-    <div class="kpi-value">{{ asistencia_hoy if asistencia_hoy else '0' }}</div>
-    <div class="kpi-label">Asistencia hoy</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-top"><div class="kpi-icon teal"><i data-lucide="zap"></i></div></div>
-    <div class="kpi-label">Acciones r&aacute;pidas</div>
-    <div class="kpi-footer" style="display:flex;gap:4px;flex-wrap:wrap;">
-      <a href="/{{ slug }}/nueva_actividad" class="btn btn-primary btn-sm"><i data-lucide="plus"></i> Nueva actividad</a>
-      <a href="/{{ slug }}/comunicaciones/nueva" class="btn btn-ghost btn-sm"><i data-lucide="megaphone"></i> Comunicado</a>
-      <a href="/{{ slug }}/asistencia" class="btn btn-ghost btn-sm"><i data-lucide="calendar-check"></i> Asistencia</a>
+<div class="dash-wrap" style="margin-bottom:0;">
+<div class="grid-2col">
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i> Resumen del curso</span>
+      <span class="trend-badge up"><i data-lucide="trending-up" style="width:10px;height:10px;"></i> Activo</span>
+    </div>
+    <div class="card-body">
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Promedio general</span>
+          <span class="info-value" style="color:{% if prom_general is not none and prom_general >= 3.5 %}var(--green){% elif prom_general is not none and prom_general >= 3.0 %}var(--yellow){% else %}var(--red){% endif %}">{{ prom_general if prom_general else '--' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Notas pendientes</span>
+          <span class="info-value">{{ notas_pend if notas_pend else '0' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Estudiantes activos</span>
+          <span class="info-value">{{ estudiantes|length if estudiantes else '0' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Asistencia hoy</span>
+          <span class="info-value">{{ asistencia_hoy if asistencia_hoy else '0' }}</span>
+        </div>
+      </div>
     </div>
   </div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title"><i data-lucide="zap" style="width:14px;height:14px;"></i> Acciones rápidas</span>
+    </div>
+    <div class="card-body">
+      <div class="quick-actions" style="margin:0;">
+        <a href="/{{ slug }}/nueva_actividad" class="qaction primary" style="flex:1;"><i data-lucide="plus" style="width:14px;height:14px;"></i> Nueva actividad</a>
+        <a href="/{{ slug }}/comunicaciones/nueva" class="qaction" style="flex:1;"><i data-lucide="megaphone" style="width:14px;height:14px;"></i> Comunicado</a>
+        <a href="/{{ slug }}/asistencia" class="qaction" style="flex:1;"><i data-lucide="calendar-check" style="width:14px;height:14px;"></i> Asistencia</a>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 </div>
@@ -686,14 +998,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <h3 id="mNombre">Observador</h3>
-        <button onclick="cerrarObs()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;"><i data-lucide="x"></i></button>
+        <button onclick="cerrarObs()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;">?</button>
     </div>
     <p style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Historial de asistencia</p>
     <div id="mHistorial" style="margin-bottom:14px;"></div>
     <p style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Observaciones</p>
     <div id="mObsList"></div>
     <div class="oform">
-        <input type="text" id="oTexto" placeholder="Escribir observaci&oacute;n...">
+        <input type="text" id="oTexto" placeholder="Escribir observación...">
         <button class="bsm badd" onclick="guardarObs()">Guardar</button>
     </div>
 </div>
@@ -702,78 +1014,1056 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="overlay" id="modalSolicitud" onclick="if(event.target===this)cerrarSolicitud()">
 <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <h3><i data-lucide="pen" style="color:var(--accent);"></i> Solicitar modificaci&oacute;n</h3>
-        <button onclick="cerrarSolicitud()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;"><i data-lucide="x"></i></button>
+        <h3><i data-lucide="pen" style="color:var(--accent);"></i> Solicitar modificación</h3>
+        <button onclick="cerrarSolicitud()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;">?</button>
     </div>
-    <p style="font-size:12px;color:var(--sub);margin-bottom:12px;">El periodo esta cerrado. Solicite una modificacion al rector.</p>
-    <div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Estudiante</div><div id="sol-alumno" style="font-size:13px;font-weight:600;"></div></div>
-    <div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Actividad</div><div id="sol-actividad" style="font-size:13px;font-weight:600;"></div></div>
-    <div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Nota actual</div><div id="sol-nota-actual" style="font-size:13px;font-weight:600;"></div></div>
-    <div style="margin-bottom:12px;"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Nueva nota</label><input type="number" id="sol-nota-nueva" min="0" max="5" step="0.1" style="width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-size:13px;font-family:'Inter',sans-serif;"></div>
-    <div style="margin-bottom:12px;"><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Motivo</label><textarea id="sol-motivo" rows="3" placeholder="Indique el motivo de la solicitud..." style="width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;resize:vertical;"></textarea></div>
-    <button onclick="enviarSolicitud()" class="bsm badd" style="width:100%;padding:10px;font-size:13px;"><i data-lucide="send"></i> Enviar solicitud</button>
+    <p style="font-size:12px;color:var(--sub);margin-bottom:12px;">
+        El periodo esta cerrado. Solicite una modificacion al rector.
+    </p>
+    <div style="margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Estudiante</div>
+        <div id="sol-alumno" style="font-size:13px;font-weight:600;"></div>
+    </div>
+    <div style="margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Actividad</div>
+        <div id="sol-actividad" style="font-size:13px;font-weight:600;"></div>
+    </div>
+    <div style="margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Nota actual</div>
+        <div id="sol-nota-actual" style="font-size:13px;font-weight:600;"></div>
+    </div>
+    <div style="margin-bottom:12px;">
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Nueva nota</label>
+        <input type="number" id="sol-nota-nueva" min="0" max="5" step="0.1" style="width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-size:13px;font-family:'Inter',sans-serif;">
+    </div>
+    <div style="margin-bottom:12px;">
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Motivo</label>
+        <textarea id="sol-motivo" rows="3" placeholder="Indique el motivo de la solicitud..." style="width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;resize:vertical;"></textarea>
+    </div>
+    <button onclick="enviarSolicitud()" class="bsm badd" style="width:100%;padding:10px;font-size:13px;">
+        <i data-lucide="send"></i> Enviar solicitud
+    </button>
 </div>
 </div>
 
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba"><i data-lucide="arrow-up"></i></button>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">?</button>
 <div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado</div>
-
-<div class="com-toast" id="comToast" onclick="hideComToast()"><div class="com-toast-icon" style="color:var(--accent);"><i data-lucide="megaphone"></i></div><div class="com-toast-body"><div class="com-toast-title" id="comToastTitle"></div><div class="com-toast-msg" id="comToastMsg"></div><div class="com-toast-time">Nuevo comunicado</div></div></div>
 
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
 
 <script>
-function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+}
 const slug = "{{ slug }}";
+var COM_DATA = {{ comunicaciones_pendientes | tojson | safe }};
 const cursoSel = "{{ curso_sel }}";
 const periodoSel = {{ periodo_sel }};
-var COM_DATA = {{ comunicaciones_pendientes | tojson | safe }};
-function getCsrf(){ return document.getElementById('csrf-global').value; }
-function showToast(msg){ msg=msg||'<i data-lucide="check-circle"></i> Guardado'; const t=document.getElementById('toast'); t.innerHTML=msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 1800); }
-function guardarNota(inp){ const val=inp.value; if(val==='') return; const aid=inp.dataset.aid; const actId=inp.dataset.actid; const f=new FormData(); f.append('aid',aid); f.append('actividad_id',actId); f.append('val',val); f.append('_csrf_token',getCsrf()); fetch('/'+slug+'/guardar_nota',{method:'POST',body:f}).then(function(r){ if(r.ok){ inp.classList.add('guardado'); setTimeout(function(){ inp.classList.remove('guardado'); },1000); showToast('<i data-lucide="check-circle"></i> Nota guardada'); recalcularProm(aid); } else { showToast('<i data-lucide="alert-triangle"></i> Error al guardar nota'); } }).catch(function(){ showToast('<i data-lucide="alert-triangle"></i> Error de conexi&oacute;n'); }); }
-function guardarEval(inp){ const val=inp.value; if(val==='') return; const aid=inp.dataset.aid; const campo=inp.dataset.campo; const f=new FormData(); f.append('aid',aid); f.append(campo,val); f.append('periodo',periodoSel); f.append('_csrf_token',getCsrf()); fetch('/'+slug+'/guardar_evaluacion',{method:'POST',body:f}).then(function(r){ if(r.ok){ inp.classList.add('guardado'); setTimeout(function(){ inp.classList.remove('guardado'); },1000); showToast('<i data-lucide="check-circle"></i> Guardado'); recalcularProm(aid); } else { showToast('<i data-lucide="alert-triangle"></i> Error al guardar'); } }).catch(function(){ showToast('<i data-lucide="alert-triangle"></i> Error de conexi&oacute;n'); }); }
-function recalcularProm(aid){ const row=document.querySelector('tr[data-aid="'+aid+'"]'); if(!row) return; const vals=[]; row.querySelectorAll('.nota-input, .eval-input').forEach(function(inp){ const v=parseFloat(inp.value); if(!isNaN(v)) vals.push(v); }); const cell=document.getElementById('prom-'+aid); if(!cell) return; if(vals.length===0){ cell.innerHTML='<span style="color:var(--muted)">&mdash;</span>'; return; } const prom=(vals.reduce(function(a,b){return a+b;},0)/vals.length).toFixed(2); const cls=prom>=3.5?'ph':prom>=3.0?'pm':'pb'; cell.innerHTML='<span class="'+cls+'">'+prom+'</span>'; }
-function marcarAsist(aid,estado){ const f=new FormData(); f.append('aid',aid); f.append('estado',estado); f.append('_csrf_token',getCsrf()); fetch('/'+slug+'/marcar_asistencia',{method:'POST',body:f}).then(function(r){ if(r.ok){ const cls=estado==='P'?'bp':estado==='A'?'ba':'bt'; const badge=document.getElementById('asist-'+aid); badge.className='asist-badge '+cls; badge.textContent=estado; const row=document.querySelector('tr[data-aid="'+aid+'"]'); row.querySelectorAll('.abtn').forEach(function(b){ b.classList.remove('active'); if(b.getAttribute('data-estado')===estado) b.classList.add('active'); }); showToast(); } else { showToast('<i data-lucide="alert-triangle"></i> Error'); } }).catch(function(){ showToast('<i data-lucide="alert-triangle"></i> Error de conexi&oacute;n'); }); }
+
+function getCsrf(){
+    return document.getElementById('csrf-global').value;
+}
+
+function showToast(msg){
+    msg = msg || '<i data-lucide="check-circle"></i> Guardado';
+    const t = document.getElementById('toast');
+    t.innerHTML = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 1800);
+}
+
+function recalcularProm(aid){
+    const row = document.querySelector('tr[data-aid="'+aid+'"]');
+    if(!row) return;
+    const vals = [];
+    row.querySelectorAll('.nota-input, .eval-input').forEach(function(inp){
+        const v = parseFloat(inp.value);
+        if(!isNaN(v)) vals.push(v);
+    });
+    const cell = document.getElementById('prom-' + aid);
+    if(!cell) return;
+    if(vals.length === 0){
+        cell.innerHTML = '<span style="color:var(--muted)"></span>';
+        return;
+    }
+    const prom = (vals.reduce(function(a,b){return a+b;},0) / vals.length).toFixed(2);
+    const cls = prom >= 3.5 ? 'ph' : prom >= 3.0 ? 'pm' : 'pb';
+    cell.innerHTML = '<span class="'+cls+'">'+prom+'</span>';
+}
+
+function guardarNota(inp){
+    const val = inp.value;
+    if(val === '') return;
+    const aid   = inp.dataset.aid;
+    const actId = inp.dataset.actid;
+    const f = new FormData();
+    f.append('aid', aid);
+    f.append('actividad_id', actId);
+    f.append('val', val);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/guardar_nota', {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                inp.classList.add('guardado');
+                setTimeout(function(){ inp.classList.remove('guardado'); }, 1000);
+                showToast('<i data-lucide="check-circle"></i> Nota guardada');
+                recalcularProm(aid);
+            } else {
+                showToast('? Error al guardar nota');
+            }
+        })
+        .catch(function(){ showToast('? Error de conexión'); });
+}
+
+function guardarEval(inp){
+    const val   = inp.value;
+    if(val === '') return;
+    const aid   = inp.dataset.aid;
+    const campo = inp.dataset.campo;
+    const f = new FormData();
+    f.append('aid', aid);
+    f.append(campo, val);
+    f.append('periodo', periodoSel);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/guardar_evaluacion', {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                inp.classList.add('guardado');
+                setTimeout(function(){ inp.classList.remove('guardado'); }, 1000);
+                showToast('<i data-lucide="check-circle"></i> Guardado');
+                recalcularProm(aid);
+            } else {
+                showToast('? Error al guardar');
+            }
+        })
+        .catch(function(){ showToast('? Error de conexión'); });
+}
+
+function marcarAsist(aid, estado){
+    const f = new FormData();
+    f.append('aid', aid);
+    f.append('estado', estado);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/marcar_asistencia', {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                const cls = estado==='P'?'bp':estado==='A'?'ba':'bt';
+                const badge = document.getElementById('asist-'+aid);
+                badge.className = 'asist-badge '+cls;
+                badge.textContent = estado;
+                const row = document.querySelector('tr[data-aid="'+aid+'"]');
+                row.querySelectorAll('.abtn').forEach(function(b){
+                    b.classList.remove('active');
+                    if(b.getAttribute('data-estado') === estado) b.classList.add('active');
+                });
+                showToast('<i data-lucide="check-circle"></i> Asistencia guardada');
+            } else {
+                showToast('? Error al guardar asistencia');
+            }
+        })
+        .catch(function(){ showToast('? Error de conexión'); });
+}
+
 const ED = {};
-{% for e in estudiantes %}ED[{{ e.id }}]={nombre:{{ e.nombre|tojson }},historial:{{ e.historial_meses|tojson }},observaciones:{{ e.observaciones|tojson }}};{% endfor %}
+{% for e in estudiantes %}
+ED[{{ e.id }}] = {
+    nombre: {{ e.nombre|tojson }},
+    historial: {{ e.historial_meses|tojson }},
+    observaciones: {{ e.observaciones|tojson }}
+};
+{% endfor %}
+
 let _aidObs = null;
-function abrirObs(aid,nombre){ _aidObs=aid; document.getElementById('mNombre').textContent=nombre; document.getElementById('oTexto').value=''; const d=ED[aid]; const hd=document.getElementById('mHistorial'); hd.innerHTML=''; const meses=Object.keys(d.historial); if(!meses.length){ hd.innerHTML='<p style="font-size:12px;color:var(--muted)">Sin registros.</p>'; } else { meses.forEach(function(m){ const div=document.createElement('div'); div.className='hmes'; const dias=d.historial[m].map(function(h){ const cls=h.estado==='P'?'bp':h.estado==='A'?'ba':'bt'; return '<span class="hdia '+cls+'">'+h.fecha.slice(8)+' '+h.estado+'</span>'; }).join(''); div.innerHTML='<div class="hmeslabel">'+m+'</div><div class="hdias">'+dias+'</div>'; hd.appendChild(div); }); } renderObs(aid); document.getElementById('modalObs').classList.add('open'); }
-function renderObs(aid){ const ol=document.getElementById('mObsList'); ol.innerHTML=''; const obs=ED[aid].observaciones; if(!obs.length){ ol.innerHTML='<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Sin observaciones.</p>'; } else { obs.forEach(function(o){ const div=document.createElement('div'); div.className='oitem'; div.innerHTML='<div>'+o.texto+'</div><div class="ometa">'+o.materia+' &middot; '+o.fecha+' <button onclick="borrarObs('+aid+','+o.id+',this)" style="background:none;border:none;color:var(--red);margin-left:6px;font-size:10px;cursor:pointer;">Borrar</button></div>'; ol.appendChild(div); }); } }
-function guardarObs(){ const inp=document.getElementById('oTexto'); const texto=inp.value.trim(); if(!texto||!_aidObs) return; const f=new FormData(); f.append('aid',_aidObs); f.append('texto',texto); f.append('_csrf_token',getCsrf()); fetch('/'+slug+'/agregar_observacion',{method:'POST',body:f}).then(function(r){ if(!r.ok){ showToast('<i data-lucide="alert-triangle"></i> Error'); return null; } return r.json(); }).then(function(o){ if(!o) return; ED[_aidObs].observaciones.unshift(o); inp.value=''; renderObs(_aidObs); const btns=document.querySelectorAll('tr[data-aid="'+_aidObs+'"] button'); btns.forEach(function(b){ if(b.getAttribute('onclick')&&b.getAttribute('onclick').indexOf('abrirObs')===0){ b.textContent=ED[_aidObs].observaciones.length; } }); showToast(); }).catch(function(){ showToast('<i data-lucide="alert-triangle"></i> Error de conexi&oacute;n'); }); }
-function borrarObs(aid,obsId,btn){ if(!confirm('&iquest;Borrar esta observaci&oacute;n?')) return; const f=new FormData(); f.append('_csrf_token',getCsrf()); fetch('/'+slug+'/borrar_observacion/'+obsId,{method:'POST',body:f}).then(function(r){ if(r.ok){ ED[aid].observaciones=ED[aid].observaciones.filter(function(o){return o.id!==obsId;}); renderObs(aid); const btns=document.querySelectorAll('tr[data-aid="'+aid+'"] button'); btns.forEach(function(b){ if(b.getAttribute('onclick')&&b.getAttribute('onclick').indexOf('abrirObs')===0){ b.textContent=ED[aid].observaciones.length; } }); showToast('<i data-lucide="check-circle"></i> Observaci&oacute;n borrada'); } else { showToast('<i data-lucide="alert-triangle"></i> Error al borrar'); } }).catch(function(){ showToast('<i data-lucide="alert-triangle"></i> Error de conexi&oacute;n'); }); }
-function cerrarObs(){ document.getElementById('modalObs').classList.remove('open'); _aidObs=null; }
-var _solAid=null,_solActid=null,_solActividad='';
-function abrirSolicitud(aid,actid,notaActual,nombre,actividad){ _solAid=aid; _solActid=actid; _solActividad=actividad; document.getElementById('sol-alumno').textContent=nombre; document.getElementById('sol-actividad').textContent=actividad; document.getElementById('sol-nota-actual').textContent=notaActual!==null?notaActual:'&mdash;'; document.getElementById('sol-nota-nueva').value=notaActual!==null?notaActual:''; document.getElementById('sol-motivo').value=''; document.getElementById('modalSolicitud').classList.add('open'); }
-function cerrarSolicitud(){ document.getElementById('modalSolicitud').classList.remove('open'); }
-function enviarSolicitud(){ const notaNueva=document.getElementById('sol-nota-nueva').value.trim(); const motivo=document.getElementById('sol-motivo').value.trim(); if(!notaNueva||!motivo){ showToast('<i data-lucide="alert-triangle"></i> Complete la nota y el motivo'); return; } const f=new FormData(); f.append('alumno_id',_solAid); f.append('actividad_id',_solActid!==null?_solActid:''); f.append('nombre_actividad',_solActividad); f.append('periodo',periodoSel); f.append('nota_actual',document.getElementById('sol-nota-actual').textContent==='&mdash;'?'':document.getElementById('sol-nota-actual').textContent); f.append('nota_solicitada',notaNueva); f.append('motivo',motivo); f.append('_csrf_token',getCsrf()); fetch('/'+slug+'/solicitar_modificacion',{method:'POST',body:f}).then(function(r){ if(r.ok){ showToast('<i data-lucide="check-circle"></i> Solicitud enviada al rector'); cerrarSolicitud(); } else if(r.status===423){ showToast('<i data-lucide="alert-triangle"></i> El periodo esta cerrado'); } else { showToast('<i data-lucide="alert-triangle"></i> Error al enviar solicitud'); } }).catch(function(){ showToast('<i data-lucide="alert-triangle"></i> Error de conexi&oacute;n'); }); }
-function addDataLabels(){ document.querySelectorAll('table').forEach(function(t){ var ths=t.querySelectorAll('thead th'); t.querySelectorAll('tbody tr').forEach(function(tr){ tr.querySelectorAll('td').forEach(function(td,i){ if(ths[i]) td.setAttribute('data-label',ths[i].textContent.replace(/\?.*/,'').trim()); }); }); }); }
-function marcarLeidoProf(cid,btn){ fetch('/'+slug+'/comunicaciones/'+cid+'/leer',{method:'POST',headers:{'X-CSRF-Token':getCsrf()}}).then(function(r){return r.json()}).then(function(d){if(d.ok){var item=btn.closest('.schedule-item'); if(item){item.style.opacity='0.25';item.style.pointerEvents='none';} else{btn.style.opacity='0.3';btn.style.pointerEvents='none';} COM_DATA=COM_DATA.filter(function(x){return x.id!==cid;}); actualizarContadorAvisos(); renderComunicaciones();}}); }
-window.addEventListener('scroll',function(){var st=document.getElementById('scrollTop'); if(!st) return; st.classList.toggle('show',window.scrollY>400);});
+
+function abrirObs(aid, nombre){
+    _aidObs = aid;
+    document.getElementById('mNombre').textContent = nombre;
+    document.getElementById('oTexto').value = '';
+    const d = ED[aid];
+    const hd = document.getElementById('mHistorial');
+    hd.innerHTML = '';
+    const meses = Object.keys(d.historial);
+    if(!meses.length){
+        hd.innerHTML = '<p style="font-size:12px;color:var(--muted)">Sin registros.</p>';
+    } else {
+        meses.forEach(function(m){
+            const div = document.createElement('div');
+            div.className = 'hmes';
+            const dias = d.historial[m].map(function(h){
+                const cls = h.estado==='P'?'bp':h.estado==='A'?'ba':'bt';
+                return '<span class="hdia '+cls+'">'+h.fecha.slice(8)+' '+h.estado+'</span>';
+            }).join('');
+            div.innerHTML = '<div class="hmeslabel">'+m+'</div><div class="hdias">'+dias+'</div>';
+            hd.appendChild(div);
+        });
+    }
+    renderObs(aid);
+    document.getElementById('modalObs').classList.add('open');
+}
+
+function renderObs(aid){
+    const ol = document.getElementById('mObsList');
+    ol.innerHTML = '';
+    const obs = ED[aid].observaciones;
+    if(!obs.length){
+        ol.innerHTML = '<p style="font-size:12px;color:var(--muted);margin-bottom:8px">Sin observaciones.</p>';
+    } else {
+        obs.forEach(function(o){
+            const div = document.createElement('div');
+            div.className = 'oitem';
+            div.innerHTML = '<div>'+o.texto+'</div><div class="ometa">'+o.materia+' · '+o.fecha+
+                ' <button onclick="borrarObs('+aid+','+o.id+',this)" style="background:none;border:none;color:var(--red);margin-left:6px;font-size:10px;cursor:pointer;">Borrar</button></div>';
+            ol.appendChild(div);
+        });
+    }
+}
+
+function guardarObs(){
+    const inp = document.getElementById('oTexto');
+    const texto = inp.value.trim();
+    if(!texto || !_aidObs) return;
+    const f = new FormData();
+    f.append('aid', _aidObs);
+    f.append('texto', texto);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/agregar_observacion', {method:'POST', body:f})
+        .then(function(r){
+            if(!r.ok){ showToast('? Error al guardar'); return null; }
+            return r.json();
+        })
+        .then(function(o){
+            if(!o) return;
+            ED[_aidObs].observaciones.unshift(o);
+            inp.value = '';
+            renderObs(_aidObs);
+            const btns = document.querySelectorAll('tr[data-aid="'+_aidObs+'"] button');
+            btns.forEach(function(b){
+                if(b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('abrirObs') === 0){
+                    b.textContent = ED[_aidObs].observaciones.length;
+                }
+            });
+            showToast('<i data-lucide="check-circle"></i> Observación guardada');
+        })
+        .catch(function(){ showToast('? Error de conexión'); });
+}
+
+function borrarObs(aid, obsId, btn){
+    if(!confirm('¿Borrar esta observación?')) return;
+    const f = new FormData();
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/borrar_observacion/'+obsId, {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                ED[aid].observaciones = ED[aid].observaciones.filter(function(o){ return o.id !== obsId; });
+                renderObs(aid);
+                const btns = document.querySelectorAll('tr[data-aid="'+aid+'"] button');
+                btns.forEach(function(b){
+                    if(b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('abrirObs') === 0){
+                        b.textContent = ED[aid].observaciones.length;
+                    }
+                });
+                showToast('<i data-lucide="check-circle"></i> Observación borrada');
+            } else {
+                showToast('? Error al borrar');
+            }
+        })
+        .catch(function(){ showToast('? Error de conexión'); });
+}
+
+function cerrarObs(){
+    document.getElementById('modalObs').classList.remove('open');
+    _aidObs = null;
+}
+
+/* -- Solicitar modificación (periodo cerrado) ------------------------ */
+var _solAid = null, _solActid = null, _solActividad = '';
+
+function abrirSolicitud(aid, actid, notaActual, nombre, actividad){
+    _solAid = aid;
+    _solActid = actid;
+    _solActividad = actividad;
+    document.getElementById('sol-alumno').textContent = nombre;
+    document.getElementById('sol-actividad').textContent = actividad;
+    document.getElementById('sol-nota-actual').textContent = notaActual !== null ? notaActual : '';
+    document.getElementById('sol-nota-nueva').value = notaActual !== null ? notaActual : '';
+    document.getElementById('sol-motivo').value = '';
+    document.getElementById('modalSolicitud').classList.add('open');
+}
+
+function cerrarSolicitud(){
+    document.getElementById('modalSolicitud').classList.remove('open');
+}
+
+function enviarSolicitud(){
+    const notaNueva = document.getElementById('sol-nota-nueva').value.trim();
+    const motivo = document.getElementById('sol-motivo').value.trim();
+    if(!notaNueva || !motivo){
+        showToast('? Complete la nota y el motivo');
+        return;
+    }
+    const f = new FormData();
+    f.append('alumno_id', _solAid);
+    f.append('actividad_id', _solActid !== null ? _solActid : '');
+    f.append('nombre_actividad', _solActividad);
+    f.append('periodo', periodoSel);
+    f.append('nota_actual', document.getElementById('sol-nota-actual').textContent === '' ? '' : document.getElementById('sol-nota-actual').textContent);
+    f.append('nota_solicitada', notaNueva);
+    f.append('motivo', motivo);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/solicitar_modificacion', {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                showToast('<i data-lucide="check-circle"></i> Solicitud enviada al rector');
+                cerrarSolicitud();
+            } else if(r.status === 423){
+                showToast('? El periodo esta cerrado');
+            } else {
+                showToast('? Error al enviar solicitud');
+            }
+        })
+        .catch(function(){ showToast('? Error de conexión'); });
+}
+
+function addDataLabels(){
+    document.querySelectorAll('table').forEach(function(t){
+        var ths = t.querySelectorAll('thead th');
+        t.querySelectorAll('tbody tr').forEach(function(tr){
+            tr.querySelectorAll('td').forEach(function(td,i){
+                if(ths[i]) td.setAttribute('data-label',ths[i].textContent.replace(/?.*/,'').trim());
+            });
+        });
+    });
+}
+function marcarLeidoProf(cid, btn){
+    fetch('/'+slug+'/comunicaciones/'+cid+'/leer',{method:'POST',headers:{'X-CSRF-Token':getCsrf()}}).then(function(r){return r.json()}).then(function(d){if(d.ok){
+        var item = btn.closest('.schedule-item');
+        if(item){ item.style.opacity='0.25'; item.style.pointerEvents='none'; }
+        else { btn.style.opacity='0.3'; btn.style.pointerEvents='none'; }
+        COM_DATA = COM_DATA.filter(function(x){return x.id!==cid;});
+        actualizarContadorAvisos();
+        renderComunicaciones();
+    }});
+}
+window.addEventListener('scroll',function(){
+    var st = document.getElementById('scrollTop');
+    if(!st) return;
+    st.classList.toggle('show',window.scrollY > 400);
+});
 addDataLabels();
 actualizarContadorAvisos();
-function renderComunicaciones(){ var container=document.getElementById('panelAvisos'); if(!container) return; if(!COM_DATA||COM_DATA.length===0){ container.innerHTML='<div class="empty-state"><div class="empty-icon"><i data-lucide="bell-off" style="width:28px;height:28px;"></i></div><div class="empty-title">Sin novedades</div><div class="empty-desc">No tienes avisos nuevos.</div></div>'; return; } var PRIO_COLORS={'baja':'#64748B','normal':'#2563EB','alta':'#F59E0B','urgente':'#EF4444'}; var html=''; var len=Math.min(COM_DATA.length,5); for(var i=0;i<len;i++){ var c=COM_DATA[i]; var pc=PRIO_COLORS[c.prioridad]||'#2563EB'; var fecha=(c.fecha_publicacion||c.fecha_creacion||'').slice(0,10); var contenido=(c.contenido||'').slice(0,120); if(c.contenido&&c.contenido.length>120)contenido+='&hellip;'; html+='<div class="schedule-item" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;"><div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;"><span style="width:8px;height:8px;border-radius:50%;background:'+pc+';flex-shrink:0;"></span><span style="font-weight:600;font-size:13px;">'+c.titulo+'</span></div><span style="font-size:10px;color:var(--muted);white-space:nowrap;">'+fecha+'</span></div><div style="font-size:12px;color:var(--muted);line-height:1.4;margin-left:16px;">'+contenido+'</div><div style="display:flex;gap:6px;margin-left:16px;margin-top:4px;"><span style="font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;background:'+pc+'15;color:'+pc+';">'+(c.prioridad.charAt(0).toUpperCase()+c.prioridad.slice(1))+'</span></div><div style="display:flex;gap:6px;margin-left:16px;margin-top:2px;"><button onclick="verComunicado('+c.id+')" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(37,99,235,.1);color:var(--blue);font-family:\'Inter\',sans-serif;"><i data-lucide="eye"></i> Ver comunicado</button><button onclick="marcarLeidoProf('+c.id+',this)" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:\'Inter\',sans-serif;"><i data-lucide="check"></i> Marcar como le&iacute;do</button></div></div>'; } container.innerHTML=html; }
-function actualizarContadorAvisos(){ var badge=document.getElementById('comCountBadge'); if(!badge) return; if(COM_DATA&&COM_DATA.length>0){badge.textContent=COM_DATA.length;badge.style.display='inline-flex';} else{badge.style.display='none';} }
-function showComToast(titulo,contenido){ var t=document.getElementById('comToast'); if(!t)return; document.getElementById('comToastTitle').textContent=titulo; document.getElementById('comToastMsg').textContent=(contenido||'').slice(0,120); t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},5000); }
+
+function renderComunicaciones(){
+    var container = document.getElementById('panelAvisos');
+    if(!container) return;
+    if(!COM_DATA || COM_DATA.length===0){
+        container.innerHTML='<div class="empty-state"><div class="icon"><i data-lucide="check-circle" style="color:var(--green);"></i></div>No tienes avisos nuevos.</div>';
+        return;
+    }
+    var PRIO_COLORS={'baja':'#64748B','normal':'#2563EB','alta':'#F59E0B','urgente':'#EF4444'};
+    var html='';
+    var len=Math.min(COM_DATA.length,5);
+    for(var i=0;i<len;i++){
+        var c=COM_DATA[i];
+        var pc=PRIO_COLORS[c.prioridad]||'#2563EB';
+        var fecha=(c.fecha_publicacion||c.fecha_creacion||'').slice(0,10);
+        var contenido=(c.contenido||'').slice(0,120);
+        if(c.contenido&&c.contenido.length>120)contenido+='';
+        html+='<div class="schedule-item" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;">'
+            +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">'
+            +'<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">'
+            +'<span style="width:8px;height:8px;border-radius:50%;background:'+pc+';flex-shrink:0;"></span>'
+            +'<span style="font-weight:600;font-size:13px;">'+c.titulo+'</span></div>'
+            +'<span style="font-size:10px;color:var(--muted);white-space:nowrap;">'+fecha+'</span></div>'
+            +'<div style="font-size:12px;color:var(--muted);line-height:1.4;margin-left:16px;">'+contenido+'</div>'
+            +'<div style="display:flex;gap:6px;margin-left:16px;margin-top:4px;">'
+            +'<span style="font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;background:'+pc+'15;color:'+pc+';">'+(c.prioridad.charAt(0).toUpperCase()+c.prioridad.slice(1))+'</span></div>'
+            +'<div style="display:flex;gap:6px;margin-left:16px;margin-top:2px;">'
+            +'<button onclick="verComunicado('+c.id+')" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(37,99,235,.1);color:var(--blue);font-family:\'Inter\',sans-serif;transition:all var(--tr);" onmouseover="this.style.background=\'rgba(37,99,235,.2)\'" onmouseout="this.style.background=\'rgba(37,99,235,.1)\'"><i data-lucide="eye"></i> Ver comunicado</button>'
+            +'<button onclick="marcarLeidoProf('+c.id+', this)" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:\'Inter\',sans-serif;transition:all var(--tr);" onmouseover="this.style.background=\'rgba(var(--accent-rgb),.2)\'" onmouseout="this.style.background=\'rgba(var(--accent-rgb),.1)\'"><i data-lucide="check"></i> Marcar como le&iacute;do</button>'
+            +'</div></div>';
+    }
+    container.innerHTML=html;
+}
+function actualizarContadorAvisos(){
+    var badge=document.getElementById('comCountBadge');
+    if(!badge)return;
+    if(COM_DATA&&COM_DATA.length>0){badge.textContent=COM_DATA.length;badge.style.display='inline-flex';}
+    else{badge.style.display='none';}
+}
+function showComToast(titulo,contenido){
+    var t=document.getElementById('comToast');
+    if(!t)return;
+    document.getElementById('comToastTitle').textContent=titulo;
+    document.getElementById('comToastMsg').textContent=(contenido||'').slice(0,120);
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t=setTimeout(function(){t.classList.remove('show');},5000);
+}
 function hideComToast(){document.getElementById('comToast').classList.remove('show');}
-function checkNuevosComunicados(){ fetch('/'+slug+'/api/comunicaciones/count',{headers:{'X-CSRF-Token':getCsrf()}}).then(function(r){return r.json()}).then(function(d){if(d.pendientes>(COM_DATA?COM_DATA.length:0)){fetch('/'+slug+'/api/comunicaciones',{headers:{'X-CSRF-Token':getCsrf()}}).then(function(r){return r.json()}).then(function(lista){COM_DATA=lista;renderComunicaciones();actualizarContadorAvisos();if(lista.length>0)showComToast(lista[0].titulo,lista[0].contenido||'');}).catch(function(){})}}).catch(function(){})}
+function checkNuevosComunicados(){
+    fetch('/'+slug+'/api/comunicaciones/count',{headers:{'X-CSRF-Token':getCsrf()}})
+    .then(function(r){return r.json()})
+    .then(function(d){
+        if(d.pendientes>(COM_DATA?COM_DATA.length:0)){
+            fetch('/'+slug+'/api/comunicaciones',{headers:{'X-CSRF-Token':getCsrf()}})
+            .then(function(r){return r.json()})
+            .then(function(lista){
+                COM_DATA=lista;
+                renderComunicaciones();
+                actualizarContadorAvisos();
+                if(lista.length>0)showComToast(lista[0].titulo,lista[0].contenido||'');
+            })
+            .catch(function(){});
+        }
+    })
+    .catch(function(){});
+}
 setInterval(checkNuevosComunicados,30000);
-var REACCIONES_DISPONIBLES=['&#128077;','&#128078;','&#128525;','&#128079;','&#129309;'];
-function crearSistemaCanales(opts){ var P=opts.prefix||''; var TIPO=opts.tipoUsuario||'profesor'; var SLUG=opts.slug; var CSRF=opts.getCsrf; var canales=[]; var canalActivo=null; var ultimoMsgId=0; var pollTimer=null; var typingTimer=null; var _dom={}; function el(id){var key=id+P; if(!_dom[key])_dom[key]=document.getElementById(key); return _dom[key];} window['switchComTab'+P]=function(tab){var containerId='centroComunicacion'+P; document.querySelectorAll('#'+containerId+' .comm-tab').forEach(function(t){t.classList.remove('active');}); el('panelAvisos').style.display=tab==='avisos'?'block':'none'; el('panelCanales').style.display=tab==='canales'?'block':'none'; document.querySelectorAll('#'+containerId+' .comm-tab').forEach(function(t){var o=t.getAttribute('onclick'); if(o&&o.indexOf("'"+tab+"'")>=0)t.classList.add('active');}); if(tab==='canales'){cargarCanales();}else{cerrarCanal();}}; function cargarCanales(){fetch('/'+SLUG+'/api/canales',{headers:{'X-CSRF-Token':CSRF()}}).then(function(r){return r.json()}).then(function(lista){canales=lista;renderCanales();actualizarContador();if(canalActivo){var existe=false;for(var i=0;i<canales.length;i++){if(canales[i].id===canalActivo){existe=true;break;}}if(!existe)cerrarCanal();}}).catch(function(){})} function renderCanales(){var cont=el('canalesLista'); if(!cont)return; if(!canales||canales.length===0){cont.innerHTML='<div class="empty-channel-list">No tienes canales disponibles.</div>';return;} var icons={'institucional':'&#127970;','rectoria':'&#128081;','profesores':'&#128101;&#8205;&#9794;&#65039;','director_curso':'&#128218;','curso':'&#127891;','materia':'&#128214;'}; var html=''; for(var i=0;i<canales.length;i++){var ch=canales[i]; var activoCls=(canalActivo===ch.id)?' active':''; var fecha=ch.ultima_fecha||ch.fecha_creacion; var hora=fecha?fecha.slice(11,16):''; var ultimo=ch.ultimo_mensaje||'Sin mensajes'; if(ultimo.length>45)ultimo=ultimo.slice(0,45)+'&hellip;'; var noLeidos=ch.no_leidos||0; var avatar=icons[ch.tipo]||'&#128172;'; var badgeHtml=noLeidos>0?'<span class="canal-list-no-leidos">'+noLeidos+'</span>':''; html+='<div class="canal-list-item'+activoCls+'" data-cid="'+ch.id+'"><div class="canal-list-avatar">'+avatar+'</div><div class="canal-list-info"><div class="canal-list-nombre">'+escHtml(ch.nombre)+'</div><div class="canal-list-ultimo">'+escHtml(ultimo)+'</div></div><div class="canal-list-meta"><span class="canal-list-hora">'+hora+'</span>'+badgeHtml+'</div></div>'} cont.innerHTML=html; if(el('canalesSidebar')){el('canalesSidebar').querySelectorAll('.canal-list-item').forEach(function(item){item.addEventListener('click',function(){var cid=this.getAttribute('data-cid'); window['abrirCanal'+(P||'')](parseInt(cid));});});} } function actualizarContador(){var badge=el('canalesCountBadge'); if(!badge)return; var total=0; for(var i=0;i<canales.length;i++){total+=canales[i].no_leidos||0;} if(total>0){badge.textContent=total;badge.style.display='inline';}else{badge.style.display='none';}}
-function escHtml(s){if(!s)return''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-// -- (canales functions continued, full version in static JS file) --
-window['abrirCanal'+P]=function(cid){if(canalActivo===cid)return; canalActivo=cid; ultimoMsgId=0; cancelarRespuesta(); fetch('/'+SLUG+'/api/canales/'+cid+'/leer',{method:'POST',headers:{'X-CSRF-Token':CSRF()}}).catch(function(){}); var ch=null; for(var i=0;i<canales.length;i++){if(canales[i].id===cid){ch=canales[i];break;}} if(!ch){cerrarCanal();return;} ch.no_leidos=0; renderCanales(); actualizarContador(); el('canalEmpty').style.display='none'; el('canalChatView').style.display='flex'; el('canalChatTitle').textContent=ch.nombre; el('canalMensajes').innerHTML='<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">Cargando mensajes...</div>'; fetch('/'+SLUG+'/api/canales/'+cid+'/mensajes',{headers:{'X-CSRF-Token':CSRF()}}).then(function(r){return r.json()}).then(function(msgs){renderMensajes(msgs); if(msgs&&msgs.length>0)ultimoMsgId=msgs[msgs.length-1].id; iniciarPolling(); cargarFijados();}).catch(function(){});}
-window['cerrarCanal'+P]=function(){detenerPolling();canalActivo=null;ultimoMsgId=0;cancelarRespuesta();el('canalChatView').style.display='none';el('canalEmpty').style.display='flex';renderCanales();}
-function renderMensajes(msgs){var container=el('canalMensajes'); if(!container)return; if(!msgs||msgs.length===0){container.innerHTML='<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">No hay mensajes. S&eacute; el primero en escribir.</div>';return;} var html='<div class="canal-msg-list">'; for(var i=0;i<msgs.length;i++){html+=renderUnMensaje(msgs[i]);} html+='</div>'; container.innerHTML=html; scrollAbajo();}
-function renderUnMensaje(m){var esMio=(m.usuario_tipo===TIPO); var autor=m.autor_nombre||(m.usuario_tipo==='rector'?'Rector&iacute;a':m.usuario_tipo); if(esMio)autor='T&uacute;'; var fecha=m.fecha||''; var horaStr=fecha.slice(11,16); var editCls=m.editado?' <span class="msg-edit-badge" title="Editado">&#9998;</span>':''; var replyHtml=''; if(m.responde_a_info){replyHtml='<div class="msg-reply-ref" onclick="var e=document.getElementById(\'msg-'+m.responde_a_info.id+'\');if(e)e.scrollIntoView({behavior:\'smooth\',block:\'center\'});"><div class="msg-reply-ref-autor">'+escHtml(m.responde_a_info.autor_nombre)+'</div><div class="msg-reply-ref-texto">'+escHtml(m.responde_a_info.mensaje)+'</div></div>';} var archivosHtml=''; if(m.archivos&&m.archivos.length>0){for(var j=0;j<m.archivos.length;j++){var af=m.archivos[j]; if(af.es_imagen){archivosHtml+='<div class="msg-archivo-img" onclick="window.open(\'/'+SLUG+'/api/archivos/'+af.id+'/previsualizar\')"><img src="/'+SLUG+'/api/archivos/'+af.id+'/previsualizar" alt="'+escHtml(af.nombre_original)+'"></div>';} else {archivosHtml+='<div class="msg-archivo" onclick="window.open(\'/'+SLUG+'/api/archivos/'+af.id+'/descargar\')"><i data-lucide="file"></i> '+escHtml(af.nombre_original)+' <span style="font-size:10px;color:var(--sub);">('+(af.tamano>1048576?(af.tamano/1048576).toFixed(1)+' MB':(af.tamano/1024).toFixed(0)+' KB')+')</span></div>';}}} var reaccionesHtml=''; if(m.reacciones){for(var r in m.reacciones){var usuarios=m.reacciones[r]||[]; var yoReaccione=usuarios.some(function(u){return u.tipo===TIPO;}); reaccionesHtml+='<span class="msg-reaccion'+(yoReaccione?' activa':'')+'" data-mid="'+m.id+'" data-reaccion="'+r+'">'+r+' '+usuarios.length+'</span>';}} var accionesHtml=''; if(esMio){accionesHtml+='<span class="msg-accion" data-accion="editar" data-mid="'+m.id+'" title="Editar"><i data-lucide="pen"></i></span>'; accionesHtml+='<span class="msg-accion" data-accion="eliminar" data-mid="'+m.id+'" title="Eliminar" style="color:var(--red);"><i data-lucide="trash-2"></i></span>';} accionesHtml+='<span class="msg-accion" data-accion="responder" data-mid="'+m.id+'" data-autor="'+escHtml(autor)+'" data-texto="'+escHtml((m.mensaje||'').substring(0,80))+'" title="Responder"><i data-lucide="reply"></i></span>'; accionesHtml+='<span class="msg-accion" data-accion="fijar" data-mid="'+m.id+'" title="Fijar"><i data-lucide="pin"></i></span>'; var reaccPicker=''; for(var ri=0;ri<REACCIONES_DISPONIBLES.length;ri++){reaccPicker+='<span class="msg-reacc-picker-item" data-mid="'+m.id+'" data-reaccion="'+REACCIONES_DISPONIBLES[ri]+'">'+REACCIONES_DISPONIBLES[ri]+'</span>';} return '<div class="canal-msg'+(esMio?' mio':'')+'" id="msg-'+m.id+'"><div class="canal-msg-autor">'+escHtml(autor)+editCls+'</div>'+replyHtml+'<div class="canal-msg-texto">'+escHtml(m.mensaje)+'</div>'+archivosHtml+'<div class="canal-msg-footer"><span class="canal-msg-fecha">'+horaStr+'</span><span class="msg-reacciones">'+reaccionesHtml+'</span></div><div class="msg-acciones"><span class="msg-reacc-picker">'+reaccPicker+'</span>'+accionesHtml+'</div><div style="clear:both;"></div></div>';}
-function agregarMensajes(msgs){var container=el('canalMensajes'); if(!container)return; var list=container.querySelector('.canal-msg-list'); if(!list){container.innerHTML='<div class="canal-msg-list">';list=container.querySelector('.canal-msg-list');} for(var i=0;i<msgs.length;i++){var existing=document.getElementById('msg-'+msgs[i].id); if(existing)continue; list.insertAdjacentHTML('beforeend',renderUnMensaje(msgs[i]));} scrollAbajo(); if(msgs.length>0)ultimoMsgId=msgs[msgs.length-1].id; lucide.createIcons();}
-function scrollAbajo(){var container=el('canalMensajes'); if(!container)return; setTimeout(function(){container.scrollTop=container.scrollHeight;},50);}
-function iniciarPolling(){detenerPolling(); if(!canalActivo)return; pollTimer=setInterval(function(){if(!canalActivo){detenerPolling();return;} fetch('/'+SLUG+'/api/canales/'+canalActivo+'/mensajes?after='+ultimoMsgId,{headers:{'X-CSRF-Token':CSRF()}}).then(function(r){return r.json()}).then(function(msgs){if(msgs&&msgs.length>0){agregarMensajes(msgs);}}).catch(function(){})},3000);}
-function detenerPolling(){if(pollTimer){clearInterval(pollTimer);pollTimer=null;}}
-function cancelarRespuesta(){el('canalReplyBar').style.display='none'; if(window['_responderA'+P]){delete window['_responderA'+P];}}
-function cargarFijados(){}
-crearSistemaCanales({prefix:'',tipoUsuario:'profesor',slug:SLUG,getCsrf:getCsrf});
+
+// -- Canales (Fase 5  Comunicación v2) ----------------------------
+function escHtml(s){
+    if(!s)return'';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+var REACCIONES_DISPONIBLES = ['??','?','?','??','?'];
+
+function crearSistemaCanales(opts){
+    var P = opts.prefix || '';
+    var TIPO = opts.tipoUsuario || 'profesor';
+    var SLUG = opts.slug;
+    var CSRF = opts.getCsrf;
+
+    var canales = [];
+    var canalActivo = null;
+    var ultimoMsgId = 0;
+    var pollTimer = null;
+    var typingTimer = null;
+    var _dom = {};
+
+    function el(id){
+        var key = id + P;
+        if(!_dom[key]) _dom[key] = document.getElementById(key);
+        return _dom[key];
+    }
+
+    window['switchComTab' + P] = function(tab){
+        var containerId = 'centroComunicacion' + P;
+        document.querySelectorAll('#' + containerId + ' .comm-tab').forEach(function(t){t.classList.remove('active');});
+        el('panelAvisos').style.display = tab === 'avisos' ? 'block' : 'none';
+        el('panelCanales').style.display = tab === 'canales' ? 'block' : 'none';
+        document.querySelectorAll('#' + containerId + ' .comm-tab').forEach(function(t){
+            var o = t.getAttribute('onclick');
+            if(o && o.indexOf("'" + tab + "'") >= 0) t.classList.add('active');
+        });
+        if(tab === 'canales'){ cargarCanales(); }
+        else { cerrarCanal(); }
+    };
+
+    function cargarCanales(){
+        fetch('/' + SLUG + '/api/canales', {headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(lista){
+            canales = lista;
+            renderCanales();
+            actualizarContador();
+            if(canalActivo){
+                var existe = false;
+                for(var i=0;i<canales.length;i++){ if(canales[i].id === canalActivo){ existe = true; break; } }
+                if(!existe) cerrarCanal();
+            }
+        })
+        .catch(function(){});
+    }
+
+    function renderCanales(){
+        var cont = el('canalesLista');
+        if(!cont) return;
+        if(!canales || canales.length === 0){
+            cont.innerHTML = '<div class="empty-channel-list">No tienes canales disponibles.</div>';
+            return;
+        }
+        var icons = {'institucional':'??','rectoria':'??','profesores':'?????','director_curso':'??','curso':'??','materia':'??'};
+        var html = '';
+        for(var i=0;i<canales.length;i++){
+            var ch = canales[i];
+            var activoCls = (canalActivo === ch.id) ? ' active' : '';
+            var fecha = ch.ultima_fecha || ch.fecha_creacion;
+            var hora = fecha ? fecha.slice(11,16) : '';
+            var ultimo = ch.ultimo_mensaje || 'Sin mensajes';
+            if(ultimo.length > 45) ultimo = ultimo.slice(0,45) + '';
+            var noLeidos = ch.no_leidos || 0;
+            var avatar = icons[ch.tipo] || '??';
+            var badgeHtml = noLeidos > 0 ? '<span class="canal-list-no-leidos">' + noLeidos + '</span>' : '';
+            html += '<div class="canal-list-item' + activoCls + '" data-cid="' + ch.id + '">'
+                + '<div class="canal-list-avatar">' + avatar + '</div>'
+                + '<div class="canal-list-info">'
+                + '<div class="canal-list-nombre">' + escHtml(ch.nombre) + '</div>'
+                + '<div class="canal-list-ultimo">' + escHtml(ultimo) + '</div></div>'
+                + '<div class="canal-list-meta">'
+                + '<span class="canal-list-hora">' + hora + '</span>'
+                + badgeHtml
+                + '</div></div>';
+        }
+        cont.innerHTML = html;
+    }
+
+    function actualizarContador(){
+        var badge = el('canalesCountBadge');
+        if(!badge) return;
+        var total = 0;
+        for(var i=0;i<canales.length;i++){ total += canales[i].no_leidos || 0; }
+        if(total > 0){ badge.textContent = total; badge.style.display = 'inline'; }
+        else { badge.style.display = 'none'; }
+    }
+
+    function abrirCanal(cid){
+        if(canalActivo === cid) return;
+        canalActivo = cid;
+        ultimoMsgId = 0;
+        cancelarRespuesta();
+        fetch('/' + SLUG + '/api/canales/' + cid + '/leer', {method:'POST', headers:{'X-CSRF-Token':CSRF()}}).catch(function(){});
+        var ch = null;
+        for(var i=0;i<canales.length;i++){ if(canales[i].id === cid){ ch = canales[i]; break; } }
+        if(!ch){ cerrarCanal(); return; }
+        ch.no_leidos = 0;
+        renderCanales();
+        actualizarContador();
+        el('canalEmpty').style.display = 'none';
+        var chatView = el('canalChatView');
+        chatView.style.display = 'flex';
+        el('canalChatTitle').textContent = ch.nombre;
+        el('canalMensajes').innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">Cargando mensajes...</div>';
+        fetch('/' + SLUG + '/api/canales/' + cid + '/mensajes', {headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(msgs){
+            renderMensajes(msgs);
+            if(msgs && msgs.length > 0) ultimoMsgId = msgs[msgs.length - 1].id;
+            iniciarPolling();
+            cargarFijados();
+        })
+        .catch(function(){});
+    }
+
+    function cerrarCanal(){
+        detenerPolling();
+        canalActivo = null;
+        ultimoMsgId = 0;
+        cancelarRespuesta();
+        el('canalChatView').style.display = 'none';
+        el('canalEmpty').style.display = 'flex';
+        renderCanales();
+    }
+
+    function renderMensajes(msgs){
+        var container = el('canalMensajes');
+        if(!container) return;
+        if(!msgs || msgs.length === 0){
+            container.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">No hay mensajes. S&eacute; el primero en escribir.</div>';
+            return;
+        }
+        var html = '<div class="canal-msg-list">';
+        for(var i=0;i<msgs.length;i++){
+            html += renderUnMensaje(msgs[i]);
+        }
+        html += '</div>';
+        container.innerHTML = html;
+        scrollAbajo();
+    }
+
+    function renderUnMensaje(m){
+        var esMio = (m.usuario_tipo === TIPO);
+        var autor = m.autor_nombre || (m.usuario_tipo === 'rector' ? 'Rectoría' : m.usuario_tipo);
+        if(esMio) autor = 'Tú';
+        var fecha = m.fecha || '';
+        var horaStr = fecha.slice(11,16);
+        var editCls = m.editado ? ' <span class="msg-edit-badge" title="Editado">?</span>' : '';
+        var replyHtml = '';
+        if(m.responde_a_info){
+            replyHtml = '<div class="msg-reply-ref" onclick="var e=document.getElementById(\'msg-'+m.responde_a_info.id+'\');if(e)e.scrollIntoView({behavior:\'smooth\',block:\'center\'});">'
+                + '<div class="msg-reply-ref-autor">' + escHtml(m.responde_a_info.autor_nombre) + '</div>'
+                + '<div class="msg-reply-ref-texto">' + escHtml(m.responde_a_info.mensaje) + '</div></div>';
+        }
+        var archivosHtml = '';
+        if(m.archivos && m.archivos.length > 0){
+            for(var j=0;j<m.archivos.length;j++){
+                var af = m.archivos[j];
+                if(af.es_imagen){
+                    archivosHtml += '<div class="msg-archivo-img" onclick="window.open(\'/' + SLUG + '/api/archivos/' + af.id + '/previsualizar\')">'
+                        + '<img src="/' + SLUG + '/api/archivos/' + af.id + '/previsualizar" alt="' + escHtml(af.nombre_original) + '" style="max-width:200px;max-height:150px;border-radius:6px;cursor:pointer;object-fit:cover;"></div>';
+                } else {
+                    archivosHtml += '<div class="msg-archivo" onclick="window.open(\'/' + SLUG + '/api/archivos/' + af.id + '/descargar\')">'
+                        + '<i data-lucide="file"></i> ' + escHtml(af.nombre_original)
+                        + ' <span style="font-size:10px;color:var(--sub);">(' + (af.tamano > 1048576 ? (af.tamano/1048576).toFixed(1)+' MB' : (af.tamano/1024).toFixed(0)+' KB') + ')</span></div>';
+                }
+            }
+        }
+        var reaccionesHtml = '';
+        if(m.reacciones){
+            for(var r in m.reacciones){
+                var usuarios = m.reacciones[r] || [];
+                var yoReaccione = usuarios.some(function(u){ return u.tipo === TIPO; });
+                reaccionesHtml += '<span class="msg-reaccion' + (yoReaccione ? ' activa' : '') + '" data-mid="' + m.id + '" data-reaccion="' + r + '">' + r + ' ' + usuarios.length + '</span>';
+            }
+        }
+        var accionesHtml = '';
+        if(esMio){
+            accionesHtml += '<span class="msg-accion" data-accion="editar" data-mid="' + m.id + '" title="Editar"><i data-lucide="pen"></i></span>';
+            accionesHtml += '<span class="msg-accion" data-accion="eliminar" data-mid="' + m.id + '" title="Eliminar" style="color:var(--red);"><i data-lucide="trash-2"></i></span>';
+        }
+        accionesHtml += '<span class="msg-accion" data-accion="responder" data-mid="' + m.id + '" data-autor="' + escHtml(autor) + '" data-texto="' + escHtml((m.mensaje||'').substring(0,80)) + '" title="Responder"><i data-lucide="reply"></i></span>';
+        accionesHtml += '<span class="msg-accion" data-accion="fijar" data-mid="' + m.id + '" title="Fijar"><i data-lucide="pin"></i></span>';
+        var reaccPicker = '';
+        for(var ri=0;ri<REACCIONES_DISPONIBLES.length;ri++){
+            reaccPicker += '<span class="msg-reacc-picker-item" data-mid="' + m.id + '" data-reaccion="' + REACCIONES_DISPONIBLES[ri] + '">' + REACCIONES_DISPONIBLES[ri] + '</span>';
+        }
+        return '<div class="canal-msg' + (esMio ? ' mio' : '') + '" id="msg-' + m.id + '">'
+            + '<div class="canal-msg-autor">' + escHtml(autor) + editCls + '</div>'
+            + replyHtml
+            + '<div class="canal-msg-texto">' + escHtml(m.mensaje) + '</div>'
+            + archivosHtml
+            + '<div class="canal-msg-footer">'
+            + '<span class="canal-msg-fecha">' + horaStr + '</span>'
+            + '<span class="msg-reacciones">' + reaccionesHtml + '</span>'
+            + '</div>'
+            + '<div class="msg-acciones"><span class="msg-reacc-picker">' + reaccPicker + '</span>' + accionesHtml + '</div>'
+            + '<div style="clear:both;"></div></div>';
+    }
+
+    function agregarMensajes(msgs){
+        var container = el('canalMensajes');
+        if(!container) return;
+        var list = container.querySelector('.canal-msg-list');
+        if(!list){
+            container.innerHTML = '<div class="canal-msg-list">';
+            list = container.querySelector('.canal-msg-list');
+        }
+        var emptyMsg = container.querySelector('div[style*="text-align:center"]');
+        if(emptyMsg && msgs.length > 0) container.innerHTML = '<div class="canal-msg-list">';
+        for(var i=0;i<msgs.length;i++){
+            container.insertAdjacentHTML('beforeend', renderUnMensaje(msgs[i]));
+        }
+        scrollAbajo();
+    }
+
+    function scrollAbajo(){
+        var container = el('canalMensajes');
+        if(container) setTimeout(function(){ container.scrollTop = container.scrollHeight; }, 20);
+    }
+
+    function enviarMensaje(){
+        var input = el('canalMsgInput');
+        if(!input || !canalActivo) return;
+        var msg = input.value.trim();
+        var files = el('canalFileInput').files;
+        var tieneArchivos = files && files.length > 0;
+        if(!msg && !tieneArchivos) return;
+        input.value = '';
+        input.focus();
+        var fd = new FormData();
+        if(msg) fd.append('mensaje', msg);
+        if(_respondiendoA) fd.append('responde_a', _respondiendoA);
+        if(tieneArchivos){
+            for(var fi=0;fi<files.length;fi++) fd.append('archivo' + fi, files[fi]);
+        }
+        el('canalFileInput').value = '';
+        el('canalFilePreview').style.display = 'none';
+        el('canalFilePreview').innerHTML = '';
+        cancelarRespuesta();
+        fetch('/' + SLUG + '/api/canales/' + canalActivo + '/enviar', {method:'POST', body:fd, headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(d){
+            if(d.ok && d.mensaje_id){
+                if(d.mensaje_id > ultimoMsgId) ultimoMsgId = d.mensaje_id;
+                cargarCanales();
+            }
+        })
+        .catch(function(){});
+    }
+
+    // -- Respuesta --
+    var _respondiendoA = null;
+    function responderMensaje(mid, autor, texto){
+        _respondiendoA = mid;
+        var bar = el('canalReplyBar');
+        if(bar){
+            bar.style.display = 'block';
+            el('canalReplyAutor').textContent = autor;
+            el('canalReplyTexto').textContent = texto;
+        }
+        el('canalMsgInput').focus();
+    }
+    function cancelarRespuesta(){
+        _respondiendoA = null;
+        var bar = el('canalReplyBar');
+        if(bar) bar.style.display = 'none';
+    }
+
+    // -- Editar --
+    function editarMensaje(mid){
+        var elMsg = document.getElementById('msg-' + mid);
+        if(!elMsg) return;
+        var textoEl = elMsg.querySelector('.canal-msg-texto');
+        if(!textoEl) return;
+        var actual = textoEl.textContent;
+        textoEl.contentEditable = true;
+        textoEl.focus();
+        var range = document.createRange();
+        range.selectNodeContents(textoEl);
+        var sel = window.getSelection();
+        sel.removeAllRanges(); sel.addRange(range);
+        function guardarEdit(){
+            textoEl.contentEditable = false;
+            var nuevo = textoEl.textContent.trim();
+            if(nuevo && nuevo !== actual){
+                var fd = new FormData();
+                fd.append('mensaje', nuevo);
+                fetch('/' + SLUG + '/api/canales/' + canalActivo + '/editar/' + mid, {method:'POST', body:fd, headers:{'X-CSRF-Token':CSRF()}})
+                .then(function(r){return r.json()})
+                .then(function(d){ if(!d.ok) textoEl.textContent = actual; })
+                .catch(function(){ textoEl.textContent = actual; });
+            } else {
+                textoEl.textContent = actual;
+            }
+            textoEl.removeEventListener('blur', guardarEdit);
+            textoEl.removeEventListener('keydown', onKey);
+        }
+        function onKey(e){
+            if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); textoEl.blur(); }
+            if(e.key === 'Escape'){ textoEl.textContent = actual; textoEl.contentEditable = false; textoEl.removeEventListener('blur', guardarEdit); textoEl.removeEventListener('keydown', onKey); }
+        }
+        textoEl.addEventListener('blur', guardarEdit);
+        textoEl.addEventListener('keydown', onKey);
+    }
+
+    // -- Eliminar --
+    function eliminarMensaje(mid){
+        if(!confirm('¿Eliminar este mensaje?')) return;
+        var fd = new FormData();
+        fd.append('_csrf_token', CSRF());
+        fetch('/' + SLUG + '/api/canales/' + canalActivo + '/eliminar/' + mid, {method:'POST', body:fd, headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(d){
+            if(d.ok){
+                var elMsg = document.getElementById('msg-' + mid);
+                if(elMsg) elMsg.style.display = 'none';
+            }
+        })
+        .catch(function(){});
+    }
+
+    // -- Reacciones --
+    function reaccionar(mid, reaccion){
+        var fd = new FormData();
+        fd.append('mensaje_id', mid);
+        fd.append('reaccion', reaccion);
+        fetch('/' + SLUG + '/api/canales/' + canalActivo + '/reaccionar', {method:'POST', body:fd, headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(){
+            fetch('/' + SLUG + '/api/canales/' + canalActivo + '/mensajes?reload=1', {headers:{'X-CSRF-Token':CSRF()}})
+            .then(function(r){return r.json()})
+            .then(function(msgs){
+                var container = el('canalMensajes');
+                if(container && msgs) renderMensajes(msgs);
+            }).catch(function(){});
+        })
+        .catch(function(){});
+    }
+
+    // -- Fijados --
+    function fijarMensaje(mid){
+        var fd = new FormData();
+        fd.append('mensaje_id', mid);
+        fetch('/' + SLUG + '/api/canales/' + canalActivo + '/fijar', {method:'POST', body:fd, headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(){ cargarFijados(); })
+        .catch(function(){});
+    }
+
+    function cargarFijados(){
+        if(!canalActivo) return;
+        fetch('/' + SLUG + '/api/canales/' + canalActivo + '/fijados', {headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(lista){
+            var cont = el('canalesFijados');
+            if(!cont) return;
+            if(!lista || lista.length === 0){
+                cont.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:10px;text-align:center;">Sin mensajes fijados</div>';
+                return;
+            }
+            var h = '';
+            for(var i=0;i<lista.length;i++){
+                var f = lista[i];
+                h += '<div class="canal-list-item" onclick="canales.abrirCanal(' + canalActivo + ');var e=document.getElementById(\'msg-' + f.id + '\');if(e)e.scrollIntoView({behavior:\'smooth\',block:\'center\'});">'
+                    + '<div class="canal-list-info"><div class="canal-list-nombre" style="font-size:11px;"><i data-lucide="pin" style="color:var(--accent);font-size:9px;"></i> ' + escHtml(f.autor_nombre) + '</div>'
+                    + '<div class="canal-list-ultimo" style="font-size:10px;">' + escHtml(f.mensaje.substring(0,60)) + '</div></div></div>';
+            }
+            cont.innerHTML = h;
+        }).catch(function(){});
+    }
+
+    // -- Biblioteca --
+    function cargarBiblioteca(){
+        if(!canalActivo) return;
+        fetch('/' + SLUG + '/api/canales/' + canalActivo + '/biblioteca', {headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(d){
+            var cont = el('canalesBiblioteca');
+            if(!cont) return;
+            var h = '<div style="padding:8px 10px;font-size:11px;font-weight:600;color:var(--muted);"><i data-lucide="file"></i> Archivos</div>';
+            var archs = d.archivos || [];
+            if(archs.length === 0){
+                h += '<div style="font-size:11px;color:var(--sub);padding:8px 10px;">Sin archivos</div>';
+            } else {
+                for(var i=0;i<Math.min(archs.length,20);i++){
+                    var a = archs[i];
+                    h += '<div class="canal-list-item" onclick="window.open(\'/' + SLUG + '/api/archivos/' + a.id + '/descargar\')">'
+                        + '<div class="canal-list-info"><div class="canal-list-ultimo" style="font-size:11px;">' + (a.es_imagen ? '<i data-lucide="image"></i>' : '<i data-lucide="file"></i>') + ' ' + escHtml(a.nombre_original) + '</div></div></div>';
+                }
+            }
+            cont.innerHTML = h;
+        }).catch(function(){});
+    }
+
+    // -- Búsqueda --
+    function toggleBusqueda(){
+        var bar = el('canalSearchBar');
+        if(bar) bar.style.display = bar.style.display === 'none' ? 'block' : 'none';
+        if(bar.style.display === 'block') el('canalSearchInput').focus();
+    }
+
+    function buscarMensajes(){
+        var q = el('canalSearchInput').value.trim();
+        if(!q || !canalActivo) return;
+        fetch('/' + SLUG + '/api/canales/' + canalActivo + '/buscar?q=' + encodeURIComponent(q), {headers:{'X-CSRF-Token':CSRF()}})
+        .then(function(r){return r.json()})
+        .then(function(msgs){
+            var div = el('canalSearchResults');
+            if(!div) return;
+            if(!msgs || msgs.length === 0){
+                div.innerHTML = 'Sin resultados';
+                return;
+            }
+            div.innerHTML = msgs.length + ' resultado(s): <a href="#" onclick="canales.renderMensajes(msgs);return false;">Ver todos</a>';
+            renderMensajes(msgs);
+        }).catch(function(){});
+    }
+
+    // -- Sidebar tabs --
+    function initSidebarTabs(){
+        var sidebar = el('canalesSidebar');
+        if(!sidebar) return;
+        sidebar.querySelectorAll('.canal-stab').forEach(function(btn){
+            btn.addEventListener('click', function(){
+                var tab = this.getAttribute('data-stab');
+                sidebar.querySelectorAll('.canal-stab').forEach(function(b){ b.style.background = 'transparent'; b.style.color = 'var(--muted)'; });
+                this.style.background = 'rgba(var(--accent-rgb),.12)'; this.style.color = 'var(--accent)';
+                el('canalesLista').style.display = tab === 'chats' ? 'block' : 'none';
+                el('canalesFijados').style.display = tab === 'fijados' ? 'block' : 'none';
+                el('canalesBiblioteca').style.display = tab === 'biblioteca' ? 'block' : 'none';
+                if(tab === 'fijados' && canalActivo) cargarFijados();
+                if(tab === 'biblioteca' && canalActivo) cargarBiblioteca();
+            });
+        });
+    }
+
+    // -- Files preview --
+    function initFileInput(){
+        var fi = el('canalFileInput');
+        if(!fi) return;
+        fi.addEventListener('change', function(){
+            var preview = el('canalFilePreview');
+            if(!preview) return;
+            if(this.files && this.files.length > 0){
+                var parts = [];
+                for(var i=0;i<this.files.length;i++){
+                    parts.push('<span style="background:var(--bg3);padding:2px 8px;border-radius:4px;margin-right:4px;font-size:10px;">' + escHtml(this.files[i].name) + '</span>');
+                }
+                preview.innerHTML = '<i data-lucide="paperclip"></i> ' + parts.join('');
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+                preview.innerHTML = '';
+            }
+        });
+    }
+
+    // -- Polling --
+    function iniciarPolling(){
+        detenerPolling();
+        pollTimer = setInterval(function(){
+            if(!canalActivo){ detenerPolling(); return; }
+            fetch('/' + SLUG + '/api/canales/' + canalActivo + '/mensajes/nuevos?ultimo_id=' + ultimoMsgId)
+            .then(function(r){return r.json()})
+            .then(function(d){
+                if(d.ok && d.mensajes && d.mensajes.length > 0){
+                    agregarMensajes(d.mensajes);
+                    for(var i=0;i<d.mensajes.length;i++){
+                        if(d.mensajes[i].id > ultimoMsgId) ultimoMsgId = d.mensajes[i].id;
+                    }
+                    cargarCanales();
+                }
+            })
+            .catch(function(){});
+            fetch('/' + SLUG + '/api/canales/' + canalActivo + '/actividad')
+            .then(function(r){return r.json()})
+            .then(function(act){ /* actividad se usa para typing, se maneja por separado */ })
+            .catch(function(){});
+        }, 3000);
+    }
+
+    function detenerPolling(){
+        if(pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+    }
+
+    // -- Typing indicator --
+    function enviarTyping(){
+        if(!canalActivo) return;
+        fetch('/' + SLUG + '/api/canales/' + canalActivo + '/escribiendo', {method:'POST', headers:{'X-CSRF-Token':CSRF()}}).catch(function(){});
+    }
+
+    // -- Drag & drop --
+    function initDragDrop(){
+        var area = el('canalMensajes');
+        if(!area) return;
+        ['dragenter','dragover','dragleave','drop'].forEach(function(evt){
+            area.addEventListener(evt, function(e){ e.preventDefault(); e.stopPropagation(); }, false);
+        });
+        area.addEventListener('drop', function(e){
+            var files = e.dataTransfer.files;
+            if(files && files.length > 0){
+                var fi = el('canalFileInput');
+                if(fi){ fi.files = files; fi.dispatchEvent(new Event('change')); }
+            }
+        });
+    }
+
+    // -- initDOM --
+    function initDOM(){
+        var lista = el('canalesLista');
+        if(lista) lista.addEventListener('click', function(e){
+            var item = e.target.closest('.canal-list-item');
+            if(item){ var cid = parseInt(item.getAttribute('data-cid')); if(cid) abrirCanal(cid); }
+        });
+        var backBtn = el('canalChatBack');
+        if(backBtn) backBtn.addEventListener('click', cerrarCanal);
+        var sendBtn = el('canalSendBtn');
+        if(sendBtn) sendBtn.addEventListener('click', enviarMensaje);
+        var inp = el('canalMsgInput');
+        if(inp){
+            inp.addEventListener('keydown', function(e){
+                if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); enviarMensaje(); }
+            });
+            inp.addEventListener('input', function(){ if(typingTimer) clearTimeout(typingTimer); typingTimer = setTimeout(enviarTyping, 800); });
+        }
+        el('canalReplyCancel').addEventListener('click', cancelarRespuesta);
+        el('canalSearchBtn').addEventListener('click', toggleBusqueda);
+        el('canalSearchGo').addEventListener('click', buscarMensajes);
+        el('canalSearchClose').addEventListener('click', function(){ el('canalSearchBar').style.display = 'none'; });
+        el('canalSearchInput').addEventListener('keydown', function(e){ if(e.key === 'Enter') buscarMensajes(); });
+        initSidebarTabs();
+        initFileInput();
+        initDragDrop();
+        // Delegación global para acciones de mensajes
+        document.addEventListener('click', function(e){
+            var picker = e.target.closest('.msg-reacc-picker-item');
+            if(picker && canalActivo){
+                var mid = parseInt(picker.getAttribute('data-mid'));
+                var reacc = picker.getAttribute('data-reaccion');
+                if(mid) reaccionar(mid, reacc);
+                return;
+            }
+            var reaccionEl = e.target.closest('.msg-reaccion');
+            if(reaccionEl && canalActivo){
+                var mid2 = parseInt(reaccionEl.getAttribute('data-mid'));
+                var reacc2 = reaccionEl.getAttribute('data-reaccion');
+                if(mid2) reaccionar(mid2, reacc2);
+                return;
+            }
+            var accionEl = e.target.closest('.msg-accion[data-accion]');
+            if(accionEl && canalActivo){
+                var mid3 = parseInt(accionEl.getAttribute('data-mid'));
+                var accion = accionEl.getAttribute('data-accion');
+                if(!mid3) return;
+                e.stopPropagation();
+                if(accion === 'editar') editarMensaje(mid3);
+                else if(accion === 'eliminar') eliminarMensaje(mid3);
+                else if(accion === 'responder'){
+                    var aut = accionEl.getAttribute('data-autor') || 'Alguien';
+                    var txt = accionEl.getAttribute('data-texto') || '';
+                    responderMensaje(mid3, aut, txt);
+                }
+                else if(accion === 'fijar') fijarMensaje(mid3);
+                return;
+            }
+        });
+    }
+
+    initDOM();
+
+    return {
+        cargar: cargarCanales,
+        abrir: abrirCanal,
+        cerrar: cerrarCanal,
+        renderMensajes: renderMensajes,
+        editarMensaje: editarMensaje,
+        eliminarMensaje: eliminarMensaje,
+        responderMensaje: responderMensaje,
+        fijarMensaje: fijarMensaje
+    };
+}
+
+var canales = crearSistemaCanales({prefix:'', tipoUsuario:'profesor', slug:slug, getCsrf:getCsrf});
 </script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-<script src="/static/js/lumini.js"></script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}
+function verComunicado(cid){
+    var d = COM_DATA.find(function(x){ return x.id === cid; });
+    if(!d) return;
+    document.getElementById('comModalTitle').textContent = d.titulo;
+    document.getElementById('comModalContent').textContent = d.contenido||'';
+    var prio = (d.prioridad||'normal');
+    document.getElementById('comModalMeta').innerHTML = (d.fecha_publicacion||d.fecha_creacion||'').slice(0,10) + ' &middot; ' + prio.charAt(0).toUpperCase()+prio.slice(1);
+    var pc = {'baja':'#64748B','normal':'#2563EB','alta':'#F59E0B','urgente':'#EF4444'};
+    document.getElementById('comModalBadge').style.background = (pc[prio]||'#2563EB')+'15';
+    document.getElementById('comModalBadge').style.color = pc[prio]||'#2563EB';
+    document.getElementById('comModalBadge').textContent = prio.charAt(0).toUpperCase()+prio.slice(1);
+    document.getElementById('comModalLeerBtn').setAttribute('data-cid',cid);
+    document.getElementById('comModal').style.display='flex';
+}
+function cerrarComunicado(){
+    document.getElementById('comModal').style.display='none';
+}
+</script>
+<div id="comModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)cerrarComunicado()">
+<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);max-width:560px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.4);">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;">
+<div style="flex:1;min-width:0;">
+<h2 id="comModalTitle" style="font-size:17px;font-weight:700;margin:0 0 4px 0;"></h2>
+<div id="comModalMeta" style="font-size:11px;color:var(--muted);"></div>
+</div>
+<span id="comModalBadge" style="font-size:10px;padding:3px 10px;border-radius:99px;font-weight:600;white-space:nowrap;"></span>
+</div>
+<div id="comModalContent" style="padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;white-space:pre-wrap;color:var(--text);margin-bottom:14px;"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">
+<button onclick="var b=document.getElementById('comModalLeerBtn');marcarLeidoProf(parseInt(b.getAttribute('data-cid')),b);cerrarComunicado();" id="comModalLeerBtn" style="padding:8px 14px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;"><i data-lucide="check"></i> Marcar como le&iacute;do</button>
+<button onclick="cerrarComunicado()" style="padding:8px 14px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--muted);font-family:'Inter',sans-serif;">Cerrar</button>
+</div>
+</div>
+</div>
+
+<div id="comToast" class="com-toast" onclick="hideComToast()">
+  <div class="com-toast-icon">??</div>
+  <div class="com-toast-body">
+    <div class="com-toast-title" id="comToastTitle">Nuevo comunicado</div>
+    <div class="com-toast-msg" id="comToastMsg"></div>
+    <div class="com-toast-time">Reci&eacute;n publicado</div>
+  </div>
+</div>
 </body>
+  <script src="/static/js/lumini.js"></script>
 </html>
+
+
+

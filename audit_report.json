@@ -1,0 +1,394 @@
+{
+  "pages_checked": 30,
+  "total_issues": 10,
+  "issues": [
+    "[CSS] gestion-rectores: missing enhanced.css",
+    "[CSS] gestion-rectores: missing lumini.css",
+    "[ICONS] gestion-rectores: missing lucide.js script",
+    "[RESP] gestion-rectores: no viewport meta",
+    "[VARS] gestion-rectores: NO :root block with CSS variables!",
+    "[VARS] gestion-rectores: root block missing --accent",
+    "[VARS] gestion-rectores: root block missing --bg",
+    "[VARS] gestion-rectores: root block missing --bg2",
+    "[VARS] gestion-rectores: root block missing --border",
+    "[VARS] gestion-rectores: root block missing --text"
+  ],
+  "by_type": {
+    "CSS": [
+      "gestion-rectores: missing enhanced.css",
+      "gestion-rectores: missing lumini.css"
+    ],
+    "ICONS": [
+      "gestion-rectores: missing lucide.js script"
+    ],
+    "RESP": [
+      "gestion-rectores: no viewport meta"
+    ],
+    "VARS": [
+      "gestion-rectores: NO :root block with CSS variables!",
+      "gestion-rectores: root block missing --accent",
+      "gestion-rectores: root block missing --bg",
+      "gestion-rectores: root block missing --bg2",
+      "gestion-rectores: root block missing --border",
+      "gestion-rectores: root block missing --text"
+    ]
+  },
+  "pages": [
+    {
+      "name": "landing",
+      "path": "/",
+      "has_lucide": true,
+      "icons": 0,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "admin_login",
+      "path": "/admin/login",
+      "has_lucide": true,
+      "icons": 1,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "login_v2",
+      "path": "/testcolegio/login",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "rector_login",
+      "path": "/testcolegio/rector/login",
+      "has_lucide": true,
+      "icons": 16,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "directora_login",
+      "path": "/testcolegio/directora/login",
+      "has_lucide": true,
+      "icons": 16,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "rector",
+      "path": "/testcolegio/rector",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "panel",
+      "path": "/testcolegio/rector/panel",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "profesores",
+      "path": "/testcolegio/rector/profesores",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "estudiantes",
+      "path": "/testcolegio/rector/estudiantes",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "cursos",
+      "path": "/testcolegio/rector/cursos",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "horarios",
+      "path": "/testcolegio/rector/horarios",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "reportes",
+      "path": "/testcolegio/rector/reportes",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "configuracion",
+      "path": "/testcolegio/rector/configuracion",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "comunicaciones",
+      "path": "/testcolegio/rector/comunicaciones",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "nueva",
+      "path": "/testcolegio/rector/comunicaciones/nueva",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "canales",
+      "path": "/testcolegio/rector/canales",
+      "has_lucide": true,
+      "icons": 16,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "auditoria",
+      "path": "/testcolegio/rector/auditoria",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "solicitudes",
+      "path": "/testcolegio/rector/solicitudes",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "gestion-rectores",
+      "path": "/testcolegio/rector/gestion-rectores",
+      "has_lucide": false,
+      "icons": 0,
+      "has_root": false,
+      "css_files": []
+    },
+    {
+      "name": "notificaciones",
+      "path": "/testcolegio/notificaciones",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "horarios",
+      "path": "/testcolegio/horarios",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "archivados",
+      "path": "/testcolegio/archivados",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "transferir_curso",
+      "path": "/testcolegio/transferir_curso",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "cambiar_password",
+      "path": "/testcolegio/cambiar_password",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "seleccionar",
+      "path": "/testcolegio/seleccionar",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "estudiante",
+      "path": "/testcolegio/estudiante",
+      "has_lucide": true,
+      "icons": 9,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "directora",
+      "path": "/testcolegio/directora",
+      "has_lucide": true,
+      "icons": 16,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "admin",
+      "path": "/admin",
+      "has_lucide": true,
+      "icons": 2,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "codigos",
+      "path": "/admin/codigos",
+      "has_lucide": true,
+      "icons": 2,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    },
+    {
+      "name": "correos",
+      "path": "/admin/correos",
+      "has_lucide": true,
+      "icons": 1,
+      "has_root": true,
+      "css_files": [
+        "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap",
+        "/static/css/lumini.css",
+        "/static/css/enhanced.css"
+      ]
+    }
+  ]
+}

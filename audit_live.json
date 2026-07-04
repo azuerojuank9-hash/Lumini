@@ -1,0 +1,201 @@
+{
+  "pages": [
+    {
+      "path": "/",
+      "name": "landing",
+      "status": 200,
+      "size": 6661,
+      "final_url": "http://127.0.0.1:5050/"
+    },
+    {
+      "path": "/admin/login",
+      "name": "admin_login",
+      "status": 404,
+      "size": 4673,
+      "final_url": "http://127.0.0.1:5050/admin/login"
+    },
+    {
+      "path": "/testcolegio/login",
+      "name": "login_v2",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/login",
+      "name": "rector_login",
+      "status": 200,
+      "size": 25732,
+      "final_url": "http://127.0.0.1:5050/testcolegio/rector/login"
+    },
+    {
+      "path": "/testcolegio/directora/login",
+      "name": "directora_login",
+      "status": 200,
+      "size": 26240,
+      "final_url": "http://127.0.0.1:5050/testcolegio/directora/login"
+    },
+    {
+      "path": "/admin",
+      "name": "admin_panel",
+      "status": 200,
+      "size": 9031,
+      "final_url": "http://127.0.0.1:5050/admin"
+    },
+    {
+      "path": "/admin/codigos",
+      "name": "admin_codigos",
+      "status": 200,
+      "size": 9031,
+      "final_url": "http://127.0.0.1:5050/admin"
+    },
+    {
+      "path": "/testcolegio",
+      "name": "index_profesor",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector",
+      "name": "rector_panel",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/profesores",
+      "name": "rector_profesores",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/estudiantes",
+      "name": "rector_estudiantes",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/cursos",
+      "name": "rector_cursos",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/horarios",
+      "name": "rector_horarios",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/reportes",
+      "name": "rector_reportes",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/configuracion",
+      "name": "rector_configuracion",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/comunicaciones",
+      "name": "rector_comunicaciones",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/comunicaciones/nueva",
+      "name": "rector_comunicacion_nueva",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/canales",
+      "name": "rector_canales",
+      "status": 200,
+      "size": 25732,
+      "final_url": "http://127.0.0.1:5050/testcolegio/rector/login"
+    },
+    {
+      "path": "/testcolegio/rector/auditoria",
+      "name": "rector_auditoria",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/rector/solicitudes",
+      "name": "rector_solicitudes",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/notificaciones",
+      "name": "notificaciones",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/horarios",
+      "name": "horarios_profesor",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/archivados",
+      "name": "archivados",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/transferir_curso",
+      "name": "transferir_curso",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/cambiar_password",
+      "name": "cambiar_password",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/seleccionar",
+      "name": "seleccionar_jornada",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/estudiante",
+      "name": "estudiante",
+      "status": 200,
+      "size": 34907,
+      "final_url": "http://127.0.0.1:5050/testcolegio/login"
+    },
+    {
+      "path": "/testcolegio/directora",
+      "name": "directora_panel",
+      "status": 200,
+      "size": 26240,
+      "final_url": "http://127.0.0.1:5050/testcolegio/directora/login"
+    }
+  ],
+  "issues": []
+}

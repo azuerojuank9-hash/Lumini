@@ -1,465 +1,463 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumini — Centro de Correos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <style>
-
-        :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 4px rgba(0,0,0,.2);}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);}
-        *{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
-        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;padding-top:80px;color:var(--text);-webkit-font-smoothing:antialiased;}
-        .navbar{position:fixed;top:0;left:0;width:100%;background:rgba(8,8,15,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 28px;z-index:1000;}
-        .navbar-left{display:flex;align-items:center;gap:14px;}
-        .navbar img{height:40px;width:40px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
-        .navbar-brand .name{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:5px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-        .navbar-brand .tagline{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;}
-        .admin-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
-        .navbar-right{display:flex;align-items:center;gap:16px;}
-        .nav-link{color:var(--muted);text-decoration:none;font-size:13px;transition:color var(--tr);}
-        .nav-link:hover{color:var(--text);}
-        .logout-btn{color:var(--red);text-decoration:none;font-size:13px;}
-        .container{max-width:960px;margin:0 auto;padding:32px 20px 60px;}
-        .page-header{margin-bottom:32px;}
-        .page-header h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;}
-        .page-header p{color:var(--muted);font-size:13px;}
-        .alert{padding:12px 16px;border-radius:var(--rmd);font-size:13px;margin-bottom:22px;display:flex;align-items:center;gap:10px;}
-        .alert-error{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.25);color:var(--red);}
-        .alert-success{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.25);color:var(--green);}
-        .tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:24px;background:var(--bg);border-radius:var(--rmd);padding:4px;border:1px solid var(--border);}
-        .tab-btn{padding:9px 18px;border-radius:var(--rsm);border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;gap:7px;white-space:nowrap;}
-        .tab-btn:hover{color:var(--text);background:rgba(255,255,255,.04);}
-        .tab-btn.active{background:var(--bg2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
-        .tab-dot{width:7px;height:7px;border-radius:50%;}
-        .panel{display:none;}
-        .panel.active{display:block;}
-        .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:26px;margin-bottom:12px;box-shadow:var(--shadow);}
-        .card-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
-        .card-desc{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5;}
-        label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;margin-top:14px;}
-        label:first-of-type{margin-top:0;}
-        input[type=text],input[type=email],textarea,select{width:100%;padding:10px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
-        input[type=text]:focus,input[type=email]:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-        textarea{resize:vertical;min-height:120px;}
-        select option{background:var(--bg3);}
-        .form-row{display:flex;gap:12px;flex-wrap:wrap;}
-        .form-row>*{flex:1;min-width:180px;}
-        .btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);display:inline-flex;align-items:center;gap:8px;}
-        .btn:active{transform:scale(.97);}
-        .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
-        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
-        .btn-warning{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;box-shadow:0 4px 12px rgba(243,156,18,.2);}
-        .btn-warning:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(243,156,18,.3);}
-        .btn-success{background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;box-shadow:0 4px 12px rgba(46,204,113,.2);}
-        .btn-success:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(46,204,113,.3);}
-        .btn-sm{padding:6px 14px;font-size:12px;}
-        .mt{margin-top:16px;}
-        .colegios-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:4px;}
-        .colegio-check{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all var(--tr);}
-        .colegio-check:hover{border-color:rgba(var(--accent-rgb),.4);}
-        .colegio-check input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;}
-        .colegio-check .cname{font-size:13px;font-weight:500;color:var(--text);}
-        .colegio-check .cslug{font-size:11px;color:var(--sub);font-family:monospace;}
-        .select-all-row{display:flex;gap:10px;margin-bottom:12px;align-items:center;}
-        .select-all-row span{font-size:12px;color:var(--muted);}
-        .plantilla-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);padding:12px 16px;cursor:pointer;text-align:left;width:100%;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px;transition:all var(--tr);margin-bottom:8px;}
-        .plantilla-btn:hover{border-color:rgba(var(--accent-rgb),.4);background:rgba(var(--accent-rgb),.04);}
-        .plantilla-btn .picon{font-size:20px;}
-        .plantilla-btn .pinfo .ptitle{font-weight:600;}
-        .plantilla-btn .pinfo .pdesc{font-size:12px;color:var(--muted);margin-top:2px;}
-        .preview-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--rsm);padding:16px;margin-top:14px;font-size:12px;color:var(--muted);max-height:200px;overflow-y:auto;line-height:1.6;}
-        .info-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.18);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
-        .historial-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;}
-        .historial-item:last-child{border-bottom:none;}
-        .historial-item .hasunto{font-weight:600;color:var(--text);}
-        .historial-item .hfecha{color:var(--muted);font-size:12px;}
-        .historial-item .hdest{color:var(--accent2);font-size:12px;}
-        .badge-enviado{background:rgba(46,204,113,.12);color:var(--green);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-        @media(max-width:640px){.navbar{padding:8px 16px;}.container{padding:20px 12px 40px;}.tabs{gap:2px;}.tab-btn{padding:8px 12px;font-size:12px;}.form-row{flex-direction:column;}}
-        @media(max-width:375px){.navbar{padding:6px 10px;}.navbar img{height:32px;width:32px;}.navbar-brand .name{font-size:.95rem;letter-spacing:3px;}.nav-link,.logout-btn{font-size:12px;}.container{padding:16px 8px 32px;}.page-header h1{font-size:1.3rem;}.card{padding:16px;}.card-title{font-size:13px;}.tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}.colegios-grid{grid-template-columns:1fr;}.form-row>*{min-width:100%;}.btn{font-size:13px;padding:8px 16px;min-height:40px;}}
-
-</style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-
-</head>
-<body>
-
-<nav class="navbar">
-    <div class="navbar-left">
-        <img src="/static/lumini_logo.webp" alt="Lumini">
-        <div class="navbar-brand">
-            <div class="name">LUMINI</div>
-            <div class="tagline">Centro de correos</div>
-        </div>
-        <span class="admin-badge">Admin</span>
-    </div>
-    <div class="navbar-right">
-        <a href="/admin" class="nav-link"><i data-lucide="arrow-left"></i> Panel principal</a>
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;padding:6px 12px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;" aria-label="Cambiar tema">🌙</button>
-        <a href="/admin/logout" class="logout-btn">🚪 Salir</a>
-    </div>
-</nav>
-
-<div class="container">
-    <div class="page-header">
-        <h1><i data-lucide="mail"></i> Centro de Correos</h1>
-        <p>Gestiona todos los correos automáticos y masivos de Lumini desde un solo lugar.</p>
-    </div>
-
-    {% if error %}<div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>{% endif %}
-    {% if exito %}<div class="alert alert-success"><i data-lucide="check-circle"></i> {{ exito }}</div>{% endif %}
-
-    <!-- TABS -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="showTab('anuncios', this)">
-            <span class="tab-dot" style="background:var(--accent)"></span> <i data-lucide="megaphone"></i> Anuncios
-        </button>
-        <button class="tab-btn" onclick="showTab('pagos', this)">
-            <span class="tab-dot" style="background:#f39c12"></span> <i data-lucide="credit-card"></i> Pagos
-        </button>
-        <button class="tab-btn" onclick="showTab('actualizacion', this)">
-            <span class="tab-dot" style="background:#2ecc71"></span> 🚀 Actualización
-        </button>
-        <button class="tab-btn" onclick="showTab('promocional', this)">
-            <span class="tab-dot" style="background:#3498db"></span> <i data-lucide="megaphone"></i> Promocional
-        </button>
-        <button class="tab-btn" onclick="showTab('individual', this)">
-            <span class="tab-dot" style="background:#e74c3c"></span> 🎯 Individual
-        </button>
-    </div>
-
-    <!-- ── PANEL: ANUNCIOS A TODOS ── -->
-    <div class="panel active" id="panel-anuncios">
-        <div class="card">
-            <div class="card-title"><i data-lucide="megaphone"></i> Anuncio a todos los colegios</div>
-            <div class="card-desc">Envía un correo a uno o varios colegios seleccionados. Ideal para noticias, cambios de plataforma o recordatorios generales.</div>
-
-            <form method="POST" action="/admin/correos/enviar_anuncio">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <label>Seleccionar destinatarios</label>
-                <div class="select-all-row">
-                    <button type="button" class="btn btn-sm" style="background:#2a2a35;color:#e8e8f0;" onclick="toggleAll('chk-anuncio', true)">✓ Todos</button>
-                    <button type="button" class="btn btn-sm" style="background:#2a2a35;color:#e8e8f0;" onclick="toggleAll('chk-anuncio', false)">✗ Ninguno</button>
-                    <span>Correo del admin de cada colegio seleccionado</span>
-                </div>
-                <div class="colegios-grid">
-                    {% for c in colegios %}
-                    <label class="colegio-check" style="display:flex;cursor:pointer;">
-                        <input type="checkbox" name="slugs" value="{{ c.slug }}" class="chk-anuncio">
-                        <div>
-                            <div class="cname">{{ c.nombre }}</div>
-                            <div class="cslug">/{{ c.slug }}</div>
-                        </div>
-                    </label>
-                    {% endfor %}
-                </div>
-
-                <label style="margin-top:18px;">Email destino (admin del colegio)</label>
-                <input type="email" name="email_destino" placeholder="admin@colegio.com (o déjalo vacío si usas selección múltiple)">
-
-                <label>Asunto del correo</label>
-                <input type="text" name="asunto" placeholder="Ej: Actualización importante de Lumini" required>
-
-                <label>Mensaje</label>
-                <textarea name="mensaje" placeholder="Escribe el mensaje principal aquí..." required></textarea>
-
-                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar anuncio</button>
-            </form>
-        </div>
-
-        <!-- Plantillas rápidas -->
-        <div class="card">
-            <div class="card-title">⚡ Plantillas rápidas</div>
-            <div class="card-desc">Haz clic en una plantilla para cargar el texto automáticamente en el formulario de arriba.</div>
-            <button class="plantilla-btn" onclick="cargarPlantilla('mantenimiento')">
-                <span class="picon"><i data-lucide="wrench"></i></span>
-                <div class="pinfo">
-                    <div class="ptitle">Mantenimiento programado</div>
-                    <div class="pdesc">Aviso de ventana de mantenimiento con fecha y hora</div>
-                </div>
-            </button>
-            <button class="plantilla-btn" onclick="cargarPlantilla('bienvenida_masivo')">
-                <span class="picon">🎉</span>
-                <div class="pinfo">
-                    <div class="ptitle">Bienvenida masiva</div>
-                    <div class="pdesc">Saludo inicial para colegios recién incorporados</div>
-                </div>
-            </button>
-            <button class="plantilla-btn" onclick="cargarPlantilla('novedad')">
-                <span class="picon"><i data-lucide="wand-sparkles"></i></span>
-                <div class="pinfo">
-                    <div class="ptitle">Nueva funcionalidad</div>
-                    <div class="pdesc">Anuncio de una característica nueva en la plataforma</div>
-                </div>
-            </button>
-        </div>
-    </div>
-
-    <!-- ── PANEL: RECORDATORIO DE PAGO ── -->
-    <div class="panel" id="panel-pagos">
-        <div class="card">
-            <div class="card-title"><i data-lucide="credit-card"></i> Recordatorio de pago</div>
-            <div class="card-desc">Envía un recordatorio de vencimiento de suscripción al correo del administrador del colegio.</div>
-
-            <form method="POST" action="/admin/recordatorio_pago">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <label>Colegio</label>
-                <select name="slug" required>
-                    <option value="">— Selecciona un colegio —</option>
-                    {% for c in colegios %}
-                    <option value="{{ c.slug }}">{{ c.nombre }} {% if c.vencimiento %}(vence: {{ c.vencimiento }}){% else %}(sin fecha){% endif %}</option>
-                    {% endfor %}
-                </select>
-
-                <label>Correo del administrador del colegio</label>
-                <input type="email" name="email" placeholder="admin@colegio.com" required>
-
-                <div class="preview-box" style="margin-top:16px;">
-                    <b style="color:#f39c12;">Vista previa del correo:</b><br><br>
-                    <i data-lucide="alert-triangle"></i> <b>Recordatorio de pago</b><br>
-                    Hola, el acceso de <i>[Nombre del colegio]</i> vence el <i>[fecha de vencimiento]</i>.<br>
-                    Para renovar su suscripción y mantener el acceso a Lumini, por favor realice el pago antes de la fecha indicada.<br><br>
-                    <span style="color:#555;">— Equipo Lumini</span>
-                </div>
-
-                <button type="submit" class="btn btn-warning mt"><i data-lucide="send"></i> Enviar recordatorio</button>
-            </form>
-        </div>
-
-        <!-- ENVÍO MASIVO DE RECORDATORIOS -->
-        <div class="card">
-            <div class="card-title"><i data-lucide="clipboard-list"></i> Recordatorios masivos por vencimiento</div>
-            <div class="card-desc">Selecciona todos los colegios con vencimiento próximo y envíales un recordatorio a la vez.</div>
-            {% set proximos = [] %}
-            {% for c in colegios %}{% if c.vencimiento %}{% set _ = proximos.append(c) %}{% endif %}{% endfor %}
-            {% if proximos %}
-            <form method="POST" action="/admin/correos/recordatorio_masivo">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <div class="colegios-grid">
-                    {% for c in proximos %}
-                    <label class="colegio-check" style="display:flex;cursor:pointer;">
-                        <input type="checkbox" name="slugs" value="{{ c.slug }}" class="chk-pago">
-                        <div>
-                            <div class="cname">{{ c.nombre }}</div>
-                            <div class="cslug">Vence: {{ c.vencimiento }}</div>
-                        </div>
-                    </label>
-                    {% endfor %}
-                </div>
-                <label style="margin-top:14px;">Email de contacto (si no está en el sistema)</label>
-                <input type="email" name="email_fallback" placeholder="correo@ejemplo.com">
-                <button type="submit" class="btn btn-warning mt"><i data-lucide="send"></i> Enviar a seleccionados</button>
-            </form>
-            {% else %}
-            <p style="color:#555;font-size:13px;">No hay colegios con fecha de vencimiento registrada.</p>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- ── PANEL: ACTUALIZACIÓN NUEVA ── -->
-    <div class="panel" id="panel-actualizacion">
-        <div class="card">
-            <div class="card-title">🚀 Notificar nueva actualización</div>
-            <div class="card-desc">Informa a todos los colegios sobre una nueva versión o mejora importante en Lumini.</div>
-
-            <form method="POST" action="/admin/correos/enviar_actualizacion">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <label>Versión o nombre de la actualización</label>
-                <input type="text" name="version" placeholder="Ej: v2.5 — Horarios mejorados" required>
-
-                <label>¿Qué hay de nuevo? (lista de mejoras)</label>
-                <textarea name="novedades" placeholder="• Nueva vista de horarios por curso&#10;• Mejora en la exportación de boletines&#10;• Corrección de errores reportados" required></textarea>
-
-                <label>Colegios destinatarios</label>
-                <div class="select-all-row">
-                    <button type="button" class="btn btn-sm" style="background:#2a2a35;color:#e8e8f0;" onclick="toggleAll('chk-act', true)">✓ Todos</button>
-                    <button type="button" class="btn btn-sm" style="background:#2a2a35;color:#e8e8f0;" onclick="toggleAll('chk-act', false)">✗ Ninguno</button>
-                </div>
-                <div class="colegios-grid">
-                    {% for c in colegios %}
-                    <label class="colegio-check" style="display:flex;cursor:pointer;">
-                        <input type="checkbox" name="slugs" value="{{ c.slug }}" class="chk-act" checked>
-                        <div>
-                            <div class="cname">{{ c.nombre }}</div>
-                            <div class="cslug">/{{ c.slug }}</div>
-                        </div>
-                    </label>
-                    {% endfor %}
-                </div>
-
-                <label style="margin-top:14px;">Email destino de cada colegio</label>
-                <input type="email" name="email_global" placeholder="Si todos usan el mismo correo, ponlo aquí">
-
-                <button type="submit" class="btn btn-success mt">🚀 Notificar actualización</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ── PANEL: CORREO PROMOCIONAL ── -->
-    <div class="panel" id="panel-promocional">
-        <div class="card">
-            <div class="card-title"><i data-lucide="megaphone"></i> Correo promocional</div>
-            <div class="card-desc">Envía correos a instituciones interesadas que aún no están registradas en Lumini.</div>
-
-            <form method="POST" action="/admin/correos/enviar_promocional">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <label>Nombre de la institución</label>
-                <input type="text" name="institucion" placeholder="Colegio San Rafael" required>
-
-                <label>Correo de contacto</label>
-                <input type="email" name="email" placeholder="contacto@institución.edu.co" required>
-
-                <label>Asunto</label>
-                <input type="text" name="asunto" value="¿Conoces Lumini? La plataforma educativa que tu colegio necesita" required>
-
-                <label>Mensaje personalizado</label>
-                <textarea name="mensaje" placeholder="Hola, somos Lumini, la plataforma de gestión académica...">Hola,
-
-Te escribimos desde Lumini, la plataforma que simplifica la gestión de notas, asistencia y comunicación escolar.
-
-Miles de profesores ya la usan para:
-• Registrar notas y generar boletines en PDF
-• Controlar asistencia diaria
-• Compartir el horario con estudiantes y padres
-• Gestionar compromisos académicos
-
-¿Te gustaría una demostración gratuita? Responde este correo o visita nuestra plataforma.
-
-— Equipo Lumini</textarea>
-
-                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar correo promocional</button>
-            </form>
-        </div>
-
-        <!-- LISTA CONTACTOS INTERESADOS -->
-        <div class="card">
-            <div class="card-title"><i data-lucide="clipboard-list"></i> Envío masivo a lista de interesados</div>
-            <div class="card-desc">Pega una lista de correos (uno por línea) para enviar el mismo mensaje a todos.</div>
-            <form method="POST" action="/admin/correos/enviar_lista">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <label>Lista de correos (uno por línea)</label>
-                <textarea name="lista_emails" placeholder="correo1@ejemplo.com&#10;correo2@ejemplo.com&#10;correo3@colegio.edu" style="min-height:100px;" required></textarea>
-                <label>Asunto</label>
-                <input type="text" name="asunto" value="Lumini — La plataforma educativa que tu institución necesita" required>
-                <label>Mensaje</label>
-                <textarea name="mensaje" placeholder="Mensaje para todos los contactos..." required></textarea>
-                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar a todos</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ── PANEL: CORREO INDIVIDUAL ── -->
-    <div class="panel" id="panel-individual">
-        <div class="card">
-            <div class="card-title">🎯 Correo individual</div>
-            <div class="card-desc">Envía un mensaje personalizado a cualquier destinatario con formato Lumini.</div>
-
-            <form method="POST" action="/admin/correos/enviar_individual">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <div class="form-row">
-                    <div>
-                        <label>Nombre del destinatario</label>
-                        <input type="text" name="nombre_dest" placeholder="Juan García" required>
-                    </div>
-                    <div>
-                        <label>Correo electrónico</label>
-                        <input type="email" name="email" placeholder="juan@ejemplo.com" required>
-                    </div>
-                </div>
-
-                <label>Asunto</label>
-                <input type="text" name="asunto" placeholder="Asunto del correo" required>
-
-                <label>Mensaje</label>
-                <textarea name="mensaje" placeholder="Escribe el mensaje aquí..." required></textarea>
-
-                <label>Tipo de correo</label>
-                <select name="tipo">
-                    <option value="general">General (fondo oscuro Lumini)</option>
-                    <option value="alerta">Alerta / Advertencia</option>
-                    <option value="bienvenida">Bienvenida</option>
-                    <option value="soporte">Soporte técnico</option>
-                </select>
-
-                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar correo</button>
-            </form>
-        </div>
-
-        <!-- REENVIAR BIENVENIDA -->
-        <div class="card">
-            <div class="card-title"><i data-lucide="refresh-cw"></i> Reenviar correo de bienvenida</div>
-            <div class="card-desc">Reenvía el correo de bienvenida a un colegio ya registrado (por si no lo recibió).</div>
-            <form method="POST" action="/admin/correos/reenviar_bienvenida">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <label>Colegio</label>
-                <select name="slug" required>
-                    <option value="">— Selecciona un colegio —</option>
-                    {% for c in colegios %}
-                    <option value="{{ c.slug }}">{{ c.nombre }}</option>
-                    {% endfor %}
-                </select>
-                <label>Correo del administrador</label>
-                <input type="email" name="email" placeholder="admin@colegio.com" required>
-                <button type="submit" class="btn btn-success mt"><i data-lucide="send"></i> Reenviar bienvenida</button>
-            </form>
-        </div>
-    </div>
-
-</div><!-- /container -->
-
-<script>
-// Tabs
-function showTab(id, btn) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('panel-' + id).classList.add('active');
-    btn.classList.add('active');
-}
-
-// Seleccionar todos los checkboxes de una clase
-function toggleAll(cls, val) {
-    document.querySelectorAll('.' + cls).forEach(cb => cb.checked = val);
-}
-
-// Plantillas rápidas
-const plantillas = {
-    mantenimiento: {
-        asunto: 'Mantenimiento programado en Lumini',
-        mensaje: 'Estimados usuarios de Lumini,\n\nLes informamos que realizaremos un mantenimiento programado en nuestra plataforma.\n\nFecha: [FECHA]\nHora: [HORA] - [HORA FIN]\n\nDurante este tiempo la plataforma no estará disponible. Disculpen los inconvenientes.\n\nGracias por su comprensión.\n— Equipo Lumini'
-    },
-    bienvenida_masivo: {
-        asunto: '🎉 ¡Bienvenidos a Lumini!',
-        mensaje: 'Hola,\n\n¡Es un placer tenerlos en la familia Lumini! Estamos muy contentos de que su institución confíe en nuestra plataforma para gestionar su información académica.\n\nRecuerden que pueden contactarnos en cualquier momento si necesitan ayuda.\n\n— Equipo Lumini'
-    },
-    novedad: {
-        asunto: 'Nueva funcionalidad disponible en Lumini',
-        mensaje: 'Hola,\n\nTenemos novedades para ustedes. Hemos lanzado una nueva funcionalidad en Lumini:\n\n[DESCRIPCIÓN DE LA FUNCIONALIDAD]\n\nIngresen a la plataforma para explorarla. Como siempre, cualquier duda o comentario es bienvenido.\n\n— Equipo Lumini'
-    }
-};
-
-function cargarPlantilla(key) {
-    const p = plantillas[key];
-    if (!p) return;
-    const asuntoInput = document.querySelector('#panel-anuncios input[name=asunto]');
-    const mensajeInput = document.querySelector('#panel-anuncios textarea[name=mensaje]');
-    if (asuntoInput) asuntoInput.value = p.asunto;
-    if (mensajeInput) mensajeInput.value = p.mensaje;
-    // Scroll al formulario
-    document.querySelector('#panel-anuncios .card').scrollIntoView({ behavior: 'smooth' });
-}
-</script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-
-</body>
-</html>
-
-
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumini — Centro de Correos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+
+        :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 4px rgba(0,0,0,.2);}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);}
+        *{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;padding-top:80px;color:var(--text);-webkit-font-smoothing:antialiased;}
+        .navbar{position:fixed;top:0;left:0;width:100%;background:rgba(8,8,15,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 28px;z-index:1000;}
+        .navbar-left{display:flex;align-items:center;gap:14px;}
+        .navbar img{height:40px;width:40px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
+        .navbar-brand .name{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:5px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .navbar-brand .tagline{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;}
+        .admin-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+        .navbar-right{display:flex;align-items:center;gap:16px;}
+        .nav-link{color:var(--muted);text-decoration:none;font-size:13px;transition:color var(--tr);}
+        .nav-link:hover{color:var(--text);}
+        .logout-btn{color:var(--red);text-decoration:none;font-size:13px;}
+        .container{max-width:960px;margin:0 auto;padding:32px 20px 60px;}
+        .page-header{margin-bottom:32px;}
+        .page-header h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;}
+        .page-header p{color:var(--muted);font-size:13px;}
+        .alert{padding:12px 16px;border-radius:var(--rmd);font-size:13px;margin-bottom:22px;display:flex;align-items:center;gap:10px;}
+        .alert-error{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.25);color:var(--red);}
+        .alert-success{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.25);color:var(--green);}
+        .tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:24px;background:var(--bg);border-radius:var(--rmd);padding:4px;border:1px solid var(--border);}
+        .tab-btn{padding:9px 18px;border-radius:var(--rsm);border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;gap:7px;white-space:nowrap;}
+        .tab-btn:hover{color:var(--text);background:rgba(255,255,255,.04);}
+        .tab-btn.active{background:var(--bg2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+        .tab-dot{width:7px;height:7px;border-radius:50%;}
+        .panel{display:none;}
+        .panel.active{display:block;}
+        .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:26px;margin-bottom:12px;box-shadow:var(--shadow);}
+        .card-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+        .card-desc{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5;}
+        label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;margin-top:14px;}
+        label:first-of-type{margin-top:0;}
+        input[type=text],input[type=email],textarea,select{width:100%;padding:10px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
+        input[type=text]:focus,input[type=email]:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
+        textarea{resize:vertical;min-height:120px;}
+        select option{background:var(--bg3);}
+        .form-row{display:flex;gap:12px;flex-wrap:wrap;}
+        .form-row>*{flex:1;min-width:180px;}
+        .btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);display:inline-flex;align-items:center;gap:8px;}
+        .btn:active{transform:scale(.97);}
+        .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
+        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
+        .btn-warning{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;box-shadow:0 4px 12px rgba(243,156,18,.2);}
+        .btn-warning:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(243,156,18,.3);}
+        .btn-success{background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;box-shadow:0 4px 12px rgba(46,204,113,.2);}
+        .btn-success:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(46,204,113,.3);}
+        .btn-sm{padding:6px 14px;font-size:12px;}
+        .mt{margin-top:16px;}
+        .colegios-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:4px;}
+        .colegio-check{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all var(--tr);}
+        .colegio-check:hover{border-color:rgba(var(--accent-rgb),.4);}
+        .colegio-check input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;}
+        .colegio-check .cname{font-size:13px;font-weight:500;color:var(--text);}
+        .colegio-check .cslug{font-size:11px;color:var(--sub);font-family:monospace;}
+        .select-all-row{display:flex;gap:10px;margin-bottom:12px;align-items:center;}
+        .select-all-row span{font-size:12px;color:var(--muted);}
+        .plantilla-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);padding:12px 16px;cursor:pointer;text-align:left;width:100%;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px;transition:all var(--tr);margin-bottom:8px;}
+        .plantilla-btn:hover{border-color:rgba(var(--accent-rgb),.4);background:rgba(var(--accent-rgb),.04);}
+        .plantilla-btn .picon{font-size:20px;}
+        .plantilla-btn .pinfo .ptitle{font-weight:600;}
+        .plantilla-btn .pinfo .pdesc{font-size:12px;color:var(--muted);margin-top:2px;}
+        .preview-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--rsm);padding:16px;margin-top:14px;font-size:12px;color:var(--muted);max-height:200px;overflow-y:auto;line-height:1.6;}
+        .info-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.18);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+        .historial-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;}
+        .historial-item:last-child{border-bottom:none;}
+        .historial-item .hasunto{font-weight:600;color:var(--text);}
+        .historial-item .hfecha{color:var(--muted);font-size:12px;}
+        .historial-item .hdest{color:var(--accent2);font-size:12px;}
+        .badge-enviado{background:rgba(46,204,113,.12);color:var(--green);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+        @media(max-width:640px){.navbar{padding:8px 16px;}.container{padding:20px 12px 40px;}.tabs{gap:2px;}.tab-btn{padding:8px 12px;font-size:12px;}.form-row{flex-direction:column;}}
+        @media(max-width:375px){.navbar{padding:6px 10px;}.navbar img{height:32px;width:32px;}.navbar-brand .name{font-size:.95rem;letter-spacing:3px;}.nav-link,.logout-btn{font-size:12px;}.container{padding:16px 8px 32px;}.page-header h1{font-size:1.3rem;}.card{padding:16px;}.card-title{font-size:13px;}.tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}.colegios-grid{grid-template-columns:1fr;}.form-row>*{min-width:100%;}.btn{font-size:13px;padding:8px 16px;min-height:40px;}}
+
+</style>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
+
+<body>
+
+<nav class="navbar">
+    <div class="navbar-left">
+        <img src="/static/lumini_logo.webp" alt="Lumini">
+        <div class="navbar-brand">
+            <div class="name">LUMINI</div>
+            <div class="tagline">Centro de correos</div>
+        </div>
+        <span class="admin-badge">Admin</span>
+    </div>
+    <div class="navbar-right">
+        <a href="/admin" class="nav-link"><i data-lucide="arrow-left"></i> Panel principal</a>
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;padding:6px 12px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;" aria-label="Cambiar tema">🌙</button>
+        <a href="/admin/logout" class="logout-btn">🚪 Salir</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1><i data-lucide="mail"></i> Centro de Correos</h1>
+        <p>Gestiona todos los correos automáticos y masivos de Lumini desde un solo lugar.</p>
+    </div>
+
+    {% if error %}<div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>{% endif %}
+    {% if exito %}<div class="alert alert-success"><i data-lucide="check-circle"></i> {{ exito }}</div>{% endif %}
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('anuncios', this)">
+            <span class="tab-dot" style="background:var(--accent)"></span> <i data-lucide="megaphone"></i> Anuncios
+        </button>
+        <button class="tab-btn" onclick="showTab('pagos', this)">
+            <span class="tab-dot" style="background:#f39c12"></span> <i data-lucide="credit-card"></i> Pagos
+        </button>
+        <button class="tab-btn" onclick="showTab('actualizacion', this)">
+            <span class="tab-dot" style="background:#2ecc71"></span> 🚀 Actualización
+        </button>
+        <button class="tab-btn" onclick="showTab('promocional', this)">
+            <span class="tab-dot" style="background:#3498db"></span> <i data-lucide="megaphone"></i> Promocional
+        </button>
+        <button class="tab-btn" onclick="showTab('individual', this)">
+            <span class="tab-dot" style="background:#e74c3c"></span> 🎯 Individual
+        </button>
+    </div>
+
+    <!-- ── PANEL: ANUNCIOS A TODOS ── -->
+    <div class="panel active" id="panel-anuncios">
+        <div class="card">
+            <div class="card-title"><i data-lucide="megaphone"></i> Anuncio a todos los colegios</div>
+            <div class="card-desc">Envía un correo a uno o varios colegios seleccionados. Ideal para noticias, cambios de plataforma o recordatorios generales.</div>
+
+            <form method="POST" action="/admin/correos/enviar_anuncio">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <label>Seleccionar destinatarios</label>
+                <div class="select-all-row">
+                    <button type="button" class="btn btn-sm" style="background:#2a2a35;color:#e8e8f0;" onclick="toggleAll('chk-anuncio', true)">✓ Todos</button>
+                    <button type="button" class="btn btn-sm" style="background:#2a2a35;color:#e8e8f0;" onclick="toggleAll('chk-anuncio', false)">✗ Ninguno</button>
+                    <span>Correo del admin de cada colegio seleccionado</span>
+                </div>
+                <div class="colegios-grid">
+                    {% for c in colegios %}
+                    <label class="colegio-check" style="display:flex;cursor:pointer;">
+                        <input type="checkbox" name="slugs" value="{{ c.slug }}" class="chk-anuncio">
+                        <div>
+                            <div class="cname">{{ c.nombre }}</div>
+                            <div class="cslug">/{{ c.slug }}</div>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <label style="margin-top:18px;">Email destino (admin del colegio)</label>
+                <input type="email" name="email_destino" placeholder="admin@colegio.com (o déjalo vacío si usas selección múltiple)">
+
+                <label>Asunto del correo</label>
+                <input type="text" name="asunto" placeholder="Ej: Actualización importante de Lumini" required>
+
+                <label>Mensaje</label>
+                <textarea name="mensaje" placeholder="Escribe el mensaje principal aquí..." required></textarea>
+
+                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar anuncio</button>
+            </form>
+        </div>
+
+        <!-- Plantillas rápidas -->
+        <div class="card">
+            <div class="card-title">⚡ Plantillas rápidas</div>
+            <div class="card-desc">Haz clic en una plantilla para cargar el texto automáticamente en el formulario de arriba.</div>
+            <button class="plantilla-btn" onclick="cargarPlantilla('mantenimiento')">
+                <span class="picon"><i data-lucide="wrench"></i></span>
+                <div class="pinfo">
+                    <div class="ptitle">Mantenimiento programado</div>
+                    <div class="pdesc">Aviso de ventana de mantenimiento con fecha y hora</div>
+                </div>
+            </button>
+            <button class="plantilla-btn" onclick="cargarPlantilla('bienvenida_masivo')">
+                <span class="picon">🎉</span>
+                <div class="pinfo">
+                    <div class="ptitle">Bienvenida masiva</div>
+                    <div class="pdesc">Saludo inicial para colegios recién incorporados</div>
+                </div>
+            </button>
+            <button class="plantilla-btn" onclick="cargarPlantilla('novedad')">
+                <span class="picon"><i data-lucide="wand-sparkles"></i></span>
+                <div class="pinfo">
+                    <div class="ptitle">Nueva funcionalidad</div>
+                    <div class="pdesc">Anuncio de una característica nueva en la plataforma</div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- ── PANEL: RECORDATORIO DE PAGO ── -->
+    <div class="panel" id="panel-pagos">
+        <div class="card">
+            <div class="card-title"><i data-lucide="credit-card"></i> Recordatorio de pago</div>
+            <div class="card-desc">Envía un recordatorio de vencimiento de suscripción al correo del administrador del colegio.</div>
+
+            <form method="POST" action="/admin/recordatorio_pago">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <label>Colegio</label>
+                <select name="slug" required>
+                    <option value="">— Selecciona un colegio —</option>
+                    {% for c in colegios %}
+                    <option value="{{ c.slug }}">{{ c.nombre }} {% if c.vencimiento %}(vence: {{ c.vencimiento }}){% else %}(sin fecha){% endif %}</option>
+                    {% endfor %}
+                </select>
+
+                <label>Correo del administrador del colegio</label>
+                <input type="email" name="email" placeholder="admin@colegio.com" required>
+
+                <div class="preview-box" style="margin-top:16px;">
+                    <b style="color:#f39c12;">Vista previa del correo:</b><br><br>
+                    <i data-lucide="alert-triangle"></i> <b>Recordatorio de pago</b><br>
+                    Hola, el acceso de <i>[Nombre del colegio]</i> vence el <i>[fecha de vencimiento]</i>.<br>
+                    Para renovar su suscripción y mantener el acceso a Lumini, por favor realice el pago antes de la fecha indicada.<br><br>
+                    <span style="color:#555;">— Equipo Lumini</span>
+                </div>
+
+                <button type="submit" class="btn btn-warning mt"><i data-lucide="send"></i> Enviar recordatorio</button>
+            </form>
+        </div>
+
+        <!-- ENVÍO MASIVO DE RECORDATORIOS -->
+        <div class="card">
+            <div class="card-title"><i data-lucide="clipboard-list"></i> Recordatorios masivos por vencimiento</div>
+            <div class="card-desc">Selecciona todos los colegios con vencimiento próximo y envíales un recordatorio a la vez.</div>
+            {% set proximos = [] %}
+            {% for c in colegios %}{% if c.vencimiento %}{% set _ = proximos.append(c) %}{% endif %}{% endfor %}
+            {% if proximos %}
+            <form method="POST" action="/admin/correos/recordatorio_masivo">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <div class="colegios-grid">
+                    {% for c in proximos %}
+                    <label class="colegio-check" style="display:flex;cursor:pointer;">
+                        <input type="checkbox" name="slugs" value="{{ c.slug }}" class="chk-pago">
+                        <div>
+                            <div class="cname">{{ c.nombre }}</div>
+                            <div class="cslug">Vence: {{ c.vencimiento }}</div>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+                <label style="margin-top:14px;">Email de contacto (si no está en el sistema)</label>
+                <input type="email" name="email_fallback" placeholder="correo@ejemplo.com">
+                <button type="submit" class="btn btn-warning mt"><i data-lucide="send"></i> Enviar a seleccionados</button>
+            </form>
+            {% else %}
+            <p style="color:#555;font-size:13px;">No hay colegios con fecha de vencimiento registrada.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ── PANEL: ACTUALIZACIÓN NUEVA ── -->
+    <div class="panel" id="panel-actualizacion">
+        <div class="card">
+            <div class="card-title">🚀 Notificar nueva actualización</div>
+            <div class="card-desc">Informa a todos los colegios sobre una nueva versión o mejora importante en Lumini.</div>
+
+            <form method="POST" action="/admin/correos/enviar_actualizacion">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <label>Versión o nombre de la actualización</label>
+                <input type="text" name="version" placeholder="Ej: v2.5 — Horarios mejorados" required>
+
+                <label>¿Qué hay de nuevo? (lista de mejoras)</label>
+                <textarea name="novedades" placeholder="• Nueva vista de horarios por curso&#10;• Mejora en la exportación de boletines&#10;• Corrección de errores reportados" required></textarea>
+
+                <label>Colegios destinatarios</label>
+                <div class="select-all-row">
+                    <button type="button" class="btn btn-sm" style="background:#2a2a35;color:#e8e8f0;" onclick="toggleAll('chk-act', true)">✓ Todos</button>
+                    <button type="button" class="btn btn-sm" style="background:#2a2a35;color:#e8e8f0;" onclick="toggleAll('chk-act', false)">✗ Ninguno</button>
+                </div>
+                <div class="colegios-grid">
+                    {% for c in colegios %}
+                    <label class="colegio-check" style="display:flex;cursor:pointer;">
+                        <input type="checkbox" name="slugs" value="{{ c.slug }}" class="chk-act" checked>
+                        <div>
+                            <div class="cname">{{ c.nombre }}</div>
+                            <div class="cslug">/{{ c.slug }}</div>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <label style="margin-top:14px;">Email destino de cada colegio</label>
+                <input type="email" name="email_global" placeholder="Si todos usan el mismo correo, ponlo aquí">
+
+                <button type="submit" class="btn btn-success mt">🚀 Notificar actualización</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── PANEL: CORREO PROMOCIONAL ── -->
+    <div class="panel" id="panel-promocional">
+        <div class="card">
+            <div class="card-title"><i data-lucide="megaphone"></i> Correo promocional</div>
+            <div class="card-desc">Envía correos a instituciones interesadas que aún no están registradas en Lumini.</div>
+
+            <form method="POST" action="/admin/correos/enviar_promocional">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <label>Nombre de la institución</label>
+                <input type="text" name="institucion" placeholder="Colegio San Rafael" required>
+
+                <label>Correo de contacto</label>
+                <input type="email" name="email" placeholder="contacto@institución.edu.co" required>
+
+                <label>Asunto</label>
+                <input type="text" name="asunto" value="¿Conoces Lumini? La plataforma educativa que tu colegio necesita" required>
+
+                <label>Mensaje personalizado</label>
+                <textarea name="mensaje" placeholder="Hola, somos Lumini, la plataforma de gestión académica...">Hola,
+
+Te escribimos desde Lumini, la plataforma que simplifica la gestión de notas, asistencia y comunicación escolar.
+
+Miles de profesores ya la usan para:
+• Registrar notas y generar boletines en PDF
+• Controlar asistencia diaria
+• Compartir el horario con estudiantes y padres
+• Gestionar compromisos académicos
+
+¿Te gustaría una demostración gratuita? Responde este correo o visita nuestra plataforma.
+
+— Equipo Lumini</textarea>
+
+                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar correo promocional</button>
+            </form>
+        </div>
+
+        <!-- LISTA CONTACTOS INTERESADOS -->
+        <div class="card">
+            <div class="card-title"><i data-lucide="clipboard-list"></i> Envío masivo a lista de interesados</div>
+            <div class="card-desc">Pega una lista de correos (uno por línea) para enviar el mismo mensaje a todos.</div>
+            <form method="POST" action="/admin/correos/enviar_lista">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <label>Lista de correos (uno por línea)</label>
+                <textarea name="lista_emails" placeholder="correo1@ejemplo.com&#10;correo2@ejemplo.com&#10;correo3@colegio.edu" style="min-height:100px;" required></textarea>
+                <label>Asunto</label>
+                <input type="text" name="asunto" value="Lumini — La plataforma educativa que tu institución necesita" required>
+                <label>Mensaje</label>
+                <textarea name="mensaje" placeholder="Mensaje para todos los contactos..." required></textarea>
+                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar a todos</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── PANEL: CORREO INDIVIDUAL ── -->
+    <div class="panel" id="panel-individual">
+        <div class="card">
+            <div class="card-title">🎯 Correo individual</div>
+            <div class="card-desc">Envía un mensaje personalizado a cualquier destinatario con formato Lumini.</div>
+
+            <form method="POST" action="/admin/correos/enviar_individual">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <div class="form-row">
+                    <div>
+                        <label>Nombre del destinatario</label>
+                        <input type="text" name="nombre_dest" placeholder="Juan García" required>
+                    </div>
+                    <div>
+                        <label>Correo electrónico</label>
+                        <input type="email" name="email" placeholder="juan@ejemplo.com" required>
+                    </div>
+                </div>
+
+                <label>Asunto</label>
+                <input type="text" name="asunto" placeholder="Asunto del correo" required>
+
+                <label>Mensaje</label>
+                <textarea name="mensaje" placeholder="Escribe el mensaje aquí..." required></textarea>
+
+                <label>Tipo de correo</label>
+                <select name="tipo">
+                    <option value="general">General (fondo oscuro Lumini)</option>
+                    <option value="alerta">Alerta / Advertencia</option>
+                    <option value="bienvenida">Bienvenida</option>
+                    <option value="soporte">Soporte técnico</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary mt"><i data-lucide="send"></i> Enviar correo</button>
+            </form>
+        </div>
+
+        <!-- REENVIAR BIENVENIDA -->
+        <div class="card">
+            <div class="card-title"><i data-lucide="refresh-cw"></i> Reenviar correo de bienvenida</div>
+            <div class="card-desc">Reenvía el correo de bienvenida a un colegio ya registrado (por si no lo recibió).</div>
+            <form method="POST" action="/admin/correos/reenviar_bienvenida">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <label>Colegio</label>
+                <select name="slug" required>
+                    <option value="">— Selecciona un colegio —</option>
+                    {% for c in colegios %}
+                    <option value="{{ c.slug }}">{{ c.nombre }}</option>
+                    {% endfor %}
+                </select>
+                <label>Correo del administrador</label>
+                <input type="email" name="email" placeholder="admin@colegio.com" required>
+                <button type="submit" class="btn btn-success mt"><i data-lucide="send"></i> Reenviar bienvenida</button>
+            </form>
+        </div>
+    </div>
+
+</div><!-- /container -->
+
+<script>
+// Tabs
+function showTab(id, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    btn.classList.add('active');
+}
+
+// Seleccionar todos los checkboxes de una clase
+function toggleAll(cls, val) {
+    document.querySelectorAll('.' + cls).forEach(cb => cb.checked = val);
+}
+
+// Plantillas rápidas
+const plantillas = {
+    mantenimiento: {
+        asunto: 'Mantenimiento programado en Lumini',
+        mensaje: 'Estimados usuarios de Lumini,\n\nLes informamos que realizaremos un mantenimiento programado en nuestra plataforma.\n\nFecha: [FECHA]\nHora: [HORA] - [HORA FIN]\n\nDurante este tiempo la plataforma no estará disponible. Disculpen los inconvenientes.\n\nGracias por su comprensión.\n— Equipo Lumini'
+    },
+    bienvenida_masivo: {
+        asunto: '🎉 ¡Bienvenidos a Lumini!',
+        mensaje: 'Hola,\n\n¡Es un placer tenerlos en la familia Lumini! Estamos muy contentos de que su institución confíe en nuestra plataforma para gestionar su información académica.\n\nRecuerden que pueden contactarnos en cualquier momento si necesitan ayuda.\n\n— Equipo Lumini'
+    },
+    novedad: {
+        asunto: 'Nueva funcionalidad disponible en Lumini',
+        mensaje: 'Hola,\n\nTenemos novedades para ustedes. Hemos lanzado una nueva funcionalidad en Lumini:\n\n[DESCRIPCIÓN DE LA FUNCIONALIDAD]\n\nIngresen a la plataforma para explorarla. Como siempre, cualquier duda o comentario es bienvenido.\n\n— Equipo Lumini'
+    }
+};
+
+function cargarPlantilla(key) {
+    const p = plantillas[key];
+    if (!p) return;
+    const asuntoInput = document.querySelector('#panel-anuncios input[name=asunto]');
+    const mensajeInput = document.querySelector('#panel-anuncios textarea[name=mensaje]');
+    if (asuntoInput) asuntoInput.value = p.asunto;
+    if (mensajeInput) mensajeInput.value = p.mensaje;
+    // Scroll al formulario
+    document.querySelector('#panel-anuncios .card').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
+  <script src="/static/js/lumini.js"></script>
+
+</html>
+
+
+

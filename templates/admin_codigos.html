@@ -1,250 +1,248 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — Códigos de invitación</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 3px rgba(0,0,0,.15);--sidebar:200px;}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.06);}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
-.sidebar-logo{padding:14px 14px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
-.sidebar-logo img{height:30px;width:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
-.sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}
-.sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}
-.sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
-.sidebar-link.active{background:var(--accent);color:#fff;}
-.sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
-.sidebar-footer{padding:8px 10px;border-top:1px solid #1E293B;}
-.main{margin-left:var(--sidebar);padding:20px 24px;width:calc(100% - var(--sidebar));min-height:100vh;max-width:1300px;}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
-.header h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:2px;}
-.header p{font-size:13px;color:var(--muted);margin-top:4px;}
-.section-title{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;margin-top:28px;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
-.card-head{padding:10px 14px;border-bottom:1px solid #1E293B;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-.card-body{padding:14px;}
-.field{margin-bottom:14px;}
-.field label{display:block;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;font-weight:600;}
-.field input,.field select{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color var(--tr);}
-.field input:focus,.field select:focus{outline:none;border-color:var(--accent);}
-.field select option{background:#0F172A;}
-.codigo-box{background:rgba(var(--accent-rgb),.08);border:1.5px solid rgba(var(--accent-rgb),.3);border-radius:9px;padding:12px 14px;margin-bottom:13px;}
-.codigo-box label{display:block;font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-weight:600;}
-.codigo-box input{width:100%;padding:10px 13px;background:#0F172A;border:1.5px solid rgba(var(--accent-rgb),.4);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;}
-.codigo-box input:focus{outline:none;border-color:var(--accent);}
-.pass-wrap{position:relative;}
-.pass-wrap input{padding-right:2.5rem;}
-.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:16px;transition:color var(--tr);}
-.eye-btn:hover{color:var(--accent);}
-.alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
-.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);}
-.alert-success{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);color:var(--green);}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all var(--tr);text-decoration:none;}
-.btn-primary{background:var(--accent);color:#fff;}
-.btn-primary:hover{background:var(--accent2);box-shadow:0 4px 12px rgba(var(--accent-rgb),.3);}
-.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
-.btn-ghost:hover{background:var(--bg3);color:var(--text);}
-.btn-green{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.25);}
-.btn-green:hover{background:rgba(16,185,129,.25);}
-.btn-yellow{background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.25);}
-.btn-yellow:hover{background:rgba(245,158,11,.25);}
-.btn-sm{padding:5px 10px;font-size:11px;}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-.hint{font-size:11px;color:var(--sub);margin-top:4px;}
-pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--accent);letter-spacing:1px;word-break:break-all;}
-@media(max-width:768px){.main{padding:20px 16px;}.grid-2,.grid-3{grid-template-columns:1fr;}}
-</style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-
-</head>
-<body>
-<aside class="sidebar">
-    <div class="sidebar-logo">
-        <img src="/static/lumini_logo.webp" alt="Lumini">
-        <div>
-            <div class="sidebar-brand">LUMINI</div>
-            <div class="sidebar-brand-sub">Panel de Administración</div>
-        </div>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="/admin" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
-        <a href="/admin/codigos" class="sidebar-link active"><span class="icon"><i data-lucide="key"></i></span> Códigos de invitación</a>
-        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
-    </nav>
-</aside>
-<div class="main">
-    <div class="header">
-        <div>
-            <h1><i data-lucide="key"></i> Códigos de invitación</h1>
-            <p>Gestiona los códigos por rol para cada colegio.</p>
-        </div>
-        <a href="/admin" class="btn btn-ghost"><i data-lucide="arrow-left"></i> Volver al Dashboard</a>
-    </div>
-
-    {% if error %}
-    <div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>
-    {% endif %}
-    {% if exito %}
-    <div class="alert alert-success">{{ exito }}</div>
-    {% endif %}
-
-    <div class="card">
-        <div class="card-head">
-            <span style="font-weight:600;font-size:13px;"><i data-lucide="school"></i> Seleccionar colegio</span>
-        </div>
-        <div class="card-body">
-            <form method="GET" id="select-colegio">
-                <div class="field">
-                    <label>Colegio</label>
-                    <select name="slug" onchange="this.form.submit()">
-                        <option value="">— Selecciona un colegio —</option>
-                        {% for c in colegios %}
-                        <option value="{{ c.slug }}" {% if colegio and colegio.slug == c.slug %}selected{% endif %}>
-                            {{ c.nombre }} ({{ c.slug }})
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {% if colegio %}
-    <div class="card">
-        <div class="card-head">
-            <span style="font-weight:600;font-size:13px;">
-                <i data-lucide="pencil"></i> Códigos para: {{ colegio.nombre }}
-                <span style="color:var(--muted);font-weight:400;font-size:11px;margin-left:6px;">({{ colegio.slug }})</span>
-            </span>
-        </div>
-        <div class="card-body">
-            <form method="POST">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="accion" value="actualizar_codigos">
-                <input type="hidden" name="slug" value="{{ colegio.slug }}">
-
-                <div class="grid-3">
-                    <div class="codigo-box">
-                        <label><i data-lucide="presentation"></i> Profesores</label>
-                        <div class="pass-wrap">
-                            <input type="text" name="codigo_profesores" id="cod-prof"
-                                   value="{{ colegio.codigo_profesores or colegio.codigo_registro or '' }}"
-                                   autocomplete="off">
-                            <button type="button" class="eye-btn" onclick="toggleCod('cod-prof',this)" aria-label="Mostrar/ocultar código"><i data-lucide="eye"></i></button>
-                        </div>
-                        <p class="hint">Los profesores ingresan este código al registrarse.</p>
-                    </div>
-
-                    <div class="codigo-box">
-                        <label><i data-lucide="user-check"></i> Directoras</label>
-                        <div class="pass-wrap">
-                            <input type="text" name="codigo_directoras" id="cod-dir"
-                                   value="{{ colegio.codigo_directoras or colegio.codigo_registro or '' }}"
-                                   autocomplete="off">
-                            <button type="button" class="eye-btn" onclick="toggleCod('cod-dir',this)" aria-label="Mostrar/ocultar código"><i data-lucide="eye"></i></button>
-                        </div>
-                        <p class="hint">Las directoras ingresan este código al registrarse.</p>
-                    </div>
-
-                    <div class="codigo-box">
-                        <label><i data-lucide="graduation-cap"></i> Rectores</label>
-                        <div class="pass-wrap">
-                            <input type="text" name="codigo_rectores" id="cod-rec"
-                                   value="{{ colegio.codigo_rectores or colegio.codigo_registro or '' }}"
-                                   autocomplete="off">
-                            <button type="button" class="eye-btn" onclick="toggleCod('cod-rec',this)" aria-label="Mostrar/ocultar código"><i data-lucide="eye"></i></button>
-                        </div>
-                        <p class="hint">Los rectores ingresan este código al registrarse.</p>
-                    </div>
-                </div>
-
-                <div style="display:flex;gap:8px;margin-top:8px;">
-                    <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Guardar cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-head">
-            <span style="font-weight:600;font-size:13px;"><i data-lucide="wand-sparkles"></i> Generar nuevos códigos</span>
-        </div>
-        <div class="card-body">
-            <form method="POST">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="accion" value="generar_codigos">
-                <input type="hidden" name="slug" value="{{ colegio.slug }}">
-
-                <div class="field">
-                    <label>Prefijo para los códigos</label>
-                    <div style="display:flex;gap:8px;align-items:center;">
-                        <input type="text" name="prefijo" placeholder="ej: sanjose2025" required autocomplete="off"
-                               style="flex:1;max-width:300px;">
-                        <button type="submit" class="btn btn-green"><i data-lucide="refresh-cw"></i> Generar</button>
-                    </div>
-                    <p class="hint">Se generarán códigos únicos para cada rol: <code>{prefijo}_prof_XXXX</code>, <code>{prefijo}_dir_XXXX</code>, <code>{prefijo}_rec_XXXX</code>.</p>
-                    <p class="hint" style="color:var(--yellow);margin-top:4px;"><i data-lucide="alert-triangle"></i> Al generar nuevos códigos, los anteriores dejarán de funcionar para nuevos registros.</p>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-head">
-            <span style="font-weight:600;font-size:13px;"><i data-lucide="info"></i> Códigos actuales</span>
-        </div>
-        <div class="card-body">
-            <div class="grid-3">
-                <div>
-                    <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Profesores</span>
-                    <pre class="code-display">{{ colegio.codigo_profesores or colegio.codigo_registro or '(vacío — registro libre)' }}</pre>
-                </div>
-                <div>
-                    <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Directoras</span>
-                    <pre class="code-display">{{ colegio.codigo_directoras or colegio.codigo_registro or '(vacío — registro libre)' }}</pre>
-                </div>
-                <div>
-                    <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Rectores</span>
-                    <pre class="code-display">{{ colegio.codigo_rectores or colegio.codigo_registro or '(vacío — registro libre)' }}</pre>
-                </div>
-            </div>
-            <p class="hint" style="margin-top:8px;">
-                <i data-lucide="info"></i>
-                Si un código específico está vacío, se usará el código general
-                <strong>"{{ colegio.codigo_registro or '(ninguno)' }}"</strong> como fallback.
-            </p>
-        </div>
-    </div>
-    {% endif %}
-</div>
-<script>
-function toggleCod(id, btn) {
-    var input = document.getElementById(id);
-    if (input.type === 'password') {
-        input.type = 'text';
-        btn.innerHTML = '<i data-lucide="eye-off"></i>';
-    } else {
-        input.type = 'password';
-        btn.innerHTML = '<i data-lucide="eye"></i>';
-    }
-}
-</script>
-  <script src="/static/js/lumini.js"></script>
-
-</body>
-</html>
-
-
-
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumini â€” Códigos de invitación</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 3px rgba(0,0,0,.15);--sidebar:200px;}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.06);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
+.sidebar-logo{padding:14px 14px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
+.sidebar-logo img{height:30px;width:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
+.sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
+.sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}
+.sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
+.sidebar-link.active{background:var(--accent);color:#fff;}
+.sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-footer{padding:8px 10px;border-top:1px solid #1E293B;}
+.main{margin-left:var(--sidebar);padding:20px 24px;width:calc(100% - var(--sidebar));min-height:100vh;max-width:1300px;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.header h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:2px;}
+.header p{font-size:13px;color:var(--muted);margin-top:4px;}
+.section-title{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;margin-top:28px;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
+.card-head{padding:10px 14px;border-bottom:1px solid #1E293B;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.card-body{padding:14px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;font-weight:600;}
+.field input,.field select{width:100%;padding:10px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color var(--tr);}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);}
+.field select option{background:#0F172A;}
+.codigo-box{background:rgba(var(--accent-rgb),.08);border:1.5px solid rgba(var(--accent-rgb),.3);border-radius:9px;padding:12px 14px;margin-bottom:13px;}
+.codigo-box label{display:block;font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-weight:600;}
+.codigo-box input{width:100%;padding:10px 13px;background:#0F172A;border:1.5px solid rgba(var(--accent-rgb),.4);border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;}
+.codigo-box input:focus{outline:none;border-color:var(--accent);}
+.pass-wrap{position:relative;}
+.pass-wrap input{padding-right:2.5rem;}
+.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:16px;transition:color var(--tr);}
+.eye-btn:hover{color:var(--accent);}
+.alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
+.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);}
+.alert-success{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);color:var(--green);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all var(--tr);text-decoration:none;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);box-shadow:0 4px 12px rgba(var(--accent-rgb),.3);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--bg3);color:var(--text);}
+.btn-green{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.25);}
+.btn-green:hover{background:rgba(16,185,129,.25);}
+.btn-yellow{background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.25);}
+.btn-yellow:hover{background:rgba(245,158,11,.25);}
+.btn-sm{padding:5px 10px;font-size:11px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.hint{font-size:11px;color:var(--sub);margin-top:4px;}
+pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--accent);letter-spacing:1px;word-break:break-all;}
+@media(max-width:768px){.main{padding:20px 16px;}.grid-2,.grid-3{grid-template-columns:1fr;}}
+</style>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
+
+<body>
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <img src="/static/lumini_logo.webp" alt="Lumini">
+        <div>
+            <div class="sidebar-brand">LUMINI</div>
+            <div class="sidebar-brand-sub">Panel de Administración</div>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="/admin" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
+        <a href="/admin/codigos" class="sidebar-link active"><span class="icon"><i data-lucide="key"></i></span> Códigos de invitación</a>
+        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
+    </nav>
+</aside>
+<div class="main">
+    <div class="header">
+        <div>
+            <h1><i data-lucide="key"></i> Códigos de invitación</h1>
+            <p>Gestiona los códigos por rol para cada colegio.</p>
+        </div>
+        <a href="/admin" class="btn btn-ghost"><i data-lucide="arrow-left"></i> Volver al Dashboard</a>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>
+    {% endif %}
+    {% if exito %}
+    <div class="alert alert-success">{{ exito }}</div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-head">
+            <span style="font-weight:600;font-size:13px;"><i data-lucide="school"></i> Seleccionar colegio</span>
+        </div>
+        <div class="card-body">
+            <form method="GET" id="select-colegio">
+                <div class="field">
+                    <label>Colegio</label>
+                    <select name="slug" onchange="this.form.submit()">
+                        <option value="">â€” Selecciona un colegio â€”</option>
+                        {% for c in colegios %}
+                        <option value="{{ c.slug }}" {% if colegio and colegio.slug == c.slug %}selected{% endif %}>
+                            {{ c.nombre }} ({{ c.slug }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if colegio %}
+    <div class="card">
+        <div class="card-head">
+            <span style="font-weight:600;font-size:13px;">
+                <i data-lucide="pencil"></i> Códigos para: {{ colegio.nombre }}
+                <span style="color:var(--muted);font-weight:400;font-size:11px;margin-left:6px;">({{ colegio.slug }})</span>
+            </span>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="accion" value="actualizar_codigos">
+                <input type="hidden" name="slug" value="{{ colegio.slug }}">
+
+                <div class="grid-3">
+                    <div class="codigo-box">
+                        <label><i data-lucide="presentation"></i> Profesores</label>
+                        <div class="pass-wrap">
+                            <input type="text" name="codigo_profesores" id="cod-prof"
+                                   value="{{ colegio.codigo_profesores or colegio.codigo_registro or '' }}"
+                                   autocomplete="off">
+                            <button type="button" class="eye-btn" onclick="toggleCod('cod-prof',this)" aria-label="Mostrar/ocultar código"><i data-lucide="eye"></i></button>
+                        </div>
+                        <p class="hint">Los profesores ingresan este código al registrarse.</p>
+                    </div>
+
+                    <div class="codigo-box">
+                        <label><i data-lucide="user-check"></i> Directoras</label>
+                        <div class="pass-wrap">
+                            <input type="text" name="codigo_directoras" id="cod-dir"
+                                   value="{{ colegio.codigo_directoras or colegio.codigo_registro or '' }}"
+                                   autocomplete="off">
+                            <button type="button" class="eye-btn" onclick="toggleCod('cod-dir',this)" aria-label="Mostrar/ocultar código"><i data-lucide="eye"></i></button>
+                        </div>
+                        <p class="hint">Las directoras ingresan este código al registrarse.</p>
+                    </div>
+
+                    <div class="codigo-box">
+                        <label><i data-lucide="graduation-cap"></i> Rectores</label>
+                        <div class="pass-wrap">
+                            <input type="text" name="codigo_rectores" id="cod-rec"
+                                   value="{{ colegio.codigo_rectores or colegio.codigo_registro or '' }}"
+                                   autocomplete="off">
+                            <button type="button" class="eye-btn" onclick="toggleCod('cod-rec',this)" aria-label="Mostrar/ocultar código"><i data-lucide="eye"></i></button>
+                        </div>
+                        <p class="hint">Los rectores ingresan este código al registrarse.</p>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                    <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head">
+            <span style="font-weight:600;font-size:13px;"><i data-lucide="wand-sparkles"></i> Generar nuevos códigos</span>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="accion" value="generar_codigos">
+                <input type="hidden" name="slug" value="{{ colegio.slug }}">
+
+                <div class="field">
+                    <label>Prefijo para los códigos</label>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <input type="text" name="prefijo" placeholder="ej: sanjose2025" required autocomplete="off"
+                               style="flex:1;max-width:300px;">
+                        <button type="submit" class="btn btn-green"><i data-lucide="refresh-cw"></i> Generar</button>
+                    </div>
+                    <p class="hint">Se generarán códigos únicos para cada rol: <code>{prefijo}_prof_XXXX</code>, <code>{prefijo}_dir_XXXX</code>, <code>{prefijo}_rec_XXXX</code>.</p>
+                    <p class="hint" style="color:var(--yellow);margin-top:4px;"><i data-lucide="alert-triangle"></i> Al generar nuevos códigos, los anteriores dejarán de funcionar para nuevos registros.</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head">
+            <span style="font-weight:600;font-size:13px;"><i data-lucide="info"></i> Códigos actuales</span>
+        </div>
+        <div class="card-body">
+            <div class="grid-3">
+                <div>
+                    <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Profesores</span>
+                    <pre class="code-display">{{ colegio.codigo_profesores or colegio.codigo_registro or '(vacío â€” registro libre)' }}</pre>
+                </div>
+                <div>
+                    <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Directoras</span>
+                    <pre class="code-display">{{ colegio.codigo_directoras or colegio.codigo_registro or '(vacío â€” registro libre)' }}</pre>
+                </div>
+                <div>
+                    <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Rectores</span>
+                    <pre class="code-display">{{ colegio.codigo_rectores or colegio.codigo_registro or '(vacío â€” registro libre)' }}</pre>
+                </div>
+            </div>
+            <p class="hint" style="margin-top:8px;">
+                <i data-lucide="info"></i>
+                Si un código específico está vacío, se usará el código general
+                <strong>"{{ colegio.codigo_registro or '(ninguno)' }}"</strong> como fallback.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+<script>
+function toggleCod(id, btn) {
+    var input = document.getElementById(id);
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<i data-lucide="eye-off"></i>';
+    } else {
+        input.type = 'password';
+        btn.innerHTML = '<i data-lucide="eye"></i>';
+    }
+}
+</script>
+  <script src="/static/js/lumini.js"></script>
+
+</html>
+
+
+
+

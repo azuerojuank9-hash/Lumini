@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Canales — {{ colegio.nombre if colegio else slug }}</title>
+<title>Canales â€” {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;--shadow:0 1px 3px rgba(0,0,0,.15);}
@@ -81,7 +81,6 @@ select.form-control{cursor:pointer;}
 <link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-</head>
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -124,32 +123,16 @@ select.form-control{cursor:pointer;}
 </nav>
 
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú"><i data-lucide="menu"></i></button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
 
-<div class="section-header">
-  <h2><span class="sh-icon"><i data-lucide="message-square" style="width:16px;height:16px;"></i></span> Canales de Comunicación</h2>
-  <div class="sh-actions">
-    <button class="btn btn-primary btn-sm" onclick="mostrarFormCrear()"><i data-lucide="plus" style="width:12px;height:12px;"></i> Nuevo canal</button>
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>Canales de Comunicación</h1>
+    <div class="breadcrumb">Gestiona los canales institucionales de mensajería</div>
   </div>
-</div>
-<div class="breadcrumb" style="font-size:12px;color:var(--muted);margin-bottom:16px;">Gestiona los canales institucionales de mensajería</div>
-
-<div class="quick-actions-grid" style="margin-bottom:20px;">
-  <a href="/{{ slug }}/rector" class="qa-card">
-    <div class="qa-icon purple"><i data-lucide="pie-chart" style="width:22px;height:22px;"></i></div>
-    <div class="qa-title">Dashboard</div>
-    <div class="qa-desc">Panel principal de rectoría</div>
-  </a>
-  <a href="/{{ slug }}/rector/comunicaciones" class="qa-card">
-    <div class="qa-icon blue"><i data-lucide="megaphone" style="width:22px;height:22px;"></i></div>
-    <div class="qa-title">Comunicaciones</div>
-    <div class="qa-desc">Gestiona avisos y comunicados</div>
-  </a>
-  <a href="/{{ slug }}/notificaciones" class="qa-card">
-    <div class="qa-icon orange"><i data-lucide="bell" style="width:22px;height:22px;"></i></div>
-    <div class="qa-title">Notificaciones</div>
-    <div class="qa-desc">Revisa notificaciones activas</div>
-  </a>
+  <div class="topbar-actions">
+    <button class="btn btn-primary" onclick="mostrarFormCrear()"><i data-lucide="plus"></i> Nuevo canal</button>
+  </div>
 </div>
 
 <div id="formCrear" class="card" style="display:none;margin-bottom:20px;">
@@ -293,7 +276,7 @@ function verMiembros(cid){
         if(!d.ok){alert('Error');return;}
         var msg='Miembros del canal:\n\n';
         d.miembros.forEach(function(m){
-            msg+='• '+m.nombre_usuario+' ('+m.usuario_tipo+')\n';
+            msg+='â€¢ '+m.nombre_usuario+' ('+m.usuario_tipo+')\n';
         });
         alert(msg);
     })
@@ -318,5 +301,8 @@ document.addEventListener('DOMContentLoaded',function(){
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
   <script src="/static/js/lumini.js"></script>
 
-</body>
 </html>
+
+
+
+

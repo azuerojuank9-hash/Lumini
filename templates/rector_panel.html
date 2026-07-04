@@ -1,502 +1,456 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rector — {{ colegio.nombre if colegio else slug }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--blue-rgb:37,99,235;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;--shadow:0 1px 3px rgba(0,0,0,.15);--shadow-lg:0 4px 20px rgba(0,0,0,.2);}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.06);--shadow-lg:0 4px 16px rgba(0,0,0,.08);}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;line-height:1.5;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
-.sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.sidebar-logo{width:32px;height:32px;border-radius:8px;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.3);flex-shrink:0;}
-.sidebar-brand{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sidebar-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.sidebar-section{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px;font-weight:600;}
-.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);margin-bottom:1px;cursor:pointer;position:relative;}
-.sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text);}
-.sidebar-item.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
-.sidebar-item .icon{width:18px;text-align:center;font-size:13px;flex-shrink:0;}
-.badge-count{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center;}
-.sidebar-user{border-top:1px solid var(--border);padding:12px 14px;font-size:12px;}
-.sidebar-user .name{color:var(--text);font-weight:600;font-size:12px;}
-.sidebar-user .role{color:var(--muted);font-size:10px;margin-top:2px;}
-.main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:1400px;width:100%;}
-.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);}
-.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
-.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.5);}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
-.topbar-left h1{font-size:20px;font-weight:700;letter-spacing:-.4px;}
-.topbar-left .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
-.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow);animation:fadeSlideIn .4s ease;}
-@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
-.dash-greeting{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
-.dash-greeting h1{font-size:24px;font-weight:800;letter-spacing:-.6px;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.dash-greeting .date{font-size:12px;color:var(--muted);margin-top:4px;}
-.dash-greeting .school-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);font-size:12px;color:var(--muted);}
-.dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
-@media(max-width:1100px){.dash-cards{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:500px){.dash-cards{grid-template-columns:1fr;}}
-.dash-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rlg);padding:20px 18px 18px;transition:all .25s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;}
-.dash-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-.dash-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.2);border-color:rgba(var(--accent-rgb),.2);}
-.dash-card.purple::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
-.dash-card.blue::before{background:linear-gradient(90deg,var(--blue),#1D4ED8);}
-.dash-card.green::before{background:linear-gradient(90deg,var(--green),#16A34A);}
-.dash-card.orange::before{background:linear-gradient(90deg,#F59E0B,#D97706);}
-.dash-card.teal::before{background:linear-gradient(90deg,#14B8A6,#0D9488);}
-.dash-card.pink::before{background:linear-gradient(90deg,#EC4899,#DB2777);}
-.dash-card .icon-wrap{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;}
-.dash-card.purple .icon-wrap{background:rgba(109,40,217,.12);color:var(--accent);}
-.dash-card.blue .icon-wrap{background:rgba(37,99,235,.12);color:var(--blue);}
-.dash-card.green .icon-wrap{background:rgba(34,197,94,.12);color:var(--green);}
-.dash-card.orange .icon-wrap{background:rgba(245,158,11,.12);color:#F59E0B;}
-.dash-card.teal .icon-wrap{background:rgba(20,184,166,.12);color:#14B8A6;}
-.dash-card.pink .icon-wrap{background:rgba(236,72,153,.12);color:#EC4899;}
-.dash-card .dval{font-size:1.8rem;font-weight:800;letter-spacing:-.7px;line-height:1.1;}
-.dash-card .dval.na{font-size:1rem;color:var(--sub);font-weight:500;letter-spacing:0;}
-.dash-card .dlabel{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
-.dash-card .dtag{font-size:11px;color:var(--sub);margin-top:3px;}
-.quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
-.qaction{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .2s ease;font-family:'Inter',sans-serif;touch-action:manipulation;}
-.qaction:hover{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.25);color:var(--accent);transform:translateY(-1px);}
-.qaction.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
-.qaction.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.35);}
-.dash-divider{height:1px;background:var(--border);margin:0 0 18px 0;border:none;}
-.placeholder-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:32px;text-align:center;color:var(--muted);}
-.placeholder-section .icon{font-size:36px;margin-bottom:12px;opacity:.3;color:var(--accent);}
-.placeholder-section h3{font-size:15px;font-weight:600;margin-bottom:6px;color:var(--text);}
-.placeholder-section p{font-size:12px;max-width:360px;margin:0 auto;}
-@media(max-width:768px){
-  .hamburger{display:flex;}
-  .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
-  .sidebar.open{transform:translateX(0);}
-  .sidebar-overlay.open{display:block;}
-  .main{margin-left:0;padding:16px;}
-}
-@media(max-width:375px){
-  .main{padding:10px;}
-  .dash-wrap{padding:16px;}
-  .dash-cards{gap:8px;}
-  .dash-card{padding:16px 14px;}
-  .dash-card .dval{font-size:1.4rem;}
-  .dash-greeting h1{font-size:19px;}
-}
-</style>
-</head>
-<body>
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<nav class="sidebar" id="sidebar">
-  <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
-  <div class="sidebar-header">
-    {% if colegio and colegio.logo %}
-    <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
-    {% else %}
-    <img class="sidebar-logo" src="/static/lumini_logo.webp" alt="Lumini">
-    {% endif %}
-    <div>
-      <div class="sidebar-brand">LUMINI</div>
-      <div class="sidebar-sub">{{ colegio.nombre if colegio else slug }}</div>
-    </div>
-  </div>
-  </a>
-  <div class="sidebar-nav">
-    <div class="sidebar-section">Rector</div>
-    <a href="/{{ slug }}/rector" class="sidebar-item active"><span class="icon"><i data-lucide="pie-chart"></i></span><span>Dashboard</span></a>
-    <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item"><span class="icon"><i data-lucide="megaphone"></i></span><span>Comunicaciones</span></a>
-    <a href="/{{ slug }}/rector/canales" class="sidebar-item"><span class="icon"><i data-lucide="message-square"></i></span><span>Canales</span></a>
-    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i data-lucide="bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
-<a href="/{{ slug }}/rector/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horarios</span></a>
-    <a href="/{{ slug }}/rector/profesores" class="sidebar-item"><span class="icon"><i data-lucide="presentation"></i></span><span>Profesores</span></a>
-    <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
-    <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
-    <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
-  </div>
-  <div class="sidebar-user">
-    <div class="name">{{ rector.nombre }}</div>
-    <div class="role">{% if rector.es_principal %}Rector Principal{% else %}Rector{% endif %}</div>
-  </div>
-</nav>
-
-<div class="main">
-
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
-
-<div class="topbar">
-  <div class="topbar-left">
-    <h1>Panel del Rector</h1>
-    <div class="breadcrumb">{{ colegio.nombre if colegio else slug }} · {{ rector.nombre }}</div>
-  </div>
-  <div class="topbar-actions" style="display:flex;gap:8px;">
-    <a href="/{{ slug }}/notificaciones" style="position:relative;color:var(--muted);font-size:18px;text-decoration:none;padding:6px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);transition:all var(--tr);">
-      <i data-lucide="bell"></i>
-      {% if notif_count > 0 %}<span style="position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px;min-width:16px;text-align:center;">{{ notif_count }}</span>{% endif %}
-    </a>
-  </div>
-</div>
-
-<div class="dash-wrap">
-
-<div class="dash-greeting fade-in">
-    <div>
-        <h1>Bienvenido, {{ rector.nombre }}</h1>
-        <div class="date">Panel de control institucional</div>
-    </div>
-    <div class="school-badge">
-        <i data-lucide="graduation-cap" style="width:16px;height:16px;"></i> Rectoría
-    </div>
-</div>
-
-<!-- ── Professional Stats Grid ───────────────────────────── -->
-<div class="stats-grid fade-in-d1">
-    <div class="stat-card">
-        <div class="stat-icon purple"><i data-lucide="graduation-cap" style="width:20px;height:20px;"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ total_estudiantes if total_estudiantes > 0 else 0 }}</div>
-            <div class="stat-label">Estudiantes activos</div>
-            <div class="stat-trend up">+{{ (total_estudiantes * 0.05)|int if total_estudiantes > 0 else 0 }} este mes</div>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon blue"><i data-lucide="chalkboard-teacher" style="width:20px;height:20px;"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ total_profesores if total_profesores > 0 else 0 }}</div>
-            <div class="stat-label">Profesores</div>
-            <div class="stat-footer">
-                <span>{{ (total_profesores / total_cursos * 100)|round|int if total_cursos > 0 else 0 }}% ocupación</span>
-                <span class="trend-badge up">{{ total_cursos if total_cursos > 0 else 0 }} cursos</span>
-            </div>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon green"><i data-lucide="book" style="width:20px;height:20px;"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ total_cursos if total_cursos > 0 else 0 }}</div>
-            <div class="stat-label">Cursos activos</div>
-            <div class="stat-footer">
-                <span>{{ total_materias if total_materias > 0 else 0 }} materias</span>
-                <span class="trend-badge up">{{ total_directoras if total_directoras > 0 else 0 }} directores</span>
-            </div>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon orange"><i data-lucide="bar-chart-3" style="width:20px;height:20px;"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ total_materias if total_materias > 0 else 0 }}</div>
-            <div class="stat-label">Materias asignadas</div>
-            <div class="stat-footer">
-                <span>{{ (total_materias / 20 * 100)|round|int if total_materias > 0 else 0 }}% cobertura</span>
-                <span class="trend-badge up">{{ total_materias if total_materias > 0 else 0 }} activas</span>
-            </div>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon red"><i data-lucide="calendar-check" style="width:20px;height:20px;"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ asistencia_hoy if asistencia_hoy > 0 else 0 }}</div>
-            <div class="stat-label">Asistencias hoy</div>
-            <div class="stat-footer">
-                {% set asis_pct = (asistencia_hoy / total_estudiantes * 100)|round|int if total_estudiantes > 0 else 0 %}
-                <span>{{ asis_pct }}% del total</span>
-                <span class="trend-badge up">{{ total_estudiantes if total_estudiantes > 0 else 0 }} estudiantes</span>
-            </div>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon teal"><i data-lucide="users" style="width:20px;height:20px;"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ total_directoras if total_directoras > 0 else 0 }}</div>
-            <div class="stat-label">Directores de curso</div>
-            <div class="stat-footer">
-                <span>Asignados</span>
-                <span class="trend-badge up">Activos</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ── Quick Action Cards ────────────────────────────────── -->
-<div class="section-header fade-in-d2">
-    <h2><span class="sh-icon"><i data-lucide="zap" style="width:16px;height:16px;"></i></span> Acciones rápidas</h2>
-    <div class="sh-actions">
-        <select class="form-select" style="padding:6px 10px;font-size:11px;width:auto;" onchange="if(this.value)location.href=this.value">
-            <option value="">Ir a...</option>
-            <option value="/{{ slug }}/rector/profesores">Gestionar profesores</option>
-            <option value="/{{ slug }}/rector/estudiantes">Gestionar estudiantes</option>
-            <option value="/{{ slug }}/rector/cursos">Gestionar cursos</option>
-            <option value="/{{ slug }}/rector/horarios">Ver horarios</option>
-            <option value="/{{ slug }}/rector/comunicaciones">Comunicaciones</option>
-            <option value="/{{ slug }}/rector/reportes">Reportes</option>
-            <option value="/{{ slug }}/rector/configuracion">Configuración</option>
-        </select>
-    </div>
-</div>
-<div class="quick-actions-grid fade-in-d2">
-    <a href="/{{ slug }}/rector/comunicaciones/nueva" class="qa-card">
-        <div class="qa-icon purple"><i data-lucide="megaphone" style="width:22px;height:22px;"></i></div>
-        <div class="qa-title">Nueva comunicación</div>
-        <div class="qa-desc">Crea un aviso o comunicado para la comunidad</div>
-    </a>
-    <a href="/{{ slug }}/rector/estudiantes" class="qa-card">
-        <div class="qa-icon blue"><i data-lucide="graduation-cap" style="width:22px;height:22px;"></i></div>
-        <div class="qa-title">Estudiantes</div>
-        <div class="qa-desc">Gestiona la lista de estudiantes activos</div>
-    </a>
-    <a href="/{{ slug }}/rector/profesores" class="qa-card">
-        <div class="qa-icon green"><i data-lucide="chalkboard-teacher" style="width:22px;height:22px;"></i></div>
-        <div class="qa-title">Profesores</div>
-        <div class="qa-desc">Administra el cuerpo docente</div>
-    </a>
-    <a href="/{{ slug }}/rector/cursos" class="qa-card">
-        <div class="qa-icon orange"><i data-lucide="book" style="width:22px;height:22px;"></i></div>
-        <div class="qa-title">Cursos</div>
-        <div class="qa-desc">Organiza cursos y jornadas</div>
-    </a>
-    <a href="/{{ slug }}/rector/horarios" class="qa-card">
-        <div class="qa-icon teal"><i data-lucide="calendar" style="width:22px;height:22px;"></i></div>
-        <div class="qa-title">Horarios</div>
-        <div class="qa-desc">Consulta horarios del plantel</div>
-    </a>
-    <a href="/{{ slug }}/rector/reportes" class="qa-card">
-        <div class="qa-icon red"><i data-lucide="bar-chart-3" style="width:22px;height:22px;"></i></div>
-        <div class="qa-title">Reportes</div>
-        <div class="qa-desc">Visualiza estadísticas y resultados</div>
-    </a>
-</div>
-
-<!-- ── Activity & Recent Items ────────────────────────────── -->
-<div class="row fade-in-d3">
-    <div class="feed-card">
-        <div class="feed-header">
-            <span class="feed-icon"><i data-lucide="megaphone" style="width:15px;height:15px;"></i></span>
-            Últimas comunicaciones
-            {% if comunicaciones %}<a href="/{{ slug }}/rector/comunicaciones" class="see-all" style="margin-left:auto;">Ver todas</a>{% endif %}
-        </div>
-        <div class="feed-body">
-            {% if comunicaciones %}
-            {% for c in comunicaciones %}
-            <div class="feed-item" onclick="location.href='/{{ slug }}/rector/comunicaciones/{{ c.id }}'" style="cursor:pointer;">
-                <div class="fi-avatar" style="background:{% if c.prioridad == 'urgente' %}rgba(239,68,68,.1){% else %}rgba(var(--accent-rgb),.08){% endif %};color:{% if c.prioridad == 'urgente' %}var(--red){% else %}var(--accent){% endif %};">
-                    <i data-lucide="mail" style="width:14px;height:14px;"></i>
-                </div>
-                <div class="fi-content">
-                    <div class="fi-text">{{ c.titulo[:60] }}{% if c.titulo|length > 60 %}...{% endif %}</div>
-                    <div class="fi-meta">
-                        <span>{{ c.fecha_creacion[:10] }}</span>
-                        <span class="tag tag-{% if c.estado == 'publicado' %}green{% elif c.estado == 'programado' %}blue{% else %}orange{% endif %}" style="margin-left:6px;">{{ c.estado }}</span>
-                        {% if c.prioridad == 'urgente' %}<span class="tag tag-red" style="margin-left:4px;">Urgente</span>{% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="feed-empty">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M22 17a2 2 0 01-2 2H4a2 2 0 01-2-2V9.5C2 7 4 5 6.5 5H18c2.2 0 4 1.8 4 4v8z"/><polyline points="15,9 18,9 18,11"/><path d="M6.5 5C9 5 11 7 11 9.5V17H4V9.5C4 7 6 5 6.5 5z"/></svg>
-                <div>No hay comunicaciones aún.</div>
-                <a href="/{{ slug }}/rector/comunicaciones/nueva" class="btn btn-primary btn-sm" style="margin-top:12px;">Crear primera</a>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="feed-card">
-        <div class="feed-header">
-            <span class="feed-icon"><i data-lucide="activity" style="width:15px;height:15px;"></i></span>
-            Actividad reciente
-        </div>
-        <div class="feed-body">
-            {% if actividad_reciente %}
-            {% for a in actividad_reciente %}
-            <div class="feed-item">
-                <div class="fi-avatar" style="background:rgba(var(--accent-rgb),.08);color:var(--accent);">
-                    <i data-lucide="rotate-cw" style="width:13px;height:13px;"></i>
-                </div>
-                <div class="fi-content">
-                    <div class="fi-text">
-                        {% if a.accion == 'crear' %}<strong>Creación</strong> en {{ a.tabla }}
-                        {% elif a.accion == 'archivar' %}<strong>Archivado</strong> en {{ a.tabla }}
-                        {% elif a.accion == 'reactivar' %}<strong>Reactivado</strong> en {{ a.tabla }}
-                        {% elif a.accion == 'eliminar' %}<strong>Eliminado</strong> de {{ a.tabla }}
-                        {% else %}<strong>{{ a.accion | capitalize }}</strong> en {{ a.tabla }}
-                        {% endif %}
-                    </div>
-                    <div class="fi-meta">{{ a.creado[:16] if a.creado else '' }}</div>
-                </div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="feed-empty">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-                <div>Sin actividad reciente. Las acciones aparecerán aquí.</div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<div class="row fade-in-d4">
-    <div class="feed-card">
-        <div class="feed-header">
-            <span class="feed-icon"><i data-lucide="users" style="width:15px;height:15px;"></i></span>
-            Últimos estudiantes
-            {% if ultimos_estudiantes %}<a href="/{{ slug }}/rector/estudiantes" class="see-all" style="margin-left:auto;">Ver todos</a>{% endif %}
-        </div>
-        <div class="feed-body">
-            {% if ultimos_estudiantes %}
-            {% for e in ultimos_estudiantes %}
-            <div class="feed-item">
-                <div class="fi-avatar" style="background:rgba(34,197,94,.1);color:var(--green);">
-                    <i data-lucide="user-plus" style="width:13px;height:13px;"></i>
-                </div>
-                <div class="fi-content">
-                    <div class="fi-text">{{ e.nombre }}</div>
-                    <div class="fi-meta">{{ e.curso }} · {{ e.jornada }}</div>
-                </div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="feed-empty">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                <div>Aún no hay estudiantes registrados.</div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="feed-card">
-        <div class="feed-header">
-            <span class="feed-icon"><i data-lucide="presentation" style="width:15px;height:15px;"></i></span>
-            Últimos profesores
-            {% if ultimos_profesores %}<a href="/{{ slug }}/rector/profesores" class="see-all" style="margin-left:auto;">Ver todos</a>{% endif %}
-        </div>
-        <div class="feed-body">
-            {% if ultimos_profesores %}
-            {% for p in ultimos_profesores %}
-            <div class="feed-item">
-                <div class="fi-avatar" style="background:rgba(var(--accent-rgb),.08);color:var(--accent);">
-                    <i data-lucide="user-check" style="width:13px;height:13px;"></i>
-                </div>
-                <div class="fi-content">
-                    <div class="fi-text">{{ p.nombre }}</div>
-                    <div class="fi-meta">{{ p.email }}</div>
-                </div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="feed-empty">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                <div>Aún no hay profesores registrados.</div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<div class="row fade-in-d4">
-    <div class="feed-card">
-        <div class="feed-header">
-            <span class="feed-icon"><i data-lucide="calendar" style="width:15px;height:15px;"></i></span>
-            Próximos eventos
-            {% if proximos_eventos %}<a href="/{{ slug }}/rector/horarios" class="see-all" style="margin-left:auto;">Ver todo</a>{% endif %}
-        </div>
-        <div class="feed-body">
-            {% if proximos_eventos %}
-            {% for ev in proximos_eventos %}
-            <div class="feed-item">
-                <div class="event-date" style="width:40px;height:40px;border-radius:8px;">
-                    <span class="day" style="font-size:14px;">{{ ev.fecha[-2:] if ev.fecha and ev.fecha|length >= 2 else '--' }}</span>
-                    <span class="month" style="font-size:8px;">{{ ev.fecha[5:7] if ev.fecha and ev.fecha|length >= 7 else '' }}</span>
-                </div>
-                <div class="fi-content">
-                    <div class="fi-text">{{ ev.titulo }}</div>
-                    <div class="fi-meta">{{ ev.materia }} · {{ ev.curso }} · {{ ev.jornada }}</div>
-                </div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="feed-empty">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                <div>No hay eventos próximos programados.</div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="feed-card">
-        <div class="feed-header">
-            <span class="feed-icon"><i data-lucide="bell" style="width:15px;height:15px;"></i></span>
-            Notificaciones
-            <a href="/{{ slug }}/notificaciones" class="see-all" style="margin-left:auto;">Ver todo</a>
-        </div>
-        <div class="feed-body">
-            {% if notif_count > 0 %}
-            <div class="feed-item">
-                <div class="fi-avatar" style="background:rgba(37,99,235,.1);color:var(--blue);">
-                    <i data-lucide="bell" style="width:14px;height:14px;"></i>
-                </div>
-                <div class="fi-content">
-                    <div class="fi-text">Tienes <strong>{{ notif_count }}</strong> notificación(es) sin leer</div>
-                    <div class="fi-meta">Pendientes de revisión</div>
-                </div>
-            </div>
-            {% else %}
-            <div class="feed-empty">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-                <div>Sin notificaciones pendientes. Todo está al día.</div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<!-- ── Institutional Summary ─────────────────────────────── -->
-<div class="card fade-in-d4" style="margin-top:8px;">
-    <div class="card-head">
-        <div style="display:flex;align-items:center;gap:8px;">
-            <i data-lucide="bar-chart-3" style="width:15px;height:15px;color:var(--accent);"></i>
-            <span style="font-size:13px;font-weight:600;">Resumen institucional</span>
-        </div>
-    </div>
-    <div class="card-body" style="padding:14px 18px;">
-        <div class="summary-row" style="margin:0;">
-            <span class="summary-item"><span class="dot" style="background:var(--accent);"></span> {{ total_estudiantes if total_estudiantes > 0 else 0 }} estudiantes</span>
-            <span class="summary-item"><span class="dot" style="background:var(--blue);"></span> {{ total_profesores if total_profesores > 0 else 0 }} profesores</span>
-            <span class="summary-item"><span class="dot" style="background:var(--green);"></span> {{ total_cursos if total_cursos > 0 else 0 }} cursos</span>
-            <span class="summary-item"><span class="dot" style="background:var(--yellow);"></span> {{ total_materias if total_materias > 0 else 0 }} materias</span>
-            <span class="summary-item"><span class="dot" style="background:#14B8A6;"></span> {{ total_directoras if total_directoras > 0 else 0 }} directores</span>
-            <span class="summary-item"><span class="dot" style="background:var(--red);"></span> {{ asistencia_hoy if asistencia_hoy > 0 else 0 }} asistencias hoy</span>
-        </div>
-    </div>
-</div>
-
-</div>
-</div>
-
-<script>
-function toggleSidebar(){
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
-}
-</script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-</body>
-</html>
-
-
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rector — {{ colegio.nombre if colegio else slug }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--blue-rgb:37,99,235;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;--shadow:0 1px 3px rgba(0,0,0,.15);--shadow-lg:0 4px 20px rgba(0,0,0,.2);}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.06);--shadow-lg:0 4px 16px rgba(0,0,0,.08);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;line-height:1.5;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sidebar-logo{width:32px;height:32px;border-radius:8px;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.3);flex-shrink:0;}
+.sidebar-brand{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sidebar-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
+.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sidebar-section{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px;font-weight:600;}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);margin-bottom:1px;cursor:pointer;position:relative;}
+.sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text);}
+.sidebar-item.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.sidebar-item .icon{width:18px;text-align:center;font-size:13px;flex-shrink:0;}
+.badge-count{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center;}
+.sidebar-user{border-top:1px solid var(--border);padding:12px 14px;font-size:12px;}
+.sidebar-user .name{color:var(--text);font-weight:600;font-size:12px;}
+.sidebar-user .role{color:var(--muted);font-size:10px;margin-top:2px;}
+.main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:1400px;width:100%;}
+.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);}
+.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
+.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.5);}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.topbar-left h1{font-size:20px;font-weight:700;letter-spacing:-.4px;}
+.topbar-left .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
+.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow);animation:fadeSlideIn .4s ease;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.dash-greeting{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
+.dash-greeting h1{font-size:24px;font-weight:800;letter-spacing:-.6px;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.dash-greeting .date{font-size:12px;color:var(--muted);margin-top:4px;}
+.dash-greeting .school-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);font-size:12px;color:var(--muted);}
+.dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+@media(max-width:1100px){.dash-cards{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.dash-cards{grid-template-columns:1fr;}}
+.dash-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rlg);padding:20px 18px 18px;transition:all .25s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.dash-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.dash-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.2);border-color:rgba(var(--accent-rgb),.2);}
+.dash-card.purple::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.dash-card.blue::before{background:linear-gradient(90deg,var(--blue),#1D4ED8);}
+.dash-card.green::before{background:linear-gradient(90deg,var(--green),#16A34A);}
+.dash-card.orange::before{background:linear-gradient(90deg,#F59E0B,#D97706);}
+.dash-card.teal::before{background:linear-gradient(90deg,#14B8A6,#0D9488);}
+.dash-card.pink::before{background:linear-gradient(90deg,#EC4899,#DB2777);}
+.dash-card .icon-wrap{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;}
+.dash-card.purple .icon-wrap{background:rgba(109,40,217,.12);color:var(--accent);}
+.dash-card.blue .icon-wrap{background:rgba(37,99,235,.12);color:var(--blue);}
+.dash-card.green .icon-wrap{background:rgba(34,197,94,.12);color:var(--green);}
+.dash-card.orange .icon-wrap{background:rgba(245,158,11,.12);color:#F59E0B;}
+.dash-card.teal .icon-wrap{background:rgba(20,184,166,.12);color:#14B8A6;}
+.dash-card.pink .icon-wrap{background:rgba(236,72,153,.12);color:#EC4899;}
+.dash-card .dval{font-size:1.8rem;font-weight:800;letter-spacing:-.7px;line-height:1.1;}
+.dash-card .dval.na{font-size:1rem;color:var(--sub);font-weight:500;letter-spacing:0;}
+.dash-card .dlabel{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+.dash-card .dtag{font-size:11px;color:var(--sub);margin-top:3px;}
+.quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.qaction{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .2s ease;font-family:'Inter',sans-serif;touch-action:manipulation;}
+.qaction:hover{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.25);color:var(--accent);transform:translateY(-1px);}
+.qaction.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
+.qaction.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.35);}
+.dash-divider{height:1px;background:var(--border);margin:0 0 18px 0;border:none;}
+.placeholder-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:32px;text-align:center;color:var(--muted);}
+.placeholder-section .icon{font-size:36px;margin-bottom:12px;opacity:.3;color:var(--accent);}
+.placeholder-section h3{font-size:15px;font-weight:600;margin-bottom:6px;color:var(--text);}
+.placeholder-section p{font-size:12px;max-width:360px;margin:0 auto;}
+@media(max-width:768px){
+  .hamburger{display:flex;}
+  .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay.open{display:block;}
+  .main{margin-left:0;padding:16px;}
+}
+@media(max-width:375px){
+  .main{padding:10px;}
+  .dash-wrap{padding:16px;}
+  .dash-cards{gap:8px;}
+  .dash-card{padding:16px 14px;}
+  .dash-card .dval{font-size:1.4rem;}
+  .dash-greeting h1{font-size:19px;}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<nav class="sidebar" id="sidebar">
+  <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
+  <div class="sidebar-header">
+    {% if colegio and colegio.logo %}
+    <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    {% else %}
+    <img class="sidebar-logo" src="/static/lumini_logo.webp" alt="Lumini">
+    {% endif %}
+    <div>
+      <div class="sidebar-brand">LUMINI</div>
+      <div class="sidebar-sub">{{ colegio.nombre if colegio else slug }}</div>
+    </div>
+  </div>
+  </a>
+  <div class="sidebar-nav">
+    <div class="sidebar-section">Rector</div>
+    <a href="/{{ slug }}/rector" class="sidebar-item active"><span class="icon"><i data-lucide="pie-chart"></i></span><span>Dashboard</span></a>
+    <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item"><span class="icon"><i data-lucide="megaphone"></i></span><span>Comunicaciones</span></a>
+    <a href="/{{ slug }}/rector/canales" class="sidebar-item"><span class="icon"><i data-lucide="message-square"></i></span><span>Canales</span></a>
+    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i data-lucide="bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+<a href="/{{ slug }}/rector/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horarios</span></a>
+    <a href="/{{ slug }}/rector/profesores" class="sidebar-item"><span class="icon"><i data-lucide="presentation"></i></span><span>Profesores</span></a>
+    <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
+    <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
+    <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+  </div>
+  <div class="sidebar-user">
+    <div class="name">{{ rector.nombre }}</div>
+    <div class="role">{% if rector.es_principal %}Rector Principal{% else %}Rector{% endif %}</div>
+  </div>
+</nav>
+
+<div class="main">
+
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>Panel del Rector</h1>
+    <div class="breadcrumb">{{ colegio.nombre if colegio else slug }} · {{ rector.nombre }}</div>
+  </div>
+  <div class="topbar-actions" style="display:flex;gap:8px;">
+    <a href="/{{ slug }}/notificaciones" style="position:relative;color:var(--muted);font-size:18px;text-decoration:none;padding:6px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);transition:all var(--tr);">
+      <i data-lucide="bell"></i>
+      {% if notif_count > 0 %}<span style="position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px;min-width:16px;text-align:center;">{{ notif_count }}</span>{% endif %}
+    </a>
+  </div>
+</div>
+
+<div class="dash-wrap">
+<div class="dash-greeting">
+    <div>
+        <h1>Bienvenido, {{ rector.nombre }}</h1>
+        <div class="date">Panel de control institucional</div>
+    </div>
+    <div class="school-badge">
+        <i data-lucide="graduation-cap"></i> Rectoría
+    </div>
+</div>
+
+<div class="dash-cards">
+    <div class="dash-card purple">
+        <div class="icon-wrap"><i data-lucide="graduation-cap" style="width:20px;height:20px;"></i></div>
+        <div class="dval {% if total_estudiantes == 0 and total_estudiantes is not none %}na{% endif %}">{{ total_estudiantes if total_estudiantes > 0 else '--' }}</div>
+        <div class="dlabel">Estudiantes</div>
+        <div class="dash-trend up">+{{ (total_estudiantes * 0.05)|int if total_estudiantes > 0 else 0 }} vs mes ant.</div>
+        <div class="dtag">activos en el sistema</div>
+    </div>
+    <div class="dash-card blue">
+        <div class="icon-wrap"><i data-lucide="chalkboard-teacher" style="width:20px;height:20px;"></i></div>
+        <div class="dval {% if total_profesores == 0 %}na{% endif %}">{{ total_profesores if total_profesores > 0 else '--' }}</div>
+        <div class="dlabel">Profesores</div>
+        <div class="dtag">activos</div>
+        <div class="dash-progress">
+            <div class="dp-label"><span>Ocupación</span><span>{{ (total_profesores / total_cursos * 100)|round|int if total_cursos > 0 else 0 }}%</span></div>
+            <div class="dp-bar"><div class="dp-fill" style="width:{{ (total_profesores / total_cursos * 100)|round|int if total_cursos > 0 else 0 }}%;"></div></div>
+        </div>
+    </div>
+    <div class="dash-card green">
+        <div class="icon-wrap"><i data-lucide="book" style="width:20px;height:20px;"></i></div>
+        <div class="dval {% if total_cursos == 0 %}na{% endif %}">{{ total_cursos if total_cursos > 0 else '--' }}</div>
+        <div class="dlabel">Cursos</div>
+        <div class="dtag">en la institución</div>
+        <div class="dash-footer">
+            <span style="font-size:10px;color:var(--sub);">{{ total_materias if total_materias > 0 else 0 }} materias</span>
+            <span class="trend-badge up">+{{ (total_cursos * 0.1)|int if total_cursos > 0 else 0 }}</span>
+        </div>
+    </div>
+    <div class="dash-card orange">
+        <div class="icon-wrap"><i data-lucide="beaker" style="width:20px;height:20px;"></i></div>
+        <div class="dval {% if total_materias == 0 %}na{% endif %}">{{ total_materias if total_materias > 0 else '--' }}</div>
+        <div class="dlabel">Materias</div>
+        <div class="dtag">asignadas</div>
+        <div class="dash-progress">
+            <div class="dp-label"><span>Cobertura</span><span>{{ (total_materias / 20 * 100)|round|int if total_materias > 0 else 0 }}%</span></div>
+            <div class="dp-bar orange"><div class="dp-fill" style="width:{{ (total_materias / 20 * 100)|round|int if total_materias > 0 else 0 }}%;"></div></div>
+        </div>
+    </div>
+    <div class="dash-card teal">
+        <div class="icon-wrap"><i data-lucide="users" style="width:20px;height:20px;"></i></div>
+        <div class="dval {% if total_directoras == 0 %}na{% endif %}">{{ total_directoras if total_directoras > 0 else '--' }}</div>
+        <div class="dlabel">Directores</div>
+        <div class="dtag">de curso</div>
+    </div>
+    <div class="dash-card pink">
+        <div class="icon-wrap"><i data-lucide="calendar-check" style="width:20px;height:20px;"></i></div>
+        <div class="dval {% if asistencia_hoy == 0 %}na{% endif %}">{{ asistencia_hoy if asistencia_hoy > 0 else '--' }}</div>
+        <div class="dlabel">Asistencia hoy</div>
+        <div class="dtag">registros del día</div>
+        <div class="dash-footer">
+            {% set asis_pct_r = (asistencia_hoy / total_estudiantes * 100)|round|int if total_estudiantes > 0 else 0 %}
+            <span style="font-size:10px;color:var(--sub);">{{ asis_pct_r }}% del total</span>
+        </div>
+    </div>
+</div>
+
+<div class="quick-actions">
+    <a href="/{{ slug }}/rector/comunicaciones/nueva" class="qaction primary"><i data-lucide="megaphone" style="width:14px;height:14px;"></i> Nueva comunicación</a>
+    <a href="/{{ slug }}/rector/horarios" class="qaction"><i data-lucide="calendar" style="width:14px;height:14px;"></i> Ver horarios</a>
+    <a href="/{{ slug }}/rector/profesores" class="qaction"><i data-lucide="chalkboard-teacher" style="width:14px;height:14px;"></i> Profesores</a>
+    <a href="/{{ slug }}/rector/estudiantes" class="qaction"><i data-lucide="graduation-cap" style="width:14px;height:14px;"></i> Estudiantes</a>
+    <a href="/{{ slug }}/rector/cursos" class="qaction"><i data-lucide="book" style="width:14px;height:14px;"></i> Cursos</a>
+    <a href="/{{ slug }}/rector/reportes" class="qaction"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i> Reportes</a>
+</div>
+
+<hr class="dash-divider">
+
+<div class="section-divider">Widgets del panel</div>
+
+<!-- ── Dashboard Modules ────────────────────────────────────── -->
+<div class="dash-modules fade-in fade-in-d1">
+    <div class="dash-module">
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="megaphone" style="width:15px;height:15px;"></i></span>
+            Últimas comunicaciones
+            <a href="/{{ slug }}/rector/comunicaciones" class="see-all">Ver todas</a>
+        </div>
+        <div class="dash-module-body compact">
+            {% if comunicaciones %}
+            {% for c in comunicaciones %}
+            <div class="comm-item" onclick="location.href='/{{ slug }}/rector/comunicaciones/{{ c.id }}'">
+                <div class="comm-priority" style="background:{% if c.prioridad == 'urgente' %}var(--red){% elif c.prioridad == 'alta' %}var(--yellow){% elif c.prioridad == 'normal' %}var(--blue){% else %}var(--sub){% endif %};"></div>
+                <div class="comm-body">
+                    <div class="comm-title">{{ c.titulo[:50] }}{% if c.titulo|length > 50 %}...{% endif %}</div>
+                    <div class="comm-meta">
+                        <span>{{ c.fecha_creacion[:10] }}</span>
+                        <span>·</span>
+                        <span class="status-badge {% if c.estado == 'publicado' %}published{% elif c.estado == 'programado' %}scheduled{% else %}draft{% endif %}">{{ c.estado | capitalize }}</span>
+                        {% if c.prioridad == 'urgente' %}<span class="status-badge urgent">Urgente</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state" style="min-height:120px;padding:20px;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M22 17a2 2 0 01-2 2H4a2 2 0 01-2-2V9.5C2 7 4 5 6.5 5H18c2.2 0 4 1.8 4 4v8z"/><polyline points="15,9 18,9 18,11"/><path d="M6.5 5C9 5 11 7 11 9.5V17H4V9.5C4 7 6 5 6.5 5z"/></svg>
+                <div class="empty-title">Sin comunicaciones</div>
+                <div class="empty-desc">No hay comunicaciones aún. Crea la primera para mantener informada a la comunidad.</div>
+                <a href="/{{ slug }}/rector/comunicaciones/nueva" class="empty-action"><i data-lucide="plus" style="width:12px;height:12px;"></i> Crear primera</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dash-module">
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="clock" style="width:14px;height:14px;"></i></span>
+            Actividad reciente
+        </div>
+        <div class="dash-module-body compact">
+            {% if actividad_reciente %}
+            {% for a in actividad_reciente %}
+            <div class="activity-item">
+                <div class="av purple"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i></div>
+                <div class="act-content">
+                    <div class="act-text">
+                        {% if a.accion == 'crear' %}<strong>Creación</strong> en {{ a.tabla }}
+                        {% elif a.accion == 'archivar' %}<strong>Archivado</strong> en {{ a.tabla }}
+                        {% elif a.accion == 'reactivar' %}<strong>Reactivado</strong> en {{ a.tabla }}
+                        {% elif a.accion == 'eliminar' %}<strong>Eliminado</strong> de {{ a.tabla }}
+                        {% elif a.accion == 'periodo_cerrado' %}<strong>Periodo cerrado</strong>
+                        {% elif a.accion == 'periodo_abierto' %}<strong>Periodo abierto</strong>
+                        {% elif a.accion == 'nota_editada' %}<strong>Nota editada</strong>
+                        {% else %}<strong>{{ a.accion | capitalize }}</strong> en {{ a.tabla }}{% endif %}
+                    </div>
+                    <div class="act-meta">{{ a.creado[:16] if a.creado else '' }}</div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state" style="min-height:120px;padding:20px;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                <div class="empty-title">Sin actividad reciente</div>
+                <div class="empty-desc">Las últimas acciones institucionales aparecerán aquí.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="dash-modules fade-in fade-in-d2">
+    <div class="dash-module">
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="users" style="width:14px;height:14px;"></i></span>
+            Últimos estudiantes
+            <a href="/{{ slug }}/rector/estudiantes" class="see-all">Ver todos</a>
+        </div>
+        <div class="dash-module-body compact">
+            {% if ultimos_estudiantes %}
+            {% for e in ultimos_estudiantes %}
+            <div class="activity-item">
+                <div class="av green"><i data-lucide="user-plus" style="width:12px;height:12px;"></i></div>
+                <div class="act-content">
+                    <div class="act-text">{{ e.nombre }}</div>
+                    <div class="act-meta">{{ e.curso }} · {{ e.jornada }}</div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state" style="min-height:100px;padding:20px;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                <div class="empty-title">Sin estudiantes</div>
+                <div class="empty-desc">Aún no hay estudiantes registrados en el sistema.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dash-module">
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="presentation" style="width:14px;height:14px;"></i></span>
+            Últimos profesores
+            <a href="/{{ slug }}/rector/profesores" class="see-all">Ver todos</a>
+        </div>
+        <div class="dash-module-body compact">
+            {% if ultimos_profesores %}
+            {% for p in ultimos_profesores %}
+            <div class="activity-item">
+                <div class="av purple"><i data-lucide="user-check" style="width:12px;height:12px;"></i></div>
+                <div class="act-content">
+                    <div class="act-text">{{ p.nombre }}</div>
+                    <div class="act-meta">{{ p.email }}</div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state" style="min-height:100px;padding:20px;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <div class="empty-title">Sin profesores</div>
+                <div class="empty-desc">Aún no hay profesores registrados en el sistema.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="dash-modules fade-in fade-in-d3">
+    <div class="dash-module">
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="calendar" style="width:14px;height:14px;"></i></span>
+            Próximos eventos
+            <a href="/{{ slug }}/rector/horarios" class="see-all">Ver todo</a>
+        </div>
+        <div class="dash-module-body compact">
+            {% if proximos_eventos %}
+            {% for ev in proximos_eventos %}
+            <div class="event-item">
+                <div class="event-date">
+                    <span class="day">{{ ev.fecha[-2:] if ev.fecha and ev.fecha|length >= 2 else '--' }}</span>
+                    <span class="month">{{ ev.fecha[5:7] if ev.fecha and ev.fecha|length >= 7 else '' }}</span>
+                </div>
+                <div class="event-info">
+                    <div class="event-title">{{ ev.titulo }}</div>
+                    <div class="event-detail">{{ ev.materia }} · {{ ev.curso }} · {{ ev.jornada }}</div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state" style="min-height:100px;padding:20px;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <div class="empty-title">Sin eventos próximos</div>
+                <div class="empty-desc">No hay evaluaciones o compromisos programados.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="dash-module">
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="bell" style="width:14px;height:14px;"></i></span>
+            Notificaciones
+            <a href="/{{ slug }}/notificaciones" class="see-all">Ver todo</a>
+        </div>
+        <div class="dash-module-body compact">
+            {% if notif_count > 0 %}
+            <div class="activity-item">
+                <div class="av blue"><i data-lucide="bell" style="width:13px;height:13px;"></i></div>
+                <div class="act-content">
+                    <div class="act-text">Tienes <strong>{{ notif_count }}</strong> notificación(es) sin leer</div>
+                    <div class="act-meta">Pendientes de revisión</div>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state" style="min-height:80px;padding:16px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:6px;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                <div class="empty-title" style="font-size:13px;">Sin notificaciones</div>
+                <div class="empty-desc" style="font-size:11px;">Todo está al día.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="fade-in fade-in-d4" style="margin-top:4px;">
+    <div class="card" style="padding:0;">
+        <div class="card-head">
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;">
+                <i data-lucide="bar-chart-3" style="width:15px;height:15px;color:var(--accent);"></i>
+                Resumen institucional
+            </div>
+        </div>
+        <div class="card-body" style="padding:14px 18px;">
+            <div class="summary-row">
+                <span class="summary-item"><span class="dot" style="background:var(--accent);"></span> {{ total_estudiantes if total_estudiantes > 0 else 0 }} estudiantes</span>
+                <span class="summary-item"><span class="dot" style="background:var(--blue);"></span> {{ total_profesores if total_profesores > 0 else 0 }} profesores</span>
+                <span class="summary-item"><span class="dot" style="background:var(--green);"></span> {{ total_cursos if total_cursos > 0 else 0 }} cursos</span>
+                <span class="summary-item"><span class="dot" style="background:var(--yellow);"></span> {{ total_materias if total_materias > 0 else 0 }} materias</span>
+                <span class="summary-item"><span class="dot" style="background:#14B8A6;"></span> {{ total_directoras if total_directoras > 0 else 0 }} directores</span>
+                <span class="summary-item"><span class="dot" style="background:var(--red);"></span> {{ asistencia_hoy if asistencia_hoy > 0 else 0 }} asistencias hoy</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+
+<script>
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
+</body>
+  <script src="/static/js/lumini.js"></script>
+</html>
+
+
+

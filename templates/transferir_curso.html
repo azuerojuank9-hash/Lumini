@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -6,7 +6,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — Transferir Curso</title>
+<title>Lumini â€” Transferir Curso</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
@@ -68,7 +68,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-</head>
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -90,7 +89,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <nav class="sidebar-nav">
         <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
         <a href="/{{ slug }}/horarios" class="sidebar-link"><span class="icon"><i data-lucide="calendar"></i></span> Horarios</a>
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i></span> Mi Perfil</a>
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>Ã¯Â¸</span> Mi Perfil</a>
         <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon"><i data-lucide="archive"></i></span> Archivados</a>
     </nav>
     <div class="sidebar-footer">
@@ -101,7 +100,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú"><i data-lucide="menu"></i></button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">Ã¢â€™Â°</button>
 
     <div class="page-title"><i data-lucide="refresh-cw"></i> Transferir Curso</div>
     <p class="page-sub">Pasa el historial completo de un curso a otro profesor de la misma materia</p>
@@ -110,7 +109,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         {% if '<i data-lucide="check-circle"></i>' in error %}
         <div class="alert alert-success">{{ error }}</div>
         {% else %}
-        <div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>
+        <div class="alert alert-error"><i data-lucide="alert-triangle"></i>Ã¯Â¸ {{ error }}</div>
         {% endif %}
     {% endif %}
     {% if exito %}
@@ -118,14 +117,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     {% endif %}
 
     <div class="info-badge">
-        <i data-lucide="book-open"></i> Materia: <strong>{{ materia }}</strong> · Jornada: <strong>{{ jornada }}</strong>
+        <i data-lucide="book-open"></i> Materia: <strong>{{ materia }}</strong> &nbsp;·&nbsp; â€¢ Jornada: <strong>{{ jornada }}</strong>
     </div>
 
     {% if not profesores_destino %}
     <div class="card">
         <div class="card-body">
             <div class="empty-state">
-                <div class="icon"><i data-lucide="users"></i></div>
+                <div class="icon">ðŸ‘¥</div>
                 <p>No hay otros profesores activos con la materia <strong>{{ materia }}</strong> en la jornada <strong>{{ jornada }}</strong> para recibir el curso.<br><br>El nuevo profesor debe registrarse primero y tener esta materia asignada.</p>
             </div>
         </div>
@@ -144,7 +143,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     {% else %}
 
     <div class="card">
-        <div class="card-head"><span class="card-title"><i data-lucide="info"></i> ¿Cómo funciona?</span></div>
+        <div class="card-head"><span class="card-title"><i data-lucide="info"></i>Ã¯Â¸ ¿Cómo funciona?</span></div>
         <div class="card-body">
             <div class="step"><div class="step-num">1</div><div class="step-text">Selecciona el <strong>curso</strong> que quieres transferir y el <strong>profesor</strong> que lo recibirá.</div></div>
             <div class="step"><div class="step-num">2</div><div class="step-text">Elige los <strong>periodos</strong> cuyas actividades, notas y evaluaciones quieres pasar al nuevo profesor.</div></div>
@@ -185,7 +184,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
                         <label class="periodo-check checked" id="label-p{{ i }}">
                             <input type="checkbox" name="periodos" value="{{ i }}" checked
                                    onchange="toggleChecked(this,'label-p{{ i }}');actualizarResumen()">
-                            <span>{{ i }}° Periodo</span>
+                            <span>{{ i }}Â° Periodo</span>
                         </label>
                         {% endfor %}
                     </div>
@@ -197,14 +196,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
                 </div>
 
                 <div class="alert alert-warn" style="margin-bottom:16px;">
-                    <i data-lucide="alert-triangle"></i> Esta acción <strong>no se puede deshacer</strong>. Todas las actividades, notas y evaluaciones de los periodos seleccionados quedarán bajo el nuevo profesor.
+                    <i data-lucide="alert-triangle"></i>Ã¯Â¸ Esta acción <strong>no se puede deshacer</strong>. Todas las actividades, notas y evaluaciones de los periodos seleccionados quedarán bajo el nuevo profesor.
                 </div>
 
                 <button type="submit" class="btn-submit" onclick="return confirmarTransferencia()">
                     <i data-lucide="refresh-cw"></i> Transferir curso
                 </button>
             </form>
-            <a href="/{{ slug }}" class="btn-back"><i data-lucide="arrow-left"></i> Volver al inicio</a>
+            <a href="/{{ slug }}" class="btn-back">Ã¢â€  Volver al inicio</a>
         </div>
     </div>
     {% endif %}
@@ -225,7 +224,7 @@ function actualizarResumen(){
     const curso = document.getElementById('selectCurso').value;
     const prof  = document.getElementById('selectProf');
     const profNombre = prof.options[prof.selectedIndex]?.text || '';
-    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'°');
+    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'Â°');
     const resumen  = document.getElementById('resumen');
     const resumenT = document.getElementById('resumenTexto');
     if(curso && profNombre && periodos.length){
@@ -240,7 +239,7 @@ function confirmarTransferencia(){
     const curso = document.getElementById('selectCurso').value;
     const prof  = document.getElementById('selectProf');
     const profNombre = prof.options[prof.selectedIndex]?.text || '';
-    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'°');
+    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'Â°');
     if(!curso || !profNombre || !periodos.length){
         alert('Por favor completa todos los campos y selecciona al menos un periodo.');
         return false;
@@ -251,5 +250,12 @@ function confirmarTransferencia(){
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
   <script src="/static/js/lumini.js"></script>
 
-</body>
 </html>
+
+
+
+
+
+
+
+

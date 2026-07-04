@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Auditoría — {{ colegio.nombre if colegio else slug }}</title>
+<title>Auditoría â€” {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
@@ -63,7 +63,6 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 <link rel="stylesheet" href="/static/css/enhanced.css">
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-</head>
 <body>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <nav class="sidebar" id="sidebar">
@@ -103,32 +102,29 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   </div>
 </nav>
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú"><i data-lucide="menu"></i></button>
-<div class="section-header">
-  <h2><span class="sh-icon"><i data-lucide="clock-rewind" style="width:16px;height:16px;"></i></span> Auditoría</h2>
-  <div class="sh-actions"></div>
-</div>
-<div class="breadcrumb" style="font-size:12px;color:var(--muted);margin-bottom:16px;">Registro de cambios y accesos al sistema</div>
-
-<div class="filter-bar">
-  <div class="filter-group">
-    <label>Tabla</label>
-    <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <select name="tabla" onchange="this.form.submit()" class="form-select" style="width:auto;font-size:11px;padding:6px 10px;">
-        <option value="">Todas las tablas</option>
-        {% for t in tablas %}
-        <option value="{{ t }}" {% if tabla == t %}selected{% endif %}>{{ t }}</option>
-        {% endfor %}
-      </select>
-      <span style="font-size:11px;color:var(--sub);">{{ total }} registro(s)</span>
-      {% if tabla %}
-      <a href="/{{ slug }}/rector/auditoria" style="font-size:11px;color:var(--accent);">Limpiar filtro</a>
-      {% endif %}
-    </form>
-  </div>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
+<div class="topbar">
+  <h1><i data-lucide="clock-rewind" style="color:var(--accent);"></i> Auditoría</h1>
+  <div class="breadcrumb">Registro de cambios y accesos al sistema</div>
 </div>
 
   <div class="card" style="padding:0;overflow:hidden;">
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+    <div class="table-top">
+      <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select name="tabla" onchange="this.form.submit()" class="form-select" style="width:auto;font-size:11px;padding:6px 10px;">
+          <option value="">Todas las tablas</option>
+          {% for t in tablas %}
+          <option value="{{ t }}" {% if tabla == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+        <span style="font-size:11px;color:var(--sub);">{{ total }} registro(s)</span>
+        {% if tabla %}
+        <a href="/{{ slug }}/rector/auditoria" style="font-size:11px;color:var(--accent);">Limpiar filtro</a>
+        {% endif %}
+      </form>
+    </div>
+  </div>
 
   {% if registros %}
   <div class="tw zebra">
@@ -159,13 +155,13 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
           {% if r.valor_anterior and r.valor_nuevo %}
           <div class="val-diff">
             <span style="color:var(--red);"><code>{{ r.valor_anterior[:60] }}</code></span>
-            <span style="color:var(--sub);"> → </span>
+            <span style="color:var(--sub);"> â†’ </span>
             <span style="color:var(--green);"><code>{{ r.valor_nuevo[:60] }}</code></span>
           </div>
           {% elif r.valor_nuevo %}
           <div class="val-diff"><code>{{ r.valor_nuevo[:80] }}</code></div>
           {% else %}
-          <span style="color:var(--sub);">—</span>
+          <span style="color:var(--sub);">â€”</span>
           {% endif %}
         </td>
         <td style="font-family:monospace;font-size:11px;color:var(--sub);">{{ r.ip or '-' }}</td>
@@ -181,7 +177,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     <div class="pagination">
     <span class="info">Página {{ page }} de {{ total_pages }}</span>
     {% if page > 1 %}
-    <a href="?page={{ page - 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">‹ Anterior</a>
+    <a href="?page={{ page - 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">â€¹ Anterior</a>
     {% endif %}
     {% for p in range(1, total_pages + 1) %}
       {% if p == page %}
@@ -189,11 +185,11 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
       {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
       <a href="?page={{ p }}{% if tabla %}&tabla={{ tabla }}{% endif %}">{{ p }}</a>
       {% elif p == page - 3 or p == page + 3 %}
-      <span style="color:var(--sub);">…</span>
+      <span style="color:var(--sub);">â€¦</span>
       {% endif %}
     {% endfor %}
     {% if page < total_pages %}
-    <a href="?page={{ page + 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">Siguiente ›</a>
+    <a href="?page={{ page + 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">Siguiente â€º</a>
     {% endif %}
   </div>
 </div>
@@ -214,5 +210,9 @@ function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('o
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
   <script src="/static/js/lumini.js"></script>
 
-</body>
 </html>
+
+
+
+
+

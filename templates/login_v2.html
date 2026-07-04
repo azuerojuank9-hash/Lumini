@@ -1,503 +1,501 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-<link rel="manifest" href="/static/manifest.json">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — {{ colegio.nombre if colegio else slug }}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
-*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
-body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
-.bg-orb{position:fixed;border-radius:50%;filter:blur(120px);opacity:.12;animation:float 10s ease-in-out infinite;pointer-events:none;}
-.orb1{width:500px;height:500px;background:var(--accent);top:-200px;left:-200px;animation-delay:0s;}
-.orb2{width:400px;height:400px;background:var(--accent2);bottom:-150px;right:-150px;animation-delay:4s;}
-@keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-30px) scale(1.04);}}
-.logo-wrap{margin-bottom:8px;text-align:center;}
-.logo-wrap img{height:88px;width:88px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px rgba(var(--accent-rgb),.4),0 8px 40px rgba(0,0,0,.4);transition:transform var(--tr);}
-.logo-wrap img:hover{transform:scale(1.05);}
-.brand{font-family:'Inter',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
-.colegio-nombre{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;margin-bottom:20px;text-align:center;}
-.tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:20px;width:100%;max-width:520px;}
-.tab-btn{flex:1;padding:9px 4px;background:none;border:none;border-radius:7px;color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all var(--tr);white-space:nowrap;}
-.tab-btn:hover{color:var(--text);}
-.tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 16px rgba(var(--accent-rgb),.3);}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;width:100%;max-width:520px;box-shadow:0 1px 4px rgba(0,0,0,.3);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
-@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-.section{display:none;}
-.section.active{display:block;}
-.field{margin-bottom:14px;}
-.field label{display:block;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-weight:600;}
-.field input,.field select{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;transition:border-color var(--tr),box-shadow var(--tr);}
-.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-.field input::placeholder{color:var(--sub);}
-.field select option{background:var(--bg3);}
-.btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rsm);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;min-height:48px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);}
-.btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(var(--accent-rgb),.3);}
-.btn-submit:active{transform:scale(.98);}
-.alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
-.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);}
-.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
-.forgot-link{display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--accent);text-decoration:none;transition:opacity var(--tr);}
-.forgot-link:hover{opacity:.8;text-decoration:underline;}
-.hint{font-size:11px;color:var(--sub);margin-top:8px;}
-.divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--sub);font-size:11px;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.materia-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
-.materia-row select{flex:1;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;}
-.materia-row select:focus{outline:none;border-color:var(--accent);}
-.btn-remove{background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.2);border-radius:6px;padding:8px 10px;cursor:pointer;font-size:13px;flex-shrink:0;transition:background var(--tr);}
-.btn-remove:hover{background:rgba(239,68,68,.2);}
-.btn-add-mat{background:rgba(var(--accent-rgb),.08);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--rsm);padding:8px 14px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;font-weight:600;width:100%;margin-top:4px;transition:background var(--tr);}
-.btn-add-mat:hover{background:rgba(var(--accent-rgb),.18);}
-.pass-wrapper{position:relative;}
-.pass-wrapper input{padding-right:2.5rem;width:100%;}
-.toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:1.1rem;transition:color var(--tr);}
-.toggle-pass:hover{color:var(--accent);}
-.codigo-field{background:rgba(var(--accent-rgb),.06);border:1.5px solid rgba(var(--accent-rgb),.2);border-radius:var(--rmd);padding:12px 14px;margin-bottom:14px;}
-.codigo-field label{display:block;font-size:10px;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
-.codigo-field input{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid rgba(var(--accent-rgb),.3);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;font-weight:600;letter-spacing:1px;}
-.codigo-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-.codigo-field .hint{font-size:11px;color:var(--sub);margin-top:6px;}
-@media(max-width:480px){.card{padding:20px 16px;}.logo-wrap img{height:72px;width:72px;}.brand{font-size:1.2rem;letter-spacing:2px;}.tab-btn{font-size:10px;padding:7px 2px;}}
-@media(max-width:375px){.tab-btn{font-size:9px;padding:6px 1px;white-space:normal;word-break:break-word;}.card{padding:16px 12px;}.logo-wrap img{height:60px;width:60px;}.brand{font-size:1rem;letter-spacing:1px;}.field input,.field select{font-size:15px;padding:10px 12px;}.btn-submit{font-size:14px;min-height:44px;padding:10px;}.materia-row{flex-direction:column;gap:6px;}.materia-row select{width:100%;}.codigo-field{padding:10px 12px;}}
-</style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-
-</head>
-<body>
-
-<div class="bg-orb orb1"></div>
-<div class="bg-orb orb2"></div>
-
-<a href="/{{ slug }}/login" style="text-decoration:none;color:inherit;display:block;">
-<div class="logo-wrap">
-    {% if colegio and colegio.logo %}
-    <img src="/static/logos/{{ colegio.logo }}" alt="Logo {{ colegio.nombre }}">
-    {% else %}
-    <img src="/static/lumini_logo.webp" alt="Lumini">
-    {% endif %}
-</div>
-<div class="brand">LUMINI</div>
-</a>
-<p class="colegio-nombre">{{ colegio.nombre if colegio else slug }}</p>
-
-<div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('profesor',this)">Profesor</button>
-    <button class="tab-btn" onclick="switchTab('registro',this)">Registrarse</button>
-    <button class="tab-btn" onclick="switchTab('estudiante',this)">Estudiante</button>
-    <button class="tab-btn" onclick="switchTab('directora',this)">Directora</button>
-    <button class="tab-btn" onclick="switchTab('rector',this)">Rector</button>
-</div>
-
-<div class="card">
-    {% if error %}
-        {% if '<i data-lucide="check-circle"></i>' in error %}
-        <div class="alert alert-success">{{ error }}</div>
-        {% else %}
-        <div class="alert alert-error">{{ error }}</div>
-        {% endif %}
-    {% endif %}
-
-    <div id="tab-profesor" class="section active">
-        <form method="POST">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="accion" value="profesor_login">
-            <div class="field">
-                <label>Usuario</label>
-                <input type="text" name="usuario" placeholder="ej: prof_matematicas" required autocomplete="username" autofocus>
-            </div>
-            <div class="field">
-                <label>Contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" name="password" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-            <button type="submit" class="btn-submit">Entrar</button>
-        </form>
-        <a href="/{{ slug }}/recuperar" class="forgot-link">¿Olvidaste tu contraseña?</a>
-    </div>
-
-    <div id="tab-registro" class="section">
-        <form method="POST" id="formRegistro">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="accion" value="profesor_registro">
-            <div class="field">
-                <label>Nombre completo</label>
-                <input type="text" name="nombre" placeholder="Tu nombre" required>
-            </div>
-            <div class="field">
-                <label>Usuario</label>
-                <input type="text" name="reg_usuario" placeholder="ej: prof_matematicas" required autocomplete="username">
-            </div>
-            <div class="field">
-                <label>Correo electrónico</label>
-                <input type="email" name="email_prof" placeholder="tu@correo.com" required autocomplete="email">
-            </div>
-            <div class="field">
-                <label>Contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" name="reg_password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-            <div class="field">
-                <label>Confirmar contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-
-            <div class="codigo-field">
-                <label>Código de invitación</label>
-                <input type="text" name="codigo_registro" placeholder="Ingresa el código que te dio el administrador" required autocomplete="off">
-                <p class="hint">El código lo entrega el administrador del colegio.</p>
-            </div>
-
-            <div class="divider">Materias y jornadas</div>
-            <div id="materias-container">
-                <div class="materia-row" id="mat-row-0">
-                    <select name="materias_sel" required>
-                        <option value="" disabled selected>Materia</option>
-                        {% for m in materias %}
-                        <option value="{{ m }}">{{ m }}</option>
-                        {% endfor %}
-                    </select>
-                    <select name="jornadas_sel" required>
-                        <option value="" disabled selected>Jornada</option>
-                        {% for j in jornadas %}
-                        <option value="{{ j }}">{{ j }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-            <button type="button" class="btn-add-mat" onclick="agregarMateria()">+ Agregar otra materia/jornada</button>
-
-            <div class="divider" style="margin-top:14px;">Pregunta secreta (para recuperar contraseña)</div>
-            <div class="field">
-                <label>Pregunta</label>
-                <select name="pregunta_secreta" required>
-                    <option value="" disabled selected>Selecciona una pregunta</option>
-                    {% for p in preguntas %}
-                    <option value="{{ p }}">{{ p }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="field">
-                <label>Respuesta secreta</label>
-                <input type="text" name="respuesta_secreta" placeholder="Tu respuesta (la usarás si olvidas tu contraseña)" required autocomplete="off">
-            </div>
-            <button type="submit" class="btn-submit">Registrarme</button>
-        </form>
-    </div>
-
-    <div id="tab-estudiante" class="section">
-        <form method="POST">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="accion" value="estudiante">
-            <div class="field">
-                <label>Tu nombre completo</label>
-                <input type="text" name="nombre_est" placeholder="Escribe tu nombre" required autocomplete="name">
-            </div>
-            <div class="field">
-                <label>Jornada</label>
-                <select name="jornada_est" required>
-                    <option value="" disabled selected>Selecciona tu jornada</option>
-                    {% for j in jornadas %}
-                    <option value="{{ j }}">{{ j }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="field">
-                <label>PIN de acceso <span style="color:var(--sub);font-weight:400;">(opcional)</span></label>
-                <input type="password" name="pin_est" placeholder="Tu PIN (si tienes)" autocomplete="off" inputmode="numeric">
-            </div>
-            <button type="submit" class="btn-submit">Ver mis notas</button>
-        </form>
-        <p class="hint">Si tu colegio asignó un PIN, escríbelo. Si no, deja el campo vacío.</p>
-    </div>
-
-    <div id="tab-directora" class="section">
-        <div style="display:flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:16px;">
-            <button type="button" class="tab-btn active" id="dir-btn-login" onclick="switchDirTab('dir-login',this)" style="flex:1;font-size:11px;">Ingresar</button>
-            <button type="button" class="tab-btn" id="dir-btn-reg" onclick="switchDirTab('dir-registro',this)" style="flex:1;font-size:11px;">Registrarse</button>
-        </div>
-
-        <div id="tab-dir-login">
-            <form method="POST">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="accion" value="directora_login">
-                <div class="field">
-                    <label>Usuario</label>
-                    <input type="text" name="dir_usuario" placeholder="ej: directora_10a" autocomplete="username">
-                </div>
-                <div class="field">
-                    <label>Contraseña</label>
-                    <div class="pass-wrapper">
-                        <input type="password" name="dir_password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                    </div>
-                </div>
-                <button type="submit" class="btn-submit">Entrar al panel</button>
-            </form>
-            <a href="/{{ slug }}/recuperar" class="forgot-link">¿Olvidaste tu contraseña?</a>
-        </div>
-
-        <div id="tab-dir-registro" style="display:none;">
-            <form method="POST" action="/{{ slug }}/directora/registrar_directo">
-                <div class="field">
-                    <label>Nombre completo</label>
-                    <input type="text" name="nombre" placeholder="Tu nombre" required>
-                </div>
-                <div class="field">
-                    <label>Usuario</label>
-                    <input type="text" name="usuario" placeholder="ej: directora_10a" required>
-                </div>
-                <div class="field">
-                    <label>Correo (opcional)</label>
-                    <input type="email" name="email" placeholder="tu@correo.com">
-                </div>
-                <div class="field">
-                    <label>Contraseña</label>
-                    <div class="pass-wrapper">
-                        <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>Confirmar contraseña</label>
-                    <div class="pass-wrapper">
-                        <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>Curso que diriges</label>
-                    <input type="text" name="curso" placeholder="ej: 10A, 9B..." required>
-                </div>
-                <div class="field">
-                    <label>Jornada</label>
-                    <select name="jornada" required>
-                        <option value="" disabled selected>Selecciona</option>
-                        {% for j in jornadas %}
-                        <option value="{{ j }}">{{ j }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="codigo-field">
-                    <label>Código de invitación</label>
-                    <input type="text" name="codigo_registro_dir" placeholder="Ingresa el código que te dio el administrador" required autocomplete="off">
-                    <p class="hint">El código lo entrega el administrador del colegio.</p>
-                </div>
-
-                <div class="divider">Pregunta secreta (para recuperar contraseña)</div>
-                <div class="field">
-                    <label>Pregunta</label>
-                    <select name="pregunta_secreta" required>
-                        <option value="" disabled selected>Selecciona una pregunta</option>
-                        {% for p in preguntas %}
-                        <option value="{{ p }}">{{ p }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Respuesta secreta</label>
-                    <input type="text" name="respuesta_secreta" placeholder="Tu respuesta (la usarás si olvidas tu contraseña)" required autocomplete="off">
-                </div>
-
-                <button type="submit" class="btn-submit">Crear cuenta</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="tab-rector" class="section">
-        <div style="display:flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:16px;">
-            <button type="button" class="tab-btn active" id="rec-btn-login" onclick="switchRecTab('rec-login',this)" style="flex:1;font-size:11px;">Ingresar</button>
-            <button type="button" class="tab-btn" id="rec-btn-reg" onclick="switchRecTab('rec-registro',this)" style="flex:1;font-size:11px;">Registrarse</button>
-        </div>
-
-        <div id="tab-rec-login">
-            <form method="POST">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="accion" value="rector_login">
-                <div class="field">
-                    <label>Usuario</label>
-                    <input type="text" name="rec_usuario" placeholder="ej: rector_colegio" autocomplete="username">
-                </div>
-                <div class="field">
-                    <label>Contraseña</label>
-                    <div class="pass-wrapper">
-                        <input type="password" name="rec_password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                    </div>
-                </div>
-                <button type="submit" class="btn-submit">Entrar al panel</button>
-            </form>
-            <a href="/{{ slug }}/recuperar" class="forgot-link">¿Olvidaste tu contraseña?</a>
-        </div>
-
-        <div id="tab-rec-registro" style="display:none;">
-            <form method="POST" action="/{{ slug }}/rector/registrar">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                <div class="field">
-                    <label>Nombre completo</label>
-                    <input type="text" name="nombre" placeholder="Tu nombre" required>
-                </div>
-                <div class="field">
-                    <label>Usuario</label>
-                    <input type="text" name="usuario" placeholder="ej: rector_colegio" required>
-                </div>
-                <div class="field">
-                    <label>Correo (opcional)</label>
-                    <input type="email" name="email" placeholder="tu@correo.com">
-                </div>
-                <div class="field">
-                    <label>Contraseña</label>
-                    <div class="pass-wrapper">
-                        <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>Confirmar contraseña</label>
-                    <div class="pass-wrapper">
-                        <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
-                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>Jornada</label>
-                    <select name="jornada" required>
-                        <option value="" disabled selected>Selecciona</option>
-                        {% for j in jornadas %}
-                        <option value="{{ j }}">{{ j }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="codigo-field">
-                    <label>Código de invitación</label>
-                    <input type="text" name="codigo_registro_rec" placeholder="Ingresa el código que te dio el administrador" required autocomplete="off">
-                    <p class="hint">El código lo entrega el administrador del colegio.</p>
-                </div>
-
-                <div class="divider">Pregunta secreta (para recuperar contraseña)</div>
-                <div class="field">
-                    <label>Pregunta</label>
-                    <select name="pregunta_secreta" required>
-                        <option value="" disabled selected>Selecciona una pregunta</option>
-                        {% for p in preguntas %}
-                        <option value="{{ p }}">{{ p }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Respuesta secreta</label>
-                    <input type="text" name="respuesta_secreta" placeholder="Tu respuesta (la usarás si olvidas tu contraseña)" required autocomplete="off">
-                </div>
-
-                <button type="submit" class="btn-submit">Crear cuenta</button>
-            </form>
-        </div>
-    </div>
-
-</div>
-
-<script>
-const MATERIAS = {{ materias | tojson }};
-const JORNADAS = {{ jornadas | tojson }};
-let matCount = 1;
-
-function switchTab(tab, btn) {
-    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
-    document.querySelectorAll('.tabs .tab-btn').forEach(function(b){ b.classList.remove('active'); });
-    document.getElementById('tab-' + tab).classList.add('active');
-    btn.classList.add('active');
-}
-
-function switchDirTab(tab, btn) {
-    document.getElementById('tab-dir-login').style.display = 'none';
-    document.getElementById('tab-dir-registro').style.display = 'none';
-    document.getElementById('tab-' + tab).style.display = 'block';
-    document.getElementById('dir-btn-login').classList.remove('active');
-    document.getElementById('dir-btn-reg').classList.remove('active');
-    btn.classList.add('active');
-}
-
-function switchRecTab(tab, btn) {
-    document.getElementById('tab-rec-login').style.display = 'none';
-    document.getElementById('tab-rec-registro').style.display = 'none';
-    document.getElementById('tab-' + tab).style.display = 'block';
-    document.getElementById('rec-btn-login').classList.remove('active');
-    document.getElementById('rec-btn-reg').classList.remove('active');
-    btn.classList.add('active');
-}
-
-function agregarMateria() {
-    var container = document.getElementById('materias-container');
-    var div = document.createElement('div');
-    div.className = 'materia-row';
-    var idx = matCount;
-    div.id = 'mat-row-' + idx;
-    div.innerHTML =
-        '<select name="materias_sel" required>'
-        + '<option value="" disabled selected>Materia</option>'
-        + MATERIAS.map(function(m){ return '<option value="' + m + '">' + m + '</option>'; }).join('')
-        + '</select>'
-        + '<select name="jornadas_sel" required>'
-        + '<option value="" disabled selected>Jornada</option>'
-        + JORNADAS.map(function(j){ return '<option value="' + j + '">' + j + '</option>'; }).join('')
-        + '</select>'
-        + '<button type="button" class="btn-remove" onclick="document.getElementById(\'mat-row-' + idx + '\').remove()"><i data-lucide="x"></i></button>';
-    container.appendChild(div);
-    matCount++;
-}
-
-function togglePass(btn) {
-    var input = btn.previousElementSibling;
-    if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
-    else { input.type = 'password'; btn.innerHTML = '<i data-lucide="eye"></i>'; }
-}
-
-{% if error %}
-{% set e = error %}
-{% if '<i data-lucide="check-circle"></i>' not in e %}
-{% if 'Registro' in e or 'usuario ya existe' in e or 'Completa' in e or 'caracteres' in e or 'materia' in e or 'pregunta' in e or 'contraseñas' in e or 'invitación' in e %}
-document.querySelectorAll('.tabs .tab-btn')[1].click();
-{% elif 'director' in e or 'Director' in e %}
-document.querySelectorAll('.tabs .tab-btn')[3].click();
-document.getElementById('dir-btn-reg').click();
-{% elif 'rector' in e or 'Rector' in e %}
-document.querySelectorAll('.tabs .tab-btn')[4].click();
-{% if 'Completa' in e or 'caracteres' in e or 'contraseñas' in e or 'pregunta' in e or 'invitación' in e or 'usuario ya existe' in e %}
-setTimeout(function(){ document.getElementById('rec-btn-reg').click(); }, 100);
-{% endif %}
-{% elif 'estudiante' in e %}
-document.querySelectorAll('.tabs .tab-btn')[2].click();
-{% endif %}
-{% endif %}
-{% endif %}
-</script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
-<button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:20px;z-index:9999;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);" aria-label="Cambiar tema">🌙</button>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-
-</body>
-</html>
-
-
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
+<link rel="manifest" href="/static/manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumini — {{ colegio.nombre if colegio else slug }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);}
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
+body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(120px);opacity:.12;animation:float 10s ease-in-out infinite;pointer-events:none;}
+.orb1{width:500px;height:500px;background:var(--accent);top:-200px;left:-200px;animation-delay:0s;}
+.orb2{width:400px;height:400px;background:var(--accent2);bottom:-150px;right:-150px;animation-delay:4s;}
+@keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-30px) scale(1.04);}}
+.logo-wrap{margin-bottom:8px;text-align:center;}
+.logo-wrap img{height:88px;width:88px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px rgba(var(--accent-rgb),.4),0 8px 40px rgba(0,0,0,.4);transition:transform var(--tr);}
+.logo-wrap img:hover{transform:scale(1.05);}
+.brand{font-family:'Inter',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
+.colegio-nombre{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;margin-bottom:20px;text-align:center;}
+.tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:20px;width:100%;max-width:520px;}
+.tab-btn{flex:1;padding:9px 4px;background:none;border:none;border-radius:7px;color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all var(--tr);white-space:nowrap;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 16px rgba(var(--accent-rgb),.3);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;width:100%;max-width:520px;box-shadow:0 1px 4px rgba(0,0,0,.3);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.section{display:none;}
+.section.active{display:block;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-weight:600;}
+.field input,.field select{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;transition:border-color var(--tr),box-shadow var(--tr);}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
+.field input::placeholder{color:var(--sub);}
+.field select option{background:var(--bg3);}
+.btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rsm);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;min-height:48px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(var(--accent-rgb),.3);}
+.btn-submit:active{transform:scale(.98);}
+.alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
+.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);}
+.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+.forgot-link{display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--accent);text-decoration:none;transition:opacity var(--tr);}
+.forgot-link:hover{opacity:.8;text-decoration:underline;}
+.hint{font-size:11px;color:var(--sub);margin-top:8px;}
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--sub);font-size:11px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.materia-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
+.materia-row select{flex:1;padding:9px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;}
+.materia-row select:focus{outline:none;border-color:var(--accent);}
+.btn-remove{background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.2);border-radius:6px;padding:8px 10px;cursor:pointer;font-size:13px;flex-shrink:0;transition:background var(--tr);}
+.btn-remove:hover{background:rgba(239,68,68,.2);}
+.btn-add-mat{background:rgba(var(--accent-rgb),.08);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--rsm);padding:8px 14px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;font-weight:600;width:100%;margin-top:4px;transition:background var(--tr);}
+.btn-add-mat:hover{background:rgba(var(--accent-rgb),.18);}
+.pass-wrapper{position:relative;}
+.pass-wrapper input{padding-right:2.5rem;width:100%;}
+.toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:1.1rem;transition:color var(--tr);}
+.toggle-pass:hover{color:var(--accent);}
+.codigo-field{background:rgba(var(--accent-rgb),.06);border:1.5px solid rgba(var(--accent-rgb),.2);border-radius:var(--rmd);padding:12px 14px;margin-bottom:14px;}
+.codigo-field label{display:block;font-size:10px;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
+.codigo-field input{width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid rgba(var(--accent-rgb),.3);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;font-weight:600;letter-spacing:1px;}
+.codigo-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
+.codigo-field .hint{font-size:11px;color:var(--sub);margin-top:6px;}
+@media(max-width:480px){.card{padding:20px 16px;}.logo-wrap img{height:72px;width:72px;}.brand{font-size:1.2rem;letter-spacing:2px;}.tab-btn{font-size:10px;padding:7px 2px;}}
+@media(max-width:375px){.tab-btn{font-size:9px;padding:6px 1px;white-space:normal;word-break:break-word;}.card{padding:16px 12px;}.logo-wrap img{height:60px;width:60px;}.brand{font-size:1rem;letter-spacing:1px;}.field input,.field select{font-size:15px;padding:10px 12px;}.btn-submit{font-size:14px;min-height:44px;padding:10px;}.materia-row{flex-direction:column;gap:6px;}.materia-row select{width:100%;}.codigo-field{padding:10px 12px;}}
+</style>
+  <link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
+
+<body>
+
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+
+<a href="/{{ slug }}/login" style="text-decoration:none;color:inherit;display:block;">
+<div class="logo-wrap">
+    {% if colegio and colegio.logo %}
+    <img src="/static/logos/{{ colegio.logo }}" alt="Logo {{ colegio.nombre }}">
+    {% else %}
+    <img src="/static/lumini_logo.webp" alt="Lumini">
+    {% endif %}
+</div>
+<div class="brand">LUMINI</div>
+</a>
+<p class="colegio-nombre">{{ colegio.nombre if colegio else slug }}</p>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('profesor',this)">Profesor</button>
+    <button class="tab-btn" onclick="switchTab('registro',this)">Registrarse</button>
+    <button class="tab-btn" onclick="switchTab('estudiante',this)">Estudiante</button>
+    <button class="tab-btn" onclick="switchTab('directora',this)">Directora</button>
+    <button class="tab-btn" onclick="switchTab('rector',this)">Rector</button>
+</div>
+
+<div class="card">
+    {% if error %}
+        {% if '<i data-lucide="check-circle"></i>' in error %}
+        <div class="alert alert-success">{{ error }}</div>
+        {% else %}
+        <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+    {% endif %}
+
+    <div id="tab-profesor" class="section active">
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="accion" value="profesor_login">
+            <div class="field">
+                <label>Usuario</label>
+                <input type="text" name="usuario" placeholder="ej: prof_matematicas" required autocomplete="username" autofocus>
+            </div>
+            <div class="field">
+                <label>Contraseña</label>
+                <div class="pass-wrapper">
+                    <input type="password" name="password" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Entrar</button>
+        </form>
+        <a href="/{{ slug }}/recuperar" class="forgot-link">¿Olvidaste tu contraseña?</a>
+    </div>
+
+    <div id="tab-registro" class="section">
+        <form method="POST" id="formRegistro">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="accion" value="profesor_registro">
+            <div class="field">
+                <label>Nombre completo</label>
+                <input type="text" name="nombre" placeholder="Tu nombre" required>
+            </div>
+            <div class="field">
+                <label>Usuario</label>
+                <input type="text" name="reg_usuario" placeholder="ej: prof_matematicas" required autocomplete="username">
+            </div>
+            <div class="field">
+                <label>Correo electrónico</label>
+                <input type="email" name="email_prof" placeholder="tu@correo.com" required autocomplete="email">
+            </div>
+            <div class="field">
+                <label>Contraseña</label>
+                <div class="pass-wrapper">
+                    <input type="password" name="reg_password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" minlength="6">
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+                </div>
+            </div>
+            <div class="field">
+                <label>Confirmar contraseña</label>
+                <div class="pass-wrapper">
+                    <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+                </div>
+            </div>
+
+            <div class="codigo-field">
+                <label>Código de invitación</label>
+                <input type="text" name="codigo_registro" placeholder="Ingresa el código que te dio el administrador" required autocomplete="off">
+                <p class="hint">El código lo entrega el administrador del colegio.</p>
+            </div>
+
+            <div class="divider">Materias y jornadas</div>
+            <div id="materias-container">
+                <div class="materia-row" id="mat-row-0">
+                    <select name="materias_sel" required>
+                        <option value="" disabled selected>Materia</option>
+                        {% for m in materias %}
+                        <option value="{{ m }}">{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="jornadas_sel" required>
+                        <option value="" disabled selected>Jornada</option>
+                        {% for j in jornadas %}
+                        <option value="{{ j }}">{{ j }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="button" class="btn-add-mat" onclick="agregarMateria()">+ Agregar otra materia/jornada</button>
+
+            <div class="divider" style="margin-top:14px;">Pregunta secreta (para recuperar contraseña)</div>
+            <div class="field">
+                <label>Pregunta</label>
+                <select name="pregunta_secreta" required>
+                    <option value="" disabled selected>Selecciona una pregunta</option>
+                    {% for p in preguntas %}
+                    <option value="{{ p }}">{{ p }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>Respuesta secreta</label>
+                <input type="text" name="respuesta_secreta" placeholder="Tu respuesta (la usarás si olvidas tu contraseña)" required autocomplete="off">
+            </div>
+            <button type="submit" class="btn-submit">Registrarme</button>
+        </form>
+    </div>
+
+    <div id="tab-estudiante" class="section">
+        <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="accion" value="estudiante">
+            <div class="field">
+                <label>Tu nombre completo</label>
+                <input type="text" name="nombre_est" placeholder="Escribe tu nombre" required autocomplete="name">
+            </div>
+            <div class="field">
+                <label>Jornada</label>
+                <select name="jornada_est" required>
+                    <option value="" disabled selected>Selecciona tu jornada</option>
+                    {% for j in jornadas %}
+                    <option value="{{ j }}">{{ j }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>PIN de acceso <span style="color:var(--sub);font-weight:400;">(opcional)</span></label>
+                <input type="password" name="pin_est" placeholder="Tu PIN (si tienes)" autocomplete="off" inputmode="numeric">
+            </div>
+            <button type="submit" class="btn-submit">Ver mis notas</button>
+        </form>
+        <p class="hint">Si tu colegio asignó un PIN, escríbelo. Si no, deja el campo vacío.</p>
+    </div>
+
+    <div id="tab-directora" class="section">
+        <div style="display:flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:16px;">
+            <button type="button" class="tab-btn active" id="dir-btn-login" onclick="switchDirTab('dir-login',this)" style="flex:1;font-size:11px;">Ingresar</button>
+            <button type="button" class="tab-btn" id="dir-btn-reg" onclick="switchDirTab('dir-registro',this)" style="flex:1;font-size:11px;">Registrarse</button>
+        </div>
+
+        <div id="tab-dir-login">
+            <form method="POST">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="accion" value="directora_login">
+                <div class="field">
+                    <label>Usuario</label>
+                    <input type="text" name="dir_usuario" placeholder="ej: directora_10a" autocomplete="username">
+                </div>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="dir_password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Entrar al panel</button>
+            </form>
+            <a href="/{{ slug }}/recuperar" class="forgot-link">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <div id="tab-dir-registro" style="display:none;">
+            <form method="POST" action="/{{ slug }}/directora/registrar_directo">
+                <div class="field">
+                    <label>Nombre completo</label>
+                    <input type="text" name="nombre" placeholder="Tu nombre" required>
+                </div>
+                <div class="field">
+                    <label>Usuario</label>
+                    <input type="text" name="usuario" placeholder="ej: directora_10a" required>
+                </div>
+                <div class="field">
+                    <label>Correo (opcional)</label>
+                    <input type="email" name="email" placeholder="tu@correo.com">
+                </div>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Confirmar contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Curso que diriges</label>
+                    <input type="text" name="curso" placeholder="ej: 10A, 9B..." required>
+                </div>
+                <div class="field">
+                    <label>Jornada</label>
+                    <select name="jornada" required>
+                        <option value="" disabled selected>Selecciona</option>
+                        {% for j in jornadas %}
+                        <option value="{{ j }}">{{ j }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="codigo-field">
+                    <label>Código de invitación</label>
+                    <input type="text" name="codigo_registro_dir" placeholder="Ingresa el código que te dio el administrador" required autocomplete="off">
+                    <p class="hint">El código lo entrega el administrador del colegio.</p>
+                </div>
+
+                <div class="divider">Pregunta secreta (para recuperar contraseña)</div>
+                <div class="field">
+                    <label>Pregunta</label>
+                    <select name="pregunta_secreta" required>
+                        <option value="" disabled selected>Selecciona una pregunta</option>
+                        {% for p in preguntas %}
+                        <option value="{{ p }}">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Respuesta secreta</label>
+                    <input type="text" name="respuesta_secreta" placeholder="Tu respuesta (la usarás si olvidas tu contraseña)" required autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn-submit">Crear cuenta</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="tab-rector" class="section">
+        <div style="display:flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:16px;">
+            <button type="button" class="tab-btn active" id="rec-btn-login" onclick="switchRecTab('rec-login',this)" style="flex:1;font-size:11px;">Ingresar</button>
+            <button type="button" class="tab-btn" id="rec-btn-reg" onclick="switchRecTab('rec-registro',this)" style="flex:1;font-size:11px;">Registrarse</button>
+        </div>
+
+        <div id="tab-rec-login">
+            <form method="POST">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="accion" value="rector_login">
+                <div class="field">
+                    <label>Usuario</label>
+                    <input type="text" name="rec_usuario" placeholder="ej: rector_colegio" autocomplete="username">
+                </div>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="rec_password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Entrar al panel</button>
+            </form>
+            <a href="/{{ slug }}/recuperar" class="forgot-link">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <div id="tab-rec-registro" style="display:none;">
+            <form method="POST" action="/{{ slug }}/rector/registrar">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <div class="field">
+                    <label>Nombre completo</label>
+                    <input type="text" name="nombre" placeholder="Tu nombre" required>
+                </div>
+                <div class="field">
+                    <label>Usuario</label>
+                    <input type="text" name="usuario" placeholder="ej: rector_colegio" required>
+                </div>
+                <div class="field">
+                    <label>Correo (opcional)</label>
+                    <input type="email" name="email" placeholder="tu@correo.com">
+                </div>
+                <div class="field">
+                    <label>Contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Confirmar contraseña</label>
+                    <div class="pass-wrapper">
+                        <input type="password" name="confirmar_password" placeholder="Repite tu contraseña" required minlength="6">
+                        <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Jornada</label>
+                    <select name="jornada" required>
+                        <option value="" disabled selected>Selecciona</option>
+                        {% for j in jornadas %}
+                        <option value="{{ j }}">{{ j }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="codigo-field">
+                    <label>Código de invitación</label>
+                    <input type="text" name="codigo_registro_rec" placeholder="Ingresa el código que te dio el administrador" required autocomplete="off">
+                    <p class="hint">El código lo entrega el administrador del colegio.</p>
+                </div>
+
+                <div class="divider">Pregunta secreta (para recuperar contraseña)</div>
+                <div class="field">
+                    <label>Pregunta</label>
+                    <select name="pregunta_secreta" required>
+                        <option value="" disabled selected>Selecciona una pregunta</option>
+                        {% for p in preguntas %}
+                        <option value="{{ p }}">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Respuesta secreta</label>
+                    <input type="text" name="respuesta_secreta" placeholder="Tu respuesta (la usarás si olvidas tu contraseña)" required autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn-submit">Crear cuenta</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const MATERIAS = {{ materias | tojson }};
+const JORNADAS = {{ jornadas | tojson }};
+let matCount = 1;
+
+function switchTab(tab, btn) {
+    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+    document.querySelectorAll('.tabs .tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('tab-' + tab).classList.add('active');
+    btn.classList.add('active');
+}
+
+function switchDirTab(tab, btn) {
+    document.getElementById('tab-dir-login').style.display = 'none';
+    document.getElementById('tab-dir-registro').style.display = 'none';
+    document.getElementById('tab-' + tab).style.display = 'block';
+    document.getElementById('dir-btn-login').classList.remove('active');
+    document.getElementById('dir-btn-reg').classList.remove('active');
+    btn.classList.add('active');
+}
+
+function switchRecTab(tab, btn) {
+    document.getElementById('tab-rec-login').style.display = 'none';
+    document.getElementById('tab-rec-registro').style.display = 'none';
+    document.getElementById('tab-' + tab).style.display = 'block';
+    document.getElementById('rec-btn-login').classList.remove('active');
+    document.getElementById('rec-btn-reg').classList.remove('active');
+    btn.classList.add('active');
+}
+
+function agregarMateria() {
+    var container = document.getElementById('materias-container');
+    var div = document.createElement('div');
+    div.className = 'materia-row';
+    var idx = matCount;
+    div.id = 'mat-row-' + idx;
+    div.innerHTML =
+        '<select name="materias_sel" required>'
+        + '<option value="" disabled selected>Materia</option>'
+        + MATERIAS.map(function(m){ return '<option value="' + m + '">' + m + '</option>'; }).join('')
+        + '</select>'
+        + '<select name="jornadas_sel" required>'
+        + '<option value="" disabled selected>Jornada</option>'
+        + JORNADAS.map(function(j){ return '<option value="' + j + '">' + j + '</option>'; }).join('')
+        + '</select>'
+        + '<button type="button" class="btn-remove" onclick="document.getElementById(\'mat-row-' + idx + '\').remove()"><i data-lucide="x"></i></button>';
+    container.appendChild(div);
+    matCount++;
+}
+
+function togglePass(btn) {
+    var input = btn.previousElementSibling;
+    if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+    else { input.type = 'password'; btn.innerHTML = '<i data-lucide="eye"></i>'; }
+}
+
+{% if error %}
+{% set e = error %}
+{% if '<i data-lucide="check-circle"></i>' not in e %}
+{% if 'Registro' in e or 'usuario ya existe' in e or 'Completa' in e or 'caracteres' in e or 'materia' in e or 'pregunta' in e or 'contraseñas' in e or 'invitación' in e %}
+document.querySelectorAll('.tabs .tab-btn')[1].click();
+{% elif 'director' in e or 'Director' in e %}
+document.querySelectorAll('.tabs .tab-btn')[3].click();
+document.getElementById('dir-btn-reg').click();
+{% elif 'rector' in e or 'Rector' in e %}
+document.querySelectorAll('.tabs .tab-btn')[4].click();
+{% if 'Completa' in e or 'caracteres' in e or 'contraseñas' in e or 'pregunta' in e or 'invitación' in e or 'usuario ya existe' in e %}
+setTimeout(function(){ document.getElementById('rec-btn-reg').click(); }, 100);
+{% endif %}
+{% elif 'estudiante' in e %}
+document.querySelectorAll('.tabs .tab-btn')[2].click();
+{% endif %}
+{% endif %}
+{% endif %}
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
+<button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:20px;z-index:9999;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);" aria-label="Cambiar tema">🌙</button>
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
+  <script src="/static/js/lumini.js"></script>
+
+</html>
+
+
+

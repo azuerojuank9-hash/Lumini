@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="es">
 
@@ -6,13 +6,14 @@
 
 <meta charset="UTF-8">
 
+
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Archivados &mdash; {{ colegio.nombre if colegio else slug }}</title>
+<title>Archivados — {{ colegio.nombre if colegio else slug }}</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -187,7 +188,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
   <link rel="stylesheet" href="/static/css/lumini.css">
 <link rel="stylesheet" href="/static/css/enhanced.css">
 
-</head>
+
 <body>
 
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
@@ -214,7 +215,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
             <div class="sidebar-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
 
-            <div class="sidebar-brand-sub">{{ profesor.nombre }} &middot; Archivados</div>
+            <div class="sidebar-brand-sub">{{ profesor.nombre }} · Archivados</div>
 
         </div>
 
@@ -228,7 +229,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
         <a href="/{{ slug }}/horarios" class="sidebar-link"><span class="icon"><i data-lucide="calendar"></i></span> Horarios</a>
 
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i></span> Mi Perfil</a>
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>ï¸</span> Mi Perfil</a>
 
         <a href="/{{ slug }}/archivados" class="sidebar-link active"><span class="icon"><i data-lucide="archive"></i></span> Archivados</a>
 
@@ -238,7 +239,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
         <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
 
-        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesi&oacute;n</a>
+        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
 
     </div>
 
@@ -246,11 +247,11 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Men&uacute;"><i data-lucide="menu"></i></button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â’°</button>
 
-  <h1><i data-lucide="archive"></i> Gesti&oacute;n de usuarios</h1>
+  <h1><i data-lucide="archive"></i> Gestión de usuarios</h1>
 
-  <p class="subtitle">Administra profesores y estudiantes &middot; Los datos archivados se conservan</p>
+  <p class="subtitle">Administra profesores y estudiantes · Los datos archivados se conservan</p>
 
   {% if mis_cursos %}
 
@@ -268,7 +269,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
   <div class="card">
 
-    <div class="card-head"><i data-lucide="users"></i> Profesores activos</div>
+    <div class="card-head">👨â€« Profesores activos</div>
 
     {% if profesores_activos %}
 
@@ -288,7 +289,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
             <th>Correo</th>
 
-            <th>Acci&oacute;n</th>
+            <th>Acción</th>
 
           </tr>
 
@@ -306,7 +307,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
               {% for mj in p.materias_jornadas %}
 
-              <span class="badge-mat">{{ mj.materia }} &middot; {{ mj.jornada }}</span>
+              <span class="badge-mat">{{ mj.materia }} · {{ mj.jornada }}</span>
 
               {% endfor %}
 
@@ -314,7 +315,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
             <td style="color:var(--muted);font-size:12px;">{{ p.usuario }}</td>
 
-            <td style="color:var(--muted);font-size:12px;">{{ p.email or '&mdash;' }}</td>
+            <td style="color:var(--muted);font-size:12px;">{{ p.email or '—' }}</td>
 
             <td style="white-space:nowrap;">
 
@@ -330,7 +331,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
                 onclick="eliminarProfesor({{ p.id }}, '{{ p.nombre|replace("'","\\'")|replace('"','\\"') }}')">
 
-                <i data-lucide="trash-2"></i> Eliminar
+                🗑 Eliminar
 
               </button>
 
@@ -372,7 +373,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
             <th>Usuario</th>
 
-            <th>Acci&oacute;n</th>
+            <th>Acción</th>
 
           </tr>
 
@@ -394,7 +395,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
                 onclick="reactivarProfesor({{ p.id }}, '{{ p.nombre|replace("'","\\'")|replace('"','\\"') }}')">
 
-                <i data-lucide="recycle"></i> Reactivar
+                <i data-lucide="recycle"></i>ï¸ Reactivar
 
               </button>
 
@@ -402,7 +403,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
                 onclick="eliminarProfesor({{ p.id }}, '{{ p.nombre|replace("'","\\'")|replace('"','\\"') }}')">
 
-                <i data-lucide="trash-2"></i> Eliminar
+                🗑 Eliminar
 
               </button>
 
@@ -428,7 +429,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
   <div class="card">
 
-    <div class="card-head"><i data-lucide="backpack"></i> Estudiantes archivados &middot; {{ curso_sel or 'sin curso' }}</div>
+    <div class="card-head">🎒 Estudiantes archivados — {{ curso_sel or 'sin curso' }}</div>
 
     {% if alumnos_archivados %}
 
@@ -444,7 +445,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
             <th>Curso</th>
 
-            <th>Acci&oacute;n</th>
+            <th>Acción</th>
 
           </tr>
 
@@ -462,9 +463,18 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
             <td style="white-space:nowrap;">
 
-              <form action="/{{ slug }}/reactivar_alumno/{{ a.id }}" method="POST" style="display:inline" onsubmit="return confirm('Reactivar a {{ a.nombre }}?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm breact"><i data-lucide="recycle"></i> Reactivar</button></form>
+              <form action="/{{ slug }}/reactivar_alumno/{{ a.id }}" method="POST" style="display:inline" onsubmit="return confirm('Reactivar a {{ a.nombre }}?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm breact">
 
-              <form action="/{{ slug }}/eliminar_alumno/{{ a.id }}" method="POST" style="display:inline;margin-left:4px;" onsubmit="return confirm('Eliminar a {{ a.nombre }} PERMANENTEMENTE?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel"><i data-lucide="trash-2"></i> Eliminar</button></form>
+                 class="bsm breact"
+
+                 onclick="return confirm('¿Reactivar a {{ a.nombre }}?')">
+
+                <i data-lucide="recycle"></i>ï¸ Reactivar
+
+              </button></form>
+
+              <form action="/{{ slug }}/eliminar_alumno/{{ a.id }}" method="POST" style="display:inline;margin-left:4px;" onsubmit="return confirm('Eliminar a {{ a.nombre }} PERMANENTEMENTE?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel"
+></button></form>
 
             </td>
 
@@ -508,7 +518,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
         <select class="fselect" id="select-prof-destino">
 
-          <option value="">&mdash; Solo archivar (sin reasignar) &mdash;</option>
+          <option value="">— Solo archivar (sin reasignar) —</option>
 
         </select>
 
@@ -522,7 +532,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
       <div class="alert-warn-box">
 
-        <i data-lucide="alert-triangle"></i> Al archivar, el profesor no podr&aacute; iniciar sesi&oacute;n. Sus datos e historial quedan guardados.
+        <i data-lucide="alert-triangle"></i>ï¸ Al archivar, el profesor no podrá iniciar sesión. Sus datos e historial quedan guardados.
 
       </div>
 
@@ -536,7 +546,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
 </div>
 
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba"><i data-lucide="arrow-up"></i></button>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
 
 <div class="toast" id="toast"></div>
 
@@ -574,25 +584,25 @@ function showToast(msg, ok){
 
 function eliminarProfesor(id, nombre){
 
-    if(!confirm('\u26A0 \u00bfEliminar a ' + nombre + ' PERMANENTEMENTE?\nSe borran sus cursos asignados y no se puede deshacer.')){
+    if(!confirm('<i data-lucide="alert-triangle"></i>ï¸ ¿Eliminar a ' + nombre + ' PERMANENTEMENTE?\nSe borran sus cursos asignados y no se puede deshacer.')){
 
         return;
 
     }
 
-    fetch('/' + SLUG + '/eliminar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':getCsrf()}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
+    fetch('/' + SLUG + '/eliminar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':csrfToken}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
 
 }
 
 function reactivarProfesor(id, nombre){
 
-    if(!confirm('\u00bfReactivar a ' + nombre + '?')){
+    if(!confirm('¿Reactivar a ' + nombre + '?')){
 
         return;
 
     }
 
-    fetch('/' + SLUG + '/reactivar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':getCsrf()}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
+    fetch('/' + SLUG + '/reactivar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':csrfToken}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
 
 }
 
@@ -610,7 +620,7 @@ function abrirModalArchivar(profId, nombre, cursosInfo, otrosProfesores){
 
     _otrosProfesores = otrosProfesores;
 
-    document.getElementById('modal-prof-nombre').innerHTML = '<i data-lucide="archive"></i> Archivar a ' + nombre;
+    document.getElementById('modal-prof-nombre').textContent = '<i data-lucide="archive"></i> Archivar a ' + nombre;
 
     var listaCursos = document.getElementById('lista-cursos-modal');
 
@@ -642,7 +652,7 @@ function abrirModalArchivar(profId, nombre, cursosInfo, otrosProfesores){
 
                 '<input type="checkbox" value="' + c.curso + '|' + c.materia + '|' + c.jornada + '" checked>'
 
-                + '<span><strong>' + c.curso + '</strong> &middot; ' + c.materia + ' &middot; ' + c.jornada + '</span>';
+                + '<span><strong>' + c.curso + '</strong> · ' + c.materia + ' · ' + c.jornada + '</span>';
 
             listaCursos.appendChild(label);
 
@@ -650,7 +660,7 @@ function abrirModalArchivar(profId, nombre, cursosInfo, otrosProfesores){
 
         var sel = document.getElementById('select-prof-destino');
 
-        sel.innerHTML = '<option value="">&mdash; Solo archivar (sin reasignar) &mdash;</option>';
+        sel.innerHTML = '<option value="">— Solo archivar (sin reasignar) —</option>';
 
         otrosProfesores.forEach(function(p){
 
@@ -658,7 +668,7 @@ function abrirModalArchivar(profId, nombre, cursosInfo, otrosProfesores){
 
             opt.value = p.id;
 
-            opt.textContent = p.nombre + ' \u00b7 ' + p.materia + ' \u00b7 ' + p.jornada;
+            opt.textContent = p.nombre + ' · ' + p.materia + ' · ' + p.jornada;
 
             sel.appendChild(opt);
 
@@ -716,7 +726,7 @@ function confirmarArchivar(){
 
             } else {
 
-                showToast('<i data-lucide="alert-circle"></i> ' + d.mensaje, false);
+                showToast('â“ ' + d.mensaje, false);
 
             }
 
@@ -726,7 +736,7 @@ function confirmarArchivar(){
 
             cerrarModal();
 
-            showToast('<i data-lucide="alert-circle"></i> Error de conexi&oacute;n.', false);
+            showToast('â“ Error de conexión.', false);
 
         });
 
@@ -768,5 +778,9 @@ addDataLabels();
 
   <script src="/static/js/lumini.js"></script>
 
-</body>
+
 </html>
+
+
+
+

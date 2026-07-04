@@ -1,469 +1,923 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
+
+
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <link rel="stylesheet" href="/static/css/lumini.css">
 <link rel="stylesheet" href="/static/css/enhanced.css">
+
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Panel Directora — {{ colegio.nombre if colegio else slug }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#7C3AED' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#6D28D9' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#7C3AED') | hex_to_rgb }};--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;--shadow:0 1px 3px rgba(0,0,0,.15);}[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.06);}*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;line-height:1.5;}.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;overflow-y:auto;}.sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}.sidebar-logo{width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0;}.sidebar-brand{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}.sidebar-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}.sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}.sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}.sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}.sidebar-link.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}.sidebar-link .icon{font-size:15px;width:20px;text-align:center;}.main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:1400px;width:100%;}.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;}.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.5);}@media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s ease;}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 24px;}}@media(max-width:480px){.main{padding:16px;}}
+
+:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#7C3AED' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#6D28D9' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#7C3AED') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 4px rgba(0,0,0,.2);--sidebar:200px;}
+
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);}
+
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
+
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
+
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+.sidebar-logo{padding:14px 14px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
+
+.sidebar-logo img{height:30px;width:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
+
+.sidebar-brand{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+.sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
+
+.sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}
+
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}
+
+.sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
+
+.sidebar-link.active{background:var(--accent);color:#fff;}
+
+.sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
+
+.sidebar-footer{padding:8px 10px;border-top:1px solid #1E293B;}
+
+.main{margin-left:var(--sidebar);padding:20px 24px;width:calc(100% - var(--sidebar));min-height:100vh;max-width:1300px;}
+
 .periodo-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
-.ptab{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;border:1px solid var(--border);color:var(--muted);background:var(--bg2);transition:all var(--tr);}
+
+.ptab{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;border:1px solid #1E293B;color:var(--muted);background:#0F172A;transition:all var(--tr);}
+
 .ptab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
+
+.card-head{padding:10px 14px;border-bottom:1px solid #1E293B;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+
+.card-title{font-size:13px;font-weight:600;}
+
+.card-body{padding:12px;}
+
 .prof-chips{display:flex;flex-wrap:wrap;gap:8px;}
-.pchip{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:5px;}
+
+.pchip{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:500;}
+
 .pchip-ok{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+
 .pchip-pend{background:rgba(245,158,11,.1);color:var(--yellow);border:1px solid rgba(245,158,11,.2);}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+
+.nbtn{padding:6px 12px;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all var(--tr);}
+
+.nbtn-pri{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
+
+.nbtn-pri:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
+
+.nbtn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid #1E293B;}
+
+.nbtn-ghost:hover{background:rgba(255,255,255,.08);}
+
+.nbtn-red{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+
+.nbtn-green{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+table{border-collapse:collapse;min-width:100%;font-size:12px;}
+
+th{padding:7px 5px;text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #1E293B;white-space:nowrap;background:#0F172A;position:sticky;top:0;}
+
+th.tnombre{text-align:left;min-width:130px;}
+
+td{padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.04);text-align:center;vertical-align:middle;}
+
+td.tnomcell{text-align:left;font-weight:500;padding-left:12px;}
+
+tr:last-child td{border-bottom:none;}
+
+tr:hover td{background:rgba(var(--accent-rgb),.03);}
+
+.nota-ok{color:var(--green);font-weight:700;}
+
+.nota-mal{color:var(--red);font-weight:700;}
+
+.nota-none{color:#64748B;}
+
+.prom-cell{font-size:13px;font-weight:700;border-left:2px solid rgba(255,255,255,.06);}
+
 .tag-apr{background:rgba(16,185,129,.12);color:var(--green);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;}
+
 .tag-rep{background:rgba(239,68,68,.12);color:var(--red);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;}
+
 .email-wrap{display:flex;align-items:center;gap:4px;min-width:140px;}
-.email-input{padding:4px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:11px;width:100%;transition:border-color var(--tr);}
+
+.email-input{padding:4px 8px;background:#0F172A;border:1px solid #1E293B;border-radius:5px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:11px;width:100%;transition:border-color var(--tr);}
+
 .email-input:focus{outline:none;border-color:var(--accent);}
+
 .email-input.saved{border-color:var(--green);}
+
 .email-save-btn{padding:3px 7px;border-radius:5px;font-size:10px;background:rgba(var(--accent-rgb),.2);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.3);cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;font-weight:600;}
+
 .email-save-btn:hover{background:rgba(var(--accent-rgb),.35);}
-.venc-ok{color:var(--green);}.venc-warn{color:var(--yellow);}.venc-danger{color:var(--red);font-weight:700;}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;align-items:center;justify-content:center;padding:16px;}
+
+.overlay.open{display:flex;}
+
+.modal{background:rgba(15,23,42,.96);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+.flabel{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;margin-top:12px;}
+
+.finput{padding:8px 10px;background:#0F172A;border:1.5px solid #1E293B;border-radius:7px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;width:100%;transition:border-color var(--tr);}
+
+.finput:focus{outline:none;border-color:var(--accent);}
+
+.finput::placeholder{color:#64748B;}
+
+.scroll-top{display:none;position:fixed;bottom:80px;right:16px;z-index:2000;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:50%;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+
+.scroll-top.show{display:flex;}
+
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid rgba(var(--accent-rgb),.3);color:var(--text);padding:8px 14px;border-radius:var(--rmd);font-size:12px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 4px 20px #00000080;max-width:320px;}
+
+.toast.show{opacity:1;transform:translateY(0);}
+
+.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:36px;height:36px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
+
+.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
+
+.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);}
+
+@media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 24px;}}
+
+@media(max-width:600px){
+
+  table,thead,tbody,tr,td,th{display:block;}
+
+  thead tr{display:none;}
+
+  tr{border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px;background:var(--bg2);}
+
+  td{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border:none;text-align:right;gap:6px;min-height:36px;border-bottom:1px solid rgba(255,255,255,.04);}
+
+  td::before{content:attr(data-label);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;flex-shrink:0;text-align:left;min-width:70px;}
+
+  td:last-child{border-bottom:none;}
+
+  .nbtn{min-height:44px;font-size:11px;}
+
+  .email-input{font-size:16px;}
+
+  .email-wrap{flex-wrap:wrap;}
+
+  tr:hover td{background:none;}
+
+}
+
+@media(max-width:375px){.main{padding:20px 24px;}.page-title{font-size:1.2rem;}.card-head{padding:10px 14px;}.card-title{font-size:12px;}.card-body{padding:12px;}.nbtn{font-size:11px;min-height:40px;padding:6px 12px;}.periodo-tabs{gap:4px;}.periodo-tab{font-size:11px;padding:4px 10px;}.hamburger{width:36px;height:36px;}.email-input{font-size:15px;padding:8px 10px;}.finput{font-size:12px;padding:8px 10px;}.stats{gap:6px;}}
+
 </style>
+
 <!-- Datadog RUM -->
+
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
+
 </head>
+
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
 <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <a href="{{ url_for('directora_panel', slug=slug) }}">
+
+    <a href="{{ url_for('directora_panel', slug=slug) }}" style="text-decoration:none;color:inherit;">
+
+    <div class="sidebar-logo">
+
         {% if colegio and colegio.logo %}
-        <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+
+        <img class="nav-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+
         {% else %}
-        <img class="sidebar-logo" src="/static/lumini_logo.webp" alt="Lumini">
+
+        <img class="nav-logo" src="/static/lumini_logo.webp" alt="Lumini">
+
         {% endif %}
-        </a>
+
         <div>
+
             <div class="sidebar-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
-            <div class="sidebar-sub"><i data-lucide="user-check"></i> {{ directora.nombre }} · {{ curso }} · {{ jornada }}</div>
+
+            <div class="sidebar-brand-sub">👩â€💼 {{ directora.nombre }} · Curso {{ curso }} · {{ jornada }}</div>
+
         </div>
+
     </div>
+
+    </a>
+
     <nav class="sidebar-nav">
+
         <a href="{{ url_for('directora_panel', slug=slug) }}" class="sidebar-link active"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
+
         <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="sidebar-link"><span class="icon"><i data-lucide="file-text"></i></span> Boletín PDF</a>
-        <button onclick="toggleTheme()" class="sidebar-link"><span class="icon"><i data-lucide="moon"></i></span> Cambiar tema</button>
+
+        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
+
         <a href="{{ url_for('directora_logout', slug=slug) }}" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
+
     </nav>
-    <div class="sidebar-footer" style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 6px;border-top:1px solid var(--border);">
+
+    <div class="sidebar-footer" style="display:flex;gap:6px;flex-wrap:wrap;">
+
         <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="nbtn nbtn-pri" style="flex:1;text-align:center;justify-content:center;"><i data-lucide="file-text"></i> PDF todos</a>
+
         <button onclick="abrirModalRegistro()" class="nbtn nbtn-ghost" style="flex:1;text-align:center;justify-content:center;"><i data-lucide="plus-circle"></i> Crear directora</button>
+
     </div>
+
 </aside>
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú"><i data-lucide="menu"></i></button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â’°</button>
 
-<div class="periodo-tabs">
-    <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Periodo:</span>
-    {% for p in range(1, num_periodos+1) %}
-    <a href="?periodo={{ p }}" class="ptab {% if p==periodo %}active{% endif %}">{{ p }}&deg; Periodo</a>
-    {% endfor %}
-</div>
+    <div class="periodo-tabs">
 
-<div class="stats-grid fade-in fade-in-d1" style="margin-bottom:20px;">
-    <div class="stat-card">
-        <div class="stat-icon purple"><i data-lucide="users"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ tabla|length }}</div>
-            <div class="stat-label">Estudiantes</div>
-        </div>
+        <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Periodo:</span>
+
+        {% for p in range(1, num_periodos+1) %}
+
+        <a href="?periodo={{ p }}" class="ptab {% if p==periodo %}active{% endif %}">{{ p }}° Periodo</a>
+
+        {% endfor %}
+
     </div>
-    <div class="stat-card">
-        <div class="stat-icon blue"><i data-lucide="book"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ lista_materias|length }}</div>
-            <div class="stat-label">Materias</div>
+
+    <div class="dash-modules">
+        <div class="dash-module">
+            <div class="dash-module-head">
+                <span class="icon"><i data-lucide="zap" style="width:15px;height:15px;"></i></span>
+                Accesos rápidos
+            </div>
+            <div class="dash-module-body" style="display:flex;flex-wrap:wrap;gap:8px;padding:14px 16px;">
+                <a href="?periodo={{ periodo }}#table-consolidada" class="qaction"><i data-lucide="clipboard-list"></i> Notas</a>
+                <button onclick="enviarCorreosTodos()" class="qaction" style="border:none;background:var(--bg3);cursor:pointer;"><i data-lucide="send"></i> Enviar boletines</button>
+                <button onclick="abrirModalRegistro()" class="qaction" style="border:none;background:var(--bg3);cursor:pointer;"><i data-lucide="user-plus"></i> Crear directora</button>
+                <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="qaction"><i data-lucide="file-text"></i> PDF todos</a>
+            </div>
         </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon green"><i data-lucide="presentation"></i></div>
-        <div class="stat-body">
-            <div class="stat-value">{{ profesores|length }}</div>
-            <div class="stat-label">Profesores</div>
-            <div class="stat-footer">{{ profesores|selectattr('enviado')|list|length }} enviaron notas</div>
+        <div class="dash-module">
+            <div class="dash-module-head">
+                <span class="icon"><i data-lucide="activity" style="width:15px;height:15px;"></i></span>
+                Resumen académico
+            </div>
+            <div class="dash-module-body">
+                {% set promedios = tabla|selectattr("promedio","ne",None)|map(attribute="promedio")|list %}
+                {% if promedios %}
+                {% set avg = (promedios|sum / promedios|length)|round(2) %}
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Estudiantes</span>
+                        <span class="info-value">{{ tabla|length }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Promedio</span>
+                        <span class="info-value" style="color:{% if avg >= 3.5 %}var(--green){% elif avg >= 3.0 %}var(--yellow){% else %}var(--red){% endif %};">{{ avg }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Materias</span>
+                        <span class="info-value">{{ lista_materias|length }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Profesores</span>
+                        <span class="info-value">{{ profesores|length }}</span>
+                    </div>
+                </div>
+                <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:8px;">
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                        <span style="color:var(--muted);">Aprobados (&ge;3.0)</span>
+                        <span style="font-weight:600;color:var(--green);">{{ aprobados }}</span>
+                    </div>
+                    <div class="progress-bar green"><div class="fill" style="width:{{ (aprobados / promedios|length * 100)|round|int if promedios|length > 0 else 0 }}%;"></div></div>
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin:8px 0 4px;">
+                        <span style="color:var(--muted);">Reprobados (&lt;3.0)</span>
+                        <span style="font-weight:600;color:var(--red);">{{ reprobados }}</span>
+                    </div>
+                    <div class="progress-bar red"><div class="fill" style="width:{{ (reprobados / promedios|length * 100)|round|int if promedios|length > 0 else 0 }}%;"></div></div>
+                    {% if sin_notas > 0 %}
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin:8px 0 4px;">
+                        <span style="color:var(--muted);">Sin notas</span>
+                        <span style="font-weight:600;color:var(--sub);">{{ sin_notas }}</span>
+                    </div>
+                    <div class="progress-bar"><div class="fill" style="width:{{ (sin_notas / promedios|length * 100)|round|int if promedios|length > 0 else 0 }}%;"></div></div>
+                    {% endif %}
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);">
+                        <span style="color:var(--muted);">Profesores con notas</span>
+                        <span style="font-weight:600;">{{ profesores|selectattr('enviado')|list|length }}/{{ profesores|length }}</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state" style="min-height:100px;padding:20px;">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                    <div class="empty-title">Sin notas registradas</div>
+                    <div class="empty-desc">Ningún profesor ha registrado actividades en el periodo {{ periodo }}.</div>
+                </div>
+                {% endif %}
+            </div>
         </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon orange"><i data-lucide="graduation-cap"></i></div>
-        <div class="stat-body">
-            {% set promedios = tabla|selectattr("promedio","ne",None)|map(attribute="promedio")|list %}
-            {% set avg = (promedios|sum / promedios|length)|round(2) if promedios else '—' %}
-            <div class="stat-value">{{ avg }}</div>
-            <div class="stat-label">Promedio general</div>
-            <div class="stat-trend {% if avg is not none and avg >= 3.0 %}up{% else %}down{% endif %}">
-                {% if avg is not none and avg >= 3.0 %}Aprobado{% else %}Reprobado{% endif %}
+        <div class="dash-module">
+            <div class="dash-module-head">
+                <span class="icon"><i data-lucide="clock" style="width:14px;height:14px;"></i></span>
+                Actividad reciente
+            </div>
+            <div class="dash-module-body compact">
+                {% if actividad_reciente %}
+                {% for a in actividad_reciente %}
+                <div class="activity-item">
+                    <div class="av purple"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i></div>
+                    <div class="act-content">
+                        <div class="act-text"><strong>{{ a.accion | capitalize }}</strong> en {{ a.tabla }}</div>
+                        <div class="act-meta">{{ a.creado[:16] if a.creado else '' }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state" style="min-height:80px;padding:16px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:6px;"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                    <div class="empty-title" style="font-size:12px;">Sin actividad reciente</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="dash-module">
+            <div class="dash-module-head">
+                <span class="icon"><i data-lucide="bell" style="width:14px;height:14px;"></i></span>
+                Notificaciones
+            </div>
+            <div class="dash-module-body compact">
+                {% if notif_count > 0 %}
+                <div class="activity-item">
+                    <div class="av blue"><i data-lucide="bell" style="width:13px;height:13px;"></i></div>
+                    <div class="act-content">
+                        <div class="act-text">Tienes <strong>{{ notif_count }}</strong> notificación(es) sin leer</div>
+                        <div class="act-meta">Pendientes de revisión</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state" style="min-height:80px;padding:16px;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:6px;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    <div class="empty-title" style="font-size:12px;">Sin notificaciones</div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
-</div>
 
-<div class="quick-actions-grid fade-in fade-in-d2" style="margin-bottom:24px;">
-    <a href="?periodo={{ periodo }}#table-consolidada" class="qa-card">
-        <div class="qa-icon purple"><i data-lucide="clipboard-list"></i></div>
-        <div class="qa-title">Notas</div>
-        <div class="qa-desc">Ver notas consolidadas</div>
-    </a>
-    <button onclick="enviarCorreosTodos()" class="qa-card" style="border:none;background:var(--bg2);cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;width:100%;">
-        <div class="qa-icon green"><i data-lucide="send"></i></div>
-        <div class="qa-title">Enviar boletines</div>
-        <div class="qa-desc">A todos los estudiantes con correo</div>
-    </button>
-    <button onclick="abrirModalRegistro()" class="qa-card" style="border:none;background:var(--bg2);cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;width:100%;">
-        <div class="qa-icon orange"><i data-lucide="user-plus"></i></div>
-        <div class="qa-title">Crear directora</div>
-        <div class="qa-desc">Registrar nueva cuenta</div>
-    </button>
-    <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="qa-card">
-        <div class="qa-icon blue"><i data-lucide="file-text"></i></div>
-        <div class="qa-title">PDF todos</div>
-        <div class="qa-desc">Descargar boletín completo</div>
-    </a>
-</div>
+    <div class="card">
 
-<div class="section-header" id="table-consolidada">
-    <h2><span class="sh-icon"><i data-lucide="bar-chart-3"></i></span> Notas consolidadas — {{ curso }} · {{ jornada }} · Periodo {{ periodo }}</h2>
-    <div class="sh-actions">
-        <span class="tag-apr">&ge; 3.0 Aprobado</span>
-        <span class="tag-rep">&lt; 3.0 Reprobado</span>
-    </div>
-</div>
+        <div class="card-head">
 
-<div class="feed-card" style="margin-bottom:16px;">
-    <div class="feed-body">
-        <div class="prof-chips">
+            <span class="card-title"><i data-lucide="clipboard-list"></i> Estado de notas — Periodo {{ periodo }}</span>
+
+            <span style="font-size:11px;color:var(--muted);">{{ profesores|selectattr('enviado')|list|length }}/{{ profesores|length }} profesores enviaron notas</span>
+
+        </div>
+
+        <div class="card-body">
+
             {% if profesores %}
-            {% for p in profesores %}
-            <span class="pchip {% if p.enviado %}pchip-ok{% else %}pchip-pend{% endif %}">
-                {% if p.enviado %}<i data-lucide="check-circle"></i>{% else %}<i data-lucide="clock"></i>{% endif %} {{ p.materia }} &middot; {{ p.nombre }}
-            </span>
-            {% endfor %}
+
+            <div class="prof-chips">
+
+                {% for p in profesores %}
+
+                <span class="pchip {% if p.enviado %}pchip-ok{% else %}pchip-pend{% endif %}">
+
+                    {% if p.enviado %}<i data-lucide="check-circle"></i>{% else %}â³{% endif %} {{ p.materia }} · {{ p.nombre }}
+
+                </span>
+
+                {% endfor %}
+
+            </div>
+
             {% else %}
-            <div class="empty-state" style="min-height:80px;">
-                <i data-lucide="file-text" style="width:32px;height:32px;color:var(--muted);"></i>
+
+            <div class="empty-state" style="min-height:100px;padding:24px;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
                 <div class="empty-title">Sin actividades registradas</div>
                 <div class="empty-desc">Ningún profesor ha registrado actividades en el periodo {{ periodo }}.</div>
             </div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="feed-footer">
-        <div class="actions">
-            <button onclick="enviarCorreosTodos()" class="btn btn-primary btn-sm"><i data-lucide="send"></i> Enviar boletines por correo (todos)</button>
-            <span style="font-size:11px;color:var(--muted);">Solo se envía a estudiantes con correo registrado.</span>
-        </div>
-    </div>
-</div>
 
-<div class="card">
-    <div class="table-top">
-        <span class="total-count">{{ tabla|length }} estudiantes</span>
-        <div class="table-search">
-            <input type="text" id="searchEstudiante" placeholder="Buscar estudiante..." oninput="filtrarTabla()">
+            {% endif %}
+
         </div>
+
     </div>
-    <div class="tw zebra fade-in fade-in-d2">
-        <table id="table-consolidada">
-            <thead>
+
+    <div class="actions">
+
+        <button onclick="enviarCorreosTodos()" class="nbtn nbtn-green">📧 Enviar boletines por correo (todos)</button>
+
+        <span style="font-size:11px;color:var(--muted);">Solo se envía a estudiantes con correo registrado.</span>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-head">
+
+            <span class="card-title"><i data-lucide="bar-chart-3"></i> Notas consolidadas — {{ curso }} · {{ jornada }} · Periodo {{ periodo }}</span>
+
+            <div style="display:flex;gap:8px;font-size:11px;">
+
+                <span class="tag-apr">&ge; 3.0 Aprobado</span>
+
+                <span class="tag-rep">&lt; 3.0 Reprobado</span>
+
+            </div>
+
+        </div>
+
+        <div class="table-search" style="padding:8px 16px;border-bottom:1px solid var(--border);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;flex-shrink:0;color:var(--muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchEstudiante" placeholder="Buscar estudiante..." oninput="filtrarTabla()" style="flex:1;padding:6px 0;background:none;border:none;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;">
+            <span style="font-size:10px;color:var(--sub);" id="tableCount">{{ tabla|length }} estudiantes</span>
+        </div>
+
+        <div class="tw zebra fade-in fade-in-d2">
+
+            <table id="table-consolidada">
+
+                <thead>
+
+                    <tr>
+
+                        <th class="tnombre">Estudiante</th>
+
+                        {% for mat in lista_materias %}
+
+                        <th colspan="4" style="color:var(--accent);border-left:2px solid rgba(var(--accent-rgb),.2);">
+
+                            {{ mat }}{% if mat not in materias_enviadas %} <span style="color:var(--yellow);font-size:9px;">â³</span>{% endif %}
+
+                        </th>
+
+                        {% endfor %}
+
+                        <th>Prom.</th><th>Estado</th>
+
+                        <th style="min-width:200px;">Correo acudiente</th>
+
+                        <th>PDF / Enviar</th>
+
+                    </tr>
+
+                    <tr style="background:#0F172A;">
+
+                        <th></th>
+
+                        {% for mat in lista_materias %}
+
+                        <th style="font-size:9px;color:#64748B;border-left:2px solid rgba(var(--accent-rgb),.15);" title="Actividades 65%">Act</th>
+
+                        <th style="font-size:9px;color:#64748B;" title="Evaluación 25%">Eval</th>
+
+                        <th style="font-size:9px;color:#64748B;" title="Autoevaluación 10%">Auto</th>
+
+                        <th style="font-size:9px;color:var(--muted);font-weight:700;" title="Nota final">Final</th>
+
+                        {% endfor %}
+
+                        <th></th><th></th><th></th><th></th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for fila in tabla %}
+
                 <tr>
-                    <th class="tnombre">Estudiante</th>
+
+                    <td class="tnomcell">{{ fila.nombre }}</td>
+
                     {% for mat in lista_materias %}
-                    <th colspan="4" style="color:var(--accent);border-left:2px solid rgba(var(--accent-rgb),.2);">
-                        {{ mat }}{% if mat not in materias_enviadas %} <span style="color:var(--yellow);font-size:9px;"><i data-lucide="clock"></i></span>{% endif %}
-                    </th>
+
+                    {% set d = fila.materias.get(mat, {}) %}
+
+                    <td style="border-left:2px solid rgba(var(--accent-rgb),.1);" class="nota-none">{{ d.act if d.act is not none else '—' }}</td>
+
+                    <td class="nota-none">{{ d.eval if d.eval is not none else '—' }}</td>
+
+                    <td class="nota-none">{{ d.auto if d.auto is not none else '—' }}</td>
+
+                    <td class="{% if d.final is not none %}{% if d.final >= 3.0 %}nota-ok{% else %}nota-mal{% endif %}{% else %}nota-none{% endif %}">{{ d.final if d.final is not none else '—' }}</td>
+
                     {% endfor %}
-                    <th>Prom.</th><th>Estado</th>
-                    <th style="min-width:200px;">Correo acudiente</th>
-                    <th>PDF / Enviar</th>
+
+                    <td class="prom-cell {% if fila.promedio is not none %}{% if fila.promedio >= 3.0 %}nota-ok{% else %}nota-mal{% endif %}{% else %}nota-none{% endif %}">
+
+                        {{ fila.promedio if fila.promedio is not none else '—' }}
+
+                    </td>
+
+                    <td>
+
+                        {% if fila.promedio is not none %}
+
+                        <span class="{% if fila.promedio >= 3.0 %}tag-apr{% else %}tag-rep{% endif %}">{% if fila.promedio >= 3.0 %}Aprobado{% else %}Reprobado{% endif %}</span>
+
+                        {% else %}<span style="color:#64748B;font-size:11px;">—</span>{% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <div class="email-wrap">
+
+                            <input class="email-input" type="email" id="email-{{ fila.id }}" value="{{ fila.email }}" placeholder="correo@acudiente.com" onkeydown="if(event.key==='Enter')guardarEmail({{ fila.id }})">
+
+                            <button class="email-save-btn" onclick="guardarEmail({{ fila.id }})">💾</button>
+
+                        </div>
+
+                    </td>
+
+                    <td style="white-space:nowrap;">
+
+                        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo, aid=fila.id) }}" title="Descargar PDF" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(var(--accent-rgb),.15);color:var(--accent);text-decoration:none;font-weight:600;margin-right:4px;"><i data-lucide="file-text"></i></a>
+
+                        <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre }}')" title="Enviar boletín" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);cursor:pointer;font-weight:600;">📧</button>
+
+                    </td>
+
                 </tr>
-                <tr style="background:var(--bg3);">
-                    <th></th>
-                    {% for mat in lista_materias %}
-                    <th style="font-size:9px;color:#64748B;border-left:2px solid rgba(var(--accent-rgb),.15);" title="Actividades 65%">Act</th>
-                    <th style="font-size:9px;color:#64748B;" title="Evaluación 25%">Eval</th>
-                    <th style="font-size:9px;color:#64748B;" title="Autoevaluación 10%">Auto</th>
-                    <th style="font-size:9px;color:var(--muted);font-weight:700;" title="Nota final">Final</th>
-                    {% endfor %}
-                    <th></th><th></th><th></th><th></th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for fila in tabla %}
-            <tr>
-                <td class="tnomcell">{{ fila.nombre }}</td>
-                {% for mat in lista_materias %}
-                {% set d = fila.materias.get(mat, {}) %}
-                <td style="border-left:2px solid rgba(var(--accent-rgb),.1);" class="nota-none">{{ d.act if d.act is not none else '&mdash;' }}</td>
-                <td class="nota-none">{{ d.eval if d.eval is not none else '&mdash;' }}</td>
-                <td class="nota-none">{{ d.auto if d.auto is not none else '&mdash;' }}</td>
-                <td class="{% if d.final is not none %}{% if d.final >= 3.0 %}nota-ok{% else %}nota-mal{% endif %}{% else %}nota-none{% endif %}">{{ d.final if d.final is not none else '&mdash;' }}</td>
+
+                {% else %}
+
+                <tr><td colspan="{{ lista_materias|length * 4 + 5 }}" style="padding:32px;text-align:center;color:var(--muted);">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;display:block;margin:0 auto 8px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    No hay estudiantes en el curso <strong>{{ curso }}</strong>.
+                </td></tr>
+
                 {% endfor %}
-                <td class="prom-cell {% if fila.promedio is not none %}{% if fila.promedio >= 3.0 %}nota-ok{% else %}nota-mal{% endif %}{% else %}nota-none{% endif %}">
-                    {{ fila.promedio if fila.promedio is not none else '&mdash;' }}
-                </td>
-                <td>
-                    {% if fila.promedio is not none %}
-                    <span class="{% if fila.promedio >= 3.0 %}tag-apr{% else %}tag-rep{% endif %}">{% if fila.promedio >= 3.0 %}Aprobado{% else %}Reprobado{% endif %}</span>
-                    {% else %}<span style="color:#64748B;font-size:11px;">&mdash;</span>{% endif %}
-                </td>
-                <td>
-                    <div class="email-wrap">
-                        <input class="email-input" type="email" id="email-{{ fila.id }}" value="{{ fila.email }}" placeholder="correo@acudiente.com" onkeydown="if(event.key==='Enter')guardarEmail({{ fila.id }})">
-                        <button class="email-save-btn" onclick="guardarEmail({{ fila.id }})"><i data-lucide="save"></i></button>
-                    </div>
-                </td>
-                <td style="white-space:nowrap;">
-                    <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo, aid=fila.id) }}" title="Descargar PDF" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(var(--accent-rgb),.15);color:var(--accent);text-decoration:none;font-weight:600;margin-right:4px;"><i data-lucide="file-text"></i></a>
-                    <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre }}')" title="Enviar boletín" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);cursor:pointer;font-weight:600;"><i data-lucide="send"></i></button>
-                </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="{{ lista_materias|length * 4 + 5 }}" style="padding:32px;text-align:center;color:var(--muted);">
-                <i data-lucide="users" style="width:36px;height:36px;color:var(--muted);"></i>
-                No hay estudiantes en el curso <strong>{{ curso }}</strong>.
-            </td></tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="table-footer">
-        <span style="font-size:11px;color:var(--sub);">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div style="font-size:11px;color:#64748B;padding:12px 16px;">
+
             <strong style="color:var(--muted);">Ponderación:</strong>
-            Act = Actividades <strong style="color:var(--accent);">65%</strong> &middot;
-            Eval = Evaluación docente <strong style="color:var(--accent);">25%</strong> &middot;
+
+            Act = Actividades <strong style="color:var(--accent);">65%</strong> ·
+
+            Eval = Evaluación docente <strong style="color:var(--accent);">25%</strong> ·
+
             Auto = Autoevaluación <strong style="color:var(--accent);">10%</strong>
-        </span>
-    </div>
-</div>
 
-<div class="section-header" style="margin-top:28px;">
-    <h2><span class="sh-icon"><i data-lucide="pie-chart"></i></span> Resumen — Periodo {{ periodo }}</h2>
-</div>
+        </div>
 
-<div class="kpi-grid" style="margin-bottom:24px;">
-    <div class="kpi-card">
-        <div class="kpi-top">
-            <div class="kpi-icon blue"><i data-lucide="users"></i></div>
-        </div>
-        <div class="kpi-value">{{ tabla|length }}</div>
-        <div class="kpi-label">Estudiantes</div>
-        <div class="kpi-footer">
-            {{ tabla|selectattr("promedio","ne",None)|list|length }} con promedio
-        </div>
     </div>
-    <div class="kpi-card">
-        <div class="kpi-top">
-            <div class="kpi-icon purple"><i data-lucide="book"></i></div>
-        </div>
-        <div class="kpi-value">{{ lista_materias|length }}</div>
-        <div class="kpi-label">Materias</div>
-        <div class="kpi-footer">
-            {{ materias_enviadas|length }} enviadas
-        </div>
-        <div class="kpi-context">
-            <div class="progress-bar blue"><div class="fill" style="width:{{ (materias_enviadas|length / lista_materias|length * 100)|round(1) if lista_materias else 0 }}%;"></div></div>
-        </div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-top">
-            <div class="kpi-icon green"><i data-lucide="presentation"></i></div>
-        </div>
-        <div class="kpi-value">{{ profesores|length }}</div>
-        <div class="kpi-label">Profesores</div>
-        <div class="kpi-footer">
-            {{ profesores|selectattr("enviado")|list|length }} enviaron notas
-        </div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-top">
-            <div class="kpi-icon orange"><i data-lucide="graduation-cap"></i></div>
-        </div>
-        {% set promedios = tabla|selectattr("promedio","ne",None)|map(attribute="promedio")|list %}
-        {% if promedios %}
-        {% set avg = (promedios|sum / promedios|length)|round(2) %}
-        {% set maxv = promedios|max %}
-        {% set minv = promedios|min %}
-        <div class="kpi-value" style="color:{% if avg >= 3.5 %}var(--green){% elif avg >= 3.0 %}var(--yellow){% else %}var(--red){% endif %};">{{ avg }}</div>
-        <div class="kpi-label">Promedio general</div>
-        <div class="kpi-footer">
-            Max {{ maxv }} &middot; Min {{ minv }}
-        </div>
-        {% else %}
-        <div class="kpi-value" style="color:var(--muted);">&mdash;</div>
-        <div class="kpi-label">Promedio general</div>
-        <div class="kpi-footer">Sin datos</div>
-        {% endif %}
-    </div>
-</div>
-
-<div class="dash-modules">
-    <div class="dash-module">
-        <div class="dash-module-head">
-            <span class="icon"><i data-lucide="clock"></i></span>
-            Actividad reciente
-        </div>
-        <div class="dash-module-body compact">
-            {% if actividad_reciente %}
-            {% for a in actividad_reciente %}
-            <div class="activity-item">
-                <div class="av purple"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i></div>
-                <div class="act-content">
-                    <div class="act-text"><strong>{{ a.accion | capitalize }}</strong> en {{ a.tabla }}</div>
-                    <div class="act-meta">{{ a.creado[:16] if a.creado else '' }}</div>
-                </div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="empty-state" style="min-height:80px;padding:16px;">
-                <i data-lucide="clock" style="width:28px;height:28px;color:var(--muted);"></i>
-                <div class="empty-title" style="font-size:12px;">Sin actividad reciente</div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="dash-module">
-        <div class="dash-module-head">
-            <span class="icon"><i data-lucide="bell"></i></span>
-            Notificaciones
-        </div>
-        <div class="dash-module-body compact">
-            {% if notif_count > 0 %}
-            <div class="activity-item">
-                <div class="av blue"><i data-lucide="bell" style="width:13px;height:13px;"></i></div>
-                <div class="act-content">
-                    <div class="act-text">Tienes <strong>{{ notif_count }}</strong> notificación(es) sin leer</div>
-                    <div class="act-meta">Pendientes de revisión</div>
-                </div>
-            </div>
-            {% else %}
-            <div class="empty-state" style="min-height:80px;padding:16px;">
-                <i data-lucide="bell-off" style="width:28px;height:28px;color:var(--muted);"></i>
-                <div class="empty-title" style="font-size:12px;">Sin notificaciones</div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<div class="dash-modules" style="margin-bottom:20px;">
-    <div class="dash-module">
-        <div class="dash-module-head">
-            <span class="icon"><i data-lucide="activity"></i></span>
-            Resumen académico
-        </div>
-        <div class="dash-module-body">
-            {% set promedios = tabla|selectattr("promedio","ne",None)|map(attribute="promedio")|list %}
-            {% if promedios %}
-            <div class="info-grid">
-                <div class="info-item"><span class="info-label">Estudiantes</span><span class="info-value">{{ tabla|length }}</span></div>
-                <div class="info-item"><span class="info-label">Promedio</span><span class="info-value" style="color:{% if avg >= 3.5 %}var(--green){% elif avg >= 3.0 %}var(--yellow){% else %}var(--red){% endif %};">{{ avg }}</span></div>
-                <div class="info-item"><span class="info-label">Materias</span><span class="info-value">{{ lista_materias|length }}</span></div>
-                <div class="info-item"><span class="info-label">Profesores</span><span class="info-value">{{ profesores|length }}</span></div>
-            </div>
-            <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:8px;">
-                <div class="summary-row">
-                    <div class="summary-item"><span class="dot" style="background:var(--green);"></span> Aprobados (&ge;3.0)</div>
-                    <span style="font-weight:600;color:var(--green);">{{ aprobados }}</span>
-                </div>
-                <div class="progress-bar green"><div class="fill" style="width:{{ (aprobados / promedios|length * 100)|round|int if promedios|length > 0 else 0 }}%;"></div></div>
-                <div class="summary-row" style="margin-top:8px;">
-                    <div class="summary-item"><span class="dot" style="background:var(--red);"></span> Reprobados (&lt;3.0)</div>
-                    <span style="font-weight:600;color:var(--red);">{{ reprobados }}</span>
-                </div>
-                <div class="progress-bar red"><div class="fill" style="width:{{ (reprobados / promedios|length * 100)|round|int if promedios|length > 0 else 0 }}%;"></div></div>
-                {% if sin_notas > 0 %}
-                <div class="summary-row" style="margin-top:8px;">
-                    <div class="summary-item"><span class="dot" style="background:var(--sub);"></span> Sin notas</div>
-                    <span style="font-weight:600;color:var(--sub);">{{ sin_notas }}</span>
-                </div>
-                <div class="progress-bar"><div class="fill" style="width:{{ (sin_notas / promedios|length * 100)|round|int if promedios|length > 0 else 0 }}%;"></div></div>
-                {% endif %}
-                <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);">
-                    <span style="color:var(--muted);">Profesores con notas</span>
-                    <span style="font-weight:600;">{{ profesores|selectattr('enviado')|list|length }}/{{ profesores|length }}</span>
-                </div>
-            </div>
-            {% else %}
-            <div class="empty-state" style="min-height:100px;padding:20px;">
-                <i data-lucide="file-text" style="width:36px;height:36px;color:var(--muted);"></i>
-                <div class="empty-title">Sin notas registradas</div>
-                <div class="empty-desc">Ningún profesor ha registrado actividades en el periodo {{ periodo }}.</div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
 
 </div>
 
 <div class="overlay" id="modalRegistro" onclick="if(event.target===this)cerrarModalRegistro()">
+
     <div class="modal">
+
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-            <h3 style="font-size:15px;"><i data-lucide="user-plus"></i> Crear cuenta de directora</h3>
-            <button onclick="cerrarModalRegistro()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;"><i data-lucide="x"></i></button>
+
+            <h3 style="font-size:15px;">👩â€💼 Crear cuenta de directora</h3>
+
+            <button onclick="cerrarModalRegistro()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
+
         </div>
+
         <div id="reg-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#EF4444;padding:9px 12px;border-radius:7px;font-size:12px;margin-bottom:10px;"></div>
+
         <div id="reg-ok"    style="display:none;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);color:#10B981;padding:9px 12px;border-radius:7px;font-size:12px;margin-bottom:10px;"></div>
-        <div class="form-group"><label class="form-label">Nombre completo</label><input class="form-input" type="text" id="reg-nombre" placeholder="Nombre de la directora"></div>
-        <div class="form-group"><label class="form-label">Usuario</label><input class="form-input" type="text" id="reg-usuario" placeholder="ej: directora_10a"></div>
-        <div class="form-group"><label class="form-label">Contraseña</label><input class="form-input" type="password" id="reg-password" placeholder="Mínimo 6 caracteres"></div>
-        <div class="form-group"><label class="form-label">Curso asignado</label><input class="form-input" type="text" id="reg-curso" placeholder="ej: 1103, 10B, 11C..."></div>
-        <div class="form-group"><label class="form-label">Correo (opcional)</label><input class="form-input" type="email" id="reg-email" placeholder="correo@ejemplo.com"></div>
-        <button onclick="crearDirectora()" class="btn btn-primary" style="width:100%;"><i data-lucide="user-plus"></i> Crear cuenta &rarr;</button>
+
+        <label class="flabel">Nombre completo</label>
+
+        <input class="finput" type="text"     id="reg-nombre"   placeholder="Nombre de la directora">
+
+        <label class="flabel">Usuario</label>
+
+        <input class="finput" type="text"     id="reg-usuario"  placeholder="ej: directora_10a">
+
+        <label class="flabel">Contraseña</label>
+
+        <input class="finput" type="password" id="reg-password" placeholder="Mínimo 6 caracteres">
+
+        <label class="flabel">Curso asignado</label>
+
+        <input class="finput" type="text"     id="reg-curso"    placeholder="ej: 1103, 10B, 11C...">
+
+        <label class="flabel">Correo (opcional)</label>
+
+        <input class="finput" type="email"    id="reg-email"    placeholder="correo@ejemplo.com" style="margin-bottom:18px;">
+
+        <button onclick="crearDirectora()" style="width:100%;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);">
+
+            Crear cuenta →
+
+        </button>
+
     </div>
+
+<div class="dash-wrap" style="margin-bottom:0;">
+
+<h3 class="section-title" style="margin-top:0;"><i data-lucide="pie-chart"></i> Resumen — Periodo {{ periodo }}</h3>
+
+<div class="grid-2col">
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title"><i data-lucide="users"></i> Estudiantes</span>
+    </div>
+    <div class="card-body">
+      <div class="stat-row">
+        <div class="stat-item" style="flex:1;">
+          <span class="stat-label">Total</span>
+          <span class="stat-value dval">{{ tabla|length }}</span>
+        </div>
+        <div class="stat-item" style="flex:1;">
+          <span class="stat-label">Con promedio</span>
+          <span class="stat-value">{{ tabla|selectattr("promedio","ne",None)|list|length }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title"><i data-lucide="book"></i> Materias</span>
+    </div>
+    <div class="card-body">
+      <div class="stat-row">
+        <div class="stat-item" style="flex:1;">
+          <span class="stat-label">Total</span>
+          <span class="stat-value dval">{{ lista_materias|length }}</span>
+        </div>
+        <div class="stat-item" style="flex:1;">
+          <span class="stat-label">Enviadas</span>
+          <span class="stat-value dval">{{ materias_enviadas|length }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title"><i data-lucide="presentation"></i> Profesores</span>
+    </div>
+    <div class="card-body">
+      <div class="stat-row">
+        <div class="stat-item" style="flex:1;">
+          <span class="stat-label">Total</span>
+          <span class="stat-value dval">{{ profesores|length }}</span>
+        </div>
+        <div class="stat-item" style="flex:1;">
+          <span class="stat-label">Enviaron notas</span>
+          <span class="stat-value">{{ profesores|selectattr("enviado")|list|length }}</span>
+        </div>
+      </div>
+      <div class="progress-track" style="margin-top:12px;">
+        <div class="progress-label"><span>Avance de notas</span><span>{{ (materias_enviadas|length / lista_materias|length * 100)|round(1) if lista_materias else 0 }}%</span></div>
+        <div class="progress-bar"><div class="progress-fill fill-warning" style="width:{{ (materias_enviadas|length / lista_materias|length * 100)|round(1) if lista_materias else 0 }}%;"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title"><i data-lucide="graduation-cap"></i> Promedios</span>
+    </div>
+    <div class="card-body">
+      {% set promedios = tabla|selectattr("promedio","ne",None)|map(attribute="promedio")|list %}
+      {% if promedios %}
+      {% set avg = (promedios|sum / promedios|length)|round(2) %}
+      {% set maxv = promedios|max %}
+      {% set minv = promedios|min %}
+      <div class="stat-row">
+        <div class="stat-item" style="flex:1;">
+          <span class="stat-label">Promedio general</span>
+          <span class="stat-value dval">{{ avg }}</span>
+        </div>
+        <div class="stat-item" style="flex:1;">
+          <span class="stat-label">Más alto</span>
+          <span class="stat-value" style="color:var(--success);">{{ maxv }}</span>
+        </div>
+        <div class="stat-item" style="flex:1;">
+          <span class="stat-label">Más bajo</span>
+          <span class="stat-value" style="color:var(--danger);">{{ minv }}</span>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-state">Sin promedios aún</div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba"><i data-lucide="arrow-up"></i></button>
+</div>
+
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
+
 <div class="toast" id="toast"></div>
+
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
 
-<style>
-.nbtn{padding:6px 12px;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all var(--tr);}
-.nbtn-pri{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
-.nbtn-pri:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
-.nbtn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border);}
-.nbtn-ghost:hover{background:rgba(255,255,255,.08);}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
-.nota-ok{color:var(--green);font-weight:700;}
-.nota-mal{color:var(--red);font-weight:700;}
-.nota-none{color:#64748B;}
-.prom-cell{font-size:13px;font-weight:700;border-left:2px solid rgba(255,255,255,.06);}
-@media(max-width:600px){
-  .actions{flex-direction:column;align-items:stretch;}
-  .email-wrap{flex-wrap:wrap;}
-  .email-input{font-size:16px;}
-}
-</style>
-
 <script>
+
 const SLUG = "{{ slug }}";
+
 const PERIODO = {{ periodo }};
-function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
-function getCsrf(){ return document.getElementById('csrf-global').value; }
-function showToast(msg, ok=true){ const t=document.getElementById('toast'); t.innerHTML=msg; t.style.borderColor=ok?'rgba(16,185,129,.4)':'rgba(239,68,68,.4)'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500); }
-function guardarEmail(aid){ const inp=document.getElementById('email-'+aid); const f=new FormData(); f.append('aid',aid); f.append('email',inp.value.trim()); f.append('_csrf_token', getCsrf()); fetch(`/${SLUG}/directora/guardar_email`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{if(d.ok){inp.classList.add('saved');setTimeout(()=>inp.classList.remove('saved'),1500);showToast('<i data-lucide="check-circle"></i> Correo guardado');}}).catch(()=>showToast('<i data-lucide="alert-triangle"></i> Error al guardar.',false)); }
-function enviarCorreosTodos(){ if(!confirm('¿Enviar boletines a todos los estudiantes con correo registrado?')) return; const btn=event.target; btn.disabled=true; btn.innerHTML='<i data-lucide="loader"></i> Enviando...'; const f=new FormData(); f.append('periodo',PERIODO); f.append('_csrf_token', getCsrf()); fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{showToast(d.mensaje,d.ok); btn.disabled=false; btn.innerHTML='<i data-lucide="send"></i> Enviar boletines por correo (todos)';}).catch(()=>{showToast('<i data-lucide="alert-triangle"></i> Error al enviar.',false);btn.disabled=false;btn.innerHTML='<i data-lucide="send"></i> Enviar boletines por correo (todos)';}); }
-function enviarCorreoUno(aid,nombre){ const emailInp=document.getElementById('email-'+aid); const email=emailInp?emailInp.value.trim():''; if(!email){showToast('<i data-lucide="alert-triangle"></i> Primero guarda el correo del acudiente.',false);emailInp&&emailInp.focus();return;} if(!confirm(`¿Enviar boletín de ${nombre} a ${email}?`)) return; const f=new FormData(); f.append('periodo',PERIODO); f.append('aid',aid); f.append('_csrf_token', getCsrf()); fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>showToast(d.mensaje,d.ok)).catch(()=>showToast('<i data-lucide="alert-triangle"></i> Error al enviar.',false)); }
-function abrirModalRegistro(){ document.getElementById('modalRegistro').classList.add('open'); document.getElementById('reg-nombre').focus(); document.getElementById('reg-error').style.display='none'; document.getElementById('reg-ok').style.display='none'; }
+
+function toggleSidebar(){
+
+    document.getElementById('sidebar').classList.toggle('open');
+
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+
+}
+
+function getCsrf(){
+
+    return document.getElementById('csrf-global').value;
+
+}
+
+function showToast(msg, ok=true){
+
+    const t=document.getElementById('toast'); t.innerHTML=msg;
+
+    t.style.borderColor=ok?'rgba(16,185,129,.4)':'rgba(239,68,68,.4)';
+
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500);
+
+}
+
+function guardarEmail(aid){
+
+    const inp=document.getElementById('email-'+aid);
+
+    const f=new FormData(); f.append('aid',aid); f.append('email',inp.value.trim()); f.append('_csrf_token', getCsrf());
+
+    fetch(`/${SLUG}/directora/guardar_email`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{
+
+        if(d.ok){inp.classList.add('saved');setTimeout(()=>inp.classList.remove('saved'),1500);showToast('<i data-lucide="check-circle"></i> Correo guardado');}
+
+    }).catch(()=>showToast('â“ Error al guardar.',false));
+
+}
+
+function enviarCorreosTodos(){
+
+    if(!confirm('¿Enviar boletines a todos los estudiantes con correo registrado?')) return;
+
+    const btn=event.target; btn.disabled=true; btn.textContent='â³ Enviando...';
+
+    const f=new FormData(); f.append('periodo',PERIODO); f.append('_csrf_token', getCsrf());
+
+    fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{
+
+        showToast(d.mensaje,d.ok); btn.disabled=false; btn.textContent='📧 Enviar boletines por correo (todos)';
+
+    }).catch(()=>{showToast('â“ Error al enviar.',false);btn.disabled=false;btn.textContent='📧 Enviar boletines por correo (todos)';});
+
+}
+
+function enviarCorreoUno(aid,nombre){
+
+    const emailInp=document.getElementById('email-'+aid);
+
+    const email=emailInp?emailInp.value.trim():'';
+
+    if(!email){showToast('<i data-lucide="alert-triangle"></i>ï¸ Primero guarda el correo del acudiente.',false);emailInp&&emailInp.focus();return;}
+
+    if(!confirm(`¿Enviar boletín de ${nombre} a ${email}?`)) return;
+
+    const f=new FormData(); f.append('periodo',PERIODO); f.append('aid',aid); f.append('_csrf_token', getCsrf());
+
+    fetch(`/${SLUG}/directora/enviar_correos`,{method:'POST',body:f}).then(r=>r.json()).then(d=>showToast(d.mensaje,d.ok)).catch(()=>showToast('â“ Error al enviar.',false));
+
+}
+
+function abrirModalRegistro(){
+
+    document.getElementById('modalRegistro').classList.add('open');
+
+    document.getElementById('reg-nombre').focus();
+
+    document.getElementById('reg-error').style.display='none';
+
+    document.getElementById('reg-ok').style.display='none';
+
+}
+
 function cerrarModalRegistro(){ document.getElementById('modalRegistro').classList.remove('open'); }
-function crearDirectora(){ const nombre=document.getElementById('reg-nombre').value.trim(); const usuario=document.getElementById('reg-usuario').value.trim(); const password=document.getElementById('reg-password').value.trim(); const curso=document.getElementById('reg-curso').value.trim(); const email=document.getElementById('reg-email').value.trim(); const errDiv=document.getElementById('reg-error'); const okDiv=document.getElementById('reg-ok'); errDiv.style.display=okDiv.style.display='none'; if(!nombre||!usuario||!password||!curso){errDiv.innerHTML='<i data-lucide="alert-triangle"></i> Completa todos los campos.';errDiv.style.display='block';return;} if(password.length<6){errDiv.innerHTML='<i data-lucide="alert-triangle"></i> Mínimo 6 caracteres.';errDiv.style.display='block';return;} const f=new FormData(); f.append('nombre',nombre);f.append('usuario',usuario);f.append('password',password);f.append('curso',curso);f.append('email',email);f.append('_csrf_token', getCsrf()); fetch(`/${SLUG}/directora/crear_desde_panel`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{if(d.ok){okDiv.innerHTML=`<i data-lucide="check-circle"></i> ${d.mensaje}`;okDiv.style.display='block';['reg-nombre','reg-usuario','reg-password','reg-curso','reg-email'].forEach(id=>document.getElementById(id).value='');}else{errDiv.innerHTML=`<i data-lucide="alert-triangle"></i> ${d.mensaje}`;errDiv.style.display='block';}}).catch(()=>{errDiv.innerHTML='<i data-lucide="alert-triangle"></i> Error de conexión.';errDiv.style.display='block';}); }
-function addDataLabels(){ document.querySelectorAll('table').forEach(function(t){ var ths = t.querySelectorAll('thead th'); t.querySelectorAll('tbody tr').forEach(function(tr){ tr.querySelectorAll('td').forEach(function(td,i){ if(ths[i]) td.setAttribute('data-label', ths[i].textContent.trim()); }); }); }); }
-window.addEventListener('scroll',function(){ var st = document.getElementById('scrollTop'); if(st) st.classList.toggle('show', window.scrollY > 400); });
+
+function crearDirectora(){
+
+    const nombre=document.getElementById('reg-nombre').value.trim();
+
+    const usuario=document.getElementById('reg-usuario').value.trim();
+
+    const password=document.getElementById('reg-password').value.trim();
+
+    const curso=document.getElementById('reg-curso').value.trim();
+
+    const email=document.getElementById('reg-email').value.trim();
+
+    const errDiv=document.getElementById('reg-error'); const okDiv=document.getElementById('reg-ok');
+
+    errDiv.style.display=okDiv.style.display='none';
+
+    if(!nombre||!usuario||!password||!curso){errDiv.textContent='<i data-lucide="alert-triangle"></i>ï¸ Completa todos los campos.';errDiv.style.display='block';return;}
+
+    if(password.length<6){errDiv.textContent='<i data-lucide="alert-triangle"></i>ï¸ Mínimo 6 caracteres.';errDiv.style.display='block';return;}
+
+    const f=new FormData(); f.append('nombre',nombre);f.append('usuario',usuario);f.append('password',password);f.append('curso',curso);f.append('email',email);f.append('_csrf_token', getCsrf());
+
+    fetch(`/${SLUG}/directora/crear_desde_panel`,{method:'POST',body:f}).then(r=>r.json()).then(d=>{
+
+        if(d.ok){okDiv.textContent=`<i data-lucide="check-circle"></i> ${d.mensaje}`;okDiv.style.display='block';['reg-nombre','reg-usuario','reg-password','reg-curso','reg-email'].forEach(id=>document.getElementById(id).value='');}
+
+        else{errDiv.textContent=`<i data-lucide="alert-triangle"></i>ï¸ ${d.mensaje}`;errDiv.style.display='block';}
+
+    }).catch(()=>{errDiv.textContent='<i data-lucide="alert-triangle"></i>ï¸ Error de conexión.';errDiv.style.display='block';});
+
+}
+
+function addDataLabels(){
+
+    document.querySelectorAll('table').forEach(function(t){
+
+        var ths = t.querySelectorAll('thead th');
+
+        t.querySelectorAll('tbody tr').forEach(function(tr){
+
+            tr.querySelectorAll('td').forEach(function(td,i){
+
+                if(ths[i]) td.setAttribute('data-label', ths[i].textContent.trim());
+
+            });
+
+        });
+
+    });
+
+}
+
+window.addEventListener('scroll',function(){
+
+    var st = document.getElementById('scrollTop');
+
+    if(st) st.classList.toggle('show', window.scrollY > 400);
+
+});
+
 addDataLabels();
-function filtrarTabla(){ var q=document.getElementById('searchEstudiante').value.toLowerCase(); var rows=document.querySelectorAll('#table-consolidada tbody tr'); var visible=0; rows.forEach(function(r){ var nombre=r.querySelector('td:first-child'); if(nombre&&nombre.textContent.toLowerCase().includes(q)){r.style.display='';visible++;}else{r.style.display='none';} }); document.querySelector('.total-count').textContent=visible+' estudiantes'; }
+
+function filtrarTabla(){
+    var q=document.getElementById('searchEstudiante').value.toLowerCase();
+    var rows=document.querySelectorAll('#table-consolidada tbody tr');
+    var visible=0;
+    rows.forEach(function(r){
+        var nombre=r.querySelector('td:first-child');
+        if(nombre&&nombre.textContent.toLowerCase().includes(q)){r.style.display='';visible++;}
+        else{r.style.display='none';}
+    });
+    document.getElementById('tableCount').textContent=visible+' estudiantes';
+}
+
 </script>
+
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-<script src="/static/js/lumini.js"></script>
+
 </body>
+
+  <script src="/static/js/lumini.js"></script>
 </html>
+
+
+
+

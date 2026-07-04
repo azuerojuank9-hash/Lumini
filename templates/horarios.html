@@ -7,7 +7,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Horarios — {{ colegio.nombre if colegio else slug }}</title>
+<title>Horarios â€” {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--danger:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
@@ -82,7 +82,6 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
   <link rel="stylesheet" href="/static/css/lumini.css">
 <link rel="stylesheet" href="/static/css/enhanced.css">
 
-</head>
 <body>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -104,7 +103,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
     <nav class="sidebar-nav">
         <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
         <a href="/{{ slug }}/horarios" class="sidebar-link active"><span class="icon"><i data-lucide="calendar"></i></span> Horarios</a>
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i></span> Mi Perfil</a>
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>Ã¯Â¸</span> Mi Perfil</a>
         <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon"><i data-lucide="archive"></i></span> Archivados</a>
     </nav>
     <div class="sidebar-footer">
@@ -115,7 +114,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">Ã¢â€™Â°</button>
 
   <h1><i data-lucide="calendar"></i> Horarios</h1>
   <p class="subtitle">Haz clic en cualquier celda para editar · Se guarda automáticamente</p>
@@ -132,13 +131,13 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
         <thead>
           <tr>
             <th></th>
-            <th><span class="hl">1a Hora</span><span class="ht">6:10 — 7:05</span></th>
-            <th><span class="hl">2a Hora</span><span class="ht">7:05 — 8:00</span></th>
-            <th><span class="hl">3a Hora</span><span class="ht">8:00 — 8:55</span></th>
-            <th><span class="hl">4a Hora</span><span class="ht">8:55 — 9:50</span></th>
-            <th><span class="hl">Descanso</span><span class="ht">9:50 — 10:20</span></th>
-            <th><span class="hl">5a Hora</span><span class="ht">10:20 — 11:10</span></th>
-            <th><span class="hl">6a Hora</span><span class="ht">11:10 — 12:00</span></th>
+            <th><span class="hl">1a Hora</span><span class="ht">6:10 â€“ 7:05</span></th>
+            <th><span class="hl">2a Hora</span><span class="ht">7:05 â€“ 8:00</span></th>
+            <th><span class="hl">3a Hora</span><span class="ht">8:00 â€“ 8:55</span></th>
+            <th><span class="hl">4a Hora</span><span class="ht">8:55 â€“ 9:50</span></th>
+            <th><span class="hl">Descanso</span><span class="ht">9:50 â€“ 10:20</span></th>
+            <th><span class="hl">5a Hora</span><span class="ht">10:20 â€“ 11:10</span></th>
+            <th><span class="hl">6a Hora</span><span class="ht">11:10 â€“ 12:00</span></th>
           </tr>
         </thead>
         <tbody>
@@ -168,7 +167,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
               </td>
             {% endfor %}
             {# Descanso #}
-            <td class="des-col">☰ Descanso</td>
+            <td class="des-col">Ã¢â€™â€¢ Descanso</td>
             {% for f in ['5','6'] %}
               {% set k = df ~ '_' ~ f %}
               {% set e = horario_map.get(k, {}) %}
@@ -217,7 +216,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
       <input class="inp" type="text" id="iProf" placeholder="ej: Alberth">
     </div>
     <div class="btn-row">
-      <button class="btn btn-clear" onclick="limpiar()" title="Borrar">🗑</button>
+      <button class="btn btn-clear" onclick="limpiar()" title="Borrar">ðŸ—‘</button>
       <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
       <button class="btn btn-primary" onclick="guardar()">Guardar</button>
     </div>
@@ -290,7 +289,7 @@ function _send(num, mat, prof){
   fd.append('curso',    CURSO);
   fetch('/'+SLUG+'/horarios', {method:'POST', body:fd})
     .then(()=>{ cerrar(); showToast('<i data-lucide="check-circle"></i> Guardado'); setTimeout(()=>location.reload(), 700); })
-    .catch(()=>{ showToast('✗ Error de conexión'); });
+    .catch(()=>{ showToast('Ã¢â€œ Error de conexión'); });
 }
 
 document.addEventListener('keydown', e=>{
@@ -301,5 +300,11 @@ document.addEventListener('keydown', e=>{
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
   <script src="/static/js/lumini.js"></script>
 
-</body>
 </html>
+
+
+
+
+
+
+
