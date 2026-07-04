@@ -208,6 +208,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .abtn.aa:hover,.abtn.active.aa{background:linear-gradient(135deg,var(--red),#DC2626);color:#fff;border-color:transparent;}
 .abtn.at{background:rgba(234,179,8,.10);color:var(--yellow);border:1px solid rgba(234,179,8,.18);}
 .abtn.at:hover,.abtn.active.at{background:linear-gradient(135deg,var(--yellow),#CA8A04);color:#fff;border-color:transparent;}
+.btable{padding:5px 10px;font-size:10px;min-height:28px;}
 
 /* -- Overlay / Modal -------------------------------------------------- */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;animation:fadeIn .15s ease;}
@@ -355,6 +356,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   .asist-wrap{justify-content:flex-end;}
   .asist-group{padding:2px;gap:2px;}
   .abtn{padding:7px 12px;min-height:36px;font-size:10px;}
+  .btable{padding:7px 12px;min-height:36px;font-size:10px;}
   .ni{width:44px;font-size:12px;}
   .stats{flex-direction:column;gap:8px;}
   .scard{padding:12px 14px;min-width:0;}
@@ -381,6 +383,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   .topbar-right{gap:4px;}
   .bsm{font-size:11px;padding:6px 10px;min-height:36px;}
   .abtn{padding:5px 8px;min-height:32px;font-size:9px;}
+  .btable{padding:5px 8px;min-height:32px;font-size:9px;}
   .finput{font-size:15px;padding:8px 10px;}
   .card-head{padding:8px 10px;}
   .card-body{padding:8px 10px;}
@@ -936,8 +939,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                         </div>
                     </div>
                 </td>
-                <td><button class="bsm badd" style="font-size:10px;padding:4px 9px;" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">{{ e.observaciones|length }}</button></td>
-                <td><form action="/{{ slug }}/archivar_alumno/{{ e.id }}" method="POST" style="display:inline" onsubmit="return confirm('¿Archivar a {{ e.nombre }}? Sus datos se conservan.')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel" style="font-size:10px;padding:4px 9px;border:none;cursor:pointer;"><i data-lucide="archive"></i></button></form></td>
+                <td><button class="bsm badd btable" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">{{ e.observaciones|length }}</button></td>
+                <td><form action="/{{ slug }}/archivar_alumno/{{ e.id }}" method="POST" style="display:inline" onsubmit="return confirm('¿Archivar a {{ e.nombre }}? Sus datos se conservan.')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel btable"><i data-lucide="archive"></i></button></form></td>
             </tr>
             {% else %}
             <tr><td colspan="20" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes todavía.</td></tr>

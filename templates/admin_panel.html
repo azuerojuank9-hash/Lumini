@@ -102,7 +102,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 .pass-wrap input{padding-right:2.5rem;}
 .eye-btn{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;}
 .eye-btn:hover{color:var(--accent);}
-.btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:all var(--tr);}
+body .btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all var(--tr);}
 .btn:hover{opacity:.9;}
 .btn-pri{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
 .btn-pri:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
@@ -116,7 +116,6 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 </style>
 <!-- Datadog RUM -->
 <script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
-  <link rel="stylesheet" href="/static/css/lumini.css">
 
 <body>
 
@@ -201,46 +200,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
     </div>
 </div>
 
-<div class="dashboard-modules" style="margin-bottom:24px;">
-    <div class="module-card">
-        <div class="module-header">
-            <i data-lucide="zap" style="width:18px;height:18px;color:var(--accent);"></i>
-            <span class="module-title">Accesos rápidos</span>
-        </div>
-        <div class="quick-actions">
-            <a href="/admin/codigos" class="qa-item">
-                <span class="qa-icon" style="background:rgba(124,58,237,.12);color:var(--accent);"><i data-lucide="key"></i></span>
-                <span class="qa-label">Códigos</span>
-            </a>
-            <a href="/admin/correos" class="qa-item">
-                <span class="qa-icon" style="background:rgba(16,185,129,.12);color:var(--green);"><i data-lucide="mail"></i></span>
-                <span class="qa-label">Correos</span>
-            </a>
-            <a href="#crear-colegio" class="qa-item" onclick="document.getElementById('nombre-colegio').focus()">
-                <span class="qa-icon" style="background:rgba(245,158,11,.12);color:var(--yellow);"><i data-lucide="plus-circle"></i></span>
-                <span class="qa-label">Nuevo colegio</span>
-            </a>
-        </div>
-    </div>
-    <div class="module-card">
-        <div class="module-header">
-            <i data-lucide="activity" style="width:18px;height:18px;color:var(--green);"></i>
-            <span class="module-title">Resumen</span>
-        </div>
-        <div style="padding:16px;">
-            <div class="stat-row" style="gap:8px;margin-bottom:0;">
-                <div class="stat-item" style="flex:1;padding:12px;min-width:0;">
-                    <div class="stat-label" style="font-size:10px;">Total colegios</div>
-                    <div class="stat-value dval" style="font-size:1.2rem;">{{ colegios|length }}</div>
-                </div>
-                <div class="stat-item" style="flex:1;padding:12px;min-width:0;">
-                    <div class="stat-label" style="font-size:10px;">Con código</div>
-                    <div class="stat-value dval" style="font-size:1.2rem;color:var(--accent);">{{ colegios|selectattr('codigo_registro')|list|length }}</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <div class="section-title" id="crear-colegio"><i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Crear nuevo colegio</div>
 <div class="card">

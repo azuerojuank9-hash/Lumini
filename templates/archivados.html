@@ -463,18 +463,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
             <td style="white-space:nowrap;">
 
-              <form action="/{{ slug }}/reactivar_alumno/{{ a.id }}" method="POST" style="display:inline" onsubmit="return confirm('Reactivar a {{ a.nombre }}?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm breact">
+              <form action="/{{ slug }}/reactivar_alumno/{{ a.id }}" method="POST" style="display:inline" onsubmit="return confirm('Reactivar a {{ a.nombre }}?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm breact"><i data-lucide="recycle"></i> Reactivar</button></form>
 
-                 class="bsm breact"
-
-                 onclick="return confirm('¿Reactivar a {{ a.nombre }}?')">
-
-                <i data-lucide="recycle"></i>ï¸ Reactivar
-
-              </button></form>
-
-              <form action="/{{ slug }}/eliminar_alumno/{{ a.id }}" method="POST" style="display:inline;margin-left:4px;" onsubmit="return confirm('Eliminar a {{ a.nombre }} PERMANENTEMENTE?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel"
-></button></form>
+              <form action="/{{ slug }}/eliminar_alumno/{{ a.id }}" method="POST" style="display:inline;margin-left:4px;" onsubmit="return confirm('Eliminar a {{ a.nombre }} PERMANENTEMENTE?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel">🗑 Eliminar</button></form>
 
             </td>
 
