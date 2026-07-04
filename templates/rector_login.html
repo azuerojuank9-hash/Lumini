@@ -1,400 +1,676 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-
-
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rector — {{ colegio.nombre if colegio else slug }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#7C3AED' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#7C3AED' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#7C3AED') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
-        *{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
-        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow-x:hidden;}
-        body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.08) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
-        .bg-orb{position:fixed;border-radius:50%;filter:blur(100px);opacity:.15;animation:float 10s ease-in-out infinite;pointer-events:none;}
-        .orb1{width:450px;height:450px;background:var(--accent);top:-120px;left:-120px;animation-delay:0s;}
-        .orb2{width:300px;height:300px;background:var(--accent2);bottom:-80px;right:-80px;animation-delay:4s;}
-        @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-25px) scale(1.03);}}
-        .logo-wrap{margin-bottom:8px;text-align:center;}
-        .logo-wrap img{height:90px;width:90px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px rgba(var(--accent-rgb),.5),0 8px 40px rgba(var(--accent-rgb),.2);transition:transform var(--tr);}
-        .logo-wrap img:hover{transform:scale(1.05);}
-        .brand{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:5px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
-        .subtitle{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;margin-bottom:10px;text-align:center;}
-        .badge-rector{display:inline-flex;align-items:center;gap:6px;background:rgba(var(--accent-rgb),.1);border:1px solid rgba(var(--accent-rgb),.2);border-radius:99px;padding:5px 16px;font-size:12px;color:var(--accent);margin-bottom:18px;font-weight:500;}
-        .tabs{display:flex;background:#0F172A;border:1px solid #1E293B;border-radius:var(--rmd);padding:4px;margin-bottom:18px;width:100%;max-width:480px;}
-        .tab-btn{flex:1;padding:8px 4px;background:none;border:none;border-radius:var(--rsm);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all var(--tr);white-space:nowrap;}
-        .tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.25);}
-        .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;width:100%;max-width:480px;backdrop-filter:blur(20px);box-shadow:0 4px 30px rgba(0,0,0,.3);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
-        @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-        .section{display:none;}
-        .section.active{display:block;}
-        .field{margin-bottom:14px;}
-        .field label{display:block;font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:600;}
-        .field input,.field select{width:100%;padding:11px 14px;background:#0F172A;border:1.5px solid #1E293B;border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;transition:border-color var(--tr),box-shadow var(--tr);}
-        .field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-        .field input::placeholder{color:var(--sub);}
-        .field select option{background:#0F172A;}
-        .pass-wrapper{position:relative;}
-        .pass-wrapper input{padding-right:2.5rem;width:100%;}
-        .toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:1.1rem;transition:color var(--tr);}
-        .toggle-pass:hover{color:var(--accent);}
-        .btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;min-height:48px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);}
-        .btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(var(--accent-rgb),.3);}
-        .btn-submit:active{transform:scale(.98);}
-        .alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
-        .alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;}
-        .alert-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10B981;}
-        .forgot-link{display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--accent);text-decoration:none;transition:opacity var(--tr);cursor:pointer;}
-        .forgot-link:hover{text-decoration:underline;opacity:.8;}
-        .back-link{display:block;text-align:center;margin-top:20px;font-size:12px;color:var(--muted);text-decoration:none;transition:color var(--tr);}
-        .back-link:hover{color:var(--accent);}
-        .divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--sub);font-size:11px;}
-        .divider::before,.divider::after{content:'';flex:1;height:1px;background:#1E293B;}
-        .pregunta-box{background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--rsm);padding:10px 13px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.5;}
-        .msg-error{display:none;margin-top:10px;padding:9px 12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;border-radius:var(--rsm);font-size:12px;}
-        .msg-ok{display:none;margin-top:10px;padding:9px 12px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10B981;border-radius:var(--rsm);font-size:12px;}
-        .codigo-field{background:rgba(var(--accent-rgb),.06);border:1.5px solid rgba(var(--accent-rgb),.2);border-radius:var(--rmd);padding:12px 14px;margin-bottom:14px;}
-        .codigo-field label{display:block;font-size:10px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
-        .codigo-field input{width:100%;padding:11px 14px;background:#0F172A;border:1.5px solid rgba(var(--accent-rgb),.3);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;letter-spacing:1px;}
-        .codigo-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-        .codigo-field .hint{font-size:11px;color:var(--sub);margin-top:6px;}
-        .pwd-strength{height:3px;border-radius:2px;margin-top:5px;transition:all .3s;background:#1E293B;}
-        .pwd-strength.weak{background:#EF4444;width:33%;}
-        .pwd-strength.medium{background:#F59E0B;width:66%;}
-        .pwd-strength.strong{background:#10B981;width:100%;}
-        .pwd-label{font-size:10px;color:var(--sub);margin-top:3px;}
-        @media(max-width:480px){.card{padding:20px 16px;}.logo-wrap img{height:80px;width:80px;}.brand{font-size:1.2rem;}}
-        @media(max-width:375px){.tab-btn{font-size:9px;padding:6px 2px;white-space:normal;word-break:break-word;}.card{padding:16px 12px;}.logo-wrap img{height:64px;width:64px;}.brand{font-size:1rem;letter-spacing:2px;}.field input,.field select{font-size:15px;padding:10px 12px;}.btn-submit{font-size:14px;min-height:44px;padding:10px;}}
-    </style>
-<!-- Datadog RUM -->
-<script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-</head>
-<body>
-
-<div class="bg-orb orb1"></div>
-<div class="bg-orb orb2"></div>
-
-<a href="/{{ slug }}/rector/login" style="text-decoration:none;color:inherit;display:block;">
-<div class="logo-wrap">
-    {% if colegio and colegio.logo %}
-    <img src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
-    {% else %}
-    <img src="/static/lumini_logo.webp" alt="Lumini">
-    {% endif %}
-</div>
-<div class="brand">LUMINI</div>
-</a>
-<p class="subtitle">{{ colegio.nombre if colegio else slug }}</p>
-<div class="badge-rector"><i data-lucide="graduation-cap"></i> Portal Rector</div>
-
-<div class="tabs">
-    <button class="tab-btn active" id="btn-login"     onclick="switchTab('login',this)"><i data-lucide="lock"></i> Ingresar</button>
-    <button class="tab-btn"        id="btn-registro"  onclick="switchTab('registro',this)"><i data-lucide="pen"></i> Registrarse</button>
-    <button class="tab-btn"        id="btn-recuperar" onclick="switchTab('recuperar',this)"><i data-lucide="key"></i> Recuperar</button>
-</div>
-
-<div class="card">
-    {% if error %}<div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>{% endif %}
-    {% if exito %}<div class="alert alert-success">{{ exito }}</div>{% endif %}
-
-    <div id="tab-login" class="section active">
-        <form method="POST" action="/{{ slug }}/rector/login">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <div class="field">
-                <label>Usuario</label>
-                <input type="text" name="usuario" placeholder="Tu usuario" required autocomplete="username" autofocus>
-            </div>
-            <div class="field">
-                <label>Contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" name="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required autocomplete="current-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-            <button type="submit" class="btn-submit">Ingresar <i data-lucide="arrow-right"></i></button>
-        </form>
-        <a class="forgot-link" onclick="switchTabById('recuperar');return false;">¿Olvidaste tu contraseña?</a>
-    </div>
-
-    <div id="tab-registro" class="section">
-        <form method="POST" action="/{{ slug }}/rector/registrar" onsubmit="return validarRegistro()">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-
-            <div class="field">
-                <label>Nombre completo</label>
-                <input type="text" name="nombre" id="reg-nombre" placeholder="Tu nombre completo" required>
-            </div>
-
-            <div class="field">
-                <label>Usuario</label>
-                <input type="text" name="usuario" id="reg-usuario" placeholder="ej: rector_colegio" required autocomplete="off">
-            </div>
-
-            <div class="field">
-                <label>Correo electrónico (opcional)</label>
-                <input type="email" name="email" placeholder="tu@correo.com">
-            </div>
-
-            <div class="field">
-                <label>Contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" name="password" id="reg-pwd"
-                           placeholder="Mínimo 6 caracteres" required minlength="6"
-                           oninput="checkPwd(this)">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-                <div class="pwd-strength" id="pwd-bar"></div>
-                <div class="pwd-label" id="pwd-label"></div>
-            </div>
-
-            <div class="field">
-                <label>Confirmar contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" name="confirmar_password" id="reg-pwd2"
-                           placeholder="Repite tu contraseña" required minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-
-            <div class="field">
-                <label>Jornada</label>
-                <select name="jornada" id="reg-jornada" required>
-                    <option value="" disabled selected>Selecciona tu jornada</option>
-                    <option value="Mañana">Mañana</option>
-                    <option value="Tarde">Tarde</option>
-                    <option value="Nocturna">Nocturna</option>
-                </select>
-            </div>
-
-            <div class="codigo-field">
-                <label><i data-lucide="key"></i> Código de invitación</label>
-                <input type="text" name="codigo_registro_rec" id="reg-codigo"
-                       placeholder="Código dado por el administrador" required autocomplete="off">
-                <p class="hint">El código lo entrega el administrador del colegio.</p>
-            </div>
-
-            <div class="divider">Pregunta secreta — para recuperar contraseña</div>
-
-            <div class="field">
-                <label>Pregunta secreta</label>
-                <select name="pregunta_secreta" id="reg-pregunta" required>
-                    <option value="" disabled selected>Selecciona una pregunta</option>
-                    <option>¿Cuál es el nombre de tu mascota?</option>
-                    <option>¿En qué ciudad naciste?</option>
-                    <option>¿Cuál es el nombre de tu colegio favorito?</option>
-                    <option>¿Cuál es tu comida favorita?</option>
-                    <option>¿Cuál es el nombre de tu mejor amigo(a)?</option>
-                    <option>¿Cuál es tu color favorito?</option>
-                    <option>¿Cuál es el nombre de tu madre?</option>
-                    <option>¿Cuál es tu deporte favorito?</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label>Respuesta secreta</label>
-                <input type="text" name="respuesta_secreta" id="reg-respuesta"
-                       placeholder="Tu respuesta (recuérdala bien)" required autocomplete="off">
-            </div>
-
-            <div id="reg-err" class="msg-error"></div>
-
-            <button type="submit" class="btn-submit" style="margin-top:8px;">Crear cuenta <i data-lucide="arrow-right"></i></button>
-        </form>
-    </div>
-
-    <div id="tab-recuperar" class="section">
-        <p style="font-size:13px;color:#94A3B8;margin-bottom:18px;line-height:1.6;">
-            Ingresa tu usuario, responde tu pregunta secreta y crea una nueva contraseña.
-        </p>
-
-        <div id="rec-paso1">
-            <div class="field">
-                <label>Tu usuario</label>
-                <input type="text" id="rec-usuario" placeholder="ej: rector_colegio" autocomplete="username">
-            </div>
-            <button type="button" class="btn-submit" onclick="recBuscar()">Continuar <i data-lucide="arrow-right"></i></button>
-            <div id="rec-err1" class="msg-error"></div>
-        </div>
-
-        <div id="rec-paso2" style="display:none;">
-            <div class="pregunta-box" id="rec-pregunta-txt"><i data-lucide="key"></i> ...</div>
-            <div class="field">
-                <label>Tu respuesta</label>
-                <input type="text" id="rec-respuesta" placeholder="Escribe tu respuesta..." autocomplete="off">
-            </div>
-            <div class="field">
-                <label>Nueva contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" id="rec-nueva" placeholder="Mínimo 6 caracteres" minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-            <div class="field">
-                <label>Confirmar contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" id="rec-confirmar" placeholder="Repite la contraseña">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-            <button type="button" class="btn-submit" onclick="recCambiar()">Guardar nueva contraseña</button>
-            <div id="rec-err2" class="msg-error"></div>
-            <div id="rec-ok2"  class="msg-ok"></div>
-            <button type="button" onclick="recReset()"
-                style="background:none;border:none;color:#94A3B8;font-size:12px;margin-top:12px;cursor:pointer;width:100%;text-align:center;">
-                <i data-lucide="arrow-left"></i> Volver
-            </button>
-        </div>
-    </div>
-</div>
-
-<a href="/{{ slug }}/login" class="back-link"><i data-lucide="arrow-left"></i> Volver al login principal</a>
-
-<script>
-const SLUG = "{{ slug }}";
-
-function switchTab(tab, btn){
-    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
-    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
-    document.getElementById('tab-'+tab).classList.add('active');
-    btn.classList.add('active');
-}
-function switchTabById(tab){ switchTab(tab, document.getElementById('btn-'+tab)); }
-
-function togglePass(btn){
-    var inp = btn.previousElementSibling;
-    inp.type = inp.type==='password' ? 'text' : 'password';
-    btn.innerHTML = inp.type==='password' ? '<i data-lucide="eye"></i>' : 'ðŸ™';
-}
-
-function checkPwd(inp){
-    var val = inp.value;
-    var bar = document.getElementById('pwd-bar');
-    var lbl = document.getElementById('pwd-label');
-    if(!val){ bar.className='pwd-strength'; lbl.textContent=''; return; }
-    var strong = val.length>=8 && /[A-Z]/.test(val) && /[0-9]/.test(val);
-    var medium = val.length>=6;
-    if(strong){ bar.className='pwd-strength strong'; lbl.textContent='Contraseña fuerte'; lbl.style.color='#10B981'; }
-    else if(medium){ bar.className='pwd-strength medium'; lbl.textContent='Contraseña aceptable'; lbl.style.color='#F59E0B'; }
-    else{ bar.className='pwd-strength weak'; lbl.textContent='Contraseña débil'; lbl.style.color='#EF4444'; }
-}
-
-function validarRegistro(){
-    var err = document.getElementById('reg-err');
-    err.style.display = 'none';
-
-    var nombre   = document.getElementById('reg-nombre').value.trim();
-    var usuario  = document.getElementById('reg-usuario').value.trim();
-    var pwd      = document.getElementById('reg-pwd').value.trim();
-    var pwd2     = document.getElementById('reg-pwd2').value.trim();
-    var jornada  = document.getElementById('reg-jornada').value;
-    var codigo   = document.getElementById('reg-codigo').value.trim();
-    var pregunta = document.getElementById('reg-pregunta').value;
-    var respuesta= document.getElementById('reg-respuesta').value.trim();
-
-    if(!nombre){ mostrarErr('Escribe tu nombre completo.'); return false; }
-    if(!usuario){ mostrarErr('Escribe un nombre de usuario.'); return false; }
-    if(pwd.length < 6){ mostrarErr('La contraseña debe tener al menos 6 caracteres.'); return false; }
-    if(pwd !== pwd2){ mostrarErr('Las contraseñas no coinciden.'); return false; }
-    if(!jornada){ mostrarErr('Selecciona una jornada.'); return false; }
-    if(!codigo){ mostrarErr('Ingresa el código de invitación.'); return false; }
-    if(!pregunta){ mostrarErr('Selecciona una pregunta secreta.'); return false; }
-    if(!respuesta){ mostrarErr('Escribe tu respuesta secreta.'); return false; }
-    return true;
-}
-
-function mostrarErr(msg){
-    var err = document.getElementById('reg-err');
-    err.textContent = '<i data-lucide="alert-triangle"></i> ' + msg;
-    err.style.display = 'block';
-    err.scrollIntoView({behavior:'smooth', block:'center'});
-}
-
-function recBuscar(){
-    var usuario = document.getElementById('rec-usuario').value.trim();
-    var err = document.getElementById('rec-err1');
-    err.style.display = 'none';
-    if(!usuario){ err.textContent='<i data-lucide="alert-triangle"></i> Escribe tu usuario.'; err.style.display='block'; return; }
-    var f = new FormData(); f.append('usuario', usuario); f.append('_csrf_token', '{{ csrf_token() }}');
-    fetch('/'+SLUG+'/rector/buscar_usuario_recuperar', {method:'POST', body:f})
-        .then(function(r){ return r.json(); })
-        .then(function(d){
-            if(d.ok){
-                document.getElementById('rec-pregunta-txt').textContent = '<i data-lucide="key"></i> '+d.pregunta;
-                document.getElementById('rec-paso1').style.display = 'none';
-                document.getElementById('rec-paso2').style.display = 'block';
-            } else {
-                err.textContent = '<i data-lucide="alert-triangle"></i> '+d.mensaje;
-                err.style.display = 'block';
-            }
-        })
-        .catch(function(){ err.textContent='<i data-lucide="alert-triangle"></i> Error de conexión.'; err.style.display='block'; });
-}
-
-function recCambiar(){
-    var usuario  = document.getElementById('rec-usuario').value.trim();
-    var respuesta= document.getElementById('rec-respuesta').value.trim();
-    var nueva    = document.getElementById('rec-nueva').value.trim();
-    var confirmar= document.getElementById('rec-confirmar').value.trim();
-    var err = document.getElementById('rec-err2');
-    var ok  = document.getElementById('rec-ok2');
-    err.style.display = ok.style.display = 'none';
-
-    if(!respuesta){ err.textContent='<i data-lucide="alert-triangle"></i> Escribe tu respuesta.'; err.style.display='block'; return; }
-    if(nueva.length < 6){ err.textContent='<i data-lucide="alert-triangle"></i> Mínimo 6 caracteres.'; err.style.display='block'; return; }
-    if(nueva !== confirmar){ err.textContent='<i data-lucide="alert-triangle"></i> Las contraseñas no coinciden.'; err.style.display='block'; return; }
-
-    var f = new FormData();
-    f.append('usuario', usuario);
-    f.append('respuesta', respuesta);
-    f.append('nueva', nueva);
-    f.append('_csrf_token', '{{ csrf_token() }}');
-    fetch('/'+SLUG+'/rector/cambiar_password_recuperar', {method:'POST', body:f})
-        .then(function(r){ return r.json(); })
-        .then(function(d){
-            if(d.ok){
-                ok.textContent = '<i data-lucide="check-circle"></i> '+d.mensaje;
-                ok.style.display = 'block';
-                setTimeout(function(){ switchTabById('login'); }, 2000);
-            } else {
-                err.textContent = '<i data-lucide="alert-triangle"></i> '+d.mensaje;
-                err.style.display = 'block';
-            }
-        })
-        .catch(function(){ err.textContent='<i data-lucide="alert-triangle"></i> Error de conexión.'; err.style.display='block'; });
-}
-
-function recReset(){
-    document.getElementById('rec-paso1').style.display = 'block';
-    document.getElementById('rec-paso2').style.display = 'none';
-    document.getElementById('rec-err1').style.display  = 'none';
-    document.getElementById('rec-usuario').value = '';
-}
-
-{% if exito %}
-switchTabById('login');
-{% endif %}
-{% if error %}
-{% set e = error|lower %}
-{% if 'usuario ya' in e or 'completa' in e or 'caracteres' in e or 'pregunta' in e or 'invitación' in e or 'contraseña' in e or 'jornada' in e %}
-switchTabById('registro');
-{% endif %}
-{% endif %}
-</script>
-<button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:20px;z-index:9999;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);" aria-label="Cambiar tema">ðŸŒ™</button>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-
-</body>
-</html>
-
-
-
-
-
+﻿<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rector — {{ colegio.nombre if colegio else slug }}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+
+        :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:{{ colegio.primary_color if colegio and colegio.primary_color else '#7C3AED' }};--accent2:{{ colegio.secondary_color if colegio and colegio.secondary_color else '#7C3AED' }};--accent-rgb:{{ (colegio.primary_color if colegio and colegio.primary_color else '#7C3AED') | hex_to_rgb }};--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:8px;--rmd:12px;--rlg:16px;--tr:.2s cubic-bezier(.4,0,.2,1);--shadow:0 1px 4px rgba(0,0,0,.2);--shadow-lg:0 8px 32px rgba(0,0,0,.3);--glow:0 0 20px rgba(124,58,237,.15);}
+
+[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.1);--glow:0 0 20px rgba(124,58,237,.08);}
+
+        *{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
+
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow-x:hidden;}
+
+        body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.08) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
+
+        .bg-orb{position:fixed;border-radius:50%;filter:blur(100px);opacity:.15;animation:float 10s ease-in-out infinite;pointer-events:none;}
+
+        .orb1{width:450px;height:450px;background:var(--accent);top:-120px;left:-120px;animation-delay:0s;}
+
+        .orb2{width:300px;height:300px;background:var(--accent2);bottom:-80px;right:-80px;animation-delay:4s;}
+
+        @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-25px) scale(1.03);}}
+
+        .logo-wrap{margin-bottom:8px;text-align:center;}
+
+        .logo-wrap img{height:90px;width:90px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px rgba(var(--accent-rgb),.5),0 8px 40px rgba(var(--accent-rgb),.2);transition:transform var(--tr);}
+
+        .logo-wrap img:hover{transform:scale(1.05);}
+
+        .brand{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:5px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
+
+        .subtitle{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;margin-bottom:10px;text-align:center;}
+
+        .badge-rector{display:inline-flex;align-items:center;gap:6px;background:rgba(var(--accent-rgb),.1);border:1px solid rgba(var(--accent-rgb),.2);border-radius:99px;padding:5px 16px;font-size:12px;color:var(--accent);margin-bottom:18px;font-weight:500;}
+
+        .tabs{display:flex;background:#0F172A;border:1px solid #1E293B;border-radius:var(--rmd);padding:4px;margin-bottom:18px;width:100%;max-width:480px;}
+
+        .tab-btn{flex:1;padding:8px 4px;background:none;border:none;border-radius:var(--rsm);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all var(--tr);white-space:nowrap;}
+
+        .tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.25);}
+
+        .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;width:100%;max-width:480px;backdrop-filter:blur(20px);box-shadow:0 4px 30px rgba(0,0,0,.3);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
+
+        @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+        .section{display:none;}
+
+        .section.active{display:block;}
+
+        .field{margin-bottom:14px;}
+
+        .field label{display:block;font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:600;}
+
+        .field input,.field select{width:100%;padding:11px 14px;background:#0F172A;border:1.5px solid #1E293B;border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;transition:border-color var(--tr),box-shadow var(--tr);}
+
+        .field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
+
+        .field input::placeholder{color:var(--sub);}
+
+        .field select option{background:#0F172A;}
+
+        .pass-wrapper{position:relative;}
+
+        .pass-wrapper input{padding-right:2.5rem;width:100%;}
+
+        .toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:1.1rem;transition:color var(--tr);}
+
+        .toggle-pass:hover{color:var(--accent);}
+
+        .btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;min-height:48px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);}
+
+        .btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(var(--accent-rgb),.3);}
+
+        .btn-submit:active{transform:scale(.98);}
+
+        .alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
+
+        .alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;}
+
+        .alert-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10B981;}
+
+        .forgot-link{display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--accent);text-decoration:none;transition:opacity var(--tr);cursor:pointer;}
+
+        .forgot-link:hover{text-decoration:underline;opacity:.8;}
+
+        .back-link{display:block;text-align:center;margin-top:20px;font-size:12px;color:var(--muted);text-decoration:none;transition:color var(--tr);}
+
+        .back-link:hover{color:var(--accent);}
+
+        .divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--sub);font-size:11px;}
+
+        .divider::before,.divider::after{content:'';flex:1;height:1px;background:#1E293B;}
+
+        .pregunta-box{background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--rsm);padding:10px 13px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.5;}
+
+        .msg-error{display:none;margin-top:10px;padding:9px 12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;border-radius:var(--rsm);font-size:12px;}
+
+        .msg-ok{display:none;margin-top:10px;padding:9px 12px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10B981;border-radius:var(--rsm);font-size:12px;}
+
+        .codigo-field{background:rgba(var(--accent-rgb),.06);border:1.5px solid rgba(var(--accent-rgb),.2);border-radius:var(--rmd);padding:12px 14px;margin-bottom:14px;}
+
+        .codigo-field label{display:block;font-size:10px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
+
+        .codigo-field input{width:100%;padding:11px 14px;background:#0F172A;border:1.5px solid rgba(var(--accent-rgb),.3);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;letter-spacing:1px;}
+
+        .codigo-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
+
+        .codigo-field .hint{font-size:11px;color:var(--sub);margin-top:6px;}
+
+        .pwd-strength{height:3px;border-radius:2px;margin-top:5px;transition:all .3s;background:#1E293B;}
+
+        .pwd-strength.weak{background:#EF4444;width:33%;}
+
+        .pwd-strength.medium{background:#F59E0B;width:66%;}
+
+        .pwd-strength.strong{background:#10B981;width:100%;}
+
+        .pwd-label{font-size:10px;color:var(--sub);margin-top:3px;}
+
+        @media(max-width:480px){.card{padding:20px 16px;}.logo-wrap img{height:80px;width:80px;}.brand{font-size:1.2rem;}}
+
+        @media(max-width:375px){.tab-btn{font-size:9px;padding:6px 2px;white-space:normal;word-break:break-word;}.card{padding:16px 12px;}.logo-wrap img{height:64px;width:64px;}.brand{font-size:1rem;letter-spacing:2px;}.field input,.field select{font-size:15px;padding:10px 12px;}.btn-submit{font-size:14px;min-height:44px;padding:10px;}}
+
+    </style>
+
+<!-- Datadog RUM -->
+
+<script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
+
+  <link rel="stylesheet" href="/static/css/lumini.css">
+
+<link rel="stylesheet" href="/static/css/enhanced.css">
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+</head>
+
+<body>
+
+<div class="bg-orb orb1"></div>
+
+<div class="bg-orb orb2"></div>
+
+<a href="/{{ slug }}/rector/login" style="text-decoration:none;color:inherit;display:block;">
+
+<div class="logo-wrap">
+
+    {% if colegio and colegio.logo %}
+
+    <img src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+
+    {% else %}
+
+    <img src="/static/lumini_logo.webp" alt="Lumini">
+
+    {% endif %}
+
+</div>
+
+<div class="brand">LUMINI</div>
+
+</a>
+
+<p class="subtitle">{{ colegio.nombre if colegio else slug }}</p>
+
+<div class="badge-rector"><i data-lucide="graduation-cap"></i> Portal Rector</div>
+
+<div class="tabs">
+
+    <button class="tab-btn active" id="btn-login"     onclick="switchTab('login',this)"><i data-lucide="lock"></i> Ingresar</button>
+
+    <button class="tab-btn"        id="btn-registro"  onclick="switchTab('registro',this)"><i data-lucide="pen"></i> Registrarse</button>
+
+    <button class="tab-btn"        id="btn-recuperar" onclick="switchTab('recuperar',this)"><i data-lucide="key"></i> Recuperar</button>
+
+</div>
+
+<div class="card">
+
+    {% if error %}<div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>{% endif %}
+
+    {% if exito %}<div class="alert alert-success">{{ exito }}</div>{% endif %}
+
+    <div id="tab-login" class="section active">
+
+        <form method="POST" action="/{{ slug }}/rector/login">
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+            <div class="field">
+
+                <label>Usuario</label>
+
+                <input type="text" name="usuario" placeholder="Tu usuario" required autocomplete="username" autofocus>
+
+            </div>
+
+            <div class="field">
+
+                <label>Contraseña</label>
+
+                <div class="pass-wrapper">
+
+                    <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit">Ingresar <i data-lucide="arrow-right"></i></button>
+
+        </form>
+
+        <a class="forgot-link" onclick="switchTabById('recuperar');return false;">¿Olvidaste tu contraseña?</a>
+
+    </div>
+
+    <div id="tab-registro" class="section">
+
+        <form method="POST" action="/{{ slug }}/rector/registrar" onsubmit="return validarRegistro()">
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+            <div class="field">
+
+                <label>Nombre completo</label>
+
+                <input type="text" name="nombre" id="reg-nombre" placeholder="Tu nombre completo" required>
+
+            </div>
+
+            <div class="field">
+
+                <label>Usuario</label>
+
+                <input type="text" name="usuario" id="reg-usuario" placeholder="ej: rector_colegio" required autocomplete="off">
+
+            </div>
+
+            <div class="field">
+
+                <label>Correo electrónico (opcional)</label>
+
+                <input type="email" name="email" placeholder="tu@correo.com">
+
+            </div>
+
+            <div class="field">
+
+                <label>Contraseña</label>
+
+                <div class="pass-wrapper">
+
+                    <input type="password" name="password" id="reg-pwd"
+
+                           placeholder="Mínimo 6 caracteres" required minlength="6"
+
+                           oninput="checkPwd(this)">
+
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+
+                </div>
+
+                <div class="pwd-strength" id="pwd-bar"></div>
+
+                <div class="pwd-label" id="pwd-label"></div>
+
+            </div>
+
+            <div class="field">
+
+                <label>Confirmar contraseña</label>
+
+                <div class="pass-wrapper">
+
+                    <input type="password" name="confirmar_password" id="reg-pwd2"
+
+                           placeholder="Repite tu contraseña" required minlength="6">
+
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+
+                </div>
+
+            </div>
+
+            <div class="field">
+
+                <label>Jornada</label>
+
+                <select name="jornada" id="reg-jornada" required>
+
+                    <option value="" disabled selected>Selecciona tu jornada</option>
+
+                    <option value="Mañana">Mañana</option>
+
+                    <option value="Tarde">Tarde</option>
+
+                    <option value="Nocturna">Nocturna</option>
+
+                </select>
+
+            </div>
+
+            <div class="codigo-field">
+
+                <label><i data-lucide="key"></i> Código de invitación</label>
+
+                <input type="text" name="codigo_registro_rec" id="reg-codigo"
+
+                       placeholder="Código dado por el administrador" required autocomplete="off">
+
+                <p class="hint">El código lo entrega el administrador del colegio.</p>
+
+            </div>
+
+            <div class="divider">Pregunta secreta — para recuperar contraseña</div>
+
+            <div class="field">
+
+                <label>Pregunta secreta</label>
+
+                <select name="pregunta_secreta" id="reg-pregunta" required>
+
+                    <option value="" disabled selected>Selecciona una pregunta</option>
+
+                    <option>¿Cuál es el nombre de tu mascota?</option>
+
+                    <option>¿En qué ciudad naciste?</option>
+
+                    <option>¿Cuál es el nombre de tu colegio favorito?</option>
+
+                    <option>¿Cuál es tu comida favorita?</option>
+
+                    <option>¿Cuál es el nombre de tu mejor amigo(a)?</option>
+
+                    <option>¿Cuál es tu color favorito?</option>
+
+                    <option>¿Cuál es el nombre de tu madre?</option>
+
+                    <option>¿Cuál es tu deporte favorito?</option>
+
+                </select>
+
+            </div>
+
+            <div class="field">
+
+                <label>Respuesta secreta</label>
+
+                <input type="text" name="respuesta_secreta" id="reg-respuesta"
+
+                       placeholder="Tu respuesta (recuérdala bien)" required autocomplete="off">
+
+            </div>
+
+            <div id="reg-err" class="msg-error"></div>
+
+            <button type="submit" class="btn-submit" style="margin-top:8px;">Crear cuenta <i data-lucide="arrow-right"></i></button>
+
+        </form>
+
+    </div>
+
+    <div id="tab-recuperar" class="section">
+
+        <p style="font-size:13px;color:#94A3B8;margin-bottom:18px;line-height:1.6;">
+
+            Ingresa tu usuario, responde tu pregunta secreta y crea una nueva contraseña.
+
+        </p>
+
+        <div id="rec-paso1">
+
+            <div class="field">
+
+                <label>Tu usuario</label>
+
+                <input type="text" id="rec-usuario" placeholder="ej: rector_colegio" autocomplete="username">
+
+            </div>
+
+            <button type="button" class="btn-submit" onclick="recBuscar()">Continuar <i data-lucide="arrow-right"></i></button>
+
+            <div id="rec-err1" class="msg-error"></div>
+
+        </div>
+
+        <div id="rec-paso2" style="display:none;">
+
+            <div class="pregunta-box" id="rec-pregunta-txt"><i data-lucide="key"></i> ...</div>
+
+            <div class="field">
+
+                <label>Tu respuesta</label>
+
+                <input type="text" id="rec-respuesta" placeholder="Escribe tu respuesta..." autocomplete="off">
+
+            </div>
+
+            <div class="field">
+
+                <label>Nueva contraseña</label>
+
+                <div class="pass-wrapper">
+
+                    <input type="password" id="rec-nueva" placeholder="Mínimo 6 caracteres" minlength="6">
+
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+
+                </div>
+
+            </div>
+
+            <div class="field">
+
+                <label>Confirmar contraseña</label>
+
+                <div class="pass-wrapper">
+
+                    <input type="password" id="rec-confirmar" placeholder="Repite la contraseña">
+
+                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
+
+                </div>
+
+            </div>
+
+            <button type="button" class="btn-submit" onclick="recCambiar()">Guardar nueva contraseña</button>
+
+            <div id="rec-err2" class="msg-error"></div>
+
+            <div id="rec-ok2"  class="msg-ok"></div>
+
+            <button type="button" onclick="recReset()"
+
+                style="background:none;border:none;color:#94A3B8;font-size:12px;margin-top:12px;cursor:pointer;width:100%;text-align:center;">
+
+                <i data-lucide="arrow-left"></i> Volver
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<a href="/{{ slug }}/login" class="back-link"><i data-lucide="arrow-left"></i> Volver al login principal</a>
+
+<script>
+
+const SLUG = "{{ slug }}";
+
+function switchTab(tab, btn){
+
+    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+
+    document.getElementById('tab-'+tab).classList.add('active');
+
+    btn.classList.add('active');
+
+}
+
+function switchTabById(tab){ switchTab(tab, document.getElementById('btn-'+tab)); }
+
+function togglePass(btn){
+
+    var inp = btn.previousElementSibling;
+
+    inp.type = inp.type==='password' ? 'text' : 'password';
+
+    btn.innerHTML = inp.type==='password' ? '<i data-lucide="eye"></i>' : '<i data-lucide="eye-off"></i>';
+
+}
+
+function checkPwd(inp){
+
+    var val = inp.value;
+
+    var bar = document.getElementById('pwd-bar');
+
+    var lbl = document.getElementById('pwd-label');
+
+    if(!val){ bar.className='pwd-strength'; lbl.textContent=''; return; }
+
+    var strong = val.length>=8 && /[A-Z]/.test(val) && /[0-9]/.test(val);
+
+    var medium = val.length>=6;
+
+    if(strong){ bar.className='pwd-strength strong'; lbl.textContent='Contraseña fuerte'; lbl.style.color='#10B981'; }
+
+    else if(medium){ bar.className='pwd-strength medium'; lbl.textContent='Contraseña aceptable'; lbl.style.color='#F59E0B'; }
+
+    else{ bar.className='pwd-strength weak'; lbl.textContent='Contraseña débil'; lbl.style.color='#EF4444'; }
+
+}
+
+function validarRegistro(){
+
+    var err = document.getElementById('reg-err');
+
+    err.style.display = 'none';
+
+    var nombre   = document.getElementById('reg-nombre').value.trim();
+
+    var usuario  = document.getElementById('reg-usuario').value.trim();
+
+    var pwd      = document.getElementById('reg-pwd').value.trim();
+
+    var pwd2     = document.getElementById('reg-pwd2').value.trim();
+
+    var jornada  = document.getElementById('reg-jornada').value;
+
+    var codigo   = document.getElementById('reg-codigo').value.trim();
+
+    var pregunta = document.getElementById('reg-pregunta').value;
+
+    var respuesta= document.getElementById('reg-respuesta').value.trim();
+
+    if(!nombre){ mostrarErr('Escribe tu nombre completo.'); return false; }
+
+    if(!usuario){ mostrarErr('Escribe un nombre de usuario.'); return false; }
+
+    if(pwd.length < 6){ mostrarErr('La contraseña debe tener al menos 6 caracteres.'); return false; }
+
+    if(pwd !== pwd2){ mostrarErr('Las contraseñas no coinciden.'); return false; }
+
+    if(!jornada){ mostrarErr('Selecciona una jornada.'); return false; }
+
+    if(!codigo){ mostrarErr('Ingresa el código de invitación.'); return false; }
+
+    if(!pregunta){ mostrarErr('Selecciona una pregunta secreta.'); return false; }
+
+    if(!respuesta){ mostrarErr('Escribe tu respuesta secreta.'); return false; }
+
+    return true;
+
+}
+
+function mostrarErr(msg){
+
+    var err = document.getElementById('reg-err');
+
+    err.innerHTML = '<i data-lucide="alert-triangle"></i> ' + msg;
+
+    err.style.display = 'block';
+
+    err.scrollIntoView({behavior:'smooth', block:'center'});
+
+}
+
+function recBuscar(){
+    var usuario = document.getElementById('rec-usuario').value.trim();
+    var err = document.getElementById('rec-err1');
+    err.style.display = 'none';
+    if(!usuario){ err.innerHTML='<i data-lucide="alert-triangle"></i> Escribe tu usuario.'; err.style.display='block'; return; }
+    var f = new FormData(); f.append('usuario', usuario); f.append('_csrf_token', '{{ csrf_token() }}');
+    fetch('/'+SLUG+'/rector/buscar_usuario_recuperar', {method:'POST', body:f})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            if(d.ok){
+                document.getElementById('rec-pregunta-txt').innerHTML = '<i data-lucide="key"></i> '+d.pregunta;
+                document.getElementById('rec-paso1').style.display = 'none';
+                document.getElementById('rec-paso2').style.display = 'block';
+            } else {
+                err.innerHTML = '<i data-lucide="alert-triangle"></i> '+d.mensaje;
+                err.style.display = 'block';
+            }
+        })
+        .catch(function(){ err.innerHTML='<i data-lucide="alert-triangle"></i> Error de conexión.'; err.style.display='block'; });
+}
+
+function recCambiar(){
+
+    var usuario  = document.getElementById('rec-usuario').value.trim();
+
+    var respuesta= document.getElementById('rec-respuesta').value.trim();
+
+    var nueva    = document.getElementById('rec-nueva').value.trim();
+
+    var confirmar= document.getElementById('rec-confirmar').value.trim();
+
+    var err = document.getElementById('rec-err2');
+
+    var ok  = document.getElementById('rec-ok2');
+
+    err.style.display = ok.style.display = 'none';
+
+    if(!respuesta){ err.innerHTML='<i data-lucide="alert-triangle"></i> Escribe tu respuesta.'; err.style.display='block'; return; }
+    if(nueva.length < 6){ err.innerHTML='<i data-lucide="alert-triangle"></i> Mínimo 6 caracteres.'; err.style.display='block'; return; }
+    if(nueva !== confirmar){ err.innerHTML='<i data-lucide="alert-triangle"></i> Las contraseñas no coinciden.'; err.style.display='block'; return; }
+
+    var f = new FormData();
+
+    f.append('usuario', usuario);
+
+    f.append('respuesta', respuesta);
+
+    f.append('nueva', nueva);
+
+    f.append('_csrf_token', '{{ csrf_token() }}');
+
+    fetch('/'+SLUG+'/rector/cambiar_password_recuperar', {method:'POST', body:f})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            if(d.ok){
+                ok.innerHTML = '<i data-lucide="check-circle"></i> '+d.mensaje;
+                ok.style.display = 'block';
+                setTimeout(function(){ switchTabById('login'); }, 2000);
+            } else {
+                err.innerHTML = '<i data-lucide="alert-triangle"></i> '+d.mensaje;
+                err.style.display = 'block';
+            }
+        })
+        .catch(function(){ err.innerHTML='<i data-lucide="alert-triangle"></i> Error de conexión.'; err.style.display='block'; });
+}
+
+function recReset(){
+
+    document.getElementById('rec-paso1').style.display = 'block';
+
+    document.getElementById('rec-paso2').style.display = 'none';
+
+    document.getElementById('rec-err1').style.display  = 'none';
+
+    document.getElementById('rec-usuario').value = '';
+
+}
+
+{% if exito %}
+
+switchTabById('login');
+
+{% endif %}
+
+{% if error %}
+
+{% set e = error|lower %}
+
+{% if 'usuario ya' in e or 'completa' in e or 'caracteres' in e or 'pregunta' in e or 'invitación' in e or 'contraseña' in e or 'jornada' in e %}
+
+switchTabById('registro');
+
+{% endif %}
+
+{% endif %}
+
+</script>
+
+<button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:20px;z-index:9999;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);" aria-label="Cambiar tema">☀️</button>
+
+<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
+
+  <script src="/static/js/lumini.js"></script>
+
+</body>
+
+</html>
+
