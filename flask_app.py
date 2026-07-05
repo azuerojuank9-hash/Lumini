@@ -181,7 +181,7 @@ def necesita_rehash(guardada):
     return not (guardada.startswith('$2b$') or guardada.startswith('$2a$'))
 
 # ── SCHEMA VERSIONING ──────────────────────────────────────────────────────────
-SCHEMA_VERSION = 10
+SCHEMA_VERSION = 11
 
 def _ejecutar_migraciones(slug, conn):
     conn.execute('''CREATE TABLE IF NOT EXISTS schema_meta (
@@ -314,6 +314,18 @@ def _migrar_v10(conn, slug=None):
     conn.execute('CREATE INDEX IF NOT EXISTS idx_audit_tabla ON audit_log(tabla, registro_id)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_audit_usuario ON audit_log(usuario_id)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_audit_fecha ON audit_log(creado)')
+
+def _migrar_v11(conn, slug=None):
+    conn.execute('''CREATE TABLE IF NOT EXISTS asistencia_v2 (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        aid INTEGER, fecha TEXT, estado TEXT,
+        UNIQUE(aid, fecha)
+    )''')
+    conn.execute('''INSERT OR IGNORE INTO asistencia_v2 (id, aid, fecha, estado)
+        SELECT id, aid, fecha, estado FROM asistencia''')
+    conn.execute('DROP TABLE asistencia')
+    conn.execute('ALTER TABLE asistencia_v2 RENAME TO asistencia')
+
     conn.execute('''CREATE TABLE IF NOT EXISTS estructura_academica (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         slug TEXT NOT NULL,
@@ -353,6 +365,7 @@ MIGRACIONES = {
     8:  _migrar_v8,
     9:  _migrar_v9,
     10: _migrar_v10,
+    11: _migrar_v11,
 }
 
 # ── MASTER DB ─────────────────────────────────────────────────────────────────
@@ -633,7 +646,8 @@ def init_db(slug):
             pin TEXT DEFAULT '')''',
         '''CREATE TABLE IF NOT EXISTS asistencia (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            aid INTEGER, fecha TEXT, estado TEXT)''',
+            aid INTEGER, fecha TEXT, estado TEXT,
+            UNIQUE(aid, fecha))''',
         '''CREATE TABLE IF NOT EXISTS compromisos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             titulo TEXT, fecha TEXT, materia TEXT,
@@ -1702,43 +1716,58 @@ def login(slug):
                     error = '✅ Registro exitoso. Ya puedes ingresar.'
 
         elif accion == 'estudiante':
-            nombre     = request.form.get('nombre_est', '').strip().lower()
-            jornada    = request.form.get('jornada_est', '').strip()
-            pin_ingresado = request.form.get('pin_est', '').strip()
-            conn = conectar(slug)
-            if jornada:
-                alumno = conn.execute(
-                    'SELECT * FROM alumnos WHERE LOWER(nombre)=? AND jornada=? AND activo=1',
-                    (nombre, jornada)).fetchone()
+            ip = request.remote_addr or '0.0.0.0'
+            bloqueo = ip_bloqueada(ip, prefijo=f'est_{slug}')
+            if bloqueo:
+                error = f'Demasiados intentos. Espera {bloqueo} segundos.'
             else:
-                alumno = conn.execute(
-                    'SELECT * FROM alumnos WHERE LOWER(nombre)=? AND activo=1', (nombre,)).fetchone()
-            conn.close()
-            if alumno:
-                if alumno['pin'] and pin_ingresado != alumno['pin']:
-                    error = 'PIN incorrecto.'
+                nombre     = request.form.get('nombre_est', '').strip().lower()
+                jornada    = request.form.get('jornada_est', '').strip()
+                pin_ingresado = request.form.get('pin_est', '').strip()
+                conn = conectar(slug)
+                if jornada:
+                    alumno = conn.execute(
+                        'SELECT * FROM alumnos WHERE LOWER(nombre)=? AND jornada=? AND activo=1',
+                        (nombre, jornada)).fetchone()
                 else:
-                    session.clear()
-                    session.permanent = True
-                    session[f'rol_{slug}']       = 'estudiante'
-                    session[f'alumno_id_{slug}'] = alumno['id']
-                    return redirect(url_for('vista_estudiante', slug=slug))
-            else:
-                error = 'No se encontró ese estudiante.'
+                    alumno = conn.execute(
+                        'SELECT * FROM alumnos WHERE LOWER(nombre)=? AND activo=1', (nombre,)).fetchone()
+                conn.close()
+                if alumno:
+                    if alumno['pin'] and pin_ingresado != alumno['pin']:
+                        registrar_fallo(ip, prefijo=f'est_{slug}')
+                        error = 'PIN incorrecto.'
+                    else:
+                        limpiar_intentos(ip, prefijo=f'est_{slug}')
+                        session.clear()
+                        session.permanent = True
+                        session[f'rol_{slug}']       = 'estudiante'
+                        session[f'alumno_id_{slug}'] = alumno['id']
+                        return redirect(url_for('vista_estudiante', slug=slug))
+                else:
+                    registrar_fallo(ip, prefijo=f'est_{slug}')
+                    error = 'No se encontró ese estudiante.'
 
         elif accion == 'directora_login':
-            u = request.form.get('dir_usuario', '').strip()
-            p = request.form.get('dir_password', '').strip()
-            conn = conectar(slug)
-            d = conn.execute(
-                'SELECT * FROM directoras WHERE usuario=? AND activo=1', (u,)).fetchone()
-            conn.close()
-            if d and verificar_pw(p, d['password']):
-                session.clear()
-                session.permanent = True
-                session[f'directora_id_{slug}'] = d['id']
-                return redirect(url_for('directora_panel', slug=slug))
-            error = 'Usuario o contraseña incorrectos.'
+            ip = request.remote_addr or '0.0.0.0'
+            bloqueo = ip_bloqueada(ip, prefijo=f'dir_{slug}')
+            if bloqueo:
+                error = f'Demasiados intentos. Espera {bloqueo} segundos.'
+            else:
+                u = request.form.get('dir_usuario', '').strip()
+                p = request.form.get('dir_password', '').strip()
+                conn = conectar(slug)
+                d = conn.execute(
+                    'SELECT * FROM directoras WHERE usuario=? AND activo=1', (u,)).fetchone()
+                conn.close()
+                if d and verificar_pw(p, d['password']):
+                    limpiar_intentos(ip, prefijo=f'dir_{slug}')
+                    session.clear()
+                    session.permanent = True
+                    session[f'directora_id_{slug}'] = d['id']
+                    return redirect(url_for('directora_panel', slug=slug))
+                registrar_fallo(ip, prefijo=f'dir_{slug}')
+                error = 'Usuario o contraseña incorrectos.'
 
         elif accion == 'rector_login':
             u = request.form.get('rec_usuario', '').strip()
@@ -1882,8 +1911,8 @@ def home(slug):
             for r in rows_asistencia:
                 asis_all.setdefault(r['aid'], []).append(r)
             rows_ultimo = conn.execute(
-                f'SELECT aid, estado FROM asistencia WHERE id IN (SELECT MAX(id) FROM asistencia WHERE aid IN ({placeholders}) GROUP BY aid)',
-                aid_list).fetchall() if rows_asistencia else []
+                f'SELECT aid, estado FROM asistencia WHERE aid IN ({placeholders}) AND fecha=date("now")',
+                aid_list).fetchall()
             asis_ultimo = {r['aid']: r['estado'] for r in rows_ultimo}
             rows_obs = conn.execute(
                 f'SELECT id, aid, materia, texto, fecha FROM observaciones WHERE aid IN ({placeholders}) AND materia=? ORDER BY aid, fecha DESC',
@@ -2475,6 +2504,64 @@ def eliminar_profesor(slug, id):
     return jsonify({'ok': True})
 
 # ── ASISTENCIA ────────────────────────────────────────────────────────────────
+@app.route('/<slug>/asistencia', methods=['GET'])
+def asistencia(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof: return redirect(url_for('login', slug=slug))
+    jornada, materia = get_sesion_jornada_materia(slug)
+    if not jornada or not materia:
+        return redirect(url_for('seleccionar_jornada', slug=slug))
+    colegio    = get_colegio(slug)
+    mis_cursos = get_cursos_profesor(slug, prof['id'], materia, jornada)
+    curso_sel  = request.args.get('curso', mis_cursos[0] if mis_cursos else None)
+    fecha_sel  = request.args.get('fecha', datetime.today().strftime('%Y-%m-%d'))
+    try:
+        fecha_dt = datetime.strptime(fecha_sel, '%Y-%m-%d') if fecha_sel else datetime.today()
+    except ValueError:
+        fecha_sel = datetime.today().strftime('%Y-%m-%d')
+        fecha_dt  = datetime.today()
+    fecha_sel_dia_anterior  = (fecha_dt - timedelta(days=1)).strftime('%Y-%m-%d')
+    fecha_sel_dia_siguiente = (fecha_dt + timedelta(days=1)).strftime('%Y-%m-%d')
+    hoy_fecha  = datetime.today().strftime('%Y-%m-%d')
+    if not curso_sel:
+        return render_template('asistencia.html', profesor=prof, slug=slug, colegio=colegio,
+                               materia=materia, jornada=jornada, mis_cursos=mis_cursos,
+                               curso_sel=None, estudiantes=[], fecha_sel=fecha_sel,
+                               fecha_sel_dia_anterior=fecha_sel_dia_anterior,
+                               fecha_sel_dia_siguiente=fecha_sel_dia_siguiente,
+                               hoy_fecha=hoy_fecha,
+                               materias_jornadas=get_materias_profesor(slug, prof['id']))
+    conn = conectar(slug)
+    try:
+        alumnos = conn.execute(
+            'SELECT id, nombre, num_curso FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
+            (curso_sel, jornada)).fetchall()
+        asis_rows = []
+        if alumnos:
+            placeholders = ','.join('?' * len(alumnos))
+            aid_tuple = tuple(a['id'] for a in alumnos)
+            asis_rows = conn.execute(
+                f'SELECT aid, estado FROM asistencia WHERE fecha=? AND aid IN ({placeholders})',
+                (fecha_sel,) + aid_tuple).fetchall()
+        asis_map = {r['aid']: r['estado'] for r in asis_rows}
+        datos = []
+        for a in alumnos:
+            datos.append({
+                'id': a['id'], 'nombre': a['nombre'],
+                'num_curso': a['num_curso'],
+                'asistencia': asis_map.get(a['id'], '')
+            })
+    finally:
+        conn.close()
+    return render_template('asistencia.html', profesor=prof, slug=slug, colegio=colegio,
+                           materia=materia, jornada=jornada, mis_cursos=mis_cursos,
+                           curso_sel=curso_sel, estudiantes=datos, fecha_sel=fecha_sel,
+                           fecha_sel_dia_anterior=fecha_sel_dia_anterior,
+                           fecha_sel_dia_siguiente=fecha_sel_dia_siguiente,
+                           hoy_fecha=hoy_fecha,
+                           materias_jornadas=get_materias_profesor(slug, prof['id']))
+
 @app.route('/<slug>/marcar_asistencia', methods=['POST'])
 def marcar_asistencia(slug):
     require_colegio(slug)
@@ -2483,7 +2570,14 @@ def marcar_asistencia(slug):
     if not validar_csrf(): return ('Error CSRF', 403)
     aid    = request.form.get('aid', type=int)
     estado = request.form.get('estado')
+    fecha  = request.form.get('fecha', '')
     if aid is None or not estado: return ('', 400)
+    if estado not in ('P', 'A', 'T'): return ('', 400)
+    if fecha:
+        try:
+            datetime.strptime(fecha, '%Y-%m-%d')
+        except ValueError:
+            return ('', 400)
     jornada, materia = get_sesion_jornada_materia(slug)
     conn = conectar(slug)
     cursos_prof = get_cursos_profesor(slug, prof['id'], materia, jornada)
@@ -2495,8 +2589,18 @@ def marcar_asistencia(slug):
         (aid, *cursos_prof, jornada)).fetchone()
     if not alumno:
         conn.close(); return ('', 403)
-    conn.execute('INSERT INTO asistencia (aid,fecha,estado) VALUES (?,date("now"),?)', (aid, estado))
-    conn.commit(); conn.close()
+    if fecha:
+        conn.execute('INSERT INTO asistencia (aid,fecha,estado) VALUES (?,?,?) '
+                     'ON CONFLICT(aid,fecha) DO UPDATE SET estado=excluded.estado',
+                     (aid, fecha, estado))
+    else:
+        conn.execute('INSERT INTO asistencia (aid,fecha,estado) VALUES (?,date("now"),?) '
+                     'ON CONFLICT(aid,fecha) DO UPDATE SET estado=excluded.estado',
+                     (aid, estado))
+    conn.commit()
+    audit_log(slug, prof['id'], 'asistencia_editada', 'asistencia', aid,
+              None, {'estado': estado})
+    conn.close()
     return jsonify({'status':'ok'})
 
 # ── OBSERVACIONES ─────────────────────────────────────────────────────────────
@@ -5100,7 +5204,7 @@ def admin_ver_profesores(slug):
 
 # ── BACKUP AUTOMÁTICO ─────────────────────────────────────────────────────────
 import threading, shutil
-from datetime import datetime as _dt
+from datetime import timedelta, datetime as _dt
 
 def hacer_backup():
     try:

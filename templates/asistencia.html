@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Asistencia - {{ materia }} · LUMINI</title>
+<link rel="icon" type="image/webp" href="/static/lumini_logo.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="/static/css/lumini.css">
+<link rel="stylesheet" href="/static/css/enhanced.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10;}
+.sidebar-header{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.sidebar-logo{width:32px;height:32px;border-radius:6px;}
+.sidebar-brand{font-size:14px;font-weight:800;letter-spacing:-.03em;}
+.sidebar-sub{font-size:9px;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.08em;}
+.sidebar-nav{flex:1;padding:10px 8px;overflow-y:auto;}
+.sidebar-section{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:8px 10px 4px;font-weight:600;}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--rsm);font-size:12px;font-weight:500;color:var(--text);text-decoration:none;transition:all var(--tr);cursor:pointer;}
+.sidebar-item:hover{background:rgba(var(--accent-rgb),.07);}
+.sidebar-item.active{background:rgba(var(--accent-rgb),.12);color:var(--accent);}
+.sidebar-item .icon{width:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);}
+.sidebar-item.active .icon{color:var(--accent);}
+.sidebar-user{padding:12px 16px;border-top:1px solid var(--border);}
+.sidebar-user .name{font-size:12px;font-weight:600;}
+.sidebar-user .role{font-size:10px;color:var(--muted);margin-top:1px;}
+.main{margin-left:220px;padding:20px 24px;max-width:1400px;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px;}
+.topbar-left h1{font-size:20px;font-weight:800;letter-spacing:-.03em;}
+.breadcrumb{font-size:11px;color:var(--muted);margin-top:2px;}
+.curso-tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;}
+.ctab{padding:6px 16px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:all var(--tr);font-family:'Inter',sans-serif;}
+.ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;}
+.ctab:hover:not(.active){background:var(--bg3);color:var(--text);}
+.card{border:1px solid var(--border);border-radius:var(--rlg);background:var(--bg2);overflow:hidden;}
+.card-head{padding:12px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.card-title{display:flex;align-items:center;gap:6px;}
+.card-body{padding:14px 16px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{padding:8px 10px;text-align:left;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;border-bottom:1px solid var(--border);}
+td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.tnum{width:32px;text-align:center;color:var(--muted);font-size:11px;}
+.tnombre{font-weight:600;color:var(--text);}
+.abtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border:none;border-radius:var(--rsm);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s ease;min-height:36px;touch-action:manipulation;}
+.abtn:active{transform:scale(.88);}
+.abtn.ap{background:rgba(34,197,94,.10);color:var(--green);border:1px solid rgba(34,197,94,.18);}
+.abtn.ap:hover,.abtn.active.ap{background:linear-gradient(135deg,var(--green),#16A34A);color:#fff;border-color:transparent;}
+.abtn.aa{background:rgba(239,68,68,.10);color:var(--red);border:1px solid rgba(239,68,68,.18);}
+.abtn.aa:hover,.abtn.active.aa{background:linear-gradient(135deg,var(--red),#DC2626);color:#fff;border-color:transparent;}
+.abtn.at{background:rgba(234,179,8,.10);color:var(--yellow);border:1px solid rgba(234,179,8,.18);}
+.abtn.at:hover,.abtn.active.at{background:linear-gradient(135deg,var(--yellow),#CA8A04);color:#fff;border-color:transparent;}
+.asist-group{display:inline-flex;gap:3px;background:var(--bg3);padding:3px;border-radius:10px;border:1px solid var(--border);}
+.date-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.date-nav-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);text-decoration:none;}
+.date-nav-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--accent);}
+.date-display{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
+.date-input{font-family:'Inter',sans-serif;font-size:13px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--rsm);background:var(--bg2);color:var(--text);cursor:pointer;}
+.date-input:focus{outline:none;border-color:var(--accent);}
+.stats-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.stat-chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--rsm);font-size:12px;font-weight:600;}
+.stat-chip .num{font-size:16px;font-weight:800;}
+.stat-chip.green{background:rgba(34,197,94,.10);color:var(--green);}
+.stat-chip.red{background:rgba(239,68,68,.10);color:var(--red);}
+.stat-chip.yellow{background:rgba(234,179,8,.10);color:var(--yellow);}
+.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);}
+.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
+.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.5);}
+@media(max-width:768px){
+  .hamburger{display:flex;}
+  .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay.open{display:block;}
+  .main{margin-left:0;padding:16px;}
+  table,thead,tbody,tr,td,th{display:block;}
+  thead{display:none;}
+  tr{border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:10px;background:var(--bg2);}
+  td{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border:none;text-align:right;gap:6px;min-height:36px;border-bottom:1px solid rgba(255,255,255,.04);}
+  td::before{content:attr(data-label);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;flex-shrink:0;text-align:left;min-width:70px;}
+  td:last-child{border-bottom:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
+  <div class="sidebar-header">
+    {% if colegio and colegio.logo %}
+    <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    {% else %}
+    <img class="sidebar-logo" src="/static/lumini_logo.webp" alt="Lumini">
+    {% endif %}
+    <div>
+      <div class="sidebar-brand">LUMINI</div>
+      <div class="sidebar-sub">{{ colegio.nombre if colegio else slug }}</div>
+    </div>
+  </div>
+  </a>
+  <div class="sidebar-nav">
+    <div class="sidebar-section">Navegación</div>
+    <a href="/{{ slug }}/" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Notas</span></a>
+    <a href="/{{ slug }}/asistencia" class="sidebar-item active"><span class="icon"><i data-lucide="calendar-check"></i></span><span>Asistencia</span></a>
+    <a href="/{{ slug }}/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horario</span></a>
+    <a href="/{{ slug }}/archivados" class="sidebar-item"><span class="icon"><i data-lucide="archive"></i></span><span>Archivados</span></a>
+    <a href="/{{ slug }}/transferir_curso" class="sidebar-item"><span class="icon"><i data-lucide="refresh-cw"></i></span><span>Transferir</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    <a href="/{{ slug }}/cambiar_password" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Perfil</span></a>
+    {% if materias_jornadas|length > 1 %}
+    <a href="/{{ slug }}/seleccionar" class="sidebar-item"><span class="icon"><i data-lucide="refresh-cw"></i></span><span>Cambiar materia</span></a>
+    {% endif %}
+    <a href="/{{ slug }}/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Salir</span></a>
+  </div>
+  <div class="sidebar-user">
+    <div class="name">{{ profesor.nombre }}</div>
+    <div class="role">{{ materia }} · {{ jornada }}</div>
+  </div>
+  <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
+</nav>
+
+<div class="main">
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1><i data-lucide="calendar-check" style="width:22px;height:22px;vertical-align:middle;"></i> Asistencia</h1>
+    <div class="breadcrumb">{{ materia }} · {{ jornada }} · {{ profesor.nombre }}</div>
+  </div>
+</div>
+
+{% if mis_cursos %}
+<div class="curso-tabs">
+{% for c in mis_cursos %}
+<a href="/{{ slug }}/asistencia?curso={{ c }}&fecha={{ fecha_sel }}" class="ctab {% if c==curso_sel %}active{% endif %}">{{ c }}</a>
+{% endfor %}
+</div>
+{% endif %}
+
+{% if curso_sel %}
+<div class="date-nav">
+  <a href="/{{ slug }}/asistencia?curso={{ curso_sel }}&fecha={{ fecha_sel_dia_anterior }}" class="date-nav-btn" id="btnPrev"><i data-lucide="chevron-left" style="width:14px;height:14px;"></i> Día anterior</a>
+  <span class="date-display" id="dateDisplay">{{ fecha_sel }}</span>
+  <input type="date" id="datePicker" class="date-input" value="{{ fecha_sel }}" onchange="irAFecha(this.value)">
+  <a href="/{{ slug }}/asistencia?curso={{ curso_sel }}&fecha={{ fecha_sel_dia_siguiente }}" class="date-nav-btn" id="btnNext">Día siguiente <i data-lucide="chevron-right" style="width:14px;height:14px;"></i></a>
+  <a href="/{{ slug }}/asistencia?curso={{ curso_sel }}&fecha={{ hoy_fecha }}" class="date-nav-btn" style="margin-left:4px;">Hoy</a>
+</div>
+
+<div class="stats-row" id="statsRow">
+  <div class="stat-chip green"><span class="num" id="statP">0</span> Presentes</div>
+  <div class="stat-chip red"><span class="num" id="statA">0</span> Ausentes</div>
+  <div class="stat-chip yellow"><span class="num" id="statT">0</span> Tardanzas</div>
+  <div class="stat-chip" style="background:var(--bg3);color:var(--muted);"><span class="num" id="statTotal">{{ estudiantes|length }}</span> Total</div>
+</div>
+
+<div class="card">
+  <div class="card-head"><span class="card-title"><i data-lucide="users" style="width:14px;height:14px;"></i> Estudiantes · {{ curso_sel }}</span></div>
+  <div class="card-body" style="padding:0;">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:32px">#</th>
+          <th>Estudiante</th>
+          <th style="width:200px">Asistencia</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for e in estudiantes %}
+      <tr data-aid="{{ e.id }}">
+        <td class="tnum">{{ e.num_curso }}</td>
+        <td class="tnombre">{{ e.nombre }}</td>
+        <td>
+          <div class="asist-group">
+            <button onclick="marcarAsistFecha({{ e.id }},'P')" class="abtn ap {% if e.asistencia=='P' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="P"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> P</button>
+            <button onclick="marcarAsistFecha({{ e.id }},'A')" class="abtn aa {% if e.asistencia=='A' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="A"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.71L12 12l6.3 6.29-1.42 1.42L12 13.41l-5.88 5.88-1.42-1.42L10.59 12 4.7 5.71 6.12 4.29 12 10.59l5.88-5.88z"/></svg> A</button>
+            <button onclick="marcarAsistFecha({{ e.id }},'T')" class="abtn at {% if e.asistencia=='T' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="T"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg> T</button>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes en este curso.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
+<input type="hidden" id="currentFecha" value="{{ fecha_sel }}">
+<input type="hidden" id="currentCurso" value="{{ curso_sel or '' }}">
+<input type="hidden" id="slug" value="{{ slug }}">
+
+</div>
+
+<div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado</div>
+
+<script>
+const slug = document.getElementById('slug').value;
+
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+function toggleTheme(){
+    var html = document.documentElement;
+    var next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+}
+
+function getCsrf(){
+    return document.getElementById('csrf-global').value;
+}
+
+function updateStats(){
+    var p = document.querySelectorAll('.abtn.ap.active').length;
+    var a = document.querySelectorAll('.abtn.aa.active').length;
+    var t = document.querySelectorAll('.abtn.at.active').length;
+    document.getElementById('statP').textContent = p;
+    document.getElementById('statA').textContent = a;
+    document.getElementById('statT').textContent = t;
+}
+
+function marcarAsistFecha(aid, estado){
+    var fecha = document.getElementById('currentFecha').value;
+    var f = new FormData();
+    f.append('aid', aid);
+    f.append('estado', estado);
+    f.append('fecha', fecha);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/marcar_asistencia', {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                var row = document.querySelector('tr[data-aid="'+aid+'"]');
+                row.querySelectorAll('.abtn').forEach(function(b){
+                    b.classList.remove('active');
+                    if(b.getAttribute('data-estado') === estado) b.classList.add('active');
+                });
+                updateStats();
+                showToast();
+            } else {
+                showToast('<i data-lucide="x-circle"></i> Error');
+            }
+        })
+        .catch(function(){ showToast('<i data-lucide="x-circle"></i> Error de conexión'); });
+}
+
+function showToast(msg){
+    msg = msg || '<i data-lucide="check-circle"></i> Guardado';
+    var t = document.getElementById('toast');
+    t.innerHTML = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 1800);
+}
+
+function irAFecha(fecha){
+    var curso = document.getElementById('currentCurso').value;
+    if(curso) window.location.href = '/'+slug+'/asistencia?curso='+curso+'&fecha='+fecha;
+}
+
+updateStats();
+
+if(window.lucide && lucide.createIcons) lucide.createIcons({attrs:{'aria-hidden':'true'}});
+</script>
+</body>
+</html>

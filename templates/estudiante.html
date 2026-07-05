@@ -943,14 +943,14 @@ function renderComunicacionesEst(){
         var pc=PRIO_COLORS[c.prioridad]||'#2563EB';
         var pn=PRIO_NAMES[c.prioridad]||c.prioridad.charAt(0).toUpperCase()+c.prioridad.slice(1);
         var fecha=(c.fecha_publicacion||c.fecha_creacion||'').slice(0,10);
-        var contenido=(c.contenido||'').slice(0,120);
+        var contenido=escHtml((c.contenido||'').slice(0,120));
         if(c.contenido&&c.contenido.length>120)contenido+='…';
         var div=document.createElement('div');
         div.className='ag-item';
         div.innerHTML='<div style="display:flex;align-items:center;gap:10px;">'
             +'<span style="width:8px;height:8px;border-radius:50%;background:'+pc+';flex-shrink:0;"></span>'
             +'<div style="flex:1;min-width:0;">'
-            +'<div style="font-weight:600;font-size:13px;">'+c.titulo+'</div>'
+            +'<div style="font-weight:600;font-size:13px;">'+escHtml(c.titulo)+'</div>'
             +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+fecha+'</div>'
             +'<div style="font-size:12px;color:var(--text);margin-top:6px;line-height:1.4;">'+contenido+'</div></div>'
             +'<span style="font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;background:'+pc+'15;color:'+pc+';white-space:nowrap;">'+pn+'</span></div>'

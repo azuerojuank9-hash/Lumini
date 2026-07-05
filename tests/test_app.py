@@ -1,13 +1,64 @@
-import os, sys, json
+import os, sys, json, sqlite3
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
 
-from flask_app import app
+from flask_app import app, init_db, hash_pw
 
 import pytest
+
+TEST_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                       'colegios_db', 'testcolegio.db')
+
+def seed_test_db():
+    # Ensure DB schema exists (creates tables + runs all migrations including v11)
+    init_db('testcolegio')
+    conn = sqlite3.connect(TEST_DB)
+    conn.row_factory = sqlite3.Row
+    # Rector
+    cur = conn.execute("SELECT id FROM rectores WHERE usuario='rector_prueba'")
+    if not cur.fetchone():
+        conn.execute("INSERT INTO rectores (nombre, usuario, password, email, activo, es_principal) VALUES (?,?,?,?,?,?)",
+                     ('Rector Prueba', 'rector_prueba', 'ecd71870d1963316a97e3ac3408c9835ad8cf0f3c1bc703527c30265534f75ae', 'rector@test.com', 1, 1))
+    # Directora
+    cur = conn.execute("SELECT id FROM directoras WHERE usuario='directora'")
+    if not cur.fetchone():
+        conn.execute("INSERT INTO directoras (nombre, usuario, password, email, activo, curso, jornada) VALUES (?,?,?,?,?,?,?)",
+                     ('Directora Prueba', 'directora', hash_pw('test123'), 'directora@test.com', 1, 'Primero A', 'Mañana'))
+    # Profesor
+    cur = conn.execute("SELECT id FROM profesores WHERE id=1")
+    if not cur.fetchone():
+        conn.execute("INSERT INTO profesores (id, nombre, usuario, password, email, activo) VALUES (?,?,?,?,?,?)",
+                     (1, 'Profesor Uno', 'profesor1', hash_pw('test123'), 'prof1@test.com', 1))
+    # Alumnos
+    cur = conn.execute("SELECT id FROM alumnos WHERE id=1")
+    if not cur.fetchone():
+        conn.execute("INSERT INTO alumnos (id, nombre, curso, jornada, activo) VALUES (?,?,?,?,?)",
+                     (1, 'Alumno Uno', 'Primero A', 'Mañana', 1))
+    cur = conn.execute("SELECT id FROM alumnos WHERE id=2")
+    if not cur.fetchone():
+        conn.execute("INSERT INTO alumnos (id, nombre, curso, jornada, activo) VALUES (?,?,?,?,?)",
+                     (2, 'Alumno Dos', 'Primero A', 'Mañana', 1))
+    cur = conn.execute("SELECT id FROM alumnos WHERE id=3")
+    if not cur.fetchone():
+        conn.execute("INSERT INTO alumnos (id, nombre, curso, jornada, activo) VALUES (?,?,?,?,?)",
+                     (3, 'Alumno Tres', 'Segundo A', 'Mañana', 1))
+    # Asignaciones curso
+    conn.execute('INSERT OR IGNORE INTO asignaciones_curso (profesor_id, materia, jornada, curso) VALUES (?, ?, ?, ?)',
+                 (1, 'Matemáticas', 'Mañana', 'Primero A'))
+    conn.execute('INSERT OR IGNORE INTO asignaciones_curso (profesor_id, materia, jornada, curso) VALUES (?, ?, ?, ?)',
+                 (1, 'Matemáticas', 'Mañana', 'Segundo A'))
+    # Periodos
+    conn.execute('INSERT OR IGNORE INTO periodos_estado (periodo, estado) VALUES (?, ?)', (1, 'abierto'))
+    # Actividades
+    conn.execute('INSERT OR IGNORE INTO actividades (id, profesor_id, materia, jornada, curso, nombre, orden, periodo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                 (1, 1, 'Matemáticas', 'Mañana', 'Primero A', 'Tarea 1', 1, 1))
+    conn.commit()
+    conn.close()
+
+seed_test_db()
 
 # ── Fixtures ──
 
@@ -34,6 +85,8 @@ def teacher_session(client):
     with client.session_transaction() as sess:
         sess['profesor_id_testcolegio'] = 1
         sess['rol_testcolegio'] = 'profesor'
+        sess['jornada_testcolegio'] = 'Mañana'
+        sess['materia_testcolegio'] = 'Matemáticas'
         sess['_csrf_token'] = 'pytest_csrf_token'
 
 @pytest.fixture
@@ -159,6 +212,19 @@ class TestRectorDashboard:
         r = client.get('/testcolegio/notificaciones/contar')
         assert r.status_code == 200
 
+# ── Teacher Pages (including attendance) ──
+
+class TestTeacherPages:
+    def test_teacher_dashboard(self, client, teacher_session):
+        r = client.get('/testcolegio/?curso=Primero+A&periodo=1', follow_redirects=True)
+        assert r.status_code == 200
+
+    def test_teacher_asistencia_page(self, client, teacher_session):
+        r = client.get('/testcolegio/asistencia?curso=Primero+A&fecha=2026-07-04')
+        assert r.status_code == 200
+        html = r.get_data(as_text=True)
+        assert 'Asistencia' in html
+
 # ── Admin Panel ──
 
 class TestAdmin:
@@ -233,15 +299,24 @@ class TestCRUD:
     def test_save_grade(self, client):
         with client.session_transaction() as sess:
             sess['profesor_id_testcolegio'] = 1
+            sess['jornada_testcolegio'] = 'Mañana'
+            sess['materia_testcolegio'] = 'Matemáticas'
             sess['_csrf_token'] = self.REUSED_CSRF
-        # This expects 204 (success, no content) or 404 (no activity exists)
         r = client.post('/testcolegio/guardar_nota', data={
             '_csrf_token': self.REUSED_CSRF,
             'actividad_id': '1',
             'aid': '1',
             'val': '4.5',
         })
-        assert r.status_code in (200, 204, 400, 403, 404, 423)
+        assert r.status_code == 200, f'Expected 200, got {r.status_code}: {r.get_data(as_text=True)}'
+        data = json.loads(r.get_data(as_text=True))
+        assert data['status'] == 'ok'
+        # Verify the grade was actually saved in the database
+        conn = sqlite3.connect(TEST_DB)
+        row = conn.execute('SELECT val FROM notas WHERE aid=1 AND actividad_id=1').fetchone()
+        conn.close()
+        assert row is not None, 'Grade was not saved in the database'
+        assert row[0] == 4.5
 
     def test_save_evaluation(self, client):
         with client.session_transaction() as sess:
@@ -254,7 +329,56 @@ class TestCRUD:
             'aid': '1',
             'evaluacion': '4.0',
         })
-        assert r.status_code in (200, 204, 400, 403, 423)
+        assert r.status_code == 200, f'Expected 200, got {r.status_code}: {r.get_data(as_text=True)}'
+        data = json.loads(r.get_data(as_text=True))
+        assert data['status'] == 'ok'
+        # Verify the evaluation was actually saved in the database
+        conn = sqlite3.connect(TEST_DB)
+        row = conn.execute(
+            'SELECT evaluacion FROM evaluaciones WHERE aid=1 AND profesor_id=1 AND materia="Matemáticas" AND jornada="Mañana" AND periodo=1'
+        ).fetchone()
+        conn.close()
+        assert row is not None, 'Evaluation was not saved in the database'
+        assert row[0] == 4.0
+
+    def test_save_attendance(self, client):
+        with client.session_transaction() as sess:
+            sess['profesor_id_testcolegio'] = 1
+            sess['jornada_testcolegio'] = 'Mañana'
+            sess['materia_testcolegio'] = 'Matemáticas'
+            sess['_csrf_token'] = self.REUSED_CSRF
+        r = client.post('/testcolegio/marcar_asistencia', data={
+            '_csrf_token': self.REUSED_CSRF,
+            'aid': '1',
+            'estado': 'P',
+        })
+        assert r.status_code == 200, f'Expected 200, got {r.status_code}: {r.get_data(as_text=True)}'
+        data = json.loads(r.get_data(as_text=True))
+        assert data['status'] == 'ok'
+
+    def test_save_attendance_with_fecha(self, client):
+        with client.session_transaction() as sess:
+            sess['profesor_id_testcolegio'] = 1
+            sess['jornada_testcolegio'] = 'Mañana'
+            sess['materia_testcolegio'] = 'Matemáticas'
+            sess['_csrf_token'] = self.REUSED_CSRF
+        r = client.post('/testcolegio/marcar_asistencia', data={
+            '_csrf_token': self.REUSED_CSRF,
+            'aid': '1',
+            'estado': 'A',
+            'fecha': '2026-06-15',
+        })
+        assert r.status_code == 200, f'Expected 200, got {r.status_code}: {r.get_data(as_text=True)}'
+        data = json.loads(r.get_data(as_text=True))
+        assert data['status'] == 'ok'
+        # Verify persisted
+        conn = sqlite3.connect(TEST_DB)
+        row = conn.execute(
+            'SELECT estado FROM asistencia WHERE aid=1 AND fecha="2026-06-15"'
+        ).fetchone()
+        conn.close()
+        assert row is not None, 'Attendance with fecha was not saved'
+        assert row[0] == 'A'
 
 # ── PDF Report Generation ──
 

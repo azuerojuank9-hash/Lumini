@@ -420,6 +420,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   <div class="sidebar-nav">
     <div class="sidebar-section">Navegación</div>
     <a href="/{{ slug }}/" class="sidebar-item active"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Notas</span></a>
+    <a href="/{{ slug }}/asistencia" class="sidebar-item"><span class="icon"><i data-lucide="users"></i></span><span>Asistencia</span></a>
     <a href="/{{ slug }}/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horario</span></a>
     <a href="/{{ slug }}/archivados" class="sidebar-item"><span class="icon"><i data-lucide="archive"></i></span><span>Archivados</span></a>
     <a href="/{{ slug }}/transferir_curso" class="sidebar-item"><span class="icon"><i data-lucide="refresh-cw"></i></span><span>Transferir</span></a>
@@ -1492,13 +1493,13 @@ function renderComunicaciones(){
         var c=COM_DATA[i];
         var pc=PRIO_COLORS[c.prioridad]||'#2563EB';
         var fecha=(c.fecha_publicacion||c.fecha_creacion||'').slice(0,10);
-        var contenido=(c.contenido||'').slice(0,120);
-        if(c.contenido&&c.contenido.length>120)contenido+='';
+        var contenido=escHtml((c.contenido||'').slice(0,120));
+        if(c.contenido&&c.contenido.length>120)contenido+='…';
         html+='<div class="schedule-item" style="flex-direction:column;align-items:stretch;gap:4px;padding:10px 0;">'
             +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">'
             +'<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">'
             +'<span style="width:8px;height:8px;border-radius:50%;background:'+pc+';flex-shrink:0;"></span>'
-            +'<span style="font-weight:600;font-size:13px;">'+c.titulo+'</span></div>'
+            +'<span style="font-weight:600;font-size:13px;">'+escHtml(c.titulo)+'</span></div>'
             +'<span style="font-size:10px;color:var(--muted);white-space:nowrap;">'+fecha+'</span></div>'
             +'<div style="font-size:12px;color:var(--muted);line-height:1.4;margin-left:16px;">'+contenido+'</div>'
             +'<div style="display:flex;gap:6px;margin-left:16px;margin-top:4px;">'
