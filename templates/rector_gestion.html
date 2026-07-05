@@ -5,7 +5,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestión de Rectores â€” {{ colegio.nombre if colegio else slug }}</title>
+<title>Gestión de Rectores — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
@@ -43,7 +43,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .rector-table{width:100%;border-collapse:collapse;}
-.rector-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.rector-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);vertical-align:middle;}
 .rector-table td{padding:12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .rector-table tr:last-child td{border-bottom:none;}
 .rector-table tr:hover td{background:rgba(var(--accent-rgb),.02);}
@@ -104,7 +104,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </nav>
 
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 
 <div class="topbar">
   <div class="topbar-left">
@@ -214,7 +214,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
           {% if rec.id == rector.id %}<span class="you-tag">(tú)</span>{% endif %}
         </td>
         <td style="color:var(--muted);font-size:12px;">{{ rec.usuario }}</td>
-        <td style="color:var(--sub);font-size:12px;">{{ rec.email or 'â€”' }}</td>
+        <td style="color:var(--sub);font-size:12px;">{{ rec.email or '—' }}</td>
         <td>
           {% if rec.es_principal %}
           <span class="principal-badge"><i data-lucide="crown"></i> Principal</span>
@@ -247,7 +247,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
             </form>
             {% endif %}
             {% else %}
-            <span style="color:var(--sub);font-size:11px;padding:5px 8px;">â€”</span>
+            <span style="color:var(--sub);font-size:11px;padding:5px 8px;">—</span>
             {% endif %}
           </div>
         </td>

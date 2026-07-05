@@ -7,7 +7,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Horarios â€” {{ colegio.nombre if colegio else slug }}</title>
+<title>Horarios — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--danger:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
@@ -34,7 +34,7 @@ h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:20px;box-shadow:var(--shadow);}
 .tabla-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
-th{padding:7px 5px;text-align:center;background:var(--bg2);border:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;}
+th{padding:7px 5px;text-align:center;background:var(--bg2);border:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;vertical-align:middle;}
 th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:2px;}
 th .ht{font-size:10px;color:var(--muted);}
 td{border:1px solid var(--border);vertical-align:middle;}
@@ -59,13 +59,13 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
 .inp{width:100%;padding:8px 10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;transition:border-color var(--tr),box-shadow var(--tr);}
 .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
 .btn-row{display:flex;gap:8px;margin-top:16px;}
-body .btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;flex:1;transition:all var(--tr);}
+body .btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;flex:1;display:inline-flex;align-items:center;gap:6px;justify-content:center;transition:all var(--tr);}
 body .btn:active{transform:scale(.97);}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.3);}
 .btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border);}
 .btn-ghost:hover{background:rgba(255,255,255,.08);}
-.btn-clear{background:rgba(239,68,68,.08);color:var(--danger);border:1px solid rgba(239,68,68,.2);flex:0;padding:10px 14px;}
+.btn-clear{background:rgba(239,68,68,.08);color:var(--danger);border:1px solid rgba(239,68,68,.2);flex:0;padding:8px 16px;}
 .btn-clear:hover{background:rgba(239,68,68,.18);}
 .toast{position:fixed;bottom:20px;right:20px;background:rgba(16,185,129,.95);color:#fff;padding:8px 14px;border-radius:var(--rmd);font-size:12px;font-weight:600;z-index:3000;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.3);}
 .toast.show{opacity:1;transform:translateY(0);}
@@ -103,7 +103,7 @@ body .btn:active{transform:scale(.97);}
     <nav class="sidebar-nav">
         <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
         <a href="/{{ slug }}/horarios" class="sidebar-link active"><span class="icon"><i data-lucide="calendar"></i></span> Horarios</a>
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>Ã¯Â¸</span> Mi Perfil</a>
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>️</span> Mi Perfil</a>
         <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon"><i data-lucide="archive"></i></span> Archivados</a>
     </nav>
     <div class="sidebar-footer">
@@ -114,7 +114,7 @@ body .btn:active{transform:scale(.97);}
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">Ã¢â€™Â°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 
   <h1><i data-lucide="calendar"></i> Horarios</h1>
   <p class="subtitle">Haz clic en cualquier celda para editar · Se guarda automáticamente</p>
@@ -131,13 +131,13 @@ body .btn:active{transform:scale(.97);}
         <thead>
           <tr>
             <th></th>
-            <th><span class="hl">1a Hora</span><span class="ht">6:10 â€“ 7:05</span></th>
-            <th><span class="hl">2a Hora</span><span class="ht">7:05 â€“ 8:00</span></th>
-            <th><span class="hl">3a Hora</span><span class="ht">8:00 â€“ 8:55</span></th>
-            <th><span class="hl">4a Hora</span><span class="ht">8:55 â€“ 9:50</span></th>
-            <th><span class="hl">Descanso</span><span class="ht">9:50 â€“ 10:20</span></th>
-            <th><span class="hl">5a Hora</span><span class="ht">10:20 â€“ 11:10</span></th>
-            <th><span class="hl">6a Hora</span><span class="ht">11:10 â€“ 12:00</span></th>
+            <th><span class="hl">1a Hora</span><span class="ht">6:10 – 7:05</span></th>
+            <th><span class="hl">2a Hora</span><span class="ht">7:05 – 8:00</span></th>
+            <th><span class="hl">3a Hora</span><span class="ht">8:00 – 8:55</span></th>
+            <th><span class="hl">4a Hora</span><span class="ht">8:55 – 9:50</span></th>
+            <th><span class="hl">Descanso</span><span class="ht">9:50 – 10:20</span></th>
+            <th><span class="hl">5a Hora</span><span class="ht">10:20 – 11:10</span></th>
+            <th><span class="hl">6a Hora</span><span class="ht">11:10 – 12:00</span></th>
           </tr>
         </thead>
         <tbody>
@@ -167,7 +167,7 @@ body .btn:active{transform:scale(.97);}
               </td>
             {% endfor %}
             {# Descanso #}
-            <td class="des-col">Ã¢â€™â€¢ Descanso</td>
+            <td class="des-col">Ã¢â€™• Descanso</td>
             {% for f in ['5','6'] %}
               {% set k = df ~ '_' ~ f %}
               {% set e = horario_map.get(k, {}) %}

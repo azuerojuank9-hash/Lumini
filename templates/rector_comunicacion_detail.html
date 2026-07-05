@@ -5,7 +5,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ com.titulo }} â€” {{ colegio.nombre if colegio else slug }}</title>
+<title>{{ com.titulo }} — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
@@ -108,11 +108,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </nav>
 
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 
 <div class="topbar">
   <h1>Detalle de comunicación</h1>
-  <div class="breadcrumb"><a href="/{{ slug }}/rector/comunicaciones" style="color:var(--accent);text-decoration:none;">Comunicaciones</a> · {{ com.titulo[:40] }}{% if com.titulo|length > 40 %}â€¦{% endif %}</div>
+  <div class="breadcrumb"><a href="/{{ slug }}/rector/comunicaciones" style="color:var(--accent);text-decoration:none;">Comunicaciones</a> · {{ com.titulo[:40] }}{% if com.titulo|length > 40 %}…{% endif %}</div>
 </div>
 
 <div class="card">

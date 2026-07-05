@@ -5,7 +5,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notificaciones â€” {{ colegio.nombre if colegio else slug }}</title>
+<title>Notificaciones — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);}
@@ -31,7 +31,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .notif-time{font-size:10px;color:var(--sub);margin-top:4px;}
 .notif-link{font-size:11px;color:var(--accent);text-decoration:none;margin-top:4px;display:inline-block;}
 .notif-link:hover{text-decoration:underline;}
-.mark-read{background:none;border:none;color:var(--sub);cursor:pointer;font-size:12px;padding:4px;transition:color var(--tr);flex-shrink:0;}
+.mark-read{background:none;border:none;color:var(--sub);cursor:pointer;font-size:12px;padding:4px;transition:color var(--tr);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;}
 .mark-read:hover{color:var(--accent);}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
 .empty-state .icon{font-size:48px;opacity:.2;margin-bottom:16px;color:var(--accent);}

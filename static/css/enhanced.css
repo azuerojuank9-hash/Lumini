@@ -367,6 +367,7 @@
   top: 0;
   font-weight: 700;
   z-index: 2;
+  vertical-align: middle;
 }
 .tw td {
   padding: 10px 12px;
@@ -672,12 +673,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: var(--rsm);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   font-family: 'Inter', sans-serif;
   cursor: pointer;
+  min-height: 36px;
   border: none;
   background: var(--bg3);
   color: var(--text);
@@ -841,5 +843,12 @@
   border-radius: var(--rlg);
   background: var(--bg2);
 }
+
+/* ── Lucide icon vertical alignment ─────────────────────────────────── */
+i[data-lucide] { vertical-align: middle; }
+
+/* ── Misc button alignment ─────────────────────────────────────────── */
+.back, .back-link, .volver { display: inline-flex; align-items: center; gap: 6px; }
+.logout-link { display: inline-flex; align-items: center; gap: 6px; justify-content: center; }
 
 

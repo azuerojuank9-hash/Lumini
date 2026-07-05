@@ -373,7 +373,10 @@ class TestCSRF:
 # ── Rendered HTML Quality ──
 
 class TestHTMLQuality:
-    MOJIBAKE_PATTERNS = ['Ã¡', 'Ã©', 'Ã­', 'Ã³', 'Ãº', 'Ã±', 'Â¿', 'Â·', 'Â«', 'Â»']
+    MOJIBAKE_PATTERNS = [
+        'Ã¡', 'Ã©', 'Ã­', 'Ã³', 'Ãº', 'Ã±', 'Â¿', 'Â·', 'Â«', 'Â»',
+        'Ã¢â€™Â°', 'Ã¯Â¸', 'Ã¢â€”', 'Ã¢Â¸',
+    ]
 
     @pytest.mark.parametrize('path', [
         '/testcolegio/rector',

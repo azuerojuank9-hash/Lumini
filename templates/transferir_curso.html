@@ -6,7 +6,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini â€” Transferir Curso</title>
+<title>Lumini — Transferir Curso</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
@@ -41,10 +41,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .periodo-check input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;}
 .periodo-check span{font-size:13px;font-weight:500;}
 .periodo-check.checked{border-color:var(--accent);background:rgba(var(--accent-rgb),.06);}
-.btn-submit{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;min-height:48px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);margin-top:4px;}
+.btn-submit{width:100%;padding:8px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);margin-top:4px;}
 .btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(var(--accent-rgb),.3);}
 .btn-submit:active{transform:scale(.98);}
-.btn-back{display:block;width:100%;padding:11px;background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;text-align:center;text-decoration:none;margin-top:10px;transition:background var(--tr);}
+.btn-back{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 16px;background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;margin-top:10px;transition:background var(--tr);}
 .btn-back:hover{background:rgba(255,255,255,.08);}
 .alert{padding:12px 16px;border-radius:var(--rsm);font-size:13px;margin-bottom:18px;line-height:1.5;}
 .alert-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red);}
@@ -61,8 +61,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .hamburger:hover{background:var(--bg3);border-color:var(--accent);}
 .sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);}
 @media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 24px;}}
-@media(max-width:480px){.card-body{padding:12px 14px;}.card-head{padding:10px 14px;}.field select,.field input{font-size:15px;padding:10px 12px;}.btn-submit{font-size:14px;min-height:44px;padding:11px;}.periodo-check{padding:7px 10px;}.periodo-check span{font-size:12px;}.main{padding:20px 24px;}.page-title{font-size:1.1rem;}}
-@media(max-width:375px){.card-body{padding:12px 14px;}.field label{font-size:9px;}.field select,.field input{font-size:14px;padding:8px 10px;}.btn-submit{font-size:13px;min-height:42px;padding:10px;}.btn-back{font-size:13px;padding:10px;}}
+@media(max-width:480px){.card-body{padding:12px 14px;}.card-head{padding:10px 14px;}.field select,.field input{font-size:15px;padding:10px 12px;}.btn-submit{font-size:13px;min-height:36px;padding:8px 16px;}.periodo-check{padding:7px 10px;}.periodo-check span{font-size:12px;}.main{padding:20px 24px;}.page-title{font-size:1.1rem;}}
+@media(max-width:375px){.card-body{padding:12px 14px;}.field label{font-size:9px;}.field select,.field input{font-size:14px;padding:8px 10px;}.btn-submit{font-size:13px;min-height:36px;padding:8px 16px;}.btn-back{font-size:13px;min-height:36px;padding:8px 16px;}}
 </style>
   <link rel="stylesheet" href="/static/css/lumini.css">
 <link rel="stylesheet" href="/static/css/enhanced.css">
@@ -89,7 +89,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <nav class="sidebar-nav">
         <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
         <a href="/{{ slug }}/horarios" class="sidebar-link"><span class="icon"><i data-lucide="calendar"></i></span> Horarios</a>
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>Ã¯Â¸</span> Mi Perfil</a>
+        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>️</span> Mi Perfil</a>
         <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon"><i data-lucide="archive"></i></span> Archivados</a>
     </nav>
     <div class="sidebar-footer">
@@ -100,7 +100,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">Ã¢â€™Â°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 
     <div class="page-title"><i data-lucide="refresh-cw"></i> Transferir Curso</div>
     <p class="page-sub">Pasa el historial completo de un curso a otro profesor de la misma materia</p>
@@ -109,7 +109,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         {% if '<i data-lucide="check-circle"></i>' in error %}
         <div class="alert alert-success">{{ error }}</div>
         {% else %}
-        <div class="alert alert-error"><i data-lucide="alert-triangle"></i>Ã¯Â¸ {{ error }}</div>
+        <div class="alert alert-error"><i data-lucide="alert-triangle"></i>️ {{ error }}</div>
         {% endif %}
     {% endif %}
     {% if exito %}
@@ -117,14 +117,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     {% endif %}
 
     <div class="info-badge">
-        <i data-lucide="book-open"></i> Materia: <strong>{{ materia }}</strong> &nbsp;·&nbsp; â€¢ Jornada: <strong>{{ jornada }}</strong>
+        <i data-lucide="book-open"></i> Materia: <strong>{{ materia }}</strong> &nbsp;·&nbsp; • Jornada: <strong>{{ jornada }}</strong>
     </div>
 
     {% if not profesores_destino %}
     <div class="card">
         <div class="card-body">
             <div class="empty-state">
-                <div class="icon">ðŸ‘¥</div>
+                <div class="icon">👥</div>
                 <p>No hay otros profesores activos con la materia <strong>{{ materia }}</strong> en la jornada <strong>{{ jornada }}</strong> para recibir el curso.<br><br>El nuevo profesor debe registrarse primero y tener esta materia asignada.</p>
             </div>
         </div>
@@ -143,7 +143,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     {% else %}
 
     <div class="card">
-        <div class="card-head"><span class="card-title"><i data-lucide="info"></i>Ã¯Â¸ ¿Cómo funciona?</span></div>
+        <div class="card-head"><span class="card-title"><i data-lucide="info"></i>️ ¿Cómo funciona?</span></div>
         <div class="card-body">
             <div class="step"><div class="step-num">1</div><div class="step-text">Selecciona el <strong>curso</strong> que quieres transferir y el <strong>profesor</strong> que lo recibirá.</div></div>
             <div class="step"><div class="step-num">2</div><div class="step-text">Elige los <strong>periodos</strong> cuyas actividades, notas y evaluaciones quieres pasar al nuevo profesor.</div></div>
@@ -196,7 +196,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
                 </div>
 
                 <div class="alert alert-warn" style="margin-bottom:16px;">
-                    <i data-lucide="alert-triangle"></i>Ã¯Â¸ Esta acción <strong>no se puede deshacer</strong>. Todas las actividades, notas y evaluaciones de los periodos seleccionados quedarán bajo el nuevo profesor.
+                    <i data-lucide="alert-triangle"></i>️ Esta acción <strong>no se puede deshacer</strong>. Todas las actividades, notas y evaluaciones de los periodos seleccionados quedarán bajo el nuevo profesor.
                 </div>
 
                 <button type="submit" class="btn-submit" onclick="return confirmarTransferencia()">

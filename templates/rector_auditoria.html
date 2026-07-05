@@ -5,7 +5,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Auditoría â€” {{ colegio.nombre if colegio else slug }}</title>
+<title>Auditoría — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
@@ -34,8 +34,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
-th{text-align:left;padding:10px 8px;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);}
-td{padding:8px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;}
+th{text-align:left;padding:10px 8px;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);vertical-align:middle;}
+td{padding:8px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
 tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
 .badge-create{background:rgba(34,197,94,.12);color:var(--green);}
@@ -102,7 +102,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   </div>
 </nav>
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 <div class="topbar">
   <h1><i data-lucide="clock-rewind" style="color:var(--accent);"></i> Auditoría</h1>
   <div class="breadcrumb">Registro de cambios y accesos al sistema</div>
@@ -155,13 +155,13 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
           {% if r.valor_anterior and r.valor_nuevo %}
           <div class="val-diff">
             <span style="color:var(--red);"><code>{{ r.valor_anterior[:60] }}</code></span>
-            <span style="color:var(--sub);"> â†’ </span>
+            <span style="color:var(--sub);"> → </span>
             <span style="color:var(--green);"><code>{{ r.valor_nuevo[:60] }}</code></span>
           </div>
           {% elif r.valor_nuevo %}
           <div class="val-diff"><code>{{ r.valor_nuevo[:80] }}</code></div>
           {% else %}
-          <span style="color:var(--sub);">â€”</span>
+          <span style="color:var(--sub);">—</span>
           {% endif %}
         </td>
         <td style="font-family:monospace;font-size:11px;color:var(--sub);">{{ r.ip or '-' }}</td>
@@ -177,7 +177,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     <div class="pagination">
     <span class="info">Página {{ page }} de {{ total_pages }}</span>
     {% if page > 1 %}
-    <a href="?page={{ page - 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">â€¹ Anterior</a>
+    <a href="?page={{ page - 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">‹ Anterior</a>
     {% endif %}
     {% for p in range(1, total_pages + 1) %}
       {% if p == page %}
@@ -185,11 +185,11 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
       {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
       <a href="?page={{ p }}{% if tabla %}&tabla={{ tabla }}{% endif %}">{{ p }}</a>
       {% elif p == page - 3 or p == page + 3 %}
-      <span style="color:var(--sub);">â€¦</span>
+      <span style="color:var(--sub);">…</span>
       {% endif %}
     {% endfor %}
     {% if page < total_pages %}
-    <a href="?page={{ page + 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">Siguiente â€º</a>
+    <a href="?page={{ page + 1 }}{% if tabla %}&tabla={{ tabla }}{% endif %}">Siguiente ›</a>
     {% endif %}
   </div>
 </div>

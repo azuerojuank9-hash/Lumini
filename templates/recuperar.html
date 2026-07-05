@@ -36,7 +36,7 @@
         .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
         .field input::placeholder{color:var(--sub);}
         .pregunta-box{background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--rsm);padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--text);line-height:1.5;}
-        .btn-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;min-height:48px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);display:block;text-align:center;text-decoration:none;}
+        .btn-submit{width:100%;padding:8px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);text-decoration:none;}
         .btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(var(--accent-rgb),.3);}
         .btn-submit:active{transform:scale(.98);}
         .alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
@@ -46,10 +46,10 @@
         .back-link:hover{color:var(--accent);}
         .pass-wrapper{position:relative;}
         .pass-wrapper input{padding-right:2.5rem;}
-        .toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:1.1rem;transition:color var(--tr);}
+        .toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:1.1rem;transition:color var(--tr);display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;}
         .toggle-pass:hover{color:var(--accent);}
         @media(max-width:480px){.card{padding:24px 18px;}.logo-wrap img{height:72px;width:72px;}.brand{font-size:1.3rem;letter-spacing:4px;}}
-        @media(max-width:375px){.card{padding:18px 14px;}.logo-wrap img{height:60px;width:60px;}.brand{font-size:1.1rem;letter-spacing:2px;}.card-title{font-size:1rem;}.field input{font-size:15px;padding:10px 12px;}.btn-submit{font-size:14px;min-height:44px;padding:10px;}}
+        @media(max-width:375px){.card{padding:18px 14px;}.logo-wrap img{height:60px;width:60px;}.brand{font-size:1.1rem;letter-spacing:2px;}.card-title{font-size:1rem;}.field input{font-size:15px;padding:10px 12px;}.btn-submit{font-size:13px;min-height:36px;padding:8px 16px;}}
     </style>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <body>

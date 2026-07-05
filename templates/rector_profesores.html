@@ -5,7 +5,7 @@
 
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profesores â€” {{ colegio.nombre if colegio else slug }}</title>
+<title>Profesores — {{ colegio.nombre if colegio else slug }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
@@ -34,8 +34,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
 .prof-table{width:100%;border-collapse:collapse;}
-.prof-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);}
-.prof-table td{padding:12px;font-size:13px;border-bottom:1px solid var(--border);}
+.prof-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);vertical-align:middle;}
+.prof-table td{padding:12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .prof-table tr:last-child td{border-bottom:none;}
 .prof-table tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
@@ -95,7 +95,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </nav>
 <div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â˜°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
 <div class="topbar">
   <h1><i data-lucide="presentation" style="color:var(--accent);"></i> Profesores</h1>
   <div class="breadcrumb">Listado de docentes de la institución</div>

@@ -163,7 +163,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 table{width:100%;border-collapse:collapse;font-size:12px;}
 
-th{padding:8px;text-align:center;background:#0F172A;border:1px solid #1E293B;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;}
+th{padding:8px;text-align:center;background:#0F172A;border:1px solid #1E293B;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);white-space:nowrap;vertical-align:middle;}
 
 th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:1px;}
 
@@ -232,7 +232,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 .canales-chat{flex:1;display:flex;flex-direction:column;height:100%;}
 .canal-chat-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
 .canal-chat-title{font-size:14px;font-weight:700;color:var(--text);flex:1;}
-.canal-chat-back{padding:4px 8px;border:none;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--muted);font-family:'Inter',sans-serif;transition:all var(--tr);}
+.canal-chat-back{padding:4px 8px;border:none;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--muted);font-family:'Inter',sans-serif;transition:all var(--tr);display:inline-flex;align-items:center;gap:4px;}
 .canal-chat-back:hover{background:var(--bg4);color:var(--text);}
 .canal-mensajes{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:6px;}
 .canal-msg{display:flex;flex-direction:column;max-width:75%;}
@@ -277,7 +277,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 .msg-reply-ref-autor{font-weight:600;color:var(--accent);font-size:10px;}
 .msg-reply-ref-texto{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .canal-reply-bar{font-size:11px;color:var(--muted);}
-.canal-hdr-btn{border-radius:4px;transition:all var(--tr);}
+.canal-hdr-btn{border-radius:4px;transition:all var(--tr);display:inline-flex;align-items:center;gap:4px;}
 .canal-hdr-btn:hover{background:var(--bg3);color:var(--text) !important;}
 .canal-file-label:hover{color:var(--accent) !important;}
 .canal-msg .canal-msg-texto[contenteditable]{outline:2px solid var(--accent);background:var(--bg2);color:var(--text) !important;}
@@ -285,7 +285,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 .canal-input-area{display:flex;gap:6px;padding:8px 14px;border-top:1px solid var(--border);}
 .canal-input{flex:1;padding:7px 10px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;transition:all var(--tr);}
 .canal-input:focus{outline:none;border-color:var(--accent);}
-.canal-send-btn{padding:7px 12px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;font-family:'Inter',sans-serif;transition:all var(--tr);}
+.canal-send-btn{padding:7px 12px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;font-family:'Inter',sans-serif;transition:all var(--tr);display:inline-flex;align-items:center;gap:4px;}
 .canal-send-btn:hover{background:var(--accent2);}
 .com-toast{position:fixed;top:16px;right:16px;z-index:99999;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rsm);padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;align-items:flex-start;gap:12px;max-width:360px;opacity:0;transform:translateY(-16px);transition:all .3s ease;pointer-events:none;cursor:pointer;}
 .com-toast.show{opacity:1;transform:translateY(0);pointer-events:auto;}
@@ -1586,7 +1586,7 @@ function scrollToSection(id){
 </div>
 <div id="estComModalContent" style="padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;white-space:pre-wrap;color:var(--text);margin-bottom:14px;"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-<button onclick="var b=document.getElementById('estComModalLeerBtn');marcarLeido(parseInt(b.getAttribute('data-cid')),b);estCerrarComunicado();" id="estComModalLeerBtn" style="padding:8px 14px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;"><i data-lucide="check"></i> Marcar como le&iacute;do</button>
+<button onclick="var b=document.getElementById('estComModalLeerBtn');marcarLeido(parseInt(b.getAttribute('data-cid')),b);estCerrarComunicado();" id="estComModalLeerBtn" style="padding:8px 14px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px;"><i data-lucide="check"></i> Marcar como le&iacute;do</button>
 <button onclick="estCerrarComunicado()" style="padding:8px 14px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--muted);font-family:'Inter',sans-serif;">Cerrar</button>
 </div>
 </div>

@@ -6,7 +6,7 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini â€” Códigos de invitación</title>
+<title>Lumini — Códigos de invitación</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 3px rgba(0,0,0,.15);--sidebar:200px;}
@@ -43,12 +43,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .codigo-box input:focus{outline:none;border-color:var(--accent);}
 .pass-wrap{position:relative;}
 .pass-wrap input{padding-right:2.5rem;}
-.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:16px;transition:color var(--tr);}
+.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:16px;transition:color var(--tr);display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;}
 .eye-btn:hover{color:var(--accent);}
 .alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
 .alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);}
 .alert-success{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);color:var(--green);}
-body .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all var(--tr);text-decoration:none;}
+body .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;border:none;transition:all var(--tr);text-decoration:none;}
 .btn-primary{background:var(--accent);color:#fff;}
 .btn-primary:hover{background:var(--accent2);box-shadow:0 4px 12px rgba(var(--accent-rgb),.3);}
 .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
@@ -57,7 +57,7 @@ body .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border
 .btn-green:hover{background:rgba(16,185,129,.25);}
 .btn-yellow{background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.25);}
 .btn-yellow:hover{background:rgba(245,158,11,.25);}
-.btn-sm{padding:5px 10px;font-size:11px;}
+.btn-sm{padding:8px 16px;font-size:13px;min-height:36px;}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 .hint{font-size:11px;color:var(--sub);margin-top:4px;}
@@ -107,7 +107,7 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
                 <div class="field">
                     <label>Colegio</label>
                     <select name="slug" onchange="this.form.submit()">
-                        <option value="">â€” Selecciona un colegio â€”</option>
+                        <option value="">— Selecciona un colegio —</option>
                         {% for c in colegios %}
                         <option value="{{ c.slug }}" {% if colegio and colegio.slug == c.slug %}selected{% endif %}>
                             {{ c.nombre }} ({{ c.slug }})
@@ -207,15 +207,15 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
             <div class="grid-3">
                 <div>
                     <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Profesores</span>
-                    <pre class="code-display">{{ colegio.codigo_profesores or colegio.codigo_registro or '(vacío â€” registro libre)' }}</pre>
+                    <pre class="code-display">{{ colegio.codigo_profesores or colegio.codigo_registro or '(vacío — registro libre)' }}</pre>
                 </div>
                 <div>
                     <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Directoras</span>
-                    <pre class="code-display">{{ colegio.codigo_directoras or colegio.codigo_registro or '(vacío â€” registro libre)' }}</pre>
+                    <pre class="code-display">{{ colegio.codigo_directoras or colegio.codigo_registro or '(vacío — registro libre)' }}</pre>
                 </div>
                 <div>
                     <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Rectores</span>
-                    <pre class="code-display">{{ colegio.codigo_rectores or colegio.codigo_registro or '(vacío â€” registro libre)' }}</pre>
+                    <pre class="code-display">{{ colegio.codigo_rectores or colegio.codigo_registro or '(vacío — registro libre)' }}</pre>
                 </div>
             </div>
             <p class="hint" style="margin-top:8px;">
