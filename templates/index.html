@@ -912,16 +912,19 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                 {% for act in actividades %}
                 <td class="{% if periodo_cerrado %}td-locked{% endif %}">
                     {% set nota = e.notas_map.get(act.id) %}
+                    <div class="ni-wrap">
                     <input class="ni nota-input" type="number" min="0" max="5" step="0.1"
                            value="{{ nota.val if nota else '' }}" placeholder=""
                            data-aid="{{ e.id }}" data-actid="{{ act.id }}"
                            {% if periodo_cerrado %}disabled{% endif %}
-                           onchange="guardarNota(this)">
+                           oninput="autoSaveNotaDebounced(this)">
+                    <span class="save-indicator"></span>
+                    </div>
                     {% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},{{ act.id }},{{ nota.val if nota else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','{{ act.nombre|replace("'", "\\'") }}')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}
                 </td>
                 {% endfor %}
-                <td class="{% if periodo_cerrado %}td-locked{% endif %}"><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="" data-aid="{{ e.id }}" data-campo="evaluacion" {% if periodo_cerrado %}disabled{% endif %} onchange="guardarEval(this)">{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.evaluacion if e.evaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Evaluación')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
-                <td class="{% if periodo_cerrado %}td-locked{% endif %}"><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="" data-aid="{{ e.id }}" data-campo="autoevaluacion" {% if periodo_cerrado %}disabled{% endif %} onchange="guardarEval(this)">{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.autoevaluacion if e.autoevaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Autoevaluación')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
+                <td class="{% if periodo_cerrado %}td-locked{% endif %}"><div class="ni-wrap"><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="" data-aid="{{ e.id }}" data-campo="evaluacion" {% if periodo_cerrado %}disabled{% endif %} oninput="autoSaveEvalDebounced(this)"><span class="save-indicator"></span></div>{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.evaluacion if e.evaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Evaluación')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
+                <td class="{% if periodo_cerrado %}td-locked{% endif %}"><div class="ni-wrap"><input class="ni eval-input" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="" data-aid="{{ e.id }}" data-campo="autoevaluacion" {% if periodo_cerrado %}disabled{% endif %} oninput="autoSaveEvalDebounced(this)"><span class="save-indicator"></span></div>{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.autoevaluacion if e.autoevaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Autoevaluación')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
                 <td class="pc prom-cell" id="prom-{{ e.id }}">
                     <span class="{% if e.promedio is not none and e.promedio>=3.5 %}ph{% elif e.promedio is not none and e.promedio>=3.0 %}pm{% elif e.promedio is not none %}pb{% endif %}">
                         {{ e.promedio if e.promedio is not none else '' }}
@@ -1008,8 +1011,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     <p style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Observaciones</p>
     <div id="mObsList"></div>
     <div class="oform">
-        <input type="text" id="oTexto" placeholder="Escribir observación...">
-        <button class="bsm badd" onclick="guardarObs()">Guardar</button>
+        <input type="text" id="oTexto" placeholder="Escribir observación..." oninput="autoSaveObsDebounced()">
+        <span class="save-indicator" id="obs-indicator"></span>
     </div>
 </div>
 </div>
@@ -1076,72 +1079,158 @@ function showToast(msg){
     setTimeout(function(){ t.classList.remove('show'); }, 1800);
 }
 
-function recalcularProm(aid){
-    const row = document.querySelector('tr[data-aid="'+aid+'"]');
-    if(!row) return;
-    const vals = [];
-    row.querySelectorAll('.nota-input, .eval-input').forEach(function(inp){
-        const v = parseFloat(inp.value);
-        if(!isNaN(v)) vals.push(v);
-    });
-    const cell = document.getElementById('prom-' + aid);
-    if(!cell) return;
-    if(vals.length === 0){
-        cell.innerHTML = '<span style="color:var(--muted)"></span>';
-        return;
+function updateIndicator(el, state){
+    const wrap = el.closest('.ni-wrap');
+    if(!wrap) return;
+    const ind = wrap.querySelector('.save-indicator');
+    if(!ind) return;
+    ind.className = 'save-indicator';
+    if(state === 'saving'){
+        ind.classList.add('saving');
+        ind.textContent = '\uD83D\uDFE1 Guardando...';
+    } else if(state === 'saved'){
+        ind.classList.add('saved');
+        ind.textContent = '\uD83D\uDFE2 Guardado';
+        setTimeout(function(){ if(ind.classList.contains('saved')){ ind.textContent = ''; ind.classList.remove('saved'); } }, 2000);
+    } else if(state === 'error'){
+        ind.classList.add('error');
+        ind.textContent = '\uD83D\uDD34 Error';
+        setTimeout(function(){ if(ind.classList.contains('error')){ ind.textContent = ''; ind.classList.remove('error'); } }, 4000);
+    } else {
+        ind.textContent = '';
     }
-    const prom = (vals.reduce(function(a,b){return a+b;},0) / vals.length).toFixed(2);
-    const cls = prom >= 3.5 ? 'ph' : prom >= 3.0 ? 'pm' : 'pb';
-    cell.innerHTML = '<span class="'+cls+'">'+prom+'</span>';
 }
 
-function guardarNota(inp){
-    const val = inp.value;
-    if(val === '') return;
+function validarNota(val){
+    if(val === '' || val === null || val === undefined) return {ok:false, msg:''};
+    const n = parseFloat(val);
+    if(isNaN(n)) return {ok:false, msg:'Solo números'};
+    if(n < 0 || n > 5) return {ok:false, msg:'0.0 – 5.0'};
+    if(val.indexOf('.') !== -1 && val.split('.')[1].length > 1) return {ok:false, msg:'Máx. 1 decimal'};
+    return {ok:true, val:n};
+}
+
+function calcularPromPonderado(aid){
+    const row = document.querySelector('tr[data-aid="'+aid+'"]');
+    if(!row) return null;
+    const notas = [];
+    row.querySelectorAll('.nota-input').forEach(function(inp){
+        const v = parseFloat(inp.value);
+        if(!isNaN(v)) notas.push(v);
+    });
+    const evalInp = row.querySelector('.eval-input[data-campo="evaluacion"]');
+    const autoInp = row.querySelector('.eval-input[data-campo="autoevaluacion"]');
+    const evalV = evalInp ? parseFloat(evalInp.value) : NaN;
+    const autoV = autoInp ? parseFloat(autoInp.value) : NaN;
+    const actProm = notas.length ? (notas.reduce(function(a,b){return a+b;},0) / notas.length) : null;
+    const hasEval = !isNaN(evalV);
+    const hasAuto = !isNaN(autoV);
+    let total = 0, weighted = 0;
+    if(actProm !== null){ weighted += actProm * 0.65; total += 0.65; }
+    if(hasEval){ weighted += evalV * 0.25; total += 0.25; }
+    if(hasAuto){ weighted += autoV * 0.10; total += 0.10; }
+    return total > 0 ? (weighted / total) : null;
+}
+
+function actualizarPromedio(aid){
+    const cell = document.getElementById('prom-' + aid);
+    if(!cell) return;
+    const prom = calcularPromPonderado(aid);
+    if(prom === null){
+        cell.innerHTML = '<span style="color:var(--muted)">\u0097</span>';
+        return;
+    }
+    const v = prom.toFixed(2);
+    const cls = v >= 3.5 ? 'ph' : v >= 3.0 ? 'pm' : 'pb';
+    cell.innerHTML = '<span class="'+cls+'">'+v+'</span>';
+}
+
+function actualizarStatsCurso(data){
+    if(!data) return;
+    if(data.promedio_curso !== undefined && data.promedio_curso !== null){
+        const el = document.querySelector('.info-value:first-child');
+        if(el){
+            const v = parseFloat(data.promedio_curso).toFixed(2);
+            el.textContent = v;
+            el.style.color = v >= 3.5 ? 'var(--green)' : v >= 3.0 ? 'var(--yellow)' : 'var(--red)';
+        }
+    }
+    if(data.notas_pendientes !== undefined){
+        const el = document.querySelectorAll('.info-value')[1];
+        if(el) el.textContent = data.notas_pendientes;
+    }
+}
+
+function debounce(fn, wait){
+    var timer = null;
+    return function(){
+        var ctx = this, args = arguments;
+        if(timer) clearTimeout(timer);
+        timer = setTimeout(function(){ fn.apply(ctx, args); timer = null; }, wait);
+    };
+}
+
+function autoSaveNota(inp){
+    const v = validarNota(inp.value);
+    if(!v.ok && v.msg){
+        updateIndicator(inp, '');
+        return;
+    }
+    if(inp.value === '' || inp.value === null || inp.value === undefined) return;
+    updateIndicator(inp, 'saving');
     const aid   = inp.dataset.aid;
     const actId = inp.dataset.actid;
     const f = new FormData();
     f.append('aid', aid);
     f.append('actividad_id', actId);
-    f.append('val', val);
+    f.append('val', v.ok ? v.val : inp.value);
+    f.append('curso', cursoSel);
     f.append('_csrf_token', getCsrf());
     fetch('/'+slug+'/guardar_nota', {method:'POST', body:f})
         .then(function(r){
-            if(r.ok){
-                inp.classList.add('guardado');
-                setTimeout(function(){ inp.classList.remove('guardado'); }, 1000);
-                showToast('<i data-lucide="check-circle"></i> Nota guardada');
-                recalcularProm(aid);
-            } else {
-                showToast('? Error al guardar nota');
-            }
+            if(!r.ok){ updateIndicator(inp, 'error'); return null; }
+            return r.json();
         })
-        .catch(function(){ showToast('? Error de conexión'); });
+        .then(function(data){
+            if(!data) return;
+            updateIndicator(inp, 'saved');
+            actualizarPromedio(aid);
+            actualizarStatsCurso(data);
+        })
+        .catch(function(){ updateIndicator(inp, 'error'); });
 }
+var autoSaveNotaDebounced = debounce(function(inp){ autoSaveNota(inp); }, 500);
 
-function guardarEval(inp){
-    const val   = inp.value;
-    if(val === '') return;
+function autoSaveEval(inp){
+    const v = validarNota(inp.value);
+    if(!v.ok && v.msg){
+        updateIndicator(inp, '');
+        return;
+    }
+    if(inp.value === '' || inp.value === null || inp.value === undefined) return;
+    updateIndicator(inp, 'saving');
     const aid   = inp.dataset.aid;
     const campo = inp.dataset.campo;
     const f = new FormData();
     f.append('aid', aid);
-    f.append(campo, val);
+    f.append(campo, v.ok ? v.val : inp.value);
     f.append('periodo', periodoSel);
+    f.append('curso', cursoSel);
     f.append('_csrf_token', getCsrf());
     fetch('/'+slug+'/guardar_evaluacion', {method:'POST', body:f})
         .then(function(r){
-            if(r.ok){
-                inp.classList.add('guardado');
-                setTimeout(function(){ inp.classList.remove('guardado'); }, 1000);
-                showToast('<i data-lucide="check-circle"></i> Guardado');
-                recalcularProm(aid);
-            } else {
-                showToast('? Error al guardar');
-            }
+            if(!r.ok){ updateIndicator(inp, 'error'); return null; }
+            return r.json();
         })
-        .catch(function(){ showToast('? Error de conexión'); });
+        .then(function(data){
+            if(!data) return;
+            updateIndicator(inp, 'saved');
+            actualizarPromedio(aid);
+            actualizarStatsCurso(data);
+        })
+        .catch(function(){ updateIndicator(inp, 'error'); });
 }
+var autoSaveEvalDebounced = debounce(function(inp){ autoSaveEval(inp); }, 500);
 
 function marcarAsist(aid, estado){
     const f = new FormData();
@@ -1250,6 +1339,39 @@ function guardarObs(){
         })
         .catch(function(){ showToast('? Error de conexión'); });
 }
+
+var autoSaveObsDebounced = debounce(function(){
+    const inp = document.getElementById('oTexto');
+    if(!inp) return;
+    const texto = inp.value.trim();
+    const ind = document.getElementById('obs-indicator');
+    if(!texto || !_aidObs){ if(ind) ind.textContent = ''; return; }
+    if(ind){ ind.className = 'save-indicator saving'; ind.textContent = '\uD83D\uDFE1 Guardando...'; }
+    const f = new FormData();
+    f.append('aid', _aidObs);
+    f.append('texto', texto);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/agregar_observacion', {method:'POST', body:f})
+        .then(function(r){
+            if(!r.ok){ if(ind){ ind.className = 'save-indicator error'; ind.textContent = '\uD83D\uDD34 Error'; } return null; }
+            return r.json();
+        })
+        .then(function(o){
+            if(!o) return;
+            ED[_aidObs].observaciones.unshift(o);
+            inp.value = '';
+            renderObs(_aidObs);
+            const btns = document.querySelectorAll('tr[data-aid="'+_aidObs+'"] button');
+            btns.forEach(function(b){
+                if(b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('abrirObs') === 0){
+                    b.textContent = ED[_aidObs].observaciones.length;
+                }
+            });
+            if(ind){ ind.className = 'save-indicator saved'; ind.textContent = '\uD83D\uDFE2 Guardado'; }
+            setTimeout(function(){ if(ind) ind.textContent = ''; }, 2000);
+        })
+        .catch(function(){ if(ind){ ind.className = 'save-indicator error'; ind.textContent = '\uD83D\uDD34 Error'; } });
+}, 500);
 
 function borrarObs(aid, obsId, btn){
     if(!confirm('¿Borrar esta observación?')) return;

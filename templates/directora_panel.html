@@ -221,7 +221,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
             <div class="sidebar-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
 
-            <div class="sidebar-brand-sub">👩â€💼 {{ directora.nombre }} · Curso {{ curso }} · {{ jornada }}</div>
+            <div class="sidebar-brand-sub"><i data-lucide="user-tie"></i> {{ directora.nombre }} · Curso {{ curso }} · {{ jornada }}</div>
 
         </div>
 
@@ -253,7 +253,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
 <div class="main">
 
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">â’°</button>
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú"><i data-lucide="menu"></i></button>
 
     <div class="periodo-tabs">
 
@@ -606,7 +606,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
 
-            <h3 style="font-size:15px;">👩â€💼 Crear cuenta de directora</h3>
+            <h3 style="font-size:15px;"><i data-lucide="user"></i> Crear cuenta de directora</h3>
 
             <button onclick="cerrarModalRegistro()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
 

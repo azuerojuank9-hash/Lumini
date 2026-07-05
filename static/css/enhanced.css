@@ -851,4 +851,16 @@ i[data-lucide] { vertical-align: middle; }
 .back, .back-link, .volver { display: inline-flex; align-items: center; gap: 6px; }
 .logout-link { display: inline-flex; align-items: center; gap: 6px; justify-content: center; }
 
+/* ── Auto-save indicator ──────────────────────────────────────────── */
+.save-indicator {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; white-space: nowrap;
+  margin-left: 4px; vertical-align: middle;
+  transition: opacity .25s ease;
+}
+.save-indicator.saving { color: var(--yellow, #eab308); }
+.save-indicator.saved  { color: var(--green, #22c55e); }
+.save-indicator.error  { color: var(--red,   #ef4444); }
+.ni-wrap { display: inline-flex; align-items: center; position: relative; }
+
 

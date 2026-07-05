@@ -119,7 +119,7 @@
             </div>
             <button type="submit" class="btn-submit">Ingresar <i data-lucide="arrow-right"></i></button>
         </form>
-        <a class="forgot-link" onclick="switchTabById('recuperar');return false;">¿Olvidaste tu contraseña?</a>
+        <a href="#" class="forgot-link" onclick="switchTabById('recuperar');return false;">¿Olvidaste tu contraseña?</a>
     </div>
 
     <div id="tab-registro" class="section">
@@ -269,7 +269,7 @@ function switchTabById(tab){ switchTab(tab, document.getElementById('btn-'+tab))
 function togglePass(btn){
     var inp = btn.previousElementSibling;
     inp.type = inp.type==='password' ? 'text' : 'password';
-    btn.innerHTML = inp.type==='password' ? '<i data-lucide="eye"></i>' : 'ðŸ™ˆ';
+    btn.innerHTML = inp.type==='password' ? '<i data-lucide="eye"></i>' : '<i data-lucide="eye-off"></i>';
 }
 
 function checkPwd(inp){
@@ -386,7 +386,7 @@ switchTabById('registro');
 {% endif %}
 {% endif %}
 </script>
-<button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:20px;z-index:9999;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);" aria-label="Cambiar tema">ðŸŒ™</button>
+<button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:20px;z-index:9999;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.3);" aria-label="Cambiar tema"><i data-lucide="sun"></i></button>
 <script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
   <script src="/static/js/lumini.js"></script>
 

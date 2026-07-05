@@ -167,7 +167,7 @@ body .btn:active{transform:scale(.97);}
               </td>
             {% endfor %}
             {# Descanso #}
-            <td class="des-col">Ã¢â€™• Descanso</td>
+            <td class="des-col"><i data-lucide="coffee"></i> Descanso</td>
             {% for f in ['5','6'] %}
               {% set k = df ~ '_' ~ f %}
               {% set e = horario_map.get(k, {}) %}
@@ -216,7 +216,7 @@ body .btn:active{transform:scale(.97);}
       <input class="inp" type="text" id="iProf" placeholder="ej: Alberth">
     </div>
     <div class="btn-row">
-      <button class="btn btn-clear" onclick="limpiar()" title="Borrar">ðŸ—‘</button>
+      <button class="btn btn-clear" onclick="limpiar()" title="Borrar"><i data-lucide="trash-2"></i></button>
       <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
       <button class="btn btn-primary" onclick="guardar()">Guardar</button>
     </div>
@@ -289,7 +289,7 @@ function _send(num, mat, prof){
   fd.append('curso',    CURSO);
   fetch('/'+SLUG+'/horarios', {method:'POST', body:fd})
     .then(()=>{ cerrar(); showToast('<i data-lucide="check-circle"></i> Guardado'); setTimeout(()=>location.reload(), 700); })
-    .catch(()=>{ showToast('Ã¢â€œ Error de conexión'); });
+    .catch(()=>{ showToast('<i data-lucide="alert-circle"></i> Error de conexión'); });
 }
 
 document.addEventListener('keydown', e=>{

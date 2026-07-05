@@ -2031,6 +2031,53 @@ def borrar_actividad(slug, act_id):
     conn.close()
     return redirect(url_for('home', slug=slug, curso=curso))
 
+# ── HELPER: weighted average ─────────────────────────────────────────────────
+def calcular_stats_estudiante(conn, slug, aid, curso_sel, materia, jornada, periodo):
+    notas_raw = conn.execute(
+        '''SELECT n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+           WHERE n.aid=? AND ac.materia=? AND ac.jornada=? AND ac.curso=?
+           AND COALESCE(ac.periodo,1)=?''',
+        (aid, materia, jornada, curso_sel, periodo)).fetchall()
+    ev = conn.execute(
+        '''SELECT evaluacion, autoevaluacion FROM evaluaciones
+           WHERE aid=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
+        (aid, materia, jornada, periodo)).fetchone()
+    eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
+    auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
+    act_prom = None
+    if notas_raw:
+        vals = [r['val'] for r in notas_raw]
+        act_prom = sum(vals) / len(vals)
+    total_peso = 0; nota_final = 0
+    if act_prom is not None: nota_final += act_prom * 0.65; total_peso += 0.65
+    if eval_v   is not None: nota_final += eval_v   * 0.25; total_peso += 0.25
+    if auto_v   is not None: nota_final += auto_v   * 0.10; total_peso += 0.10
+    prom_est = round(nota_final / total_peso, 2) if total_peso > 0 else None
+    return prom_est
+
+def calcular_stats_curso(conn, slug, curso_sel, materia, jornada, periodo):
+    alumnos = conn.execute(
+        'SELECT id FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
+        (curso_sel, jornada)).fetchall()
+    promedios = []
+    for a in alumnos:
+        p = calcular_stats_estudiante(conn, slug, a['id'], curso_sel, materia, jornada, periodo)
+        if p is not None: promedios.append(p)
+    prom_curso = round(sum(promedios) / len(promedios), 2) if promedios else None
+    # Pending grades
+    total_est = len(alumnos)
+    act_ids = conn.execute(
+        '''SELECT id FROM actividades WHERE materia=? AND jornada=? AND curso=?
+           AND COALESCE(periodo,1)=?''',
+        (materia, jornada, curso_sel, periodo)).fetchall()
+    act_count = len(act_ids)
+    notas_count = conn.execute(
+        '''SELECT COUNT(*) as c FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+           WHERE ac.materia=? AND ac.jornada=? AND ac.curso=? AND COALESCE(ac.periodo,1)=?''',
+        (materia, jornada, curso_sel, periodo)).fetchone()['c']
+    pend = total_est * act_count - notas_count if total_est and act_count else 0
+    return {'promedio_curso': prom_curso, 'notas_pendientes': max(pend, 0)}
+
 # ── NOTAS ─────────────────────────────────────────────────────────────────────
 @app.route('/<slug>/guardar_nota', methods=['POST'])
 def guardar_nota(slug):
@@ -2072,8 +2119,11 @@ def guardar_nota(slug):
     audit_log(slug, prof['id'], 'nota_editada', 'notas', registro_id=None,
               valor_anterior={'aid': aid, 'actividad_id': actividad_id, 'val': old_val},
               valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'val': val})
+    jornada, materia = get_sesion_jornada_materia(slug)
+    prom_est = calcular_stats_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'])
+    curso_stats = calcular_stats_curso(conn, slug, act['curso'], materia, jornada, act['p'])
     conn.close()
-    return ('', 204)
+    return jsonify({'status':'ok','promedio':prom_est,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
 
 # ── EVALUACIONES ──────────────────────────────────────────────────────────────
 @app.route('/<slug>/guardar_evaluacion', methods=['POST'])
@@ -2087,11 +2137,15 @@ def guardar_evaluacion(slug):
     ev      = request.form.get('evaluacion', type=float)
     au      = request.form.get('autoevaluacion', type=float)
     periodo = request.form.get('periodo', 1, type=int)
+    curso   = request.form.get('curso', '')
     if aid is None: return ('', 400)
     conn = conectar(slug)
     if periodo_cerrado(slug, periodo):
         conn.close()
         return ('Periodo cerrado', 423)
+    if not curso:
+        cursos_prof = get_cursos_profesor(slug, prof['id'], materia, jornada)
+        curso = cursos_prof[0] if cursos_prof else ''
     existing = conn.execute(
         '''SELECT evaluacion, autoevaluacion FROM evaluaciones
            WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
@@ -2112,8 +2166,10 @@ def guardar_evaluacion(slug):
     audit_log(slug, prof['id'], 'evaluacion_editada', 'evaluaciones', registro_id=None,
               valor_anterior={'aid': aid, 'evaluacion': old_eval, 'autoevaluacion': old_auto},
               valor_nuevo={'aid': aid, 'evaluacion': ev_final, 'autoevaluacion': au_final})
+    prom_est = calcular_stats_estudiante(conn, slug, aid, curso, materia, jornada, periodo)
+    curso_stats = calcular_stats_curso(conn, slug, curso, materia, jornada, periodo)
     conn.close()
-    return ('', 204)
+    return jsonify({'status':'ok','promedio':prom_est,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
 
 # ── SOLICITUDES DE MODIFICACION ──────────────────────────────────────────────
 @app.route('/<slug>/solicitar_modificacion', methods=['POST'])
@@ -2441,7 +2497,7 @@ def marcar_asistencia(slug):
         conn.close(); return ('', 403)
     conn.execute('INSERT INTO asistencia (aid,fecha,estado) VALUES (?,date("now"),?)', (aid, estado))
     conn.commit(); conn.close()
-    return ('', 204)
+    return jsonify({'status':'ok'})
 
 # ── OBSERVACIONES ─────────────────────────────────────────────────────────────
 @app.route('/<slug>/agregar_observacion', methods=['POST'])

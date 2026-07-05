@@ -338,7 +338,7 @@ body .btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM 
             <td style="font-size:11px;color:var(--muted);">{{ c.creado }}</td>
             <td style="text-align:center;">
                 <span class="badge {% if c.activo %}badge-ok{% else %}badge-off{% endif %}">
-                    {% if c.activo %}Ã¢— Activo{% else %}Ã¢—‹ Inactivo{% endif %}
+                    {% if c.activo %}<i data-lucide="check-circle"></i> Activo{% else %}<i data-lucide="x-circle"></i> Inactivo{% endif %}
                 </span>
             </td>
             <td>
@@ -348,24 +348,24 @@ body .btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM 
                         <input type="hidden" name="accion" value="toggle_colegio">
                         <input type="hidden" name="slug" value="{{ c.slug }}">
                         <button type="submit" class="btn btn-ghost btn-sm">
-                            {% if c.activo %}Ã¢Â¸ Desactivar{% else %}<i data-lucide="play"></i> Activar{% endif %}
+                            {% if c.activo %}<i data-lucide="pause-circle"></i> Desactivar{% else %}<i data-lucide="play"></i> Activar{% endif %}
                         </button>
                     </form>
                     <button class="btn btn-ghost btn-sm"
                         onclick="abrirEditar('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}',{{ c.num_periodos or 4 }},'{{ c.vencimiento or "" }}','{{ c.codigo_registro or "" }}','{{ c.primary_color or "#7C3AED" }}','{{ c.secondary_color or "#7C3AED" }}')">
-                        Ã¢â€️ Editar
+                        <i data-lucide="pencil"></i> Editar
                     </button>
                     <button class="btn btn-yellow btn-sm" onclick="verProfesores('{{ c.slug }}','{{ c.nombre|replace("'","\\'")|replace('"','\\"') }}')">
                         👥 Profesores
                     </button>
                     <a href="/{{ c.slug }}/directora/panel" target="_blank" class="btn btn-ghost btn-sm"><i data-lucide="bar-chart-3"></i> Panel</a>
-                    <a href="/{{ c.slug }}/login" target="_blank" class="btn btn-green btn-sm">ðŸ”— Login</a>
+                    <a href="/{{ c.slug }}/login" target="_blank" class="btn btn-green btn-sm"><i data-lucide="log-in"></i> Login</a>
                     <form method="POST" style="display:inline;"
                           onsubmit="return confirm('¿Eliminar {{ c.nombre }}?\nEsta acción no se puede deshacer.')">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="accion" value="eliminar_colegio">
                         <input type="hidden" name="slug" value="{{ c.slug }}">
-                        <button type="submit" class="btn btn-red btn-sm">ðŸ—‘ Eliminar</button>
+                        <button type="submit" class="btn btn-red btn-sm"><i data-lucide="trash-2"></i> Eliminar</button>
                     </form>
                 </div>
             </td>
@@ -389,7 +389,7 @@ body .btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM 
 <div class="overlay" id="modalEditar" onclick="if(event.target===this)cerrarEditar()">
     <div class="modal">
         <div class="modal-title">
-            Ã¢â€️ Editar colegio
+            <i data-lucide="pencil"></i> Editar colegio
             <button class="close-btn" onclick="cerrarEditar()">✕</button>
         </div>
         <form method="POST" enctype="multipart/form-data">
@@ -498,17 +498,17 @@ function verCodigo(slug) {
     var btn   = document.getElementById('btn-cod-' + slug);
     if (badge.style.display === 'none') {
         badge.style.display = 'inline-block';
-        btn.textContent = 'â„¢Ë† Ocultar';
+        btn.innerHTML = '<i data-lucide="eye-off"></i> Ocultar';
     } else {
         badge.style.display = 'none';
-        btn.textContent = '<i data-lucide="key"></i> Ver código';
+        btn.innerHTML = '<i data-lucide="key"></i> Ver código';
     }
 }
 
 function toggleCod(id, btn) {
     var inp = document.getElementById(id);
-    if (inp.type === 'text') { inp.type = 'password'; btn.textContent = '‘️'; }
-    else { inp.type = 'text'; btn.textContent = 'â„¢Ë†'; }
+    if (inp.type === 'text') { inp.type = 'password'; btn.innerHTML = '<i data-lucide="eye"></i>'; }
+    else { inp.type = 'text'; btn.innerHTML = '<i data-lucide="eye-off"></i>'; }
 }
 
 function verProfesores(slug, nombre) {
@@ -526,8 +526,8 @@ function verProfesores(slug, nombre) {
             var html = '<table><thead><tr><th>#</th><th>Nombre</th><th>Usuario</th><th>Materias</th><th style="text-align:center;">Estado</th></tr></thead><tbody>';
             data.profesores.forEach(function(p, i){
                 var badge = p.activo
-                    ? '<span class="badge badge-ok">Ã¢— Activo</span>'
-                    : '<span class="badge badge-off">Ã¢—‹ Inactivo</span>';
+                    ? '<span class="badge badge-ok"><i data-lucide="check-circle"></i> Activo</span>'
+                    : '<span class="badge badge-off"><i data-lucide="x-circle"></i> Inactivo</span>';
                 var materias = p.materias.map(function(m){
                     return '<span class="prof-chip">' + m.materia + ' · ' + m.jornada + '</span>';
                 }).join('');

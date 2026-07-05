@@ -241,7 +241,7 @@ class TestCRUD:
             'aid': '1',
             'val': '4.5',
         })
-        assert r.status_code in (204, 400, 403, 404, 423)
+        assert r.status_code in (200, 204, 400, 403, 404, 423)
 
     def test_save_evaluation(self, client):
         with client.session_transaction() as sess:
@@ -254,7 +254,7 @@ class TestCRUD:
             'aid': '1',
             'evaluacion': '4.0',
         })
-        assert r.status_code in (204, 400, 403, 423)
+        assert r.status_code in (200, 204, 400, 403, 423)
 
 # ── PDF Report Generation ──
 
