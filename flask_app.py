@@ -179,7 +179,7 @@ def necesita_rehash(guardada):
     return not (guardada.startswith('$2b$') or guardada.startswith('$2a$'))
 
 # ── SCHEMA VERSIONING ──────────────────────────────────────────────────────────
-SCHEMA_VERSION = 11
+SCHEMA_VERSION = 12
 
 def _ejecutar_migraciones(slug, conn):
     conn.execute('''CREATE TABLE IF NOT EXISTS schema_meta (
@@ -357,6 +357,51 @@ def _migrar_v11(conn, slug=None):
         UNIQUE(curso_id, materia_id)
     )''')
 
+def _recrear_si_unique_incorrecto(conn, slug, tabla, unique_deseado, sql_insert, sql_select):
+    import re as _re
+    row = conn.execute(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name=?",
+        (tabla,)
+    ).fetchone()
+    if not row:
+        return False
+    sql_actual = row['sql']
+    m = _re.search(r'UNIQUE\s*\(([^)]+)\)', sql_actual, _re.IGNORECASE)
+    if m:
+        cols_actuales = [c.strip().lower() for c in m.group(1).split(',')]
+        cols_deseadas = [c.strip().lower() for c in unique_deseado.strip('()').split(',')]
+        if cols_actuales == cols_deseadas:
+            return False
+    logger.warning(f'[{slug}] Recreando tabla {tabla} (UNIQUE incorrecto)')
+    conn.execute(f'ALTER TABLE {tabla} RENAME TO {tabla}_old')
+    conn.execute(sql_insert)
+    conn.execute(f'INSERT OR IGNORE INTO {tabla} {sql_select}')
+    conn.execute(f'DROP TABLE {tabla}_old')
+    conn.commit()
+    return True
+
+def _migrar_v12(conn, slug=None):
+    _recrear_si_unique_incorrecto(conn, slug, 'evaluaciones',
+        '(aid,profesor_id,materia,jornada,periodo)',
+        '''CREATE TABLE evaluaciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            aid INTEGER NOT NULL, profesor_id INTEGER NOT NULL,
+            materia TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
+            evaluacion REAL, autoevaluacion REAL, periodo INTEGER DEFAULT 1,
+            UNIQUE(aid,profesor_id,materia,jornada,periodo))''',
+        '''(id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
+           SELECT id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,
+                  COALESCE(periodo,1) FROM evaluaciones_old''')
+    _recrear_si_unique_incorrecto(conn, slug, 'horarios_curso',
+        '(curso,jornada,dia,franja)',
+        '''CREATE TABLE horarios_curso (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            curso TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
+            dia TEXT NOT NULL, franja TEXT NOT NULL,
+            num TEXT DEFAULT "", materia TEXT DEFAULT "", profesor TEXT DEFAULT "",
+            UNIQUE(curso, jornada, dia, franja))''',
+        'SELECT * FROM horarios_curso_old')
+
 MIGRACIONES = {
     6:  _migrar_v6,
     7:  _migrar_v7,
@@ -364,6 +409,7 @@ MIGRACIONES = {
     9:  _migrar_v9,
     10: _migrar_v10,
     11: _migrar_v11,
+    12: _migrar_v12,
 }
 
 # ── MASTER DB ─────────────────────────────────────────────────────────────────
@@ -520,24 +566,17 @@ def migrar_db(slug):
             conn.execute('UPDATE evaluaciones SET jornada="Mañana" WHERE jornada IS NULL OR jornada=""')
             conn.commit()
         # Verificar que UNIQUE incluya periodo — si no, recrear la tabla
-        create_sql = conn.execute(
-            "SELECT sql FROM sqlite_master WHERE type='table' AND name='evaluaciones'"
-        ).fetchone()
-        if create_sql and 'periodo' not in create_sql['sql'].split('UNIQUE')[1].split(')')[0] if 'UNIQUE' in create_sql['sql'] else '':
-            logger.warning(f'[{slug}] Recreando tabla evaluaciones (UNIQUE sin periodo)')
-            conn.execute('ALTER TABLE evaluaciones RENAME TO evaluaciones_old')
-            conn.execute('''CREATE TABLE evaluaciones (
+        _recrear_si_unique_incorrecto(conn, slug, 'evaluaciones',
+            '(aid,profesor_id,materia,jornada,periodo)',
+            '''CREATE TABLE evaluaciones (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 aid INTEGER NOT NULL, profesor_id INTEGER NOT NULL,
                 materia TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
                 evaluacion REAL, autoevaluacion REAL, periodo INTEGER DEFAULT 1,
-                UNIQUE(aid,profesor_id,materia,jornada,periodo))''')
-            conn.execute('''INSERT OR IGNORE INTO evaluaciones
-                (id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
-                SELECT id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,
-                       COALESCE(periodo,1) FROM evaluaciones_old''')
-            conn.execute('DROP TABLE evaluaciones_old')
-            conn.commit()
+                UNIQUE(aid,profesor_id,materia,jornada,periodo))''',
+            '''(id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
+               SELECT id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,
+                      COALESCE(periodo,1) FROM evaluaciones_old''')
 
         cols_comp = [r[1] for r in conn.execute('PRAGMA table_info(compromisos)').fetchall()]
         if 'jornada' not in cols_comp:
@@ -582,22 +621,15 @@ def migrar_db(slug):
                 respuesta_secreta TEXT DEFAULT "")''')
             conn.commit()
 
-        try:
-            conn.execute('INSERT OR IGNORE INTO horarios_curso (curso,jornada,dia,franja) VALUES ("__test__","__test__","__test__","__test__")')
-            conn.execute('DELETE FROM horarios_curso WHERE curso="__test__"')
-            conn.commit()
-        except sqlite3.OperationalError:
-            logger.warning(f'[{slug}] Recreando tabla horarios_curso (schema legacy)')
-            conn.execute('ALTER TABLE horarios_curso RENAME TO horarios_curso_old')
-            conn.execute('''CREATE TABLE horarios_curso (
+        _recrear_si_unique_incorrecto(conn, slug, 'horarios_curso',
+            '(curso,jornada,dia,franja)',
+            '''CREATE TABLE horarios_curso (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 curso TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
                 dia TEXT NOT NULL, franja TEXT NOT NULL,
                 num TEXT DEFAULT "", materia TEXT DEFAULT "", profesor TEXT DEFAULT "",
-                UNIQUE(curso, jornada, dia, franja))''')
-            conn.execute('INSERT OR IGNORE INTO horarios_curso SELECT * FROM horarios_curso_old')
-            conn.execute('DROP TABLE horarios_curso_old')
-            conn.commit()
+                UNIQUE(curso, jornada, dia, franja))''',
+            'SELECT * FROM horarios_curso_old')
 
         cols_rec = [r[1] for r in conn.execute('PRAGMA table_info(rectores)').fetchall()]
         if 'es_principal' not in cols_rec:
@@ -2219,14 +2251,40 @@ def guardar_evaluacion(slug):
     old_auto = existing['autoevaluacion'] if existing else None
     ev_final = ev if ev is not None else old_eval
     au_final = au if au is not None else old_auto
-    conn.execute(
-        '''INSERT INTO evaluaciones
-           (aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
-           VALUES (?,?,?,?,?,?,?)
-           ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
-           DO UPDATE SET evaluacion=excluded.evaluacion, autoevaluacion=excluded.autoevaluacion''',
-        (aid, prof['id'], materia, jornada, ev_final, au_final, periodo))
-    conn.commit()
+    try:
+        conn.execute(
+            '''INSERT INTO evaluaciones
+               (aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
+               VALUES (?,?,?,?,?,?,?)
+               ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
+               DO UPDATE SET evaluacion=excluded.evaluacion, autoevaluacion=excluded.autoevaluacion''',
+            (aid, prof['id'], materia, jornada, ev_final, au_final, periodo))
+        conn.commit()
+    except sqlite3.OperationalError as e:
+        conn.rollback()
+        if 'ON CONFLICT clause does not match' in str(e):
+            logger.warning(f'[{slug}] ON CONFLICT falló en guardar_evaluacion, reparando...')
+            _recrear_si_unique_incorrecto(conn, slug, 'evaluaciones',
+                '(aid,profesor_id,materia,jornada,periodo)',
+                '''CREATE TABLE evaluaciones (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    aid INTEGER NOT NULL, profesor_id INTEGER NOT NULL,
+                    materia TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
+                    evaluacion REAL, autoevaluacion REAL, periodo INTEGER DEFAULT 1,
+                    UNIQUE(aid,profesor_id,materia,jornada,periodo))''',
+                '''(id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
+                   SELECT id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,
+                          COALESCE(periodo,1) FROM evaluaciones_old''')
+            conn.execute(
+                '''INSERT INTO evaluaciones
+                   (aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
+                   VALUES (?,?,?,?,?,?,?)
+                   ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
+                   DO UPDATE SET evaluacion=excluded.evaluacion, autoevaluacion=excluded.autoevaluacion''',
+                (aid, prof['id'], materia, jornada, ev_final, au_final, periodo))
+            conn.commit()
+        else:
+            raise
     audit_log(slug, prof['id'], 'evaluacion_editada', 'evaluaciones', registro_id=None,
               valor_anterior={'aid': aid, 'evaluacion': old_eval, 'autoevaluacion': old_auto},
               valor_nuevo={'aid': aid, 'evaluacion': ev_final, 'autoevaluacion': au_final})

@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
 
-from flask_app import app, init_db, hash_pw, _promedio_ponderado
+from flask_app import app, init_db, hash_pw, _promedio_ponderado, _recrear_si_unique_incorrecto
 
 import pytest
 
@@ -921,3 +921,106 @@ class TestPromedioPonderadoFormula:
 
     def test_sin_datos_retorna_none(self):
         assert _promedio_ponderado([], None, None) is None
+
+class TestMigraciones:
+    """Verifica que _recrear_si_unique_incorrecto detecte y corrija UNIQUEs erroneos."""
+
+    def test_recrea_evaluaciones_unique_incorrecto(self):
+        conn = sqlite3.connect(':memory:')
+        conn.row_factory = sqlite3.Row
+        conn.execute('''CREATE TABLE evaluaciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            aid INTEGER NOT NULL, profesor_id INTEGER NOT NULL,
+            materia TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
+            evaluacion REAL, autoevaluacion REAL, periodo INTEGER DEFAULT 1,
+            UNIQUE(aid,profesor_id,materia,jornada))''')
+        conn.execute('INSERT INTO evaluaciones (aid, profesor_id, materia, jornada, evaluacion, periodo) VALUES (1, 1, "Mat", "M", 4.0, 1)')
+        conn.commit()
+        result = _recrear_si_unique_incorrecto(conn, 'test', 'evaluaciones',
+            '(aid,profesor_id,materia,jornada,periodo)',
+            '''CREATE TABLE evaluaciones (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                aid INTEGER NOT NULL, profesor_id INTEGER NOT NULL,
+                materia TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
+                evaluacion REAL, autoevaluacion REAL, periodo INTEGER DEFAULT 1,
+                UNIQUE(aid,profesor_id,materia,jornada,periodo))''',
+            '''(id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
+               SELECT id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,
+                      COALESCE(periodo,1) FROM evaluaciones_old''')
+        assert result == True, 'Deberia haber recreado la tabla'
+        sql = conn.execute("SELECT sql FROM sqlite_master WHERE name='evaluaciones'").fetchone()[0]
+        assert 'UNIQUE(aid,profesor_id,materia,jornada,periodo)' in sql, 'UNIQUE debe incluir periodo'
+        row = conn.execute('SELECT * FROM evaluaciones').fetchone()
+        assert row['aid'] == 1
+        assert row['evaluacion'] == 4.0
+        assert row['periodo'] == 1
+        conn.close()
+
+    def test_no_recrea_si_unique_correcto(self):
+        conn = sqlite3.connect(':memory:')
+        conn.row_factory = sqlite3.Row
+        conn.execute('''CREATE TABLE evaluaciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            aid INTEGER NOT NULL, profesor_id INTEGER NOT NULL,
+            materia TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
+            evaluacion REAL, autoevaluacion REAL, periodo INTEGER DEFAULT 1,
+            UNIQUE(aid,profesor_id,materia,jornada,periodo))''')
+        conn.commit()
+        result = _recrear_si_unique_incorrecto(conn, 'test', 'evaluaciones',
+            '(aid,profesor_id,materia,jornada,periodo)',
+            '''CREATE TABLE evaluaciones (...)''', 'SELECT * FROM evaluaciones_old')
+        assert result == False, 'No deberia recrear la tabla si UNIQUE ya es correcto'
+        conn.close()
+
+    def test_recrea_horarios_curso_unique_incorrecto(self):
+        conn = sqlite3.connect(':memory:')
+        conn.row_factory = sqlite3.Row
+        conn.execute('''CREATE TABLE horarios_curso (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            curso TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
+            dia TEXT NOT NULL, franja TEXT NOT NULL,
+            num TEXT DEFAULT "", materia TEXT DEFAULT "", profesor TEXT DEFAULT "",
+            UNIQUE(curso, dia, franja))''')
+        conn.execute('INSERT INTO horarios_curso (curso, jornada, dia, franja) VALUES ("1A", "M", "Lun", "1")')
+        conn.commit()
+        result = _recrear_si_unique_incorrecto(conn, 'test', 'horarios_curso',
+            '(curso,jornada,dia,franja)',
+            '''CREATE TABLE horarios_curso (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                curso TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
+                dia TEXT NOT NULL, franja TEXT NOT NULL,
+                num TEXT DEFAULT "", materia TEXT DEFAULT "", profesor TEXT DEFAULT "",
+                UNIQUE(curso, jornada, dia, franja))''',
+            'SELECT * FROM horarios_curso_old')
+        assert result == True
+        sql = conn.execute("SELECT sql FROM sqlite_master WHERE name='horarios_curso'").fetchone()[0]
+        assert 'UNIQUE(curso, jornada, dia, franja)' in sql
+        row = conn.execute('SELECT * FROM horarios_curso').fetchone()
+        assert row['curso'] == '1A'
+        conn.close()
+
+    def test_guardar_evaluacion_con_upsert_ok(self, client, teacher_session):
+        with client.session_transaction() as sess:
+            sess['_csrf_token'] = 'pytest_csrf_token'
+        r = client.post('/testcolegio/guardar_evaluacion', data={
+            '_csrf_token': 'pytest_csrf_token',
+            'aid': '1', 'evaluacion': '4.5', 'autoevaluacion': '3.5', 'periodo': '1', 'curso': 'Primero A',
+        })
+        assert r.status_code == 200, f'Expected 200, got {r.status_code}: {r.get_data(as_text=True)}'
+        data = json.loads(r.get_data(as_text=True))
+        assert data['status'] == 'ok'
+        r2 = client.post('/testcolegio/guardar_evaluacion', data={
+            '_csrf_token': 'pytest_csrf_token',
+            'aid': '1', 'evaluacion': '4.8', 'autoevaluacion': '3.8', 'periodo': '1', 'curso': 'Primero A',
+        })
+        assert r2.status_code == 200, f'Expected 200 on overwrite, got {r2.status_code}: {r2.get_data(as_text=True)}'
+        data2 = json.loads(r2.get_data(as_text=True))
+        assert data2['status'] == 'ok'
+        conn = sqlite3.connect(TEST_DB)
+        row = conn.execute(
+            'SELECT evaluacion, autoevaluacion FROM evaluaciones WHERE aid=1 AND profesor_id=1 AND materia="Matemáticas" AND jornada="Mañana" AND periodo=1'
+        ).fetchone()
+        conn.close()
+        assert row is not None
+        assert row[0] == 4.8
+        assert row[1] == 3.8
