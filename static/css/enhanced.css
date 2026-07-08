@@ -862,5 +862,12 @@ i[data-lucide] { vertical-align: middle; }
 .save-indicator.saved  { color: var(--green, #22c55e); }
 .save-indicator.error  { color: var(--red,   #ef4444); }
 .ni-wrap { display: inline-flex; align-items: center; position: relative; }
+.nota-input, .eval-input { width: 64px; text-align: center; padding: 4px 6px; font-size: 14px; border-radius: 5px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: border-color .15s ease; }
+.nota-input:focus, .eval-input:focus { border-color: var(--accent); outline: none; }
+@media (max-width: 768px) { .nota-input, .eval-input { width: 50px; font-size: 13px; padding: 3px 3px; } }
+.panel-tabs { display: flex; gap: 4px; margin-bottom: 14px; background: var(--bg2); padding: 4px; border-radius: 10px; }
+.ptab { flex: 1; padding: 8px 14px; border: none; border-radius: 7px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Inter', sans-serif; transition: all .2s ease; }
+.ptab:hover { color: var(--text); background: rgba(var(--accent-rgb),.06); }
+.ptab.active { background: var(--bg); color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
 
 

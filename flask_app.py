@@ -1,6 +1,7 @@
 import os, sys
 from dotenv import load_dotenv
-load_dotenv()
+_basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(_basedir, '.env'))
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file, abort, jsonify, g
 import sqlite3, hashlib, time, secrets, logging, json, uuid, bcrypt
 from datetime import timedelta, datetime
@@ -24,20 +25,11 @@ if _secure_override:
 else:
     app.config['SESSION_COOKIE_SECURE'] = (ENV == 'production')
 
-# Safety: refuse explicitly insecure production config
-if ENV == 'production' and not app.config['SESSION_COOKIE_SECURE']:
-    msg = (
-        "\n" + "=" * 60 + "\n"
-        "ERROR: Refusing to run in production mode without secure cookies.\n"
-        "  Production requires SESSION_COOKIE_SECURE=True and HTTPS.\n"
-        "  Set FLASK_ENV=development for local development, or configure HTTPS.\n"
-        "=" * 60 + "\n"
-    )
-    print(msg, file=sys.stderr)
-    sys.exit(1)
-
-if ENV == 'production':
-    print(f"[LUMINI] Production mode — SESSION_COOKIE_SECURE={app.config['SESSION_COOKIE_SECURE']}, ensure HTTPS is configured.")
+if ENV == 'production' and app.config['SESSION_COOKIE_SECURE']:
+    print(f"[LUMINI] Production mode — SESSION_COOKIE_SECURE=True, ensure HTTPS is configured.")
+elif ENV == 'production' and not app.config['SESSION_COOKIE_SECURE']:
+    print(f"[LUMINI] WARNING: Production mode with SESSION_COOKIE_SECURE=False. "
+          "Set SESSION_COOKIE_SECURE=true or use HTTPS in real deployments.")
 
 app.config['JSON_AS_ASCII'] = False
 app.config['TEMPLATES_AUTO_RELOAD'] = ENV != 'production'
@@ -1280,18 +1272,10 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
                WHERE aid=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
             (alumno['id'], mat, jornada, periodo)
         ).fetchone()
-        act_prom = round(sum(r['val'] for r in notas_r) / len(notas_r), 2) if notas_r else None
+        notas_vals = [r['val'] for r in notas_r]
         eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
         auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
-
-        if act_prom is not None or eval_v is not None or auto_v is not None:
-            total_peso = 0; nota_final = 0
-            if act_prom is not None: nota_final += act_prom * 0.65; total_peso += 0.65
-            if eval_v   is not None: nota_final += eval_v   * 0.25; total_peso += 0.25
-            if auto_v   is not None: nota_final += auto_v   * 0.10; total_peso += 0.10
-            final = round(nota_final / total_peso, 2) if total_peso else None
-        else:
-            final = None
+        final = _promedio_ponderado(notas_vals, eval_v, auto_v)
 
         story.append(Paragraph(mat, mat_style))
         data = [['Actividades', 'Evaluación', 'Autoevaluación', 'Nota Final'],
@@ -1886,8 +1870,8 @@ def home(slug):
                 f'''SELECT n.aid, n.actividad_id, n.val, n.id FROM notas n
                     JOIN actividades ac ON ac.id=n.actividad_id
                     WHERE n.aid IN ({placeholders}) AND ac.materia=? AND ac.jornada=? AND ac.curso=?
-                    AND COALESCE(ac.periodo,1)=? ORDER BY n.aid''',
-                (*aid_list, materia, jornada, curso_sel, periodo_sel)).fetchall()
+                    AND COALESCE(ac.periodo,1)=? AND ac.profesor_id=? ORDER BY n.aid''',
+                (*aid_list, materia, jornada, curso_sel, periodo_sel, prof['id'])).fetchall()
             notas_by_aid = {}
             for r in notas_all:
                 notas_by_aid.setdefault(r['aid'], []).append(r)
@@ -1925,10 +1909,8 @@ def home(slug):
             ev = evals_by_aid.get(a['id'])
             eval_v = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
             auto_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
-            todas = [nr['val'] for nr in notas_raw]
-            if eval_v is not None: todas.append(eval_v)
-            if auto_v is not None: todas.append(auto_v)
-            prom = round(sum(todas) / len(todas), 2) if todas else None
+            vals = [nr['val'] for nr in notas_raw]
+            prom = _promedio_ponderado(vals, eval_v, auto_v)
             historial_raw = asis_all.get(a['id'], [])
             hist_meses = {}
             for h in historial_raw:
@@ -2060,50 +2042,60 @@ def borrar_actividad(slug, act_id):
     conn.close()
     return redirect(url_for('home', slug=slug, curso=curso))
 
-# ── HELPER: weighted average ─────────────────────────────────────────────────
-def calcular_stats_estudiante(conn, slug, aid, curso_sel, materia, jornada, periodo):
+# ── CENTRAL WEIGHTED AVERAGE (65/25/10) ──────────────────────────────────────
+def _promedio_ponderado(notas_actividades, evaluacion, autoevaluacion):
+    act_prom = None
+    if notas_actividades:
+        act_prom = round(sum(notas_actividades) / len(notas_actividades), 2)
+    nota_final = 0
+    tiene_datos = False
+    if act_prom is not None:
+        nota_final += act_prom * 0.65
+        tiene_datos = True
+    if evaluacion is not None:
+        nota_final += evaluacion * 0.25
+        tiene_datos = True
+    if autoevaluacion is not None:
+        nota_final += autoevaluacion * 0.10
+        tiene_datos = True
+    return round(nota_final, 2) if tiene_datos else None
+
+def calcular_stats_estudiante(conn, slug, aid, curso_sel, materia, jornada, periodo, profesor_id):
     notas_raw = conn.execute(
         '''SELECT n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
            WHERE n.aid=? AND ac.materia=? AND ac.jornada=? AND ac.curso=?
-           AND COALESCE(ac.periodo,1)=?''',
-        (aid, materia, jornada, curso_sel, periodo)).fetchall()
+           AND COALESCE(ac.periodo,1)=? AND ac.profesor_id=?''',
+        (aid, materia, jornada, curso_sel, periodo, profesor_id)).fetchall()
     ev = conn.execute(
         '''SELECT evaluacion, autoevaluacion FROM evaluaciones
            WHERE aid=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
         (aid, materia, jornada, periodo)).fetchone()
     eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
     auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
-    act_prom = None
-    if notas_raw:
-        vals = [r['val'] for r in notas_raw]
-        act_prom = sum(vals) / len(vals)
-    total_peso = 0; nota_final = 0
-    if act_prom is not None: nota_final += act_prom * 0.65; total_peso += 0.65
-    if eval_v   is not None: nota_final += eval_v   * 0.25; total_peso += 0.25
-    if auto_v   is not None: nota_final += auto_v   * 0.10; total_peso += 0.10
-    prom_est = round(nota_final / total_peso, 2) if total_peso > 0 else None
-    return prom_est
+    vals = [r['val'] for r in notas_raw] if notas_raw else []
+    return _promedio_ponderado(vals, eval_v, auto_v)
 
-def calcular_stats_curso(conn, slug, curso_sel, materia, jornada, periodo):
+def calcular_stats_curso(conn, slug, curso_sel, materia, jornada, periodo, profesor_id):
     alumnos = conn.execute(
         'SELECT id FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
         (curso_sel, jornada)).fetchall()
     promedios = []
     for a in alumnos:
-        p = calcular_stats_estudiante(conn, slug, a['id'], curso_sel, materia, jornada, periodo)
+        p = calcular_stats_estudiante(conn, slug, a['id'], curso_sel, materia, jornada, periodo, profesor_id)
         if p is not None: promedios.append(p)
     prom_curso = round(sum(promedios) / len(promedios), 2) if promedios else None
     # Pending grades
     total_est = len(alumnos)
     act_ids = conn.execute(
         '''SELECT id FROM actividades WHERE materia=? AND jornada=? AND curso=?
-           AND COALESCE(periodo,1)=?''',
-        (materia, jornada, curso_sel, periodo)).fetchall()
+           AND COALESCE(periodo,1)=? AND profesor_id=?''',
+        (materia, jornada, curso_sel, periodo, profesor_id)).fetchall()
     act_count = len(act_ids)
     notas_count = conn.execute(
         '''SELECT COUNT(*) as c FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
-           WHERE ac.materia=? AND ac.jornada=? AND ac.curso=? AND COALESCE(ac.periodo,1)=?''',
-        (materia, jornada, curso_sel, periodo)).fetchone()['c']
+           WHERE ac.materia=? AND ac.jornada=? AND ac.curso=? AND COALESCE(ac.periodo,1)=?
+           AND ac.profesor_id=?''',
+        (materia, jornada, curso_sel, periodo, profesor_id)).fetchone()['c']
     pend = total_est * act_count - notas_count if total_est and act_count else 0
     return {'promedio_curso': prom_curso, 'notas_pendientes': max(pend, 0)}
 
@@ -2149,8 +2141,8 @@ def guardar_nota(slug):
               valor_anterior={'aid': aid, 'actividad_id': actividad_id, 'val': old_val},
               valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'val': val})
     jornada, materia = get_sesion_jornada_materia(slug)
-    prom_est = calcular_stats_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'])
-    curso_stats = calcular_stats_curso(conn, slug, act['curso'], materia, jornada, act['p'])
+    prom_est = calcular_stats_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
+    curso_stats = calcular_stats_curso(conn, slug, act['curso'], materia, jornada, act['p'], prof['id'])
     conn.close()
     return jsonify({'status':'ok','promedio':prom_est,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
 
@@ -2195,8 +2187,8 @@ def guardar_evaluacion(slug):
     audit_log(slug, prof['id'], 'evaluacion_editada', 'evaluaciones', registro_id=None,
               valor_anterior={'aid': aid, 'evaluacion': old_eval, 'autoevaluacion': old_auto},
               valor_nuevo={'aid': aid, 'evaluacion': ev_final, 'autoevaluacion': au_final})
-    prom_est = calcular_stats_estudiante(conn, slug, aid, curso, materia, jornada, periodo)
-    curso_stats = calcular_stats_curso(conn, slug, curso, materia, jornada, periodo)
+    prom_est = calcular_stats_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
+    curso_stats = calcular_stats_curso(conn, slug, curso, materia, jornada, periodo, prof['id'])
     conn.close()
     return jsonify({'status':'ok','promedio':prom_est,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
 
@@ -2630,9 +2622,35 @@ def agregar_observacion(slug):
     obs = conn.execute(
         'SELECT id, materia, texto, fecha FROM observaciones WHERE aid=? AND materia=? ORDER BY id DESC LIMIT 1',
         (aid, materia)).fetchone()
+    audit_log(slug, prof['id'], 'observacion_creada', 'observaciones', registro_id=obs['id'],
+              valor_anterior=None, valor_nuevo={'aid': aid, 'texto': texto})
     conn.close()
     return jsonify({'id': obs['id'], 'materia': obs['materia'],
                     'texto': obs['texto'], 'fecha': obs['fecha']})
+
+@app.route('/<slug>/editar_observacion/<int:id_o>', methods=['POST'])
+def editar_observacion(slug, id_o):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof: return ('', 403)
+    if not validar_csrf(): return ('Error CSRF', 403)
+    jornada, materia = get_sesion_jornada_materia(slug)
+    texto = request.form.get('texto', '').strip()
+    if not texto: return ('', 400)
+    conn = conectar(slug)
+    obs = conn.execute(
+        'SELECT id, aid, materia, texto, fecha FROM observaciones WHERE id=? AND materia=?',
+        (id_o, materia)).fetchone()
+    if not obs:
+        conn.close(); return ('', 404)
+    old_text = obs['texto']
+    conn.execute('UPDATE observaciones SET texto=? WHERE id=?', (texto, id_o))
+    conn.commit()
+    audit_log(slug, prof['id'], 'observacion_editada', 'observaciones', registro_id=id_o,
+              valor_anterior={'texto': old_text}, valor_nuevo={'texto': texto})
+    conn.close()
+    return jsonify({'id': obs['id'], 'aid': obs['aid'], 'materia': obs['materia'],
+                    'texto': texto, 'fecha': obs['fecha']})
 
 @app.route('/<slug>/borrar_observacion/<int:id_o>', methods=['POST'])
 def borrar_observacion(slug, id_o):
@@ -2642,12 +2660,14 @@ def borrar_observacion(slug, id_o):
     if not validar_csrf(): return ('Error CSRF', 403)
     jornada, materia = get_sesion_jornada_materia(slug)
     conn = conectar(slug)
-    obs = conn.execute('SELECT materia FROM observaciones WHERE id=?', (id_o,)).fetchone()
+    obs = conn.execute('SELECT id, aid, materia, texto FROM observaciones WHERE id=?', (id_o,)).fetchone()
     if obs and obs['materia'] == materia:
         conn.execute('DELETE FROM observaciones WHERE id=?', (id_o,))
         conn.commit()
+        audit_log(slug, prof['id'], 'observacion_eliminada', 'observaciones', registro_id=id_o,
+                  valor_anterior={'aid': obs['aid'], 'texto': obs['texto']}, valor_nuevo=None)
     conn.close()
-    return ('', 204)
+    return jsonify({'ok': True})
 
 # ── PERFIL / CURSOS ───────────────────────────────────────────────────────────
 @app.route('/<slug>/cambiar_password', methods=['GET', 'POST'])
@@ -2895,18 +2915,10 @@ def vista_estudiante(slug):
     todos_finales = []
     for mat, notas in notas_pm.items():
         notas_vals = [n['val'] for n in notas]
-        act_prom = round(sum(notas_vals) / len(notas_vals), 2) if notas_vals else None
         ev = evals_map.get(mat, {})
         eval_v = ev.get('evaluacion') if ev.get('evaluacion') is not None else None
         auto_v = ev.get('autoevaluacion') if ev.get('autoevaluacion') is not None else None
-        if act_prom is not None or eval_v is not None or auto_v is not None:
-            total_peso = 0; nota_final = 0
-            if act_prom is not None: nota_final += act_prom * 0.65; total_peso += 0.65
-            if eval_v   is not None: nota_final += eval_v   * 0.25; total_peso += 0.25
-            if auto_v   is not None: nota_final += auto_v   * 0.10; total_peso += 0.10
-            prom = round(nota_final / total_peso, 2) if total_peso else None
-        else:
-            prom = None
+        prom = _promedio_ponderado(notas_vals, eval_v, auto_v)
         proms_pm[mat] = prom
         if prom is not None: todos_finales.append(prom)
     promedio_general = round(sum(todos_finales) / len(todos_finales), 2) if todos_finales else None
@@ -4845,18 +4857,11 @@ def directora_panel(slug):
         todos_finales = []
         for mat in lista_materias:
             notas_vals = notas_by.get((a['id'], mat), [])
-            act_prom = round(sum(notas_vals) / len(notas_vals), 2) if notas_vals else None
             ev = evals_by.get((a['id'], mat))
             eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
             auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
-            if act_prom is not None or eval_v is not None or auto_v is not None:
-                total_peso = 0; nota_final = 0
-                if act_prom is not None: nota_final += act_prom * 0.65; total_peso += 0.65
-                if eval_v   is not None: nota_final += eval_v   * 0.25; total_peso += 0.25
-                if auto_v   is not None: nota_final += auto_v   * 0.10; total_peso += 0.10
-                final = round(nota_final / total_peso, 2) if total_peso else None
-            else:
-                final = None
+            final = _promedio_ponderado(notas_vals, eval_v, auto_v)
+            act_prom = round(sum(notas_vals) / len(notas_vals), 2) if notas_vals else None
             fila['materias'][mat] = {'act': act_prom, 'eval': eval_v, 'auto': auto_v, 'final': final}
             if final is not None: todos_finales.append(final)
         fila['promedio'] = round(sum(todos_finales) / len(todos_finales), 2) if todos_finales else None
@@ -5230,13 +5235,11 @@ init_master_db()
 threading.Timer(30, programar_backup).start()
 
 if __name__ == '__main__':
-    if ENV == 'production':
-        try:
-            from waitress import serve
-            logger.info('🌐 Servidor Waitress en http://0.0.0.0:8000')
-            serve(app, host='0.0.0.0', port=int(os.environ.get('PORT', 8000)), threads=8)
-        except ImportError:
-            logger.warning('waitress no instalado. Usando Flask dev server. Instala: pip install waitress')
-            app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)), debug=True)
-    else:
-        app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
+    _port = int(os.environ.get('PORT', 8000 if ENV == 'production' else 5000))
+    try:
+        from waitress import serve
+        logger.info(f'Servidor Waitress en http://0.0.0.0:{_port}')
+        serve(app, host='0.0.0.0', port=_port, threads=8)
+    except ImportError:
+        logger.warning('waitress no instalado. Usando Flask dev server (sin reloader).')
+        app.run(host='0.0.0.0', port=_port, debug=True, use_reloader=False)

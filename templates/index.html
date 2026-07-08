@@ -420,6 +420,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   <div class="sidebar-nav">
     <div class="sidebar-section">Navegación</div>
     <a href="/{{ slug }}/" class="sidebar-item active"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Notas</span></a>
+    <a href="#centroComunicacion" class="sidebar-item" onclick="toggleSidebar()"><span class="icon"><i data-lucide="megaphone"></i></span><span>Comunicados</span></a>
     <a href="/{{ slug }}/asistencia" class="sidebar-item"><span class="icon"><i data-lucide="users"></i></span><span>Asistencia</span></a>
     <a href="/{{ slug }}/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horario</span></a>
     <a href="/{{ slug }}/archivados" class="sidebar-item"><span class="icon"><i data-lucide="archive"></i></span><span>Archivados</span></a>
@@ -730,32 +731,6 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
             </div>
         </div>
     </div>
-    <div class="dash-module">
-        <div class="dash-module-head">
-            <span class="icon"><i data-lucide="zap" style="width:15px;height:15px;"></i></span>
-            Accesos rápidos
-        </div>
-        <div class="dash-module-body">
-            <div class="quick-actions-grid">
-                <a href="#notas-card" class="qa-card">
-                    <div class="qa-icon purple"><i data-lucide="edit-3" style="width:18px;height:18px;"></i></div>
-                    <span class="qa-label">Registrar notas</span>
-                </a>
-                <a href="#agenda-card" class="qa-card">
-                    <div class="qa-icon blue"><i data-lucide="calendar-plus" style="width:18px;height:18px;"></i></div>
-                    <span class="qa-label">Agregar trabajo</span>
-                </a>
-                <a href="/{{ slug }}/horarios" class="qa-card">
-                    <div class="qa-icon green"><i data-lucide="clock" style="width:18px;height:18px;"></i></div>
-                    <span class="qa-label">Ver horario</span>
-                </a>
-                <a href="/{{ slug }}/archivados" class="qa-card">
-                    <div class="qa-icon orange"><i data-lucide="archive" style="width:18px;height:18px;"></i></div>
-                    <span class="qa-label">Archivados</span>
-                </a>
-            </div>
-        </div>
-    </div>
 </div>
 <!-- -- Fin Dashboard Modules ---------------------------------- -->
 
@@ -877,9 +852,16 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     </div>
 </div>
 
+<div class="panel-tabs">
+    <button class="ptab active" onclick="switchPanel('notas')"><i data-lucide="edit-3" style="width:14px;height:14px;"></i> Notas</button>
+    <button class="ptab" onclick="switchPanel('asistencia')"><i data-lucide="calendar-check" style="width:14px;height:14px;"></i> Asistencia</button>
+    <button class="ptab" onclick="switchPanel('observaciones')"><i data-lucide="eye" style="width:14px;height:14px;"></i> Observaciones</button>
+</div>
+
+<div id="panelNotas">
 <div class="card" id="notas-card">
     <div class="card-head">
-        <span class="card-title">Notas  {{ curso_sel }} · {{ materia }}</span>
+        <span class="card-title">Notas &mdash; {{ curso_sel }} &middot; {{ materia }}</span>
         <form method="POST" action="/{{ slug }}/nueva_actividad" style="display:flex;gap:7px;">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
@@ -953,6 +935,76 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         </table>
     </div>
 </div>
+</div> <!-- /panelNotas -->
+
+<div id="panelAsistencia" style="display:none;">
+<div class="card">
+    <div class="card-head">
+        <span class="card-title"><i data-lucide="calendar-check" style="width:14px;height:14px;"></i> Asistencia &mdash; {{ curso_sel }} &middot; {{ materia }}</span>
+    </div>
+    <div class="tw zebra">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:28px">#</th>
+                    <th>Estudiante</th>
+                    <th style="width:80px">Estado</th>
+                    <th>Acci&oacute;n</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for e in estudiantes %}
+            <tr data-aid="{{ e.id }}">
+                <td>{{ e.num_curso }}</td>
+                <td>{{ e.nombre }}</td>
+                <td>
+                    <span class="asist-badge {% if e.asistencia=='P' %}bp{% elif e.asistencia=='A' %}ba{% elif e.asistencia=='T' %}bt{% else %}bn{% endif %}" id="asist-tab-{{ e.id }}">
+                        {% if e.asistencia=='P' %}P{% elif e.asistencia=='A' %}A{% elif e.asistencia=='T' %}T{% else %}&mdash;{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <div class="asist-group">
+                        <button onclick="marcarAsist({{ e.id }},'P')" class="abtn ap {% if e.asistencia=='P' %}active{% endif %}" aria-label="Presente" data-estado="P" data-aid="{{ e.id }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Presente</button>
+                        <button onclick="marcarAsist({{ e.id }},'A')" class="abtn aa {% if e.asistencia=='A' %}active{% endif %}" aria-label="Ausente" data-estado="A" data-aid="{{ e.id }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.71L12 12l6.3 6.29-1.42 1.42L12 13.41l-5.88 5.88-1.42-1.42L10.59 12 4.7 5.71 6.12 4.29 12 10.59l5.88-5.88z"/></svg> Ausente</button>
+                        <button onclick="marcarAsist({{ e.id }},'T')" class="abtn at {% if e.asistencia=='T' %}active{% endif %}" aria-label="Tardanza" data-estado="T" data-aid="{{ e.id }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg> Tardanza</button>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="20" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div> <!-- /panelAsistencia -->
+
+<div id="panelObservaciones" style="display:none;">
+<div class="card">
+    <div class="card-head">
+        <span class="card-title"><i data-lucide="eye" style="width:14px;height:14px;"></i> Observaciones &mdash; {{ curso_sel }} &middot; {{ materia }}</span>
+    </div>
+    <div class="card-body">
+        <div style="margin-bottom:14px;">
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600;">Seleccionar estudiante</label>
+            <select id="obsStudentSelect" onchange="cargarObsTab()" style="width:100%;max-width:300px;padding:8px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-family:'Inter',sans-serif;">
+                <option value="">-- Seleccionar --</option>
+                {% for e in estudiantes %}
+                <option value="{{ e.id }}">{{ e.num_curso }}. {{ e.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="obsTabHistorial" style="margin-bottom:16px;"></div>
+        <div id="obsTabList" style="margin-bottom:14px;"></div>
+        <div id="obsTabForm" style="display:none;">
+            <div class="oform" style="margin-top:8px;">
+                <input type="text" id="obsTabInput" placeholder="Escribir observaci&oacute;n..." oninput="autoSaveObsTabDebounced()" style="flex:1;">
+                <span class="save-indicator" id="obsTabIndicator"></span>
+            </div>
+        </div>
+    </div>
+</div>
+</div> <!-- /panelObservaciones -->
 
 {% endif %}
 
@@ -990,9 +1042,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     </div>
     <div class="card-body">
       <div class="quick-actions" style="margin:0;">
-        <a href="/{{ slug }}/nueva_actividad" class="qaction primary" style="flex:1;"><i data-lucide="plus" style="width:14px;height:14px;"></i> Nueva actividad</a>
-        <a href="/{{ slug }}/comunicaciones/nueva" class="qaction" style="flex:1;"><i data-lucide="megaphone" style="width:14px;height:14px;"></i> Comunicado</a>
-        <a href="/{{ slug }}/asistencia" class="qaction" style="flex:1;"><i data-lucide="calendar-check" style="width:14px;height:14px;"></i> Asistencia</a>
+        <a href="#notas-card" class="qaction primary" style="flex:1;" onclick="switchPanel('notas')"><i data-lucide="plus" style="width:14px;height:14px;"></i> Nueva actividad</a>
+        <a href="#centroComunicacion" class="qaction" style="flex:1;"><i data-lucide="megaphone" style="width:14px;height:14px;"></i> Comunicados</a>
+        <a href="#" onclick="switchPanel('asistencia');return false;" class="qaction" style="flex:1;"><i data-lucide="calendar-check" style="width:14px;height:14px;"></i> Asistencia</a>
       </div>
     </div>
   </div>
@@ -1121,16 +1173,14 @@ function calcularPromPonderado(aid){
     });
     const evalInp = row.querySelector('.eval-input[data-campo="evaluacion"]');
     const autoInp = row.querySelector('.eval-input[data-campo="autoevaluacion"]');
-    const evalV = evalInp ? parseFloat(evalInp.value) : NaN;
-    const autoV = autoInp ? parseFloat(autoInp.value) : NaN;
-    const actProm = notas.length ? (notas.reduce(function(a,b){return a+b;},0) / notas.length) : null;
-    const hasEval = !isNaN(evalV);
-    const hasAuto = !isNaN(autoV);
-    let total = 0, weighted = 0;
-    if(actProm !== null){ weighted += actProm * 0.65; total += 0.65; }
-    if(hasEval){ weighted += evalV * 0.25; total += 0.25; }
-    if(hasAuto){ weighted += autoV * 0.10; total += 0.10; }
-    return total > 0 ? (weighted / total) : null;
+    const eV = evalInp && evalInp.value !== '' ? parseFloat(evalInp.value) : null;
+    const aV = autoInp && autoInp.value !== '' ? parseFloat(autoInp.value) : null;
+    const actProm = notas.length ? Math.round((notas.reduce(function(a,b){return a+b;},0) / notas.length) * 100) / 100 : null;
+    var notaFinal = 0, tieneDatos = false;
+    if(actProm !== null){ notaFinal += actProm * 0.65; tieneDatos = true; }
+    if(eV !== null){ notaFinal += eV * 0.25; tieneDatos = true; }
+    if(aV !== null){ notaFinal += aV * 0.10; tieneDatos = true; }
+    return tieneDatos ? Math.round(notaFinal * 100) / 100 : null;
 }
 
 function actualizarPromedio(aid){
@@ -1243,10 +1293,17 @@ function marcarAsist(aid, estado){
             if(r.ok){
                 const cls = estado==='P'?'bp':estado==='A'?'ba':'bt';
                 const badge = document.getElementById('asist-'+aid);
-                badge.className = 'asist-badge '+cls;
-                badge.textContent = estado;
+                if(badge){ badge.className = 'asist-badge '+cls; badge.textContent = estado; }
+                const tabBadge = document.getElementById('asist-tab-'+aid);
+                if(tabBadge){ tabBadge.className = 'asist-badge '+cls; tabBadge.textContent = estado; }
                 const row = document.querySelector('tr[data-aid="'+aid+'"]');
-                row.querySelectorAll('.abtn').forEach(function(b){
+                if(row){
+                    row.querySelectorAll('.abtn').forEach(function(b){
+                        b.classList.remove('active');
+                        if(b.getAttribute('data-estado') === estado) b.classList.add('active');
+                    });
+                }
+                document.querySelectorAll('#panelAsistencia .abtn[data-aid="'+aid+'"]').forEach(function(b){
                     b.classList.remove('active');
                     if(b.getAttribute('data-estado') === estado) b.classList.add('active');
                 });
@@ -1256,6 +1313,127 @@ function marcarAsist(aid, estado){
             }
         })
         .catch(function(){ showToast('? Error de conexión'); });
+}
+
+function switchPanel(name){
+    document.querySelectorAll('.ptab').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('[id^="panel"]').forEach(function(p){ p.style.display = 'none'; });
+    var btn = document.querySelector('.ptab[onclick*="' + name + '"]');
+    if(btn) btn.classList.add('active');
+    var panel = document.getElementById('panel' + name.charAt(0).toUpperCase() + name.slice(1));
+    if(panel) panel.style.display = '';
+    if(name === 'observaciones') cargarObsTab();
+}
+
+function cargarObsTab(){
+    var sel = document.getElementById('obsStudentSelect');
+    var aid = sel ? parseInt(sel.value) : null;
+    document.getElementById('obsTabHistorial').innerHTML = '';
+    document.getElementById('obsTabList').innerHTML = '';
+    document.getElementById('obsTabForm').style.display = 'none';
+    if(!aid || !ED[aid]) return;
+    var d = ED[aid];
+    var hd = document.getElementById('obsTabHistorial');
+    var meses = Object.keys(d.historial);
+    if(!meses.length){
+        hd.innerHTML = '<p style="font-size:12px;color:var(--muted)">Sin registros de asistencia.</p>';
+    } else {
+        meses.forEach(function(m){
+            var div = document.createElement('div');
+            div.className = 'hmes';
+            var dias = d.historial[m].map(function(h){
+                var cls = h.estado==='P'?'bp':h.estado==='A'?'ba':'bt';
+                return '<span class="hdia '+cls+'">'+h.fecha.slice(8)+' '+h.estado+'</span>';
+            }).join('');
+            div.innerHTML = '<div class="hmeslabel">'+m+'</div><div class="hdias">'+dias+'</div>';
+            hd.appendChild(div);
+        });
+    }
+    renderObsTab(aid);
+    document.getElementById('obsTabForm').style.display = '';
+}
+
+function renderObsTab(aid){
+    var ol = document.getElementById('obsTabList');
+    ol.innerHTML = '';
+    if(!ED[aid] || !ED[aid].observaciones || ED[aid].observaciones.length === 0){
+        ol.innerHTML = '<p style="font-size:12px;color:var(--muted);padding:8px 0;">Sin observaciones.</p>';
+        return;
+    }
+    var arr = ED[aid].observaciones.slice();
+    arr.reverse();
+    arr.forEach(function(o){
+        var div = document.createElement('div');
+        div.className = 'oitem';
+        div.innerHTML = '<div class="obs-text" id="obs-tab-text-'+o.id+'">'+o.texto+'</div><div class="ometa">'+o.materia+' · '+o.fecha+
+            ' <button onclick="editarObsTab('+aid+','+o.id+')" style="background:none;border:none;color:var(--accent);margin-left:6px;font-size:10px;cursor:pointer;">Editar</button>'+
+            ' <button onclick="borrarObsTab('+aid+','+o.id+')" style="background:none;border:none;color:var(--red);margin-left:6px;font-size:10px;cursor:pointer;">Borrar</button></div>';
+        ol.appendChild(div);
+    });
+}
+
+function editarObsTab(aid, obsId){
+    var cont = document.getElementById('obs-tab-text-'+obsId);
+    if(!cont) return;
+    var oldText = cont.textContent;
+    cont.innerHTML = '<input type="text" id="obs-tab-input-'+obsId+'" value="'+oldText.replace(/"/g,'&quot;')+'" style="width:100%;padding:4px 8px;border:1.5px solid var(--accent);border-radius:5px;background:var(--bg);color:var(--text);font-size:12px;font-family:\'Inter\',sans-serif;">'+
+        '<div style="margin-top:4px;display:flex;gap:4px;">'+
+        '<button onclick="guardarEditObsTab('+aid+','+obsId+')" style="padding:2px 8px;border:none;border-radius:4px;background:var(--accent);color:#fff;font-size:10px;font-weight:600;cursor:pointer;">Guardar</button>'+
+        '<button onclick="cancelarEditObsTab('+aid+','+obsId+')" style="padding:2px 8px;border:none;border-radius:4px;background:rgba(var(--muted-rgb),.15);color:var(--muted);font-size:10px;cursor:pointer;">Cancelar</button></div>';
+}
+
+function guardarEditObsTab(aid, obsId){
+    var inp = document.getElementById('obs-tab-input-'+obsId);
+    if(!inp) return;
+    var texto = inp.value.trim();
+    if(!texto) return;
+    var f = new FormData();
+    f.append('texto', texto);
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/editar_observacion/'+obsId, {method:'POST', body:f})
+        .then(function(r){
+            if(!r.ok){ showToast('? Error al editar'); return null; }
+            return r.json();
+        })
+        .then(function(o){
+            if(!o) return;
+            for(var i=0;i<ED[aid].observaciones.length;i++){
+                if(ED[aid].observaciones[i].id === obsId){
+                    ED[aid].observaciones[i].texto = texto;
+                    break;
+                }
+            }
+            renderObsTab(aid);
+            showToast('<i data-lucide="check-circle"></i> Observaci\u00f3n editada');
+        })
+        .catch(function(){ showToast('? Error de conexi\u00f3n'); });
+}
+
+function cancelarEditObsTab(aid, obsId){
+    renderObsTab(aid);
+}
+
+function borrarObsTab(aid, obsId){
+    if(!confirm('¿Borrar esta observaci\u00f3n?')) return;
+    var f = new FormData();
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/borrar_observacion/'+obsId, {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                ED[aid].observaciones = ED[aid].observaciones.filter(function(o){ return o.id !== obsId; });
+                renderObsTab(aid);
+                var btns = document.querySelectorAll('tr[data-aid="'+aid+'"] button');
+                btns.forEach(function(b){
+                    if(b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('abrirObs') === 0){
+                        b.textContent = ED[aid].observaciones.length;
+                    }
+                });
+                showToast('<i data-lucide="check-circle"></i> Observaci\u00f3n borrada');
+            } else {
+                showToast('? Error al borrar');
+            }
+        })
+        .catch(function(){ showToast('? Error de conexi\u00f3n'); });
 }
 
 const ED = {};
@@ -1305,40 +1483,77 @@ function renderObs(aid){
         obs.forEach(function(o){
             const div = document.createElement('div');
             div.className = 'oitem';
-            div.innerHTML = '<div>'+o.texto+'</div><div class="ometa">'+o.materia+' · '+o.fecha+
+            div.innerHTML = '<div class="obs-text" id="obs-text-'+o.id+'">'+o.texto+'</div><div class="ometa">'+o.materia+' · '+o.fecha+
+                ' <button onclick="editarObs('+aid+','+o.id+',this)" style="background:none;border:none;color:var(--accent);margin-left:6px;font-size:10px;cursor:pointer;">Editar</button>'+
                 ' <button onclick="borrarObs('+aid+','+o.id+',this)" style="background:none;border:none;color:var(--red);margin-left:6px;font-size:10px;cursor:pointer;">Borrar</button></div>';
             ol.appendChild(div);
         });
     }
 }
 
-function guardarObs(){
-    const inp = document.getElementById('oTexto');
+function editarObs(aid, obsId, btn){
+    const cont = document.getElementById('obs-text-'+obsId);
+    if(!cont) return;
+    const oldText = cont.textContent;
+    const metaDiv = cont.nextElementSibling;
+    cont.innerHTML = '<input type="text" id="obs-edit-input-'+obsId+'" value="'+oldText.replace(/"/g,'&quot;')+'" style="width:100%;padding:4px 8px;border:1.5px solid var(--accent);border-radius:5px;background:var(--bg);color:var(--text);font-size:12px;font-family:\'Inter\',sans-serif;">'+
+        '<div style="margin-top:4px;display:flex;gap:4px;">'+
+        '<button onclick="guardarEditObs('+aid+','+obsId+')" style="padding:2px 8px;border:none;border-radius:4px;background:var(--accent);color:#fff;font-size:10px;font-weight:600;cursor:pointer;">Guardar</button>'+
+        '<button onclick="cancelarEditObs('+aid+','+obsId+',\''+oldText.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')" style="padding:2px 8px;border:none;border-radius:4px;background:rgba(var(--muted-rgb),.15);color:var(--muted);font-size:10px;cursor:pointer;">Cancelar</button></div>';
+}
+
+function guardarEditObs(aid, obsId){
+    const inp = document.getElementById('obs-edit-input-'+obsId);
+    if(!inp) return;
     const texto = inp.value.trim();
-    if(!texto || !_aidObs) return;
+    if(!texto) return;
     const f = new FormData();
-    f.append('aid', _aidObs);
     f.append('texto', texto);
     f.append('_csrf_token', getCsrf());
-    fetch('/'+slug+'/agregar_observacion', {method:'POST', body:f})
+    fetch('/'+slug+'/editar_observacion/'+obsId, {method:'POST', body:f})
         .then(function(r){
-            if(!r.ok){ showToast('? Error al guardar'); return null; }
+            if(!r.ok){ showToast('? Error al editar'); return null; }
             return r.json();
         })
         .then(function(o){
             if(!o) return;
-            ED[_aidObs].observaciones.unshift(o);
-            inp.value = '';
-            renderObs(_aidObs);
-            const btns = document.querySelectorAll('tr[data-aid="'+_aidObs+'"] button');
-            btns.forEach(function(b){
-                if(b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('abrirObs') === 0){
-                    b.textContent = ED[_aidObs].observaciones.length;
+            for(var i=0;i<ED[aid].observaciones.length;i++){
+                if(ED[aid].observaciones[i].id === obsId){
+                    ED[aid].observaciones[i].texto = texto;
+                    break;
                 }
-            });
-            showToast('<i data-lucide="check-circle"></i> Observación guardada');
+            }
+            renderObs(aid);
+            showToast('<i data-lucide="check-circle"></i> Observaci\u00f3n editada');
         })
-        .catch(function(){ showToast('? Error de conexión'); });
+        .catch(function(){ showToast('? Error de conexi\u00f3n'); });
+}
+
+function cancelarEditObs(aid, obsId, oldText){
+    renderObs(aid);
+}
+
+function borrarObs(aid, obsId, btn){
+    if(!confirm('¿Borrar esta observación?')) return;
+    const f = new FormData();
+    f.append('_csrf_token', getCsrf());
+    fetch('/'+slug+'/borrar_observacion/'+obsId, {method:'POST', body:f})
+        .then(function(r){
+            if(r.ok){
+                ED[aid].observaciones = ED[aid].observaciones.filter(function(o){ return o.id !== obsId; });
+                renderObs(aid);
+                const btns = document.querySelectorAll('tr[data-aid="'+aid+'"] button');
+                btns.forEach(function(b){
+                    if(b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('abrirObs') === 0){
+                        b.textContent = ED[aid].observaciones.length;
+                    }
+                });
+                showToast('<i data-lucide="check-circle"></i> Observaci\u00f3n borrada');
+            } else {
+                showToast('? Error al borrar');
+            }
+        })
+        .catch(function(){ showToast('? Error de conexi\u00f3n'); });
 }
 
 var autoSaveObsDebounced = debounce(function(){
@@ -1374,28 +1589,40 @@ var autoSaveObsDebounced = debounce(function(){
         .catch(function(){ if(ind){ ind.className = 'save-indicator error'; ind.textContent = '\uD83D\uDD34 Error'; } });
 }, 500);
 
-function borrarObs(aid, obsId, btn){
-    if(!confirm('¿Borrar esta observación?')) return;
+var autoSaveObsTabDebounced = debounce(function(){
+    const inp = document.getElementById('obsTabInput');
+    if(!inp) return;
+    const texto = inp.value.trim();
+    const ind = document.getElementById('obsTabIndicator');
+    var sel = document.getElementById('obsStudentSelect');
+    var aid = sel ? parseInt(sel.value) : null;
+    if(!texto || !aid){ if(ind) ind.textContent = ''; return; }
+    if(ind){ ind.className = 'save-indicator saving'; ind.textContent = '\uD83D\uDFE1 Guardando...'; }
     const f = new FormData();
+    f.append('aid', aid);
+    f.append('texto', texto);
     f.append('_csrf_token', getCsrf());
-    fetch('/'+slug+'/borrar_observacion/'+obsId, {method:'POST', body:f})
+    fetch('/'+slug+'/agregar_observacion', {method:'POST', body:f})
         .then(function(r){
-            if(r.ok){
-                ED[aid].observaciones = ED[aid].observaciones.filter(function(o){ return o.id !== obsId; });
-                renderObs(aid);
-                const btns = document.querySelectorAll('tr[data-aid="'+aid+'"] button');
-                btns.forEach(function(b){
-                    if(b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('abrirObs') === 0){
-                        b.textContent = ED[aid].observaciones.length;
-                    }
-                });
-                showToast('<i data-lucide="check-circle"></i> Observación borrada');
-            } else {
-                showToast('? Error al borrar');
-            }
+            if(!r.ok){ if(ind){ ind.className = 'save-indicator error'; ind.textContent = '\uD83D\uDD34 Error'; } return null; }
+            return r.json();
         })
-        .catch(function(){ showToast('? Error de conexión'); });
-}
+        .then(function(o){
+            if(!o) return;
+            ED[aid].observaciones.unshift(o);
+            inp.value = '';
+            renderObsTab(aid);
+            const btns = document.querySelectorAll('tr[data-aid="'+aid+'"] button');
+            btns.forEach(function(b){
+                if(b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('abrirObs') === 0){
+                    b.textContent = ED[aid].observaciones.length;
+                }
+            });
+            if(ind){ ind.className = 'save-indicator saved'; ind.textContent = '\uD83D\uDFE2 Guardado'; }
+            setTimeout(function(){ if(ind) ind.textContent = ''; }, 2000);
+        })
+        .catch(function(){ if(ind){ ind.className = 'save-indicator error'; ind.textContent = '\uD83D\uDD34 Error'; } });
+}, 500);
 
 function cerrarObs(){
     document.getElementById('modalObs').classList.remove('open');
@@ -1456,7 +1683,7 @@ function addDataLabels(){
         var ths = t.querySelectorAll('thead th');
         t.querySelectorAll('tbody tr').forEach(function(tr){
             tr.querySelectorAll('td').forEach(function(td,i){
-                if(ths[i]) td.setAttribute('data-label',ths[i].textContent.replace(/?.*/,'').trim());
+                if(ths[i]) td.setAttribute('data-label',ths[i].textContent.replace(/\?.*/,'').trim());
             });
         });
     });
