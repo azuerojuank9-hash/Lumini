@@ -11,9 +11,23 @@ import html
 app = Flask(__name__)
 ENV = os.environ.get('FLASK_ENV', 'production')
 
+# ── LOGGING (antes que la config para que logger esté disponible) ──────────────
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler('lumini.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
 # ── Environment-aware config ──────────────────────────────────────────────
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400 * 7 if ENV == 'production' else 86400
-app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+app.secret_key = os.environ.get('SECRET_KEY')
+if not app.secret_key:
+    app.secret_key = secrets.token_hex(32)
+    logger.warning("SECRET_KEY no definido en .env — las sesiones se invalidarán al reiniciar la app. Define SECRET_KEY en .env para evitar esto.")
 app.permanent_session_lifetime = timedelta(hours=4)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
@@ -26,10 +40,9 @@ else:
     app.config['SESSION_COOKIE_SECURE'] = (ENV == 'production')
 
 if ENV == 'production' and app.config['SESSION_COOKIE_SECURE']:
-    print(f"[LUMINI] Production mode — SESSION_COOKIE_SECURE=True, ensure HTTPS is configured.")
+    logger.info("Producción — SESSION_COOKIE_SECURE=True, asegúrate de tener HTTPS.")
 elif ENV == 'production' and not app.config['SESSION_COOKIE_SECURE']:
-    print(f"[LUMINI] WARNING: Production mode with SESSION_COOKIE_SECURE=False. "
-          "Set SESSION_COOKIE_SECURE=true or use HTTPS in real deployments.")
+    logger.warning("Producción con SESSION_COOKIE_SECURE=False. Usa HTTPS y establece SESSION_COOKIE_SECURE=true.")
 
 app.config['JSON_AS_ASCII'] = False
 app.config['TEMPLATES_AUTO_RELOAD'] = ENV != 'production'
@@ -49,16 +62,6 @@ def parse_json_filter(val):
     try: return json.loads(val) if val else {}
     except Exception: return {}
 
-# ── LOGGING ───────────────────────────────────────────────────────────────────
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler('lumini.log'),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
 # ── CONFIGURACIÓN ─────────────────────────────────────────────────────────────
 DB_FOLDER   = os.path.join(os.path.dirname(__file__), 'colegios_db')
 MASTER_DB   = os.path.join(os.path.dirname(__file__), 'master.db')
@@ -1435,7 +1438,10 @@ def admin():
             return redirect(url_for('admin'))
 
         elif accion == 'editar_colegio':
-            slug_e  = request.form.get('slug')
+            slug_e  = request.form.get('slug', '').strip().lower()
+            if not slug_e.replace('-', '').isalnum():
+                error = 'Slug inválido.'
+                return render_template('admin_panel.html', error=error, exito=exito, colegios=colegios)
             nombre  = request.form.get('nombre', '').strip()
             num_p   = request.form.get('num_periodos', 4, type=int)
             venc    = request.form.get('vencimiento', '').strip() or None
@@ -1500,7 +1506,7 @@ def recuperar_password(slug):
     if request.method == 'POST':
         if not validar_csrf():
             error = 'Error de seguridad. Intenta de nuevo.'
-            paso = 1
+            return render_template('recuperar.html', slug=slug, colegio=colegio, error=error, exito=exito, pregunta=pregunta, usuario_val=usuario_val, paso=paso)
         bloqueado = ip_bloqueada(ip, prefijo=f'recup_{slug}')
         if bloqueado:
             error = f'Demasiados intentos. Espera {bloqueado}s.'
@@ -1564,6 +1570,9 @@ def directora_buscar_usuario_recuperar(slug):
     if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
     require_colegio(slug)
     ip = request.remote_addr
+    bloqueado = ip_bloqueada(ip, prefijo=f'recup_directora_{slug}')
+    if bloqueado:
+        return jsonify({'ok': False, 'mensaje': f'Demasiados intentos. Espera {bloqueado}s.'})
     usuario = request.form.get('usuario', '').strip()
     conn = conectar(slug)
     d = conn.execute(
@@ -1583,6 +1592,9 @@ def directora_cambiar_password_recuperar(slug):
     if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
     require_colegio(slug)
     ip = request.remote_addr
+    bloqueado = ip_bloqueada(ip, prefijo=f'recup_directora_{slug}')
+    if bloqueado:
+        return jsonify({'ok': False, 'mensaje': f'Demasiados intentos. Espera {bloqueado}s.'})
     usuario   = request.form.get('usuario', '').strip()
     respuesta = request.form.get('respuesta', '').strip().lower()
     nueva     = request.form.get('nueva', '').strip()
@@ -1754,6 +1766,12 @@ def login(slug):
                 error = 'Usuario o contraseña incorrectos.'
 
         elif accion == 'rector_login':
+            bloqueado = ip_bloqueada(ip, prefijo=f'rec_{slug}')
+            if bloqueado:
+                error = f'Demasiados intentos. Espera {bloqueado}s.'
+                return render_template('login_v2.html', error=error, materias=MATERIAS,
+                                       jornadas=JORNADAS, preguntas=PREGUNTAS_SECRETAS,
+                                       slug=slug, colegio=colegio)
             u = request.form.get('rec_usuario', '').strip()
             p = request.form.get('rec_password', '').strip()
             conn = conectar(slug)
@@ -1761,10 +1779,12 @@ def login(slug):
                 'SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
             conn.close()
             if rector and verificar_pw(p, rector['password']):
+                limpiar_intentos(ip, prefijo=f'rec_{slug}')
                 session.clear()
                 session.permanent = True
                 session[f'rector_id_{slug}'] = rector['id']
                 return redirect(url_for('rector_panel', slug=slug))
+            registrar_fallo(ip, prefijo=f'rec_{slug}')
             error = 'Usuario o contraseña incorrectos.'
 
     return render_template('login_v2.html', error=error, materias=MATERIAS,
@@ -2318,8 +2338,13 @@ def archivar_alumno(slug, id):
     require_colegio(slug)
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
+    jornada, materia = get_sesion_jornada_materia(slug)
     curso_sel = request.form.get('curso', '')
     conn = conectar(slug)
+    alumno = conn.execute('SELECT curso FROM alumnos WHERE id=?', (id,)).fetchone()
+    mis_cursos = get_cursos_profesor(slug, prof['id'], materia, jornada)
+    if not alumno or alumno['curso'] not in mis_cursos:
+        conn.close(); return ('No autorizado', 403)
     conn.execute('UPDATE alumnos SET activo=0 WHERE id=?', (id,))
     conn.commit(); audit_log(slug, prof['id'], 'archivar', 'alumnos', id)
     conn.close()
@@ -2331,8 +2356,13 @@ def reactivar_alumno(slug, id):
     require_colegio(slug)
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
+    jornada, materia = get_sesion_jornada_materia(slug)
     curso_sel = request.form.get('curso', '')
     conn = conectar(slug)
+    alumno = conn.execute('SELECT curso FROM alumnos WHERE id=?', (id,)).fetchone()
+    mis_cursos = get_cursos_profesor(slug, prof['id'], materia, jornada)
+    if not alumno or alumno['curso'] not in mis_cursos:
+        conn.close(); return ('No autorizado', 403)
     conn.execute('UPDATE alumnos SET activo=1 WHERE id=?', (id,))
     conn.commit(); audit_log(slug, prof['id'], 'reactivar', 'alumnos', id)
     conn.close()
@@ -2344,8 +2374,13 @@ def eliminar_alumno(slug, id):
     require_colegio(slug)
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
+    jornada, materia = get_sesion_jornada_materia(slug)
     curso_sel = request.form.get('curso', '')
     conn = conectar(slug)
+    alumno = conn.execute('SELECT curso FROM alumnos WHERE id=?', (id,)).fetchone()
+    mis_cursos = get_cursos_profesor(slug, prof['id'], materia, jornada)
+    if not alumno or alumno['curso'] not in mis_cursos:
+        conn.close(); return ('No autorizado', 403)
     conn.execute('DELETE FROM alumnos WHERE id=?', (id,))
     conn.execute('DELETE FROM notas WHERE aid=?', (id,))
     conn.execute('DELETE FROM evaluaciones WHERE aid=?', (id,))
@@ -3063,6 +3098,9 @@ def rector_buscar_usuario_recuperar(slug):
     if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
     require_colegio(slug)
     ip = request.remote_addr
+    bloqueado = ip_bloqueada(ip, prefijo=f'recup_rector_{slug}')
+    if bloqueado:
+        return jsonify({'ok': False, 'mensaje': f'Demasiados intentos. Espera {bloqueado}s.'})
     u = request.form.get('usuario', '').strip()
     conn = conectar(slug)
     r = conn.execute('SELECT pregunta_secreta FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
@@ -3077,6 +3115,9 @@ def rector_cambiar_password_recuperar(slug):
     if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
     require_colegio(slug)
     ip = request.remote_addr
+    bloqueado = ip_bloqueada(ip, prefijo=f'recup_rector_{slug}')
+    if bloqueado:
+        return jsonify({'ok': False, 'mensaje': f'Demasiados intentos. Espera {bloqueado}s.'})
     u = request.form.get('usuario', '').strip()
     rta = request.form.get('respuesta', '').strip().lower()
     nueva = request.form.get('nueva', '').strip()
