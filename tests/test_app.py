@@ -313,12 +313,37 @@ class TestCRUD:
         assert r.status_code == 200, f'Expected 200, got {r.status_code}: {r.get_data(as_text=True)}'
         data = json.loads(r.get_data(as_text=True))
         assert data['status'] == 'ok'
+        assert 'promedio' in data, 'Response must include promedio'
         # Verify the grade was actually saved in the database
         conn = sqlite3.connect(TEST_DB)
         row = conn.execute('SELECT val FROM notas WHERE aid=1 AND actividad_id=1').fetchone()
         conn.close()
         assert row is not None, 'Grade was not saved in the database'
         assert row[0] == 4.5
+
+    def test_save_grade_single_nota_returns_correct_promedio(self, client):
+        """Una sola nota de 1.6 debe producir promedio ponderado de 1.04 (no 0.40)."""
+        conn = sqlite3.connect(TEST_DB)
+        # Limpiar notas previas de este alumno para que solo tenga esta
+        conn.execute('DELETE FROM notas WHERE aid=1')
+        conn.execute('DELETE FROM evaluaciones WHERE aid=1')
+        conn.commit()
+        conn.close()
+        with client.session_transaction() as sess:
+            sess['profesor_id_testcolegio'] = 1
+            sess['jornada_testcolegio'] = 'Mañana'
+            sess['materia_testcolegio'] = 'Matemáticas'
+            sess['_csrf_token'] = self.REUSED_CSRF
+        r = client.post('/testcolegio/guardar_nota', data={
+            '_csrf_token': self.REUSED_CSRF,
+            'actividad_id': '2',
+            'aid': '1',
+            'val': '1.6',
+        })
+        assert r.status_code == 200, f'Expected 200, got {r.status_code}: {r.get_data(as_text=True)}'
+        data = json.loads(r.get_data(as_text=True))
+        assert data['status'] == 'ok'
+        assert data['promedio'] == 1.04, f'Promedio should be 1.04 (1.6*0.65), got {data["promedio"]}'
 
     def test_save_evaluation(self, client):
         with client.session_transaction() as sess:
@@ -921,6 +946,44 @@ class TestPromedioPonderadoFormula:
 
     def test_sin_datos_retorna_none(self):
         assert _promedio_ponderado([], None, None) is None
+
+class TestPromedioUnicaNota:
+    """Verifica que con una sola nota existente el promedio sea correcto (sin dividir por total de actividades)."""
+
+    def test_una_nota_1_6_devuelve_act_prom_1_6(self):
+        r = _promedio_ponderado([1.6], None, None)
+        assert r == 1.04, f'Una nota 1.6 debe dar 1.04 (1.6*0.65), no {r}'
+
+    def test_una_nota_5_0_devuelve_3_25(self):
+        r = _promedio_ponderado([5.0], None, None)
+        assert r == 3.25, f'Una nota 5.0 debe dar 3.25 (5.0*0.65), no {r}'
+
+    def test_una_nota_con_eval_devuelve_correcto(self):
+        r = _promedio_ponderado([1.6], 3.0, None)
+        assert r == 1.79, f'act=1.6 eval=3.0 debe dar 1.79, no {r}'
+
+    def test_varias_notas_sin_eval_devuelve_correcto(self):
+        r = _promedio_ponderado([4.0, 3.0, 5.0], None, None)
+        esperado = round((4.0+3.0+5.0)/3 * 0.65, 2)
+        assert r == esperado, f'[4,3,5] sin eval debe dar {esperado}, no {r}'
+
+    def test_varias_notas_con_eval_y_auto(self):
+        r = _promedio_ponderado([4.0, 3.0], 3.5, 5.0)
+        assert r == 3.65, f'[4,3] + eval=3.5 + auto=5.0 debe dar 3.65, no {r}'
+
+    def test_sin_notas_solo_eval_devuelve_25_por_ciento(self):
+        r = _promedio_ponderado([], 1.6, None)
+        assert r == 0.40, f'sin actividades, eval=1.6 debe dar 0.40 (1.6*0.25), no {r}'
+
+    def test_notas_vacias_no_afectan_act_prom(self):
+        """Si notas_actividades tiene None, deben ser ignorados."""
+        r = _promedio_ponderado([1.6, None, None], None, None)
+        assert r == 1.04, f'None debe ser ignorado, debe dar 1.04, no {r}'
+
+    def test_sin_datos_retorna_none(self):
+        assert _promedio_ponderado([], None, None) is None
+        assert _promedio_ponderado(None, None, None) is None
+
 
 class TestMigraciones:
     """Verifica que _recrear_si_unique_incorrecto detecte y corrija UNIQUEs erroneos."""

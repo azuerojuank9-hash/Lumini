@@ -2121,7 +2121,9 @@ def borrar_actividad(slug, act_id):
 def _promedio_ponderado(notas_actividades, evaluacion, autoevaluacion):
     act_prom = None
     if notas_actividades:
-        act_prom = round(sum(notas_actividades) / len(notas_actividades), 2)
+        vals = [v for v in notas_actividades if v is not None]
+        if vals:
+            act_prom = round(sum(vals) / len(vals), 2)
     nota_final = 0
     tiene_datos = False
     if act_prom is not None:
