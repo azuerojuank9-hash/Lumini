@@ -24,10 +24,13 @@ logger = logging.getLogger(__name__)
 
 # ── Environment-aware config ──────────────────────────────────────────────
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400 * 7 if ENV == 'production' else 86400
-app.secret_key = os.environ.get('SECRET_KEY')
-if not app.secret_key:
-    app.secret_key = secrets.token_hex(32)
-    logger.warning("SECRET_KEY no definido en .env — las sesiones se invalidarán al reiniciar la app. Define SECRET_KEY en .env para evitar esto.")
+_raw_secret = (os.environ.get('SECRET_KEY') or '').strip()
+if not _raw_secret:
+    raise RuntimeError(
+        "SECRET_KEY no está definido en .env. "
+        "Genera una con: python -c \"import secrets; print(secrets.token_hex(32))\""
+    )
+app.secret_key = _raw_secret
 app.permanent_session_lifetime = timedelta(hours=4)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
@@ -70,12 +73,12 @@ os.makedirs(DB_FOLDER, exist_ok=True)
 os.makedirs(LOGO_FOLDER, exist_ok=True)
 
 # ── CREDENCIALES DESDE .env ───────────────────────────────────────────────────
-ADMIN_PASSWORD   = os.environ.get('ADMIN_PASSWORD')
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-EMAIL_ORIGEN     = os.environ.get('EMAIL_ORIGEN', 'lumini.appag@gmail.com')
+ADMIN_PASSWORD   = (os.environ.get('ADMIN_PASSWORD') or '').strip()
+SENDGRID_API_KEY = (os.environ.get('SENDGRID_API_KEY') or '').strip()
+EMAIL_ORIGEN     = (os.environ.get('EMAIL_ORIGEN') or 'lumini.appag@gmail.com').strip()
 
 if not ADMIN_PASSWORD:
-    raise RuntimeError("ADMIN_PASSWORD no está definido en .env")
+    raise RuntimeError("ADMIN_PASSWORD no está definido en .env. Crea el archivo .env con: ADMIN_PASSWORD=tu_clave")
 if not SENDGRID_API_KEY:
     logger.warning("SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.")
 
@@ -515,6 +518,25 @@ def migrar_db(slug):
         if 'jornada' not in cols_ev:
             conn.execute('ALTER TABLE evaluaciones ADD COLUMN jornada TEXT DEFAULT "Mañana"')
             conn.execute('UPDATE evaluaciones SET jornada="Mañana" WHERE jornada IS NULL OR jornada=""')
+            conn.commit()
+        # Verificar que UNIQUE incluya periodo — si no, recrear la tabla
+        create_sql = conn.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='evaluaciones'"
+        ).fetchone()
+        if create_sql and 'periodo' not in create_sql['sql'].split('UNIQUE')[1].split(')')[0] if 'UNIQUE' in create_sql['sql'] else '':
+            logger.warning(f'[{slug}] Recreando tabla evaluaciones (UNIQUE sin periodo)')
+            conn.execute('ALTER TABLE evaluaciones RENAME TO evaluaciones_old')
+            conn.execute('''CREATE TABLE evaluaciones (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                aid INTEGER NOT NULL, profesor_id INTEGER NOT NULL,
+                materia TEXT NOT NULL, jornada TEXT NOT NULL DEFAULT "Mañana",
+                evaluacion REAL, autoevaluacion REAL, periodo INTEGER DEFAULT 1,
+                UNIQUE(aid,profesor_id,materia,jornada,periodo))''')
+            conn.execute('''INSERT OR IGNORE INTO evaluaciones
+                (id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,periodo)
+                SELECT id,aid,profesor_id,materia,jornada,evaluacion,autoevaluacion,
+                       COALESCE(periodo,1) FROM evaluaciones_old''')
+            conn.execute('DROP TABLE evaluaciones_old')
             conn.commit()
 
         cols_comp = [r[1] for r in conn.execute('PRAGMA table_info(compromisos)').fetchall()]
@@ -1279,6 +1301,7 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
         eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
         auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
         final = _promedio_ponderado(notas_vals, eval_v, auto_v)
+        act_prom = round(sum(notas_vals) / len(notas_vals), 2) if notas_vals else None
 
         story.append(Paragraph(mat, mat_style))
         data = [['Actividades', 'Evaluación', 'Autoevaluación', 'Nota Final'],
