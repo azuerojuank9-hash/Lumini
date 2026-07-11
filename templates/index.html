@@ -1195,6 +1195,17 @@ function actualizarPromedio(aid){
     const cls = v >= 3.5 ? 'ph' : v >= 3.0 ? 'pm' : 'pb';
     cell.innerHTML = '<span class="'+cls+'">'+v+'</span>';
 }
+function actualizarPromedioDesdeServidor(aid, serverProm){
+    const cell = document.getElementById('prom-' + aid);
+    if(!cell) return;
+    if(serverProm === null || serverProm === undefined){
+        cell.innerHTML = '<span style="color:var(--muted)">\u0097</span>';
+        return;
+    }
+    const v = parseFloat(serverProm).toFixed(2);
+    const cls = v >= 3.5 ? 'ph' : v >= 3.0 ? 'pm' : 'pb';
+    cell.innerHTML = '<span class="'+cls+'">'+v+'</span>';
+}
 
 function actualizarStatsCurso(data){
     if(!data) return;
@@ -1245,7 +1256,7 @@ function autoSaveNota(inp){
         .then(function(data){
             if(!data) return;
             updateIndicator(inp, 'saved');
-            actualizarPromedio(aid);
+            actualizarPromedioDesdeServidor(aid, data.promedio);
             actualizarStatsCurso(data);
         })
         .catch(function(){ updateIndicator(inp, 'error'); });
@@ -1276,7 +1287,7 @@ function autoSaveEval(inp){
         .then(function(data){
             if(!data) return;
             updateIndicator(inp, 'saved');
-            actualizarPromedio(aid);
+            actualizarPromedioDesdeServidor(aid, data.promedio);
             actualizarStatsCurso(data);
         })
         .catch(function(){ updateIndicator(inp, 'error'); });
