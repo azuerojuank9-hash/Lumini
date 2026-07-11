@@ -882,6 +882,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                     <th>Eval.</th>
                     <th>Autoev.</th>
                     <th>Prom.</th>
+                    <th>N.Final</th>
                     <th>Asist.</th>
                     <th>Obs.</th>
                     <th>Del</th>
@@ -911,6 +912,11 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                 <td class="pc prom-cell" id="prom-{{ e.id }}">
                     <span class="{% if e.promedio is not none and e.promedio>=3.5 %}ph{% elif e.promedio is not none and e.promedio>=3.0 %}pm{% elif e.promedio is not none %}pb{% endif %}">
                         {{ e.promedio if e.promedio is not none else '' }}
+                    </span>
+                </td>
+                <td class="pc nf-cell" id="nf-{{ e.id }}">
+                    <span class="{% if e.nota_final is not none and e.nota_final>=3.5 %}ph{% elif e.nota_final is not none and e.nota_final>=3.0 %}pm{% elif e.nota_final is not none %}pb{% endif %}">
+                        {{ e.nota_final if e.nota_final is not none else '' }}
                     </span>
                 </td>
                 <td>
@@ -1206,6 +1212,17 @@ function actualizarPromedioDesdeServidor(aid, serverProm){
     const cls = v >= 3.5 ? 'ph' : v >= 3.0 ? 'pm' : 'pb';
     cell.innerHTML = '<span class="'+cls+'">'+v+'</span>';
 }
+function actualizarNotaFinalDesdeServidor(aid, nf){
+    const cell = document.getElementById('nf-' + aid);
+    if(!cell) return;
+    if(nf === null || nf === undefined){
+        cell.innerHTML = '<span style="color:var(--muted)">\u0097</span>';
+        return;
+    }
+    const v = parseFloat(nf).toFixed(2);
+    const cls = v >= 3.5 ? 'ph' : v >= 3.0 ? 'pm' : 'pb';
+    cell.innerHTML = '<span class="'+cls+'">'+v+'</span>';
+}
 
 function actualizarStatsCurso(data){
     if(!data) return;
@@ -1257,6 +1274,7 @@ function autoSaveNota(inp){
             if(!data) return;
             updateIndicator(inp, 'saved');
             actualizarPromedioDesdeServidor(aid, data.promedio);
+            actualizarNotaFinalDesdeServidor(aid, data.nota_final);
             actualizarStatsCurso(data);
         })
         .catch(function(){ updateIndicator(inp, 'error'); });
@@ -1288,6 +1306,7 @@ function autoSaveEval(inp){
             if(!data) return;
             updateIndicator(inp, 'saved');
             actualizarPromedioDesdeServidor(aid, data.promedio);
+            actualizarNotaFinalDesdeServidor(aid, data.nota_final);
             actualizarStatsCurso(data);
         })
         .catch(function(){ updateIndicator(inp, 'error'); });

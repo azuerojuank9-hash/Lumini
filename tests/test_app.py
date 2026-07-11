@@ -870,7 +870,7 @@ class TestGradesSystem:
         assert log is not None, 'Audit log entry not found for note edit'
 
     def test_promedio_ponderado_consistency(self, client):
-        """Verify PROM column shows simple avg (not weighted) across all views."""
+        """Verify PROM = simple avg, N.Final = weighted (65/25/10)."""
         with client.session_transaction() as sess:
             sess['profesor_id_testcolegio'] = 1
             sess['jornada_testcolegio'] = 'Mañana'
@@ -892,8 +892,11 @@ class TestGradesSystem:
         assert r.status_code == 200
         html = r.get_data(as_text=True)
         # PROM column = simple avg of actividades (5+3)/2 = 4.0
-        assert 'id="prom-1"' in html, 'Promedio cell not found in HTML'
-        assert '4.0' in html, f'Expected simple avg 4.0 in PROM column, got HTML without it'
+        assert 'id="prom-1"' in html
+        assert '4.0' in html, f'Expected simple avg 4.0 in PROM column'
+        # N.Final column = 4.0*0.65 + 4.0*0.25 + 3.0*0.10 = 3.9
+        assert 'id="nf-1"' in html
+        assert '3.9' in html, f'Expected weighted 3.9 in N.Final column'
 
 
 # ── Promedio Ponderado Formula ──

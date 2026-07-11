@@ -1986,6 +1986,7 @@ def home(slug):
             auto_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
             vals = [nr['val'] for nr in notas_raw]
             prom = _promedio_simple(vals)
+            nota_final = _promedio_ponderado(vals, eval_v, auto_v)
             historial_raw = asis_all.get(a['id'], [])
             hist_meses = {}
             for h in historial_raw:
@@ -1999,7 +2000,7 @@ def home(slug):
             datos.append({
                 'id': a['id'], 'num_curso': a['num_curso'],
                 'nombre': a['nombre'], 'curso': a['curso'],
-                'promedio': prom, 'notas_map': notas_map,
+                'promedio': prom, 'nota_final': nota_final, 'notas_map': notas_map,
                 'evaluacion':     eval_v if eval_v is not None else '',
                 'autoevaluacion': auto_v if auto_v is not None else '',
                 'asistencia': ult_estado or '-',
@@ -2157,6 +2158,21 @@ def calcular_stats_estudiante(conn, slug, aid, curso_sel, materia, jornada, peri
                  len(notas_raw), vals)
     return _promedio_simple(vals)
 
+def calcular_nota_final_estudiante(conn, slug, aid, curso_sel, materia, jornada, periodo, profesor_id):
+    notas_raw = conn.execute(
+        '''SELECT n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+           WHERE n.aid=? AND ac.materia=? AND ac.jornada=? AND ac.curso=?
+           AND COALESCE(ac.periodo,1)=? AND ac.profesor_id=?''',
+        (aid, materia, jornada, curso_sel, periodo, profesor_id)).fetchall()
+    ev = conn.execute(
+        '''SELECT evaluacion, autoevaluacion FROM evaluaciones
+           WHERE aid=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
+        (aid, materia, jornada, periodo)).fetchone()
+    vals = [r['val'] for r in notas_raw] if notas_raw else []
+    eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
+    auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
+    return _promedio_ponderado(vals, eval_v, auto_v)
+
 def calcular_stats_curso(conn, slug, curso_sel, materia, jornada, periodo, profesor_id):
     alumnos = conn.execute(
         'SELECT id FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
@@ -2224,10 +2240,11 @@ def guardar_nota(slug):
               valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'val': val})
     jornada, materia = get_sesion_jornada_materia(slug)
     prom_est = calcular_stats_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
+    nf = calcular_nota_final_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
     curso_stats = calcular_stats_curso(conn, slug, act['curso'], materia, jornada, act['p'], prof['id'])
     conn.close()
-    logger.info('guardar_nota: aid=%d actividad_id=%d val=%s prom_est=%s', aid, actividad_id, val, prom_est)
-    return jsonify({'status':'ok','promedio':prom_est,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
+    logger.info('guardar_nota: aid=%d actividad_id=%d val=%s prom_est=%s nf=%s', aid, actividad_id, val, prom_est, nf)
+    return jsonify({'status':'ok','promedio':prom_est,'nota_final':nf,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
 
 # ── EVALUACIONES ──────────────────────────────────────────────────────────────
 @app.route('/<slug>/guardar_evaluacion', methods=['POST'])
@@ -2297,9 +2314,10 @@ def guardar_evaluacion(slug):
               valor_anterior={'aid': aid, 'evaluacion': old_eval, 'autoevaluacion': old_auto},
               valor_nuevo={'aid': aid, 'evaluacion': ev_final, 'autoevaluacion': au_final})
     prom_est = calcular_stats_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
+    nf = calcular_nota_final_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
     curso_stats = calcular_stats_curso(conn, slug, curso, materia, jornada, periodo, prof['id'])
     conn.close()
-    return jsonify({'status':'ok','promedio':prom_est,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
+    return jsonify({'status':'ok','promedio':prom_est,'nota_final':nf,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
 
 # ── SOLICITUDES DE MODIFICACION ──────────────────────────────────────────────
 @app.route('/<slug>/solicitar_modificacion', methods=['POST'])
