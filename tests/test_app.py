@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
 
-from flask_app import app, init_db, hash_pw, _promedio_ponderado, _recrear_si_unique_incorrecto
+from flask_app import app, init_db, hash_pw, _promedio_ponderado, _promedio_simple, _recrear_si_unique_incorrecto
 
 import pytest
 
@@ -322,9 +322,8 @@ class TestCRUD:
         assert row[0] == 4.5
 
     def test_save_grade_single_nota_returns_correct_promedio(self, client):
-        """Una sola nota de 1.6 debe producir promedio ponderado de 1.04 (no 0.40)."""
+        """Una sola nota de 1.6 debe mostrar promedio simple de 1.6 (sin ponderar)."""
         conn = sqlite3.connect(TEST_DB)
-        # Limpiar notas previas de este alumno para que solo tenga esta
         conn.execute('DELETE FROM notas WHERE aid=1')
         conn.execute('DELETE FROM evaluaciones WHERE aid=1')
         conn.commit()
@@ -343,7 +342,7 @@ class TestCRUD:
         assert r.status_code == 200, f'Expected 200, got {r.status_code}: {r.get_data(as_text=True)}'
         data = json.loads(r.get_data(as_text=True))
         assert data['status'] == 'ok'
-        assert data['promedio'] == 1.04, f'Promedio should be 1.04 (1.6*0.65), got {data["promedio"]}'
+        assert data['promedio'] == 1.6, f'PROM debe ser 1.6 (simple avg), got {data["promedio"]}'
 
     def test_save_evaluation(self, client):
         with client.session_transaction() as sess:
@@ -871,7 +870,7 @@ class TestGradesSystem:
         assert log is not None, 'Audit log entry not found for note edit'
 
     def test_promedio_ponderado_consistency(self, client):
-        """Verify _promedio_ponderado returns the same value across all views."""
+        """Verify PROM column shows simple avg (not weighted) across all views."""
         with client.session_transaction() as sess:
             sess['profesor_id_testcolegio'] = 1
             sess['jornada_testcolegio'] = 'Mañana'
@@ -892,10 +891,9 @@ class TestGradesSystem:
         r = client.get('/testcolegio/?curso=Primero+A&periodo=1')
         assert r.status_code == 200
         html = r.get_data(as_text=True)
-        # act_prom=(5+3)/2=4.0, eval=4.0, auto=3.0
-        # final = 4.0*0.65 + 4.0*0.25 + 3.0*0.10 = 2.6+1.0+0.3 = 3.9
+        # PROM column = simple avg of actividades (5+3)/2 = 4.0
         assert 'id="prom-1"' in html, 'Promedio cell not found in HTML'
-        assert '3.9' in html, f'Expected promedio 3.9 in dashboard HTML'
+        assert '4.0' in html, f'Expected simple avg 4.0 in PROM column, got HTML without it'
 
 
 # ── Promedio Ponderado Formula ──
@@ -983,6 +981,42 @@ class TestPromedioUnicaNota:
     def test_sin_datos_retorna_none(self):
         assert _promedio_ponderado([], None, None) is None
         assert _promedio_ponderado(None, None, None) is None
+
+
+class TestPromedioSimple:
+    """_promedio_simple: promedio exacto como calculadora (suma/cant, sin ponderar)."""
+
+    def test_una_nota_1_6(self):
+        assert _promedio_simple([1.6]) == 1.6
+
+    def test_una_nota_5_0(self):
+        assert _promedio_simple([5.0]) == 5.0
+
+    def test_dos_notas(self):
+        assert _promedio_simple([4.0, 3.0]) == 3.5
+
+    def test_tres_notas(self):
+        assert _promedio_simple([4.0, 3.0, 5.0]) == 4.0
+
+    def test_notas_con_none_ignorados(self):
+        assert _promedio_simple([1.6, None, None]) == 1.6
+
+    def test_todos_none_retorna_none(self):
+        assert _promedio_simple([None, None]) is None
+
+    def test_lista_vacia_retorna_none(self):
+        assert _promedio_simple([]) is None
+
+    def test_none_retorna_none(self):
+        assert _promedio_simple(None) is None
+
+    def test_redondeo_2_decimales(self):
+        r = _promedio_simple([4.0, 3.0, 5.0, 2.0])
+        esperado = round((4.0+3.0+5.0+2.0)/4, 2)
+        assert r == esperado, f'Esperado {esperado}, obtenido {r}'
+
+    def test_suma_entera_con_decimales(self):
+        assert _promedio_simple([3.3, 3.3, 3.3]) == 3.3
 
 
 class TestMigraciones:

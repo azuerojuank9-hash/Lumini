@@ -1985,7 +1985,7 @@ def home(slug):
             eval_v = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
             auto_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
             vals = [nr['val'] for nr in notas_raw]
-            prom = _promedio_ponderado(vals, eval_v, auto_v)
+            prom = _promedio_simple(vals)
             historial_raw = asis_all.get(a['id'], [])
             hist_meses = {}
             for h in historial_raw:
@@ -2118,13 +2118,17 @@ def borrar_actividad(slug, act_id):
     return redirect(url_for('home', slug=slug, curso=curso))
 
 # ── CENTRAL WEIGHTED AVERAGE (65/25/10) ──────────────────────────────────────
+def _promedio_simple(notas_actividades):
+    """Average of graded activities only (empty = not counted)."""
+    if not notas_actividades:
+        return None
+    vals = [v for v in notas_actividades if v is not None]
+    if not vals:
+        return None
+    return round(sum(vals) / len(vals), 2)
+
 def _promedio_ponderado(notas_actividades, evaluacion, autoevaluacion):
-    act_prom = None
-    if notas_actividades:
-        vals = [v for v in notas_actividades if v is not None]
-        logger.debug('_promedio_ponderado: notas_actividades=%s vals_filtrados=%s len(vals)=%d', notas_actividades, vals, len(vals) if vals else 0)
-        if vals:
-            act_prom = round(sum(vals) / len(vals), 2)
+    act_prom = _promedio_simple(notas_actividades)
     logger.debug('_promedio_ponderado: act_prom=%s evaluacion=%s autoevaluacion=%s', act_prom, evaluacion, autoevaluacion)
     nota_final = 0
     tiene_datos = False
@@ -2147,17 +2151,11 @@ def calcular_stats_estudiante(conn, slug, aid, curso_sel, materia, jornada, peri
            WHERE n.aid=? AND ac.materia=? AND ac.jornada=? AND ac.curso=?
            AND COALESCE(ac.periodo,1)=? AND ac.profesor_id=?''',
         (aid, materia, jornada, curso_sel, periodo, profesor_id)).fetchall()
-    ev = conn.execute(
-        '''SELECT evaluacion, autoevaluacion FROM evaluaciones
-           WHERE aid=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
-        (aid, materia, jornada, periodo)).fetchone()
-    eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
-    auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
     vals = [r['val'] for r in notas_raw] if notas_raw else []
-    logger.debug('calcular_stats_estudiante slug=%s aid=%d curso=%s materia=%s jornada=%s periodo=%d prof=%d notas_raw=%d vals=%s eval=%s auto=%s',
+    logger.debug('calcular_stats_estudiante slug=%s aid=%d curso=%s materia=%s jornada=%s periodo=%d prof=%d notas_raw=%d vals=%s',
                  slug, aid, curso_sel, materia, jornada, periodo, profesor_id,
-                 len(notas_raw), vals, eval_v, auto_v)
-    return _promedio_ponderado(vals, eval_v, auto_v)
+                 len(notas_raw), vals)
+    return _promedio_simple(vals)
 
 def calcular_stats_curso(conn, slug, curso_sel, materia, jornada, periodo, profesor_id):
     alumnos = conn.execute(
