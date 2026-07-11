@@ -2122,8 +2122,10 @@ def _promedio_ponderado(notas_actividades, evaluacion, autoevaluacion):
     act_prom = None
     if notas_actividades:
         vals = [v for v in notas_actividades if v is not None]
+        logger.debug('_promedio_ponderado: notas_actividades=%s vals_filtrados=%s len(vals)=%d', notas_actividades, vals, len(vals) if vals else 0)
         if vals:
             act_prom = round(sum(vals) / len(vals), 2)
+    logger.debug('_promedio_ponderado: act_prom=%s evaluacion=%s autoevaluacion=%s', act_prom, evaluacion, autoevaluacion)
     nota_final = 0
     tiene_datos = False
     if act_prom is not None:
@@ -2135,7 +2137,9 @@ def _promedio_ponderado(notas_actividades, evaluacion, autoevaluacion):
     if autoevaluacion is not None:
         nota_final += autoevaluacion * 0.10
         tiene_datos = True
-    return round(nota_final, 2) if tiene_datos else None
+    resultado = round(nota_final, 2) if tiene_datos else None
+    logger.debug('_promedio_ponderado: resultado=%s', resultado)
+    return resultado
 
 def calcular_stats_estudiante(conn, slug, aid, curso_sel, materia, jornada, periodo, profesor_id):
     notas_raw = conn.execute(
@@ -2150,6 +2154,9 @@ def calcular_stats_estudiante(conn, slug, aid, curso_sel, materia, jornada, peri
     eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
     auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
     vals = [r['val'] for r in notas_raw] if notas_raw else []
+    logger.debug('calcular_stats_estudiante slug=%s aid=%d curso=%s materia=%s jornada=%s periodo=%d prof=%d notas_raw=%d vals=%s eval=%s auto=%s',
+                 slug, aid, curso_sel, materia, jornada, periodo, profesor_id,
+                 len(notas_raw), vals, eval_v, auto_v)
     return _promedio_ponderado(vals, eval_v, auto_v)
 
 def calcular_stats_curso(conn, slug, curso_sel, materia, jornada, periodo, profesor_id):
@@ -2221,6 +2228,7 @@ def guardar_nota(slug):
     prom_est = calcular_stats_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
     curso_stats = calcular_stats_curso(conn, slug, act['curso'], materia, jornada, act['p'], prof['id'])
     conn.close()
+    logger.info('guardar_nota: aid=%d actividad_id=%d val=%s prom_est=%s', aid, actividad_id, val, prom_est)
     return jsonify({'status':'ok','promedio':prom_est,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
 
 # ── EVALUACIONES ──────────────────────────────────────────────────────────────
