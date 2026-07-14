@@ -1,27 +1,11 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
+{% extends "base.html" %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% block title %}Lumini — Panel Admin{% endblock %}
 
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — Panel Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 3px rgba(0,0,0,.15);--sidebar:200px;}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.15);}
-*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.sidebar-logo{padding:14px 14px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
 .sidebar-logo img{height:30px;width:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
-.sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}
 .sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}
 .sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
 .sidebar-link.active{background:var(--accent);color:#fff;}
@@ -51,7 +35,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .codigo-badge{display:inline-block;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#A78BFA;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:700;letter-spacing:1px;font-family:monospace;}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-@media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr;}}
 table{border-collapse:collapse;width:100%;font-size:12px;}
 th{padding:7px 5px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #1E293B;background:#0F172A;white-space:nowrap;vertical-align:middle;}
 td{padding:6px 4px;border-bottom:1px solid rgba(30,41,59,.5);vertical-align:middle;}
@@ -78,11 +61,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
 .scroll-top.show{display:flex;}
 .toast{position:fixed;bottom:20px;right:20px;background:rgba(15,23,42,.95);border:1px solid rgba(var(--accent-rgb),.3);color:var(--text);padding:8px 14px;border-radius:8px;font-size:12px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4);}
 .toast.show{opacity:1;transform:translateY(0);}
-.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:36px;height:36px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
-.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
-.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);}
 .prof-chip{display:inline-block;background:#1E293B;border:1px solid #1E293B;border-radius:6px;padding:3px 8px;font-size:11px;margin:2px;color:var(--muted);}
-@media(max-width:600px){
   table,thead,tbody,tr,td,th{display:block;}
   thead{display:none;}
   tr{border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px;background:var(--bg2);}
@@ -94,7 +73,6 @@ tr:hover td{background:rgba(var(--accent-rgb),.03);}
   .btn-sm{min-height:36px;font-size:13px;display:inline-flex;align-items:center;justify-content:center;width:100%;gap:6px;}
   tr:hover td{background:none;}
 }
-@media(max-width:375px){.main{padding:20px 24px;}.section-title{font-size:14px;}.card{padding:10px;}.card-head{padding:10px 14px;}.card-title{font-size:12px;}.grid-2,.grid-3{gap:8px;}.field input,.field select{font-size:14px;padding:9px 10px;}.field label{font-size:9px;}.btn-sm{font-size:13px;min-height:36px;padding:8px 16px;}.hamburger{width:36px;height:36px;}.stats-row{gap:6px;}.stat{min-width:100px;padding:10px;}.stat .num{font-size:1.2rem;}.actions-cell{gap:3px;}}
 .venc-ok{color:var(--green);}
 .venc-warn{color:var(--yellow);}
 .venc-danger{color:var(--red);font-weight:700;}
@@ -112,37 +90,9 @@ body .btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM 
 .btn-green{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);}
 .btn-yellow{background:rgba(245,158,11,.1);color:var(--yellow);border:1px solid rgba(245,158,11,.2);}
 .btn-sm{padding:8px 16px;font-size:13px;min-height:36px;}
-@media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 24px;}}
-</style>
-<!-- Datadog RUM -->
-<script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
+{% endblock %}
 
-<body>
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<aside class="sidebar" id="sidebar">
-    <a href="/admin" style="text-decoration:none;color:inherit;">
-    <div class="sidebar-logo">
-        <img src="/static/lumini_logo.webp" alt="Lumini">
-        <div>
-            <div class="sidebar-brand">LUMINI</div>
-            <div class="sidebar-brand-sub">Panel de Administración</div>
-        </div>
-    </div>
-    </a>
-    <nav class="sidebar-nav">
-        <a href="/admin" class="sidebar-link active"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
-        <a href="/admin/codigos" class="sidebar-link"><span class="icon"><i data-lucide="key"></i></span> Códigos de invitación</a>
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
-        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
-    </nav>
-</aside>
-
-<div class="main">
-
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
-
+{% block content %}
 {% if error %}<div class="alert alert-error"><i data-lucide="alert-triangle"></i>️ {{ error }}</div>{% endif %}
 {% if exito %}<div class="alert alert-success"><i data-lucide="check-circle"></i> {{ exito }}</div>{% endif %}
 
@@ -463,111 +413,5 @@ body .btn{padding:8px 16px;border:none;border-radius:var(--rsm);font-family:'DM 
 </div>
 
 <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
-<div class="toast" id="toast"></div>
-
-<script>
-function addDataLabels(){
-    document.querySelectorAll('table').forEach(function(t){
-        var ths = t.querySelectorAll('thead th');
-        t.querySelectorAll('tbody tr').forEach(function(tr){
-            tr.querySelectorAll('td').forEach(function(td,i){
-                if(ths[i]) td.setAttribute('data-label', ths[i].textContent.trim());
-            });
-        });
-    });
-}
-window.addEventListener('scroll',function(){
-    var st = document.getElementById('scrollTop');
-    if(st) st.classList.toggle('show', window.scrollY > 400);
-});
-addDataLabels();
-function abrirEditar(slug, nombre, periodos, vencimiento, codigo, primary, secondary) {
-    document.getElementById('edit-slug').value = slug;
-    document.getElementById('edit-nombre').value = nombre;
-    document.getElementById('edit-periodos').value = String(periodos);
-    document.getElementById('edit-vencimiento').value = vencimiento;
-    document.getElementById('edit-codigo').value = codigo;
-    document.getElementById('edit-primary').value = primary || '#7C3AED';
-    document.getElementById('edit-secondary').value = secondary || '#7C3AED';
-    document.getElementById('modalEditar').classList.add('open');
-}
-function cerrarEditar() { document.getElementById('modalEditar').classList.remove('open'); }
-
-function verCodigo(slug) {
-    var badge = document.getElementById('cod-' + slug);
-    var btn   = document.getElementById('btn-cod-' + slug);
-    if (badge.style.display === 'none') {
-        badge.style.display = 'inline-block';
-        btn.innerHTML = '<i data-lucide="eye-off"></i> Ocultar';
-    } else {
-        badge.style.display = 'none';
-        btn.innerHTML = '<i data-lucide="key"></i> Ver código';
-    }
-}
-
-function toggleCod(id, btn) {
-    var inp = document.getElementById(id);
-    if (inp.type === 'text') { inp.type = 'password'; btn.innerHTML = '<i data-lucide="eye"></i>'; }
-    else { inp.type = 'text'; btn.innerHTML = '<i data-lucide="eye-off"></i>'; }
-}
-
-function verProfesores(slug, nombre) {
-    document.getElementById('prof-colegio-nombre').textContent = nombre;
-    document.getElementById('prof-contenido').innerHTML = '<p style="color:var(--muted);font-size:13px;">Cargando...</p>';
-    document.getElementById('modalProfesores').classList.add('open');
-    fetch('/admin/profesores/' + slug)
-        .then(function(r){ return r.json(); })
-        .then(function(data){
-            if (!data.profesores || data.profesores.length === 0) {
-                document.getElementById('prof-contenido').innerHTML =
-                    '<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No hay profesores registrados.</p>';
-                return;
-            }
-            var html = '<table><thead><tr><th>#</th><th>Nombre</th><th>Usuario</th><th>Materias</th><th style="text-align:center;">Estado</th></tr></thead><tbody>';
-            data.profesores.forEach(function(p, i){
-                var badge = p.activo
-                    ? '<span class="badge badge-ok"><i data-lucide="check-circle"></i> Activo</span>'
-                    : '<span class="badge badge-off"><i data-lucide="x-circle"></i> Inactivo</span>';
-                var materias = p.materias.map(function(m){
-                    return '<span class="prof-chip">' + m.materia + ' · ' + m.jornada + '</span>';
-                }).join('');
-                html += '<tr><td style="color:var(--muted);">' + (i+1) + '</td>'
-                    + '<td style="font-weight:600;">' + p.nombre + '</td>'
-                    + '<td style="font-size:11px;color:var(--muted);">' + p.usuario + '</td>'
-                    + '<td>' + (materias || '<span style="color:#64748B;font-size:11px;">Sin asignar</span>') + '</td>'
-                    + '<td style="text-align:center;">' + badge + '</td></tr>';
-            });
-            html += '</tbody></table>';
-            html += '<p style="color:var(--muted);font-size:11px;margin-top:12px;text-align:right;">' + data.profesores.length + ' profesor(es)</p>';
-            document.getElementById('prof-contenido').innerHTML = html;
-        })
-        .catch(function(){
-            document.getElementById('prof-contenido').innerHTML =
-                '<p style="color:var(--red);font-size:13px;">Error al cargar profesores.</p>';
-        });
-}
-function cerrarProfesores() { document.getElementById('modalProfesores').classList.remove('open'); }
-
-function toggleSidebar(){
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
-}
-function showToast(msg, ok){
-    ok = ok !== false;
-    var t = document.getElementById('toast');
-    t.innerHTML = msg;
-    t.style.borderColor = ok ? 'rgba(16,185,129,.4)' : 'rgba(239,68,68,.4)';
-    t.classList.add('show');
-    setTimeout(function(){ t.classList.remove('show'); }, 3000);
-}
-</script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-
-</html>
-
-
-
-
-
-
+<div class="toast" id="toast">
+{% endblock %}

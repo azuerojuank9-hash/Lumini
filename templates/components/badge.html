@@ -1,0 +1,14 @@
+{% macro badge(text, type='neutral', size='', dot=false) %}
+<span class="badge badge-{{ type }}{% if size %} badge-{{ size }}{% endif %}{% if dot %} badge-dot{% endif %}" role="status">
+  {% if dot %}{% else %}{{ text }}{% endif %}
+</span>
+{% endmacro %}
+
+{% macro status_badge(status) %}
+{% set map = {'activo': 'success', 'inactivo': 'danger', 'pendiente': 'warning',
+              'borrador': 'neutral', 'publicado': 'success', 'abierto': 'success',
+              'cerrado': 'danger', 'aprobado': 'success', 'rechazado': 'danger',
+              'pagado': 'success', 'vencido': 'danger'} %}
+{% set color = map.get(status|lower, 'neutral') %}
+<span class="badge badge-{{ color }}">{{ status }}</span>
+{% endmacro %}

@@ -1,0 +1,19 @@
+{% macro pagination(current, total, base_url='') %}
+{% if total > 1 %}
+<nav class="flex gap-sm" role="navigation" aria-label="Paginación">
+  {% if current > 1 %}
+  <a href="{{ base_url }}?page={{ current - 1 }}" class="btn btn-sm btn-ghost" aria-label="Página anterior">
+    <i data-lucide="chevron-left" width="14" height="14"></i>
+  </a>
+  {% endif %}
+  {% for p in range(1, total + 1) %}
+  <a href="{{ base_url }}?page={{ p }}" class="btn btn-sm {% if p == current %}btn-primary{% else %}btn-ghost{% endif %}" aria-label="Página {{ p }}" {% if p == current %}aria-current="page"{% endif %}>{{ p }}</a>
+  {% endfor %}
+  {% if current < total %}
+  <a href="{{ base_url }}?page={{ current + 1 }}" class="btn btn-sm btn-ghost" aria-label="Página siguiente">
+    <i data-lucide="chevron-right" width="14" height="14"></i>
+  </a>
+  {% endif %}
+</nav>
+{% endif %}
+{% endmacro %}

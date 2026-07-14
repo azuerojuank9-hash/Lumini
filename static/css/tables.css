@@ -1,0 +1,37 @@
+/* LUMINI Design System — Tables */
+.table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: var(--font-sm); }
+thead { background: var(--bg3); }
+th { text-align: left; padding: 10px 14px; font-weight: 600; color: var(--muted); font-size: var(--font-xs); text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; border-bottom: 1px solid var(--border); cursor: default; user-select: none; }
+th.sortable { cursor: pointer; }
+th.sortable:hover { color: var(--accent); }
+th.sortable::after { content: ''; display: inline-block; width: 12px; height: 12px; margin-left: 4px; vertical-align: middle; opacity: .3; }
+th.sort-asc::after { content: '▲'; opacity: 1; color: var(--accent); }
+th.sort-desc::after { content: '▼'; opacity: 1; color: var(--accent); }
+td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg3); }
+tr.selected td { background: rgba(124,58,237,.08); }
+.table-sticky th { position: sticky; top: 0; z-index: 1; }
+.table-compact td, .table-compact th { padding: 6px 10px; font-size: var(--font-xs); }
+.table-striped tbody tr:nth-child(even) td { background: var(--bg3); }
+.table-card { border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+.table-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--spacing-sm); padding: 12px 14px; background: var(--bg3); border-bottom: 1px solid var(--border); }
+.table-search { position: relative; }
+.table-search input { padding: 7px 12px 7px 32px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: var(--font-sm); width: 220px; transition: width var(--tr); }
+.table-search input:focus { width: 300px; outline: none; border-color: var(--accent); }
+.table-search .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); width: 14px; height: 14px; pointer-events: none; }
+.table-col-toggle { display: flex; gap: 4px; flex-wrap: wrap; }
+.table-col-toggle label { font-size: var(--font-xs); padding: 4px 8px; border-radius: var(--radius-sm); background: var(--bg2); border: 1px solid var(--border); cursor: pointer; transition: all var(--tr); }
+.table-col-toggle label:hover { border-color: var(--accent); }
+.table-col-toggle input { display: none; }
+.table-col-toggle input:checked + span { color: var(--accent); }
+.table-empty { text-align: center; padding: 40px 20px; color: var(--muted); }
+.table-empty-icon { font-size: 32px; opacity: .2; margin-bottom: 8px; }
+.table-count { font-size: var(--font-xs); color: var(--muted); }
+@media(max-width:768px) {
+  .table-toolbar { flex-direction: column; align-items: stretch; }
+  .table-search input { width: 100%; }
+  .table-search input:focus { width: 100%; }
+  td, th { padding: 8px 10px; }
+}

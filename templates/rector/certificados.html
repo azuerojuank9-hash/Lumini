@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}LUMINI — Certificados{% endblock %}
+
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block sidebar %}
+{% include "rector_panel.html" %}
+{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h1><i data-lucide="file-text" style="color:var(--accent);"></i> Certificados</h1>
+  <div class="breadcrumb">Generación de documentos oficiales</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+  <div class="card" onclick="window.open('/{{ slug }}/api/rector/certificados/constancia?curso=','_blank')" style="cursor:pointer;">
+    <div class="card-body" style="text-align:center;padding:30px 20px;">
+      <i data-lucide="graduation-cap" style="width:40px;height:40px;color:var(--accent);margin-bottom:10px;"></i>
+      <h3 style="font-size:14px;margin-bottom:6px;">Constancia de Estudio</h3>
+      <p style="font-size:12px;color:var(--muted);">Certificado de matrícula vigente</p>
+    </div>
+  </div>
+  <div class="card" onclick="window.open('/{{ slug }}/api/rector/certificados/estudio?curso=','_blank')" style="cursor:pointer;">
+    <div class="card-body" style="text-align:center;padding:30px 20px;">
+      <i data-lucide="award" style="width:40px;height:40px;color:var(--accent);margin-bottom:10px;"></i>
+      <h3 style="font-size:14px;margin-bottom:6px;">Certificado de Estudio</h3>
+      <p style="font-size:12px;color:var(--muted);">Certificado final con notas</p>
+    </div>
+  </div>
+  <div class="card" onclick="window.open('/{{ slug }}/api/rector/certificados/paz-y-salvo?curso=','_blank')" style="cursor:pointer;">
+    <div class="card-body" style="text-align:center;padding:30px 20px;">
+      <i data-lucide="check-circle" style="width:40px;height:40px;color:var(--accent);margin-bottom:10px;"></i>
+      <h3 style="font-size:14px;margin-bottom:6px;">Paz y Salvo</h3>
+      <p style="font-size:12px;color:var(--muted);">Certificado de cuenta en cero</p>
+    </div>
+  </div>
+  <div class="card" onclick="window.open('/{{ slug }}/api/rector/certificados/conducta?curso=','_blank')" style="cursor:pointer;">
+    <div class="card-body" style="text-align:center;padding:30px 20px;">
+      <i data-lucide="heart" style="width:40px;height:40px;color:var(--accent);margin-bottom:10px;"></i>
+      <h3 style="font-size:12px;margin-bottom:6px;">Certificado de Conducta</h3>
+      <p style="font-size:12px;color:var(--muted);">Constancia de comportamiento</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

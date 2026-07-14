@@ -1,34 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
+{% extends "base.html" %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% block title %}Comunicaciones — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comunicaciones — {{ colegio.nombre if colegio else slug }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;--shadow:0 1px 3px rgba(0,0,0,.15);}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;line-height:1.5;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
-.sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.sidebar-logo{width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0;}
-.sidebar-brand{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sidebar-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;}
-.sidebar-section{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px;font-weight:600;}
-.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);margin-bottom:1px;cursor:pointer;position:relative;}
-.sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text);}
-.sidebar-item.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
-.sidebar-item .icon{width:18px;text-align:center;font-size:13px;flex-shrink:0;}
-.badge-count{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center;}
-.sidebar-user{border-top:1px solid var(--border);padding:12px 14px;font-size:12px;}
-.sidebar-user .name{color:var(--text);font-weight:600;font-size:12px;}
-.sidebar-user .role{color:var(--muted);font-size:10px;margin-top:2px;}
-.main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:1400px;width:100%;}
-.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;}
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
 .topbar-left h1{font-size:20px;font-weight:700;}
 .topbar-left .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
@@ -59,38 +34,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .empty-state .icon{font-size:48px;opacity:.2;margin-bottom:16px;color:var(--accent);}
 .empty-state h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;}
 .empty-state p{font-size:13px;max-width:340px;margin:0 auto;}
-@media(max-width:768px){
-  .hamburger{display:flex;}
   .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
   .sidebar.open{transform:translateX(0);}
-  .sidebar-overlay.open{display:block;}
   .main{margin-left:0;padding:16px;}
   .com-card{flex-direction:column;}
 }
-@media(max-width:375px){.main{padding:10px;}}
-</style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
+{% endblock %}
 
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<body>
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
+{% block sidebar %}
 <nav class="sidebar" id="sidebar">
   <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
   <div class="sidebar-header">
     {% if colegio and colegio.logo %}
-    <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
     {% else %}
-    <img class="sidebar-logo" src="/static/lumini_logo.webp" alt="Lumini">
+    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
     {% endif %}
-    <div>
-      <div class="sidebar-brand">LUMINI</div>
-      <div class="sidebar-sub">{{ colegio.nombre if colegio else slug }}</div>
-    </div>
-  </div>
-  </a>
+    <div class="brand-text">
+      <div class="brand-name">LUMINI</div>
+      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div></div></div></a>
   <div class="sidebar-nav">
     <div class="sidebar-section">Rector</div>
     <a href="/{{ slug }}/rector" class="sidebar-item"><span class="icon"><i data-lucide="pie-chart"></i></span><span>Dashboard</span></a>
@@ -113,10 +75,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="role">{% if rector.es_principal %}Rector Principal{% else %}Rector{% endif %}</div>
   </div>
 </nav>
+{% endblock %}
 
-<div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
-
+{% block content %}
 <div class="topbar">
   <div class="topbar-left">
     <h1>Comunicaciones</h1>
@@ -178,21 +139,4 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <a href="/{{ slug }}/rector/comunicaciones/nueva" class="btn btn-primary" style="margin-top:16px;"><i data-lucide="plus"></i> Crear comunicación</a>
 </div>
 {% endif %}
-</div>
-
-<script>
-function toggleSidebar(){
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
-}
-</script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-
-</html>
-
-
-
-
-
+{% endblock %}

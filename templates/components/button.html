@@ -1,0 +1,15 @@
+{% macro btn(label, class='btn-primary', icon=None, url=None, id='', onclick='', type='button', disabled=false, size='') %}
+{% if url %}
+<a href="{{ url }}" class="btn {{ class }}{% if size %} btn-{{ size }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}{% if onclick %} onclick="{{ onclick }}"{% endif %}{% if disabled %} aria-disabled="true"{% endif %}>
+  {% if icon %}<i data-lucide="{{ icon }}" width="14" height="14"></i> {% endif %}{{ label }}
+</a>
+{% else %}
+<button type="{{ type }}" class="btn {{ class }}{% if size %} btn-{{ size }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}{% if onclick %} onclick="{{ onclick }}"{% endif %}{% if disabled %} disabled{% endif %}>
+  {% if icon %}<i data-lucide="{{ icon }}" width="14" height="14"></i> {% endif %}{{ label }}
+</button>
+{% endif %}
+{% endmacro %}
+
+{% macro btn_group() %}
+<div class="btn-group">{{ caller() }}</div>
+{% endmacro %}

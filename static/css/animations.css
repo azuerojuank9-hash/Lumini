@@ -1,0 +1,40 @@
+/* LUMINI Design System — Animations */
+.fade-in { animation: fadeIn var(--tr-slow) ease forwards; }
+.fade-in-up { animation: fadeInUp var(--tr-slow) ease forwards; }
+.fade-in-down { animation: fadeInDown var(--tr-slow) ease forwards; }
+.scale-in { animation: scaleIn var(--tr-slow) ease forwards; }
+.slide-in-right { animation: slideInRight var(--tr-slow) ease forwards; }
+.slide-in-left { animation: slideInLeft var(--tr-slow) ease forwards; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+.skeleton { background: linear-gradient(90deg, var(--bg3) 25%, var(--bg4) 50%, var(--bg3) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
+.skeleton-text { height: 12px; margin-bottom: 8px; }
+.skeleton-text-sm { height: 8px; width: 60%; }
+.skeleton-card { height: 100px; }
+.skeleton-avatar { width: 36px; height: 36px; border-radius: 50%; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.pulse { animation: pulse 2s ease infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .6; } }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.stagger-1 { animation-delay: .05s; }
+.stagger-2 { animation-delay: .1s; }
+.stagger-3 { animation-delay: .15s; }
+.stagger-4 { animation-delay: .2s; }
+.stagger-5 { animation-delay: .25s; }
+.toast-enter { animation: slideInRight .3s ease forwards; }
+.toast-exit { animation: fadeOut .3s ease forwards; }
+@keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(20px); } }
+.stagger-children > * { opacity: 0; animation: fadeInUp .3s ease forwards; }
+.stagger-children > *:nth-child(1) { animation-delay: .02s; }
+.stagger-children > *:nth-child(2) { animation-delay: .04s; }
+.stagger-children > *:nth-child(3) { animation-delay: .06s; }
+.stagger-children > *:nth-child(4) { animation-delay: .08s; }
+.stagger-children > *:nth-child(5) { animation-delay: .1s; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

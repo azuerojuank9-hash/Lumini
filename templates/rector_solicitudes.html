@@ -1,45 +1,20 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
+{% extends "base.html" %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% block title %}Solicitudes — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Solicitudes — {{ colegio.nombre if colegio else slug }}</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#6D28D9;--accent2:#4C1D95;--accent-rgb:109,40,217;--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;line-height:1.5;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .25s cubic-bezier(.4,0,.2,1);}
-.sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.sidebar-logo{width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0;}
-.sidebar-brand{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sidebar-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;}
-.sidebar-section{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;padding:8px 10px 4px;font-weight:600;}
-.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);margin-bottom:1px;cursor:pointer;position:relative;}
-.sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text);}
-.sidebar-item.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
-.sidebar-item .icon{width:18px;text-align:center;font-size:13px;flex-shrink:0;}
-.badge-count{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center;}
-.sidebar-user{border-top:1px solid var(--border);padding:12px 14px;font-size:12px;}
-.sidebar-user .name{color:var(--text);font-weight:600;font-size:12px;}
-.sidebar-user .role{color:var(--muted);font-size:10px;margin-top:2px;}
-.main{flex:1;margin-left:var(--sidebar);padding:24px 32px;max-width:900px;width:100%;}
-.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;}
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
 .topbar{margin-bottom:20px;}
 .topbar h1{font-size:20px;font-weight:700;}
 .topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'Inter',sans-serif;border:none;transition:all var(--tr);}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.35);}
 .btn-ok{background:rgba(34,197,94,.1);color:var(--green);}
 .btn-ok:hover{background:rgba(34,197,94,.2);}
 .btn-danger{background:rgba(239,68,68,.1);color:var(--red);}
 .btn-danger:hover{background:rgba(239,68,68,.2);}
+.btn-sm{font-size:10px;padding:4px 10px;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
 th{text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);color:var(--sub);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;vertical-align:middle;}
 td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
@@ -49,34 +24,28 @@ td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle;
 .badge-rechazada{background:rgba(239,68,68,.15);color:var(--red);}
 textarea{width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;resize:vertical;}
 textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-@media(max-width:768px){
-  .hamburger{display:flex;}
+@keyframes fadeOut{0%{opacity:1}70%{opacity:1}to{opacity:0}}
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:var(--rsm);font-size:13px;font-weight:600;color:#fff;z-index:9999;animation:fadeOut 3s forwards;}
+.toast-ok{background:var(--green);}
+.toast-err{background:var(--red);}
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
-  .sidebar-overlay.open{display:block;}
   .main{margin-left:0;padding:16px;}
 }
-</style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
+{% endblock %}
 
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<body>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+{% block sidebar %}
 <nav class="sidebar" id="sidebar">
   <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
   <div class="sidebar-header">
     {% if colegio and colegio.logo %}
-    <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
     {% else %}
-    <img class="sidebar-logo" src="/static/lumini_logo.webp" alt="Lumini">
+    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
     {% endif %}
-    <div>
-      <div class="sidebar-brand">LUMINI</div>
-      <div class="sidebar-sub">{{ colegio.nombre if colegio else slug }}</div>
-    </div>
-  </div>
-  </a>
+    <div class="brand-text">
+      <div class="brand-name">LUMINI</div>
+      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div></div></div></a>
   <div class="sidebar-nav">
     <div class="sidebar-section">Rector</div>
     <a href="/{{ slug }}/rector" class="sidebar-item"><span class="icon"><i data-lucide="pie-chart"></i></span><span>Dashboard</span></a>
@@ -89,22 +58,23 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
     <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
     <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
     <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Académico</div>
+    <div class="sidebar-section" style="margin-top:12px;">Acad&eacute;mico</div>
     <a href="/{{ slug }}/rector/solicitudes" class="sidebar-item active"><span class="icon"><i data-lucide="clipboard-list"></i></span><span>Solicitudes</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuraci&oacute;n</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gesti&oacute;n de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuraci&oacute;n</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesi&oacute;n</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
     <div class="role">{% if rector.es_principal %}Rector Principal{% else %}Rector{% endif %}</div>
   </div>
 </nav>
-<div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+{% endblock %}
+
+{% block content %}
 <div class="topbar">
-  <h1><i data-lucide="clipboard-list" style="color:var(--accent);"></i> Solicitudes de modificación</h1>
+  <h1><i data-lucide="clipboard-list" style="color:var(--accent);"></i> Solicitudes de modificaci&oacute;n</h1>
   <div class="breadcrumb">Solicitudes de docentes para modificar notas en periodos cerrados</div>
 </div>
 
@@ -122,41 +92,36 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
         <th>Estudiante</th>
         <th>Materia</th>
         <th>Actividad</th>
-        <th>Nota actual</th>
-        <th>Solicitada</th>
+        <th>Valor actual</th>
+        <th>Solicitado</th>
         <th>Motivo</th>
         <th>Estado</th>
-        <th>Acción</th>
+        <th>Acci&oacute;n</th>
       </tr>
     </thead>
     <tbody>
       {% for s in solicitudes %}
-      <tr>
-        <td style="white-space:nowrap;font-size:11px;color:var(--sub);">{{ s.creado[:10] if s.creado else '' }}</td>
+      <tr id="sol-{{ s.id }}">
+        <td style="white-space:nowrap;font-size:11px;color:var(--sub);">{{ s.fecha_solicitud[:10] if s.fecha_solicitud else '' }}</td>
         <td>{{ s.profesor_nombre }}</td>
         <td>{{ s.alumno_nombre }}</td>
         <td>{{ s.materia }}</td>
         <td style="font-size:11px;">{{ s.actividad_nombre }}</td>
-        <td style="text-align:center;">{{ s.nota_actual }}</td>
-        <td style="text-align:center;font-weight:600;">{{ s.nota_solicitada }}</td>
+        <td style="text-align:center;">{{ s.valor_actual or '—' }}</td>
+        <td style="text-align:center;font-weight:600;">{{ s.valor_solicitado }}</td>
         <td style="max-width:200px;font-size:11px;color:var(--sub);">{{ s.motivo }}</td>
         <td>
           <span class="badge badge-{{ s.estado }}">{{ s.estado|capitalize }}</span>
         </td>
-        <td>
+        <td style="white-space:nowrap;">
           {% if s.estado == 'pendiente' %}
-          <form method="POST" action="/{{ slug }}/rector/solicitudes/{{ s.id }}/aprobar" style="display:inline-block;margin-bottom:4px;">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <textarea name="respuesta" placeholder="Comentario (opcional)" rows="1" style="width:120px;font-size:10px;padding:4px 6px;margin-bottom:4px;display:block;"></textarea>
-            <button type="submit" class="btn btn-ok" style="font-size:10px;padding:4px 10px;"><i data-lucide="check"></i> Aprobar</button>
-          </form>
-          <form method="POST" action="/{{ slug }}/rector/solicitudes/{{ s.id }}/rechazar" style="display:inline-block;">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <textarea name="respuesta" placeholder="Motivo del rechazo" rows="1" style="width:120px;font-size:10px;padding:4px 6px;margin-bottom:4px;display:block;" required></textarea>
-            <button type="submit" class="btn btn-danger" style="font-size:10px;padding:4px 10px;"><i data-lucide="x"></i> Rechazar</button>
-          </form>
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          <div style="display:flex;gap:4px;align-items:center;">
+            <button class="btn btn-ok btn-sm" onclick="responderSolicitud({{ s.id }},'aprobar')"><i data-lucide="check" style="width:12px;height:12px;"></i></button>
+            <button class="btn btn-danger btn-sm" onclick="responderSolicitud({{ s.id }},'rechazar')"><i data-lucide="x" style="width:12px;height:12px;"></i></button>
+          </div>
           {% else %}
-          <span style="font-size:11px;color:var(--sub);">{{ s.respuesta or '—' }}</span>
+          <span style="font-size:11px;color:var(--sub);">{{ s.fecha_respuesta[:10] if s.fecha_respuesta else '—' }}</span>
           {% endif %}
         </td>
       </tr>
@@ -170,25 +135,10 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
   <div class="empty-state has-action">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:10px;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     <div class="empty-title">Sin solicitudes pendientes</div>
-    <div class="empty-desc">No hay solicitudes de modificación de notas en este momento.</div>
+    <div class="empty-desc">No hay solicitudes de modificaci&oacute;n de notas en este momento.</div>
   </div>
-</div>
-<div class="card" style="text-align:center;padding:40px;">
-  <i data-lucide="clipboard-check" style="font-size:40px;color:var(--muted);margin-bottom:12px;"></i>
-  <p style="color:var(--muted);font-size:14px;">No hay solicitudes de modificacion pendientes.</p>
 </div>
 {% endif %}
 </div>
-<script>
-function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('open'); }
-</script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js")}</script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-
-</html>
-
-
-
-
-
+<div id="toast">
+{% endblock %}

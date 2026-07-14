@@ -1,35 +1,11 @@
-<!DOCTYPE html>
-<html lang="es" data-theme="dark">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Asistencia - {{ materia }} · LUMINI</title>
-<link rel="icon" type="image/webp" href="/static/lumini_logo.webp">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/lucide@latest"></script>
-<link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-<style>
+{% extends "base.html" %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% block title %}Asistencia - {{ materia }} · LUMINI{% endblock %}
+
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-.sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10;}
-.sidebar-header{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
-.sidebar-logo{width:32px;height:32px;border-radius:6px;}
-.sidebar-brand{font-size:14px;font-weight:800;letter-spacing:-.03em;}
-.sidebar-sub{font-size:9px;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.08em;}
-.sidebar-nav{flex:1;padding:10px 8px;overflow-y:auto;}
-.sidebar-section{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:8px 10px 4px;font-weight:600;}
-.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--rsm);font-size:12px;font-weight:500;color:var(--text);text-decoration:none;transition:all var(--tr);cursor:pointer;}
-.sidebar-item:hover{background:rgba(var(--accent-rgb),.07);}
-.sidebar-item.active{background:rgba(var(--accent-rgb),.12);color:var(--accent);}
-.sidebar-item .icon{width:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);}
-.sidebar-item.active .icon{color:var(--accent);}
-.sidebar-user{padding:12px 16px;border-top:1px solid var(--border);}
-.sidebar-user .name{font-size:12px;font-weight:600;}
-.sidebar-user .role{font-size:10px;color:var(--muted);margin-top:1px;}
-.main{margin-left:220px;padding:20px 24px;max-width:1400px;}
+.main{margin-left:var(--sidebar);padding:20px 24px;max-width:1400px;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px;}
 .topbar-left h1{font-size:20px;font-weight:800;letter-spacing:-.03em;}
 .breadcrumb{font-size:11px;color:var(--muted);margin-top:2px;}
@@ -47,7 +23,7 @@ td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align
 tr:last-child td{border-bottom:none;}
 .tnum{width:32px;text-align:center;color:var(--muted);font-size:11px;}
 .tnombre{font-weight:600;color:var(--text);}
-.abtn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border:none;border-radius:var(--rsm);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s ease;min-height:36px;touch-action:manipulation;}
+.abtn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 12px;border:none;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s ease;min-height:32px;touch-action:manipulation;}
 .abtn:active{transform:scale(.88);}
 .abtn.ap{background:rgba(34,197,94,.10);color:var(--green);border:1px solid rgba(34,197,94,.18);}
 .abtn.ap:hover,.abtn.active.ap{background:linear-gradient(135deg,var(--green),#16A34A);color:#fff;border-color:transparent;}
@@ -55,27 +31,40 @@ tr:last-child td{border-bottom:none;}
 .abtn.aa:hover,.abtn.active.aa{background:linear-gradient(135deg,var(--red),#DC2626);color:#fff;border-color:transparent;}
 .abtn.at{background:rgba(234,179,8,.10);color:var(--yellow);border:1px solid rgba(234,179,8,.18);}
 .abtn.at:hover,.abtn.active.at{background:linear-gradient(135deg,var(--yellow),#CA8A04);color:#fff;border-color:transparent;}
-.asist-group{display:inline-flex;gap:3px;background:var(--bg3);padding:3px;border-radius:10px;border:1px solid var(--border);}
+.abtn.ae{background:rgba(59,130,246,.10);color:#3B82F6;border:1px solid rgba(59,130,246,.18);}
+.abtn.ae:hover,.abtn.active.ae{background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;border-color:transparent;}
+.abtn.ax{background:rgba(168,85,247,.10);color:#A855F7;border:1px solid rgba(168,85,247,.18);}
+.abtn.ax:hover,.abtn.active.ax{background:linear-gradient(135deg,#A855F7,#9333EA);color:#fff;border-color:transparent;}
+.abtn.as{background:rgba(251,146,60,.10);color:#FB923C;border:1px solid rgba(251,146,60,.18);}
+.abtn.as:hover,.abtn.active.as{background:linear-gradient(135deg,#FB923C,#F97316);color:#fff;border-color:transparent;}
+.asist-group{display:inline-flex;gap:3px;background:var(--bg3);padding:3px;border-radius:10px;border:1px solid var(--border);flex-wrap:wrap;max-width:360px;}
 .date-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
 .date-nav-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);text-decoration:none;}
 .date-nav-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--accent);}
 .date-display{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
 .date-input{font-family:'Inter',sans-serif;font-size:13px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--rsm);background:var(--bg2);color:var(--text);cursor:pointer;}
 .date-input:focus{outline:none;border-color:var(--accent);}
-.stats-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
-.stat-chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--rsm);font-size:12px;font-weight:600;}
-.stat-chip .num{font-size:16px;font-weight:800;}
-.stat-chip.green{background:rgba(34,197,94,.10);color:var(--green);}
-.stat-chip.red{background:rgba(239,68,68,.10);color:var(--red);}
-.stat-chip.yellow{background:rgba(234,179,8,.10);color:var(--yellow);}
-.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:20px;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);}
-.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
-.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.5);}
-@media(max-width:768px){
-  .hamburger{display:flex;}
+.stats-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.stat-card{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--rmd);border:1px solid var(--border);background:var(--bg2);flex:1;min-width:120px;}
+.stat-card .stat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.stat-card .stat-info{display:flex;flex-direction:column;}
+.stat-card .stat-num{font-size:20px;font-weight:800;line-height:1.2;}
+.stat-card .stat-label{font-size:11px;color:var(--muted);}
+.stat-card .stat-icon.green{background:rgba(34,197,94,.15);color:var(--green);}
+.stat-card .stat-icon.red{background:rgba(239,68,68,.15);color:var(--red);}
+.stat-card .stat-icon.yellow{background:rgba(234,179,8,.15);color:var(--yellow);}
+.stat-card .stat-icon.blue{background:rgba(59,130,246,.15);color:#3B82F6;}
+.stat-card .stat-icon.purple{background:rgba(168,85,247,.15);color:#A855F7;}
+.stat-card .stat-icon.orange{background:rgba(251,146,60,.15);color:#FB923C;}
+.alerts-panel{padding:12px 16px;}
+.alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--rsm);margin-bottom:6px;font-size:12px;}
+.alert-item.high{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);}
+.alert-item.medium{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.15);}
+.alert-item .alert-icon{width:20px;height:20px;flex-shrink:0;margin-top:1px;}
+.obs-input{font-family:'Inter',sans-serif;font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg3);color:var(--text);width:100%;max-width:180px;}
+.obs-input:focus{outline:none;border-color:var(--accent);}
   .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
   .sidebar.open{transform:translateX(0);}
-  .sidebar-overlay.open{display:block;}
   .main{margin-left:0;padding:16px;}
   table,thead,tbody,tr,td,th{display:block;}
   thead{display:none;}
@@ -83,26 +72,24 @@ tr:last-child td{border-bottom:none;}
   td{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border:none;text-align:right;gap:6px;min-height:36px;border-bottom:1px solid rgba(255,255,255,.04);}
   td::before{content:attr(data-label);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;flex-shrink:0;text-align:left;min-width:70px;}
   td:last-child{border-bottom:none;}
+  .asist-group{gap:2px;max-width:100%;}
+  .abtn{padding:4px 8px;font-size:11px;}
+  .stat-card{min-width:calc(50% - 8px);}
 }
-</style>
-</head>
-<body>
+{% endblock %}
 
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+{% block sidebar %}
 <nav class="sidebar" id="sidebar">
   <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
   <div class="sidebar-header">
     {% if colegio and colegio.logo %}
-    <img class="sidebar-logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
     {% else %}
-    <img class="sidebar-logo" src="/static/lumini_logo.webp" alt="Lumini">
+    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
     {% endif %}
-    <div>
-      <div class="sidebar-brand">LUMINI</div>
-      <div class="sidebar-sub">{{ colegio.nombre if colegio else slug }}</div>
-    </div>
-  </div>
-  </a>
+    <div class="brand-text">
+      <div class="brand-name">LUMINI</div>
+      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div></div></div></a>
   <div class="sidebar-nav">
     <div class="sidebar-section">Navegación</div>
     <a href="/{{ slug }}/" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Notas</span></a>
@@ -123,14 +110,16 @@ tr:last-child td{border-bottom:none;}
   </div>
   <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
 </nav>
+{% endblock %}
 
-<div class="main">
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
-
+{% block content %}
 <div class="topbar">
   <div class="topbar-left">
     <h1><i data-lucide="calendar-check" style="width:22px;height:22px;vertical-align:middle;"></i> Asistencia</h1>
     <div class="breadcrumb">{{ materia }} · {{ jornada }} · {{ profesor.nombre }}</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <a href="#" onclick="exportarExcel();return false;" class="date-nav-btn" style="font-size:12px;"><i data-lucide="file-spreadsheet" style="width:14px;height:14px;"></i> Excel</a>
   </div>
 </div>
 
@@ -152,21 +141,26 @@ tr:last-child td{border-bottom:none;}
 </div>
 
 <div class="stats-row" id="statsRow">
-  <div class="stat-chip green"><span class="num" id="statP">0</span> Presentes</div>
-  <div class="stat-chip red"><span class="num" id="statA">0</span> Ausentes</div>
-  <div class="stat-chip yellow"><span class="num" id="statT">0</span> Tardanzas</div>
-  <div class="stat-chip" style="background:var(--bg3);color:var(--muted);"><span class="num" id="statTotal">{{ estudiantes|length }}</span> Total</div>
+  <div class="stat-card"><div class="stat-icon green"><i data-lucide="check-circle"></i></div><div class="stat-info"><span class="stat-num" id="statP">0</span><span class="stat-label">Presentes</span></div></div>
+  <div class="stat-card"><div class="stat-icon red"><i data-lucide="x-circle"></i></div><div class="stat-info"><span class="stat-num" id="statA">0</span><span class="stat-label">Ausentes</span></div></div>
+  <div class="stat-card"><div class="stat-icon yellow"><i data-lucide="clock"></i></div><div class="stat-info"><span class="stat-num" id="statT">0</span><span class="stat-label">Tardanzas</span></div></div>
+  <div class="stat-card"><div class="stat-icon blue"><i data-lucide="file-text"></i></div><div class="stat-info"><span class="stat-num" id="statE">0</span><span class="stat-label">Excusas</span></div></div>
+  <div class="stat-card"><div class="stat-icon purple"><i data-lucide="check-square"></i></div><div class="stat-info"><span class="stat-num" id="statX">0</span><span class="stat-label">Permisos</span></div></div>
+  <div class="stat-card"><div class="stat-icon orange"><i data-lucide="log-out"></i></div><div class="stat-info"><span class="stat-num" id="statS">0</span><span class="stat-label">Salidas</span></div></div>
+  <div class="stat-card"><div class="stat-icon" style="background:var(--bg3);color:var(--muted);"><i data-lucide="users"></i></div><div class="stat-info"><span class="stat-num" id="statTotal">{{ estudiantes|length }}</span><span class="stat-label">Total</span></div></div>
 </div>
 
 <div class="card">
-  <div class="card-head"><span class="card-title"><i data-lucide="users" style="width:14px;height:14px;"></i> Estudiantes · {{ curso_sel }}</span></div>
+  <div class="card-head"><span class="card-title"><i data-lucide="users" style="width:14px;height:14px;"></i> Estudiantes · {{ curso_sel }}</span> <span style="font-size:11px;color:var(--muted);font-weight:400;" id="horaDisplay">Hoy: {{ hoy_hora }}</span></div>
   <div class="card-body" style="padding:0;">
+    <div style="overflow-x:auto;">
     <table>
       <thead>
         <tr>
           <th style="width:32px">#</th>
           <th>Estudiante</th>
-          <th style="width:200px">Asistencia</th>
+          <th style="min-width:320px">Asistencia</th>
+          <th style="min-width:160px">Observación</th>
         </tr>
       </thead>
       <tbody>
@@ -175,18 +169,46 @@ tr:last-child td{border-bottom:none;}
         <td class="tnum">{{ e.num_curso }}</td>
         <td class="tnombre">{{ e.nombre }}</td>
         <td>
-          <div class="asist-group">
-            <button onclick="marcarAsistFecha({{ e.id }},'P')" class="abtn ap {% if e.asistencia=='P' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="P"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> P</button>
-            <button onclick="marcarAsistFecha({{ e.id }},'A')" class="abtn aa {% if e.asistencia=='A' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="A"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.71L12 12l6.3 6.29-1.42 1.42L12 13.41l-5.88 5.88-1.42-1.42L10.59 12 4.7 5.71 6.12 4.29 12 10.59l5.88-5.88z"/></svg> A</button>
-            <button onclick="marcarAsistFecha({{ e.id }},'T')" class="abtn at {% if e.asistencia=='T' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="T"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg> T</button>
+          <div class="asist-group" id="asistGroup-{{ e.id }}">
+            {% set cls_map = {'P':'ap','A':'aa','T':'at','E':'ae','X':'ax','S':'as'} %}
+            <button onclick="marcarAsistFecha({{ e.id }},'P')" class="abtn ap {% if e.asistencia=='P' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="P"><i data-lucide="check" style="width:14px;height:14px;"></i> P</button>
+            <button onclick="marcarAsistFecha({{ e.id }},'A')" class="abtn aa {% if e.asistencia=='A' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="A"><i data-lucide="x" style="width:14px;height:14px;"></i> A</button>
+            <button onclick="marcarAsistFecha({{ e.id }},'T')" class="abtn at {% if e.asistencia=='T' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="T"><i data-lucide="clock" style="width:14px;height:14px;"></i> T</button>
+            <button onclick="marcarAsistFecha({{ e.id }},'E')" class="abtn ae {% if e.asistencia=='E' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="E"><i data-lucide="file-text" style="width:14px;height:14px;"></i> E</button>
+            <button onclick="marcarAsistFecha({{ e.id }},'X')" class="abtn ax {% if e.asistencia=='X' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="X"><i data-lucide="check-square" style="width:14px;height:14px;"></i> X</button>
+            <button onclick="marcarAsistFecha({{ e.id }},'S')" class="abtn as {% if e.asistencia=='S' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="S"><i data-lucide="log-out" style="width:14px;height:14px;"></i> S</button>
           </div>
+        </td>
+        <td>
+          <input type="text" class="obs-input" id="obs-{{ e.id }}" placeholder="Observación..." value="{{ e.observacion }}" onchange="guardarObservacion({{ e.id }},this.value)">
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="3" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes en este curso.</td></tr>
+      <tr><td colspan="4" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes en este curso.</td></tr>
       {% endfor %}
       </tbody>
     </table>
+    </div>
+  </div>
+</div>
+
+{% if stats and stats.total > 0 %}
+<div class="card" style="margin-top:16px;">
+  <div class="card-head"><span class="card-title"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i> Estadísticas del curso</span></div>
+  <div class="card-body">
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;">
+      <span style="padding:6px 14px;border-radius:8px;background:rgba(34,197,94,.10);color:var(--green);font-weight:700;">{{ stats.porcentaje_asistencia }}% Asistencia</span>
+      <span style="padding:6px 14px;border-radius:8px;background:rgba(239,68,68,.10);color:var(--red);font-weight:700;">{{ stats.porcentaje_inasistencia }}% Inasistencia</span>
+      <span style="padding:6px 14px;border-radius:8px;background:rgba(234,179,8,.10);color:var(--yellow);font-weight:700;">{{ stats.porcentaje_tardanzas }}% Tardanzas</span>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="card" style="margin-top:16px;" id="alertasCard">
+  <div class="card-head"><span class="card-title"><i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Alertas</span><span id="alertCount" style="font-size:11px;color:var(--muted);font-weight:400;">Cargando...</span></div>
+  <div class="alerts-panel" id="alertasContent">
+    <div style="text-align:center;padding:16px;color:var(--muted);font-size:13px;">Cargando alertas...</div>
   </div>
 </div>
 {% endif %}
@@ -195,79 +217,9 @@ tr:last-child td{border-bottom:none;}
 <input type="hidden" id="currentFecha" value="{{ fecha_sel }}">
 <input type="hidden" id="currentCurso" value="{{ curso_sel or '' }}">
 <input type="hidden" id="slug" value="{{ slug }}">
+<input type="hidden" id="hoyHora" value="{{ hoy_hora }}">
 
 </div>
 
-<div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado</div>
-
-<script>
-const slug = document.getElementById('slug').value;
-
-function toggleSidebar(){
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
-}
-
-function toggleTheme(){
-    var html = document.documentElement;
-    var next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-}
-
-function getCsrf(){
-    return document.getElementById('csrf-global').value;
-}
-
-function updateStats(){
-    var p = document.querySelectorAll('.abtn.ap.active').length;
-    var a = document.querySelectorAll('.abtn.aa.active').length;
-    var t = document.querySelectorAll('.abtn.at.active').length;
-    document.getElementById('statP').textContent = p;
-    document.getElementById('statA').textContent = a;
-    document.getElementById('statT').textContent = t;
-}
-
-function marcarAsistFecha(aid, estado){
-    var fecha = document.getElementById('currentFecha').value;
-    var f = new FormData();
-    f.append('aid', aid);
-    f.append('estado', estado);
-    f.append('fecha', fecha);
-    f.append('_csrf_token', getCsrf());
-    fetch('/'+slug+'/marcar_asistencia', {method:'POST', body:f})
-        .then(function(r){
-            if(r.ok){
-                var row = document.querySelector('tr[data-aid="'+aid+'"]');
-                row.querySelectorAll('.abtn').forEach(function(b){
-                    b.classList.remove('active');
-                    if(b.getAttribute('data-estado') === estado) b.classList.add('active');
-                });
-                updateStats();
-                showToast();
-            } else {
-                showToast('<i data-lucide="x-circle"></i> Error');
-            }
-        })
-        .catch(function(){ showToast('<i data-lucide="x-circle"></i> Error de conexión'); });
-}
-
-function showToast(msg){
-    msg = msg || '<i data-lucide="check-circle"></i> Guardado';
-    var t = document.getElementById('toast');
-    t.innerHTML = msg;
-    t.classList.add('show');
-    setTimeout(function(){ t.classList.remove('show'); }, 1800);
-}
-
-function irAFecha(fecha){
-    var curso = document.getElementById('currentCurso').value;
-    if(curso) window.location.href = '/'+slug+'/asistencia?curso='+curso+'&fecha='+fecha;
-}
-
-updateStats();
-
-if(window.lucide && lucide.createIcons) lucide.createIcons({attrs:{'aria-hidden':'true'}});
-</script>
-</body>
-</html>
+<div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado
+{% endblock %}

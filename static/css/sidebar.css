@@ -1,0 +1,19 @@
+/* ── Shared rector/teacher sidebar (`.sidebar-item` variant) ── */
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;overflow:hidden;}
+.sidebar .sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.sidebar .sidebar-header .logo{width:32px;height:32px;border-radius:8px;object-fit:cover;}
+.sidebar .sidebar-header .brand-text{flex:1;}
+.sidebar .sidebar-header .brand-text .brand-name{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sidebar .sidebar-header .brand-text .brand-sub{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.sidebar .sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;}
+.sidebar .sidebar-section{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:12px 10px 4px;font-weight:600;}
+.sidebar .sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rsm);font-size:12px;font-weight:500;color:var(--text);text-decoration:none;cursor:pointer;position:relative;transition:all var(--tr);}
+.sidebar .sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text);}
+.sidebar .sidebar-item.active,.sidebar .sidebar-item.active-page{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600;}
+.sidebar .sidebar-item .icon{width:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);}
+.sidebar .sidebar-item.active .icon,.sidebar .sidebar-item.active-page .icon{color:#fff;}
+.sidebar .sidebar-item .badge-count{margin-left:auto;background:var(--red);color:#fff;border-radius:99px;padding:1px 6px;font-size:9px;font-weight:700;min-width:16px;text-align:center;}
+.sidebar .sidebar-user{padding:12px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.sidebar .sidebar-user .name{font-size:12px;font-weight:600;}
+.sidebar .sidebar-user .role{font-size:10px;color:var(--muted);margin-top:1px;}
+.sidebar .sidebar-user .avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}

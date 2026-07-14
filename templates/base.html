@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es"{% block html_attrs %}{% endblock %}>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
+<title>{% block title %}LUMINI{% endblock %}</title>
+<link rel="icon" type="image/webp" href="/static/lumini_logo.webp">
+<link rel="manifest" href="/static/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LUMINI">
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{% block fonts %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+{% endblock %}
+<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="/static/css/theme.css">
+<link rel="stylesheet" href="/static/css/layout.css">
+<link rel="stylesheet" href="/static/css/buttons.css">
+<link rel="stylesheet" href="/static/css/forms.css">
+<link rel="stylesheet" href="/static/css/tables.css">
+<link rel="stylesheet" href="/static/css/cards.css">
+<link rel="stylesheet" href="/static/css/badges.css">
+<link rel="stylesheet" href="/static/css/alerts.css">
+<link rel="stylesheet" href="/static/css/animations.css">
+<link rel="stylesheet" href="/static/css/utilities.css">
+{% block extra_css %}{% endblock %}
+{% block extra_head %}{% endblock %}
+<style>
+:root {
+  {% block accent_css %}{% endblock %}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform var(--tr);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay.open{display:block;}
+  .main{margin-left:0!important;max-width:100%!important;width:100%;padding:16px!important;}
+}
+@media(max-width:480px){
+  .main{padding:12px!important;}
+  .card{padding:16px!important;}
+}
+{% block extra_styles %}{% endblock %}
+</style>
+</head>
+<body>
+{% block hamburger %}<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu" aria-expanded="false">☰</button>{% endblock %}
+{% block sidebar_overlay %}<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()" role="presentation"></div>{% endblock %}
+{% block sidebar %}{% endblock %}
+<main class="main"{% block main_attrs %}{% endblock %}>
+{% block content %}{% endblock %}
+</main>
+{% block theme_toggle %}
+<button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Cambiar tema">
+  <i data-lucide="moon" aria-hidden="true"></i>
+</button>
+{% endblock %}
+{% block toast_container %}<div id="toast-container" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>{% endblock %}
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="/static/js/utils.js"></script>
+<script src="/static/js/theme.js"></script>
+<script src="/static/js/tables.js"></script>
+<script src="/static/js/modals.js"></script>
+<script src="/static/js/forms.js"></script>
+<script src="/static/js/dashboard.js"></script>
+<script src="/static/js/notifications.js"></script>
+<script src="/static/js/pwa.js"></script>
+<script src="/static/js/lumini.js" defer></script>
+<script>
+function toggleSidebar(){
+  var s=document.querySelector('.sidebar');var o=document.getElementById('sidebarOverlay');var h=document.querySelector('.hamburger');
+  if(s){s.classList.toggle('open');}
+  if(o){o.classList.toggle('open');}
+  if(h){h.setAttribute('aria-expanded',s&&s.classList.contains('open'));}
+}
+document.addEventListener('DOMContentLoaded',function(){
+  if(window.lucide)lucide.createIcons({attrs:{'aria-hidden':'true'}});
+  var alerts=document.querySelectorAll('.alert-auto');
+  if(alerts.length)setTimeout(function(){
+    alerts.forEach(function(el){el.style.opacity='0';setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},300);});
+  },5000);
+});
+{% block extra_scripts %}{% endblock %}
+</script>
+</body>
+</html>

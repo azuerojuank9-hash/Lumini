@@ -1,0 +1,72 @@
+{% macro input(name, label='', value='', type='text', placeholder='', required=false, error='', hint='', class='', disabled=false) %}
+<div class="form-group{% if error %} has-error{% endif %}">
+  {% if label %}<label class="form-label" for="field-{{ name }}">{{ label }}{% if required %}<span class="required">*</span>{% endif %}</label>{% endif %}
+  {% if type == 'textarea' %}
+  <textarea name="{{ name }}" id="field-{{ name }}" class="form-textarea{% if class %} {{ class }}{% endif %}" placeholder="{{ placeholder }}" {% if required %}required{% endif %} {% if disabled %}disabled{% endif %}>{{ value }}</textarea>
+  {% elif type == 'select' %}
+  <select name="{{ name }}" id="field-{{ name }}" class="form-select{% if class %} {{ class }}{% endif %}" {% if required %}required{% endif %} {% if disabled %}disabled{% endif %}>
+    {{ caller() if caller else '' }}
+  </select>
+  {% else %}
+  <input type="{{ type }}" name="{{ name }}" id="field-{{ name }}" value="{{ value }}" class="form-input{% if class %} {{ class }}{% endif %}" placeholder="{{ placeholder }}" {% if required %}required{% endif %} {% if disabled %}disabled{% endif %}>
+  {% endif %}
+  {% if error %}<div class="form-error visible" role="alert">{{ error }}</div>{% endif %}
+  {% if hint %}<div class="form-hint">{{ hint }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro checkbox(name, label, checked=false, value='1') %}
+<label class="form-checkbox">
+  <input type="checkbox" name="{{ name }}" value="{{ value }}"{% if checked %} checked{% endif %}>
+  <span>{{ label }}</span>
+</label>
+{% endmacro %}
+
+{% macro radio(name, options, selected='') %}
+{% for val, label in options %}
+<label class="form-radio">
+  <input type="radio" name="{{ name }}" value="{{ val }}"{% if val == selected %} checked{% endif %}>
+  <span>{{ label }}</span>
+</label>
+{% endfor %}
+{% endmacro %}
+
+{% macro form_script() %}
+<script>
+document.addEventListener('input', function(e) {
+  var field = e.target.closest('.form-input, .form-select, .form-textarea');
+  if (!field) return;
+  var group = field.closest('.form-group');
+  if (!group) return;
+  var errorEl = group.querySelector('.form-error');
+  if (errorEl) {
+    if (field.value.trim()) {
+      errorEl.classList.remove('visible');
+      field.classList.remove('error');
+    }
+  }
+  if (field.value !== field.defaultValue) {
+    group.classList.add('form-dirty');
+  } else {
+    group.classList.remove('form-dirty');
+  }
+});
+document.addEventListener('submit', function(e) {
+  var form = e.target.closest('form');
+  if (!form) return;
+  var firstError = null;
+  form.querySelectorAll('[required]').forEach(function(f) {
+    if (!f.value.trim()) {
+      f.classList.add('error');
+      var group = f.closest('.form-group');
+      if (group) {
+        var err = group.querySelector('.form-error');
+        if (err) { err.textContent = 'Este campo es obligatorio'; err.classList.add('visible'); }
+      }
+      if (!firstError) firstError = f;
+    }
+  });
+  if (firstError) { e.preventDefault(); firstError.focus(); }
+});
+</script>
+{% endmacro %}

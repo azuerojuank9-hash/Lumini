@@ -1,0 +1,42 @@
+{% macro card(heading=None, body=None, icon=None, class="", interactive=false, id="") %}
+<div class="card{% if interactive %} card-interactive{% endif %}{% if class %} {{ class }}{% endif %}"{% if id %} id="{{ id }}"{% endif %}>
+  {% if heading %}
+  <div class="card-head">
+    <span class="card-title">{% if icon %}<i data-lucide="{{ icon }}" width="14" height="14"></i> {% endif %}{{ heading }}</span>
+    {% if caller %}<div class="card-actions">{{ caller() }}</div>{% endif %}
+  </div>
+  {% endif %}
+  {% if body %}
+  <div class="card-body">{{ body }}</div>
+  {% elif caller and not heading %}
+  <div class="card-body">{{ caller() }}</div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro stats_card(value, label, icon, color="accent", change=None, change_label="", id="") %}
+<div class="stats-card card"{% if id %} id="{{ id }}"{% endif %}>
+  <div class="stats-card-icon bg-{{ color }}" style="background:rgba(124,58,237,.12);color:var(--accent);">
+    <i data-lucide="{{ icon }}" width="20" height="20"></i>
+  </div>
+  <div class="stats-card-info">
+    <div class="stats-card-value">{{ value }}</div>
+    <div class="stats-card-label">{{ label }}</div>
+    {% if change is not none %}
+    <div class="stats-card-change {% if change > 0 %}up{% elif change < 0 %}down{% endif %}">
+      {{ '+' if change > 0 else '' }}{{ change }}{{ change_label }}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro kpi_card(value, label, icon, color="accent", id="") %}
+<div class="card kpi-card"{% if id %} id="{{ id }}"{% endif %}>
+  <div class="kpi-icon" style="background:rgba(124,58,237,.12);color:var(--accent);">
+    <i data-lucide="{{ icon }}" width="20" height="20"></i>
+  </div>
+  <div class="kpi-value">{{ value }}</div>
+  <div class="kpi-label">{{ label }}</div>
+</div>
+{% endmacro %}

@@ -1,0 +1,31 @@
+{% macro alert_error(message, dismissible=false) %}
+<div class="alert alert-error" role="alert">
+  <i data-lucide="alert-triangle" class="alert-icon" width="16" height="16"></i>
+  <div class="alert-content">{{ message }}</div>
+  {% if dismissible %}<button class="btn-icon-sm btn-ghost" onclick="this.closest('.alert').remove()" aria-label="Cerrar"><i data-lucide="x" width="12" height="12"></i></button>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro alert_success(message, dismissible=false) %}
+<div class="alert alert-success" role="alert">
+  <i data-lucide="check-circle" class="alert-icon" width="16" height="16"></i>
+  <div class="alert-content">{{ message }}</div>
+  {% if dismissible %}<button class="btn-icon-sm btn-ghost" onclick="this.closest('.alert').remove()" aria-label="Cerrar"><i data-lucide="x" width="12" height="12"></i></button>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro alert_warning(message, dismissible=false) %}
+<div class="alert alert-warning" role="alert">
+  <i data-lucide="alert-circle" class="alert-icon" width="16" height="16"></i>
+  <div class="alert-content">{{ message }}</div>
+  {% if dismissible %}<button class="btn-icon-sm btn-ghost" onclick="this.closest('.alert').remove()" aria-label="Cerrar"><i data-lucide="x" width="12" height="12"></i></button>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro alert_info(message, dismissible=false) %}
+<div class="alert alert-info" role="alert">
+  <i data-lucide="info" class="alert-icon" width="16" height="16"></i>
+  <div class="alert-content">{{ message }}</div>
+  {% if dismissible %}<button class="btn-icon-sm btn-ghost" onclick="this.closest('.alert').remove()" aria-label="Cerrar"><i data-lucide="x" width="12" height="12"></i></button>{% endif %}
+</div>
+{% endmacro %}

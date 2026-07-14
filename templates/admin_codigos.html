@@ -1,24 +1,10 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
+{% extends "base.html" %}
+{% block title %}Lumini — Códigos de invitación{% endblock %}
 
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — Códigos de invitación</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 3px rgba(0,0,0,.15);--sidebar:200px;}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.06);}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--bg3);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;}
-.sidebar-logo{padding:14px 14px;border-bottom:1px solid #1E293B;display:flex;align-items:center;gap:12px;}
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
 .sidebar-logo img{height:30px;width:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
-.sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}
 .sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}
 .sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
 .sidebar-link.active{background:var(--accent);color:#fff;}
@@ -62,28 +48,10 @@ body .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
 .hint{font-size:11px;color:var(--sub);margin-top:4px;}
 pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--accent);letter-spacing:1px;word-break:break-all;}
-@media(max-width:768px){.main{padding:20px 16px;}.grid-2,.grid-3{grid-template-columns:1fr;}}
-</style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
+{% endblock %}
 
-<body>
-<aside class="sidebar">
-    <div class="sidebar-logo">
-        <img src="/static/lumini_logo.webp" alt="Lumini">
-        <div>
-            <div class="sidebar-brand">LUMINI</div>
-            <div class="sidebar-brand-sub">Panel de Administración</div>
-        </div>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="/admin" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
-        <a href="/admin/codigos" class="sidebar-link active"><span class="icon"><i data-lucide="key"></i></span> Códigos de invitación</a>
-        <a href="/admin/logout" class="sidebar-link" style="color:#EF4444;margin-top:auto;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
-    </nav>
-</aside>
-<div class="main">
-    <div class="header">
+{% block content %}
+<div class="header">
         <div>
             <h1><i data-lucide="key"></i> Códigos de invitación</h1>
             <p>Gestiona los códigos por rol para cada colegio.</p>
@@ -226,23 +194,4 @@ pre.code-display{background:#0F172A;padding:10px 14px;border-radius:var(--rsm);b
         </div>
     </div>
     {% endif %}
-</div>
-<script>
-function toggleCod(id, btn) {
-    var input = document.getElementById(id);
-    if (input.type === 'password') {
-        input.type = 'text';
-        btn.innerHTML = '<i data-lucide="eye-off"></i>';
-    } else {
-        input.type = 'password';
-        btn.innerHTML = '<i data-lucide="eye"></i>';
-    }
-}
-</script>
-  <script src="/static/js/lumini.js"></script>
-
-</html>
-
-
-
-
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% block title %}Asistencia — {{ colegio.nombre if colegio else slug }}{% endblock %}
+
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.page-title{font-size:20px;font-weight:800;letter-spacing:-.02em;}
+.page-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:flex-end;}
+.filter-group{display:flex;flex-direction:column;gap:3px;}
+.filter-group label{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+.filter-group select,.filter-group input{padding:7px 10px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--bg2);color:var(--text);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;min-width:130px;}
+.filter-group select:focus,.filter-group input:focus{outline:none;border-color:var(--accent);}
+.date-nav-btn{padding:7px 14px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);text-decoration:none;}
+.date-nav-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--accent);}
+.stats-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.stat-card{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--rmd);border:1px solid var(--border);background:var(--bg2);flex:1;min-width:100px;}
+.stat-card .stat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.stat-card .stat-info{display:flex;flex-direction:column;}
+.stat-card .stat-num{font-size:18px;font-weight:800;line-height:1.2;}
+.stat-card .stat-label{font-size:10px;color:var(--muted);}
+.stat-card .stat-icon.green{background:rgba(34,197,94,.15);color:var(--green);}
+.stat-card .stat-icon.red{background:rgba(239,68,68,.15);color:var(--red);}
+.stat-card .stat-icon.yellow{background:rgba(234,179,8,.15);color:#EAB308;}
+.stat-card .stat-icon.blue{background:rgba(59,130,246,.15);color:#3B82F6;}
+.stat-card .stat-icon.purple{background:rgba(168,85,247,.15);color:#A855F7;}
+.stat-card .stat-icon.orange{background:rgba(251,146,60,.15);color:#FB923C;}
+.card{border:1px solid var(--border);border-radius:var(--rlg);background:var(--bg2);overflow:hidden;}
+.card-head{padding:12px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.card-title{display:flex;align-items:center;gap:6px;}
+.card-body{padding:14px 16px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{padding:8px 10px;text-align:left;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;border-bottom:1px solid var(--border);}
+td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.abtn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 10px;border:none;border-radius:var(--rsm);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s ease;min-height:30px;}
+.abtn:active{transform:scale(.88);}
+.abtn.ap{background:rgba(34,197,94,.10);color:var(--green);border:1px solid rgba(34,197,94,.18);}
+.abtn.ap.active{background:linear-gradient(135deg,var(--green),#16A34A);color:#fff;border-color:transparent;}
+.abtn.aa{background:rgba(239,68,68,.10);color:var(--red);border:1px solid rgba(239,68,68,.18);}
+.abtn.aa.active{background:linear-gradient(135deg,var(--red),#DC2626);color:#fff;border-color:transparent;}
+.abtn.at{background:rgba(234,179,8,.10);color:#EAB308;border:1px solid rgba(234,179,8,.18);}
+.abtn.at.active{background:linear-gradient(135deg,#EAB308,#CA8A04);color:#fff;border-color:transparent;}
+.abtn.ae{background:rgba(59,130,246,.10);color:#3B82F6;border:1px solid rgba(59,130,246,.18);}
+.abtn.ae.active{background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;border-color:transparent;}
+.abtn.ax{background:rgba(168,85,247,.10);color:#A855F7;border:1px solid rgba(168,85,247,.18);}
+.abtn.ax.active{background:linear-gradient(135deg,#A855F7,#9333EA);color:#fff;border-color:transparent;}
+.abtn.as{background:rgba(251,146,60,.10);color:#FB923C;border:1px solid rgba(251,146,60,.18);}
+.abtn.as.active{background:linear-gradient(135deg,#FB923C,#F97316);color:#fff;border-color:transparent;}
+.alerts-panel{padding:12px 16px;}
+.alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--rsm);margin-bottom:6px;font-size:12px;}
+.alert-item.high{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);}
+.alert-item.medium{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.15);}
+.empty-state{text-align:center;padding:28px;color:var(--muted);font-size:13px;}
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;padding:16px;}
+  table,thead,tbody,tr,td,th{display:block;}
+  thead{display:none;}
+  tr{border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:10px;}
+  td{display:flex;justify-content:space-between;padding:6px 0;border:none;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);}
+  td::before{content:attr(data-label);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600;text-align:left;min-width:70px;}
+  td:last-child{border-bottom:none;}
+  .filters{gap:6px;}
+  .filter-group select,.filter-group input{min-width:100px;font-size:11px;}
+}
+{% endblock %}
+
+{% block sidebar %}
+<nav class="sidebar" id="sidebar">
+  <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
+  <div class="sidebar-header">
+    {% if colegio and colegio.logo %}
+    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    {% else %}
+    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
+    {% endif %}
+    <div class="brand-text">
+      <div class="brand-name">LUMINI</div>
+      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div></div></div></a>
+  <div class="sidebar-nav">
+    <div class="sidebar-section">Rector</div>
+    <a href="/{{ slug }}/rector" class="sidebar-item"><span class="icon"><i data-lucide="pie-chart"></i></span><span>Dashboard</span></a>
+    <a href="/{{ slug }}/rector/asistencia" class="sidebar-item active"><span class="icon"><i data-lucide="calendar-check"></i></span><span>Asistencia</span></a>
+    <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item"><span class="icon"><i data-lucide="megaphone"></i></span><span>Comunicaciones</span></a>
+    <a href="/{{ slug }}/rector/canales" class="sidebar-item"><span class="icon"><i data-lucide="message-square"></i></span><span>Canales</span></a>
+    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i data-lucide="bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+    <a href="/{{ slug }}/rector/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horarios</span></a>
+    <a href="/{{ slug }}/rector/profesores" class="sidebar-item"><span class="icon"><i data-lucide="presentation"></i></span><span>Profesores</span></a>
+    <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
+    <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
+    <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
+    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
+    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
+    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+  </div>
+  <div class="sidebar-user">
+    <div class="name">{{ rector.nombre }}</div>
+    <div class="role">Rector</div>
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <div>
+    <div class="page-title"><i data-lucide="calendar-check" style="width:20px;height:20px;vertical-align:middle;"></i> Panel de Asistencia</div>
+    <div class="page-sub">Vista general de asistencia institucional</div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a href="#" onclick="exportarExcel();return false;" class="date-nav-btn" style="font-size:12px;"><i data-lucide="file-spreadsheet" style="width:14px;height:14px;"></i> Excel</a>
+  </div>
+</div>
+
+<div class="filters">
+  <div class="filter-group">
+    <label>Curso</label>
+    <select id="filtroCurso" onchange="cargarDatos()">
+      <option value="">Todos</option>
+      {% for c in cursos %}
+      <option value="{{ c }}">{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Jornada</label>
+    <select id="filtroJornada" onchange="cargarDatos()">
+      <option value="">Todas</option>
+      {% for j in jornadas %}
+      <option value="{{ j }}">{{ j }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Profesor</label>
+    <select id="filtroProfesor" onchange="cargarDatos()">
+      <option value="">Todos</option>
+      {% for p in profesores %}
+      <option value="{{ p.id }}">{{ p.nombre }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Fecha</label>
+    <input type="date" id="filtroFecha" value="{{ hoy_fecha }}" onchange="cargarDatos()">
+  </div>
+  <div class="filter-group" style="align-self:flex-end;">
+    <button class="date-nav-btn" onclick="document.getElementById('filtroFecha').value = '{{ hoy_fecha }}';cargarDatos();">Hoy</button>
+  </div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="card" style="margin-bottom:16px;">
+  <div class="card-head">
+    <span class="card-title"><i data-lucide="users" style="width:14px;height:14px;"></i> Estudiantes</span>
+    <span id="estudiantesCount" style="font-size:11px;color:var(--muted);font-weight:400;">0 estudiantes</span>
+  </div>
+  <div class="card-body" style="padding:0;">
+    <div id="estudiantesContent">
+      <div class="empty-state">Selecciona filtros para ver estudiantes</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head">
+    <span class="card-title"><i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Alertas</span>
+    <span id="alertasCount" style="font-size:11px;color:var(--muted);font-weight:400;">0</span>
+  </div>
+  <div class="alerts-panel" id="alertasContent">
+    <div class="empty-state">Sin alertas activas</div>
+  </div>
+</div>
+
+</div>
+
+<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
+<input type="hidden" id="slug" value="{{ slug }}">
+
+<div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado
+{% endblock %}

@@ -1,0 +1,10 @@
+{% macro empty_state(icon, title, description='', action_url=None, action_text=None) %}
+<div class="empty-state" style="text-align:center;padding:60px 20px;color:var(--muted);">
+  <i data-lucide="{{ icon }}" style="width:48px;height:48px;opacity:.15;margin-bottom:16px;color:var(--accent);"></i>
+  <h3 style="font-size:var(--font-lg);font-weight:600;margin-bottom:8px;color:var(--text);">{{ title }}</h3>
+  {% if description %}<p style="font-size:var(--font-sm);max-width:400px;margin:0 auto;color:var(--muted);">{{ description }}</p>{% endif %}
+  {% if action_url and action_text %}
+  <a href="{{ action_url }}" class="btn btn-primary mt-lg">{{ action_text }}</a>
+  {% endif %}
+</div>
+{% endmacro %}

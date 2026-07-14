@@ -2,7 +2,7 @@ import os, sys
 from dotenv import load_dotenv
 _basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(_basedir, '.env'))
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file, abort, jsonify, g
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file, abort, jsonify, g, Response
 import sqlite3, hashlib, time, secrets, logging, json, uuid, bcrypt
 from datetime import timedelta, datetime
 from io import BytesIO
@@ -128,6 +128,31 @@ def validar_csrf():
 
 app.jinja_env.globals['csrf_token'] = generar_csrf
 
+@app.context_processor
+def inject_theme():
+    def accent_css(colegio):
+        primary = (colegio and colegio['primary_color']) or '#7C3AED'
+        secondary = (colegio and colegio['secondary_color']) or '#6D28D9'
+        h = primary.lstrip('#')
+        rgb = f'{int(h[0:2], 16)},{int(h[2:4], 16)},{int(h[4:6], 16)}' if len(h) == 6 else '124,58,237'
+        return f'--accent:{primary};--accent2:{secondary};--accent-rgb:{rgb};'
+    return dict(accent_css=accent_css)
+
+@app.context_processor
+def inject_rector_defaults():
+    return dict(
+        total_estudiantes=0, total_profesores=0, total_cursos=0,
+        total_materias=0, total_directoras=0, asistencia_hoy=0, asis_pct_r=0,
+    )
+
+# ── API v1 BLUEPRINT ────────────────────────────────────────────────────────────
+try:
+    from api.v1.auth import bp as api_v1_bp
+    app.register_blueprint(api_v1_bp)
+    logger.info("API v1 blueprint registrado.")
+except ImportError as e:
+    logger.warning(f"No se pudo registrar API v1: {e}")
+
 # ── FUERZA BRUTA ──────────────────────────────────────────────────────────────
 login_intentos = {}
 
@@ -179,7 +204,7 @@ def necesita_rehash(guardada):
     return not (guardada.startswith('$2b$') or guardada.startswith('$2a$'))
 
 # ── SCHEMA VERSIONING ──────────────────────────────────────────────────────────
-SCHEMA_VERSION = 12
+SCHEMA_VERSION = 16
 
 def _ejecutar_migraciones(slug, conn):
     conn.execute('''CREATE TABLE IF NOT EXISTS schema_meta (
@@ -402,6 +427,185 @@ def _migrar_v12(conn, slug=None):
             UNIQUE(curso, jornada, dia, franja))''',
         'SELECT * FROM horarios_curso_old')
 
+def _migrar_v13(conn, slug=None):
+    conn.execute('''CREATE TABLE IF NOT EXISTS auditoria_notas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id INTEGER NOT NULL,
+        rol TEXT NOT NULL,
+        creado TEXT DEFAULT (datetime('now','localtime')),
+        ip TEXT,
+        curso TEXT,
+        materia TEXT,
+        periodo INTEGER,
+        tipo_accion TEXT NOT NULL,
+        tabla TEXT NOT NULL,
+        registro_id INTEGER,
+        aid INTEGER NOT NULL,
+        actividad_id INTEGER,
+        campo TEXT,
+        valor_anterior TEXT,
+        valor_nuevo TEXT,
+        motivo TEXT
+    )''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_auditoria_notas_aid ON auditoria_notas(aid)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_auditoria_notas_curso ON auditoria_notas(curso, materia, periodo)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_auditoria_notas_fecha ON auditoria_notas(creado)')
+
+def _migrar_v14(conn, slug=None):
+    # Handle legacy solicitudes_modificacion table (old schema from pre-v14)
+    cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='solicitudes_modificacion'")
+    if cur.fetchone():
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(solicitudes_modificacion)").fetchall()}
+        if 'slug' not in cols:
+            conn.execute("DROP TABLE IF EXISTS solicitudes_modificacion")
+    conn.execute('''CREATE TABLE IF NOT EXISTS solicitudes_modificacion (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        aid INTEGER NOT NULL,
+        profesor_id INTEGER NOT NULL,
+        materia TEXT NOT NULL,
+        curso TEXT NOT NULL,
+        jornada TEXT NOT NULL,
+        periodo INTEGER NOT NULL DEFAULT 1,
+        tipo TEXT NOT NULL CHECK(tipo IN ('actividad', 'evaluacion', 'autoevaluacion')),
+        actividad_id INTEGER,
+        valor_actual TEXT,
+        valor_solicitado TEXT NOT NULL,
+        motivo TEXT NOT NULL,
+        estado TEXT NOT NULL DEFAULT 'pendiente' CHECK(estado IN ('pendiente', 'aprobada', 'rechazada')),
+        aprobado_por INTEGER,
+        fecha_solicitud TEXT DEFAULT (datetime('now','localtime')),
+        fecha_respuesta TEXT
+    )''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_solicitudes_slug_estado ON solicitudes_modificacion(slug, estado)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_solicitudes_profesor ON solicitudes_modificacion(profesor_id, slug)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_solicitudes_aid ON solicitudes_modificacion(aid)')
+    # Ensure slug default for existing rows
+    conn.execute("UPDATE solicitudes_modificacion SET slug=? WHERE slug IS NULL OR slug=''", (slug or '',))
+
+def _migrar_v15(conn, slug=None):
+    # Expand asistencia: new states + metadata columns
+    cur = conn.execute("PRAGMA table_info(asistencia)")
+    cols = {r[1] for r in cur.fetchall()}
+    for col, ddl in [
+        ('observacion',   'observacion TEXT DEFAULT ""'),
+        ('hora',          'hora TEXT DEFAULT ""'),
+        ('usuario_tipo',  'usuario_tipo TEXT DEFAULT "profesor"'),
+        ('usuario_id',    'usuario_id INTEGER DEFAULT 0'),
+    ]:
+        if col not in cols:
+            conn.execute(f'ALTER TABLE asistencia ADD COLUMN {ddl}')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_asistencia_fecha_estado ON asistencia(fecha, estado)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_asistencia_aid_estado ON asistencia(aid, estado)')
+
+def _migrar_v16(conn, slug=None):
+    conn.execute('''CREATE TABLE IF NOT EXISTS firmas_digitales (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        usuario_tipo TEXT NOT NULL,
+        usuario_id INTEGER NOT NULL,
+        nombre TEXT NOT NULL,
+        documento_tipo TEXT NOT NULL,
+        documento_id INTEGER NOT NULL,
+        hash_documento TEXT NOT NULL,
+        firma_hash TEXT NOT NULL,
+        metodo TEXT DEFAULT 'hmac-sha256',
+        ip TEXT DEFAULT '',
+        user_agent TEXT DEFAULT '',
+        creado TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_firmas_doc ON firmas_digitales(documento_tipo, documento_id)')
+
+    conn.execute('''CREATE TABLE IF NOT EXISTS enterprise_audit_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        usuario_id INTEGER,
+        usuario_tipo TEXT DEFAULT '',
+        accion TEXT NOT NULL,
+        categoria TEXT DEFAULT '',
+        descripcion TEXT DEFAULT '',
+        tabla TEXT DEFAULT '',
+        registro_id INTEGER,
+        valor_anterior TEXT,
+        valor_nuevo TEXT,
+        ip TEXT DEFAULT '',
+        user_agent TEXT DEFAULT '',
+        dispositivo TEXT DEFAULT '',
+        navegador TEXT DEFAULT '',
+        sesion_id TEXT DEFAULT '',
+        nivel TEXT DEFAULT 'info',
+        creado TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_enterprise_audit_slug ON enterprise_audit_log(slug, creado)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_enterprise_audit_accion ON enterprise_audit_log(accion)')
+
+    conn.execute('''CREATE TABLE IF NOT EXISTS observador_registros (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        aid INTEGER NOT NULL,
+        tipo TEXT NOT NULL CHECK(tipo IN ('positivo','llamado','compromiso','seguimiento')),
+        texto TEXT NOT NULL,
+        docente TEXT DEFAULT '',
+        materia TEXT DEFAULT '',
+        estado TEXT DEFAULT 'pendiente' CHECK(estado IN ('pendiente','aprobado','rechazado')),
+        aprobado_por_tipo TEXT,
+        aprobado_por_id INTEGER,
+        fecha TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_observador_aid ON observador_registros(aid)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_observador_tipo ON observador_registros(tipo)')
+
+    conn.execute('''CREATE TABLE IF NOT EXISTS expediente_documentos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        aid INTEGER NOT NULL,
+        tipo TEXT NOT NULL,
+        nombre TEXT NOT NULL,
+        archivo TEXT DEFAULT '',
+        descripcion TEXT DEFAULT '',
+        subido_por_tipo TEXT DEFAULT 'rector',
+        subido_por_id INTEGER DEFAULT 0,
+        fecha TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_expediente_aid ON expediente_documentos(aid)')
+
+    conn.execute('''CREATE TABLE IF NOT EXISTS eventos_calendario (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        tipo TEXT NOT NULL DEFAULT 'evento',
+        titulo TEXT NOT NULL,
+        descripcion TEXT DEFAULT '',
+        fecha_inicio TEXT NOT NULL,
+        fecha_fin TEXT,
+        todo_el_dia INTEGER DEFAULT 1,
+        curso TEXT DEFAULT '',
+        creado_por_tipo TEXT DEFAULT 'rector',
+        creado_por_id INTEGER DEFAULT 0,
+        color TEXT DEFAULT '#6c63ff',
+        fecha_creacion TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_eventos_fecha ON eventos_calendario(slug, fecha_inicio)')
+
+    conn.execute('''CREATE TABLE IF NOT EXISTS pagos_estructura (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        alumno_id INTEGER NOT NULL,
+        concepto TEXT NOT NULL,
+        monto REAL NOT NULL,
+        descuento REAL DEFAULT 0,
+        pagado REAL DEFAULT 0,
+        estado TEXT DEFAULT 'pendiente' CHECK(estado IN ('pendiente','pagado','parcial','anulado')),
+        fecha_vencimiento TEXT,
+        fecha_pago TEXT,
+        metodo_pago TEXT DEFAULT '',
+        referencia TEXT DEFAULT '',
+        notas TEXT DEFAULT '',
+        creado TEXT DEFAULT (datetime('now','localtime')),
+        actualizado TEXT DEFAULT (datetime('now','localtime'))
+    )''')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_pagos_alumno ON pagos_estructura(alumno_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_pagos_estado ON pagos_estructura(estado)')
+
 MIGRACIONES = {
     6:  _migrar_v6,
     7:  _migrar_v7,
@@ -410,6 +614,10 @@ MIGRACIONES = {
     10: _migrar_v10,
     11: _migrar_v11,
     12: _migrar_v12,
+    13: _migrar_v13,
+    14: _migrar_v14,
+    15: _migrar_v15,
+    16: _migrar_v16,
 }
 
 # ── MASTER DB ─────────────────────────────────────────────────────────────────
@@ -463,21 +671,8 @@ def init_master_db():
     conn.commit()
     conn.close()
 
-def get_colegio(slug):
-    try:
-        cache = g.setdefault('_colegios', {})
-        if slug in cache:
-            return cache[slug]
-    except (RuntimeError, AttributeError):
-        pass
-    c = conectar_master()
-    r = c.execute('SELECT * FROM colegios WHERE slug=?', (slug,)).fetchone()
-    c.close()
-    try:
-        cache[slug] = r
-    except (RuntimeError, AttributeError):
-        pass
-    return r
+
+
 
 def get_codigo_registro(slug, rol=None):
     """Devuelve el código de invitación del colegio para un rol específico.
@@ -814,22 +1009,7 @@ def init_db(slug):
             fecha_cierre TEXT,
             abierto_por INTEGER,
             cerrado_por INTEGER)''',
-        '''CREATE TABLE IF NOT EXISTS solicitudes_modificacion (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            periodo INTEGER NOT NULL,
-            aid INTEGER NOT NULL,
-            actividad_id INTEGER,
-            campo TEXT DEFAULT 'nota',
-            materia TEXT,
-            nota_actual REAL,
-            nota_solicitada REAL NOT NULL,
-            motivo TEXT NOT NULL,
-            estado TEXT NOT NULL DEFAULT 'pendiente',
-            solicitado_por INTEGER NOT NULL,
-            revisado_por INTEGER,
-            respuesta TEXT,
-            creado TEXT DEFAULT (datetime('now','localtime')),
-            actualizado TEXT DEFAULT (datetime('now','localtime')))''',
+        # ── solicitudes_modificacion is created by migration v14 ──
         # ── Fase 5 – Comunicación v2 ─────────────────────────────────
         '''CREATE TABLE IF NOT EXISTS mensajes_archivos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -914,7 +1094,6 @@ def init_db(slug):
         'CREATE INDEX IF NOT EXISTS idx_compromisos_materia ON compromisos(materia, curso, jornada)',
         'CREATE INDEX IF NOT EXISTS idx_horarios_materia ON horarios_curso(materia, jornada, dia)',
         'CREATE INDEX IF NOT EXISTS idx_notificaciones_usuario ON notificaciones(usuario_tipo, usuario_id, leida)',
-        'CREATE INDEX IF NOT EXISTS idx_solicitudes_prof ON solicitudes_modificacion(solicitado_por, estado)',
         'CREATE INDEX IF NOT EXISTS idx_comunicaciones_rector ON comunicaciones(rector_id, activo)',
         'CREATE INDEX IF NOT EXISTS idx_asignaciones_curso_prof ON asignaciones_curso(profesor_id, materia, jornada)',
         'CREATE INDEX IF NOT EXISTS idx_canal_miembros_usuario ON canal_miembros(usuario_tipo, usuario_id)',
@@ -930,6 +1109,14 @@ def init_db(slug):
         'CREATE INDEX IF NOT EXISTS idx_config_institucion_slug ON config_institucion(slug)',
         'CREATE INDEX IF NOT EXISTS idx_alumnos_id_curso ON alumnos(id, curso)',
         'CREATE INDEX IF NOT EXISTS idx_comunicaciones_estado ON comunicaciones(rector_id, activo, estado)',
+        # ── Phase 11: Performance indexes ──────────────────────────────
+        'CREATE INDEX IF NOT EXISTS idx_ml_mensaje_tipo ON mensajes_leidos(mensaje_id, usuario_tipo, usuario_id)',
+        'CREATE INDEX IF NOT EXISTS idx_obs_aid_materia ON observaciones(aid, materia)',
+        'CREATE INDEX IF NOT EXISTS idx_comunicaciones_rector_fecha ON comunicaciones(rector_id, activo, fecha_creacion)',
+        'CREATE INDEX IF NOT EXISTS idx_audit_log_tabla ON audit_log(tabla)',
+        'CREATE INDEX IF NOT EXISTS idx_asistencia_fecha ON asistencia(fecha)',
+        'CREATE INDEX IF NOT EXISTS idx_actividades_prof_periodo ON actividades(profesor_id, materia, jornada, curso, periodo)',
+        'CREATE INDEX IF NOT EXISTS idx_solicitudes_fecha ON solicitudes_modificacion(fecha_solicitud)',
     ]
     for idx in indexes:
         try: conn.execute(idx)
@@ -939,6 +1126,100 @@ def init_db(slug):
     _ejecutar_migraciones(slug, conn)
     conn.close()
     migrar_db(slug)
+
+# ── INTELLIGENT CACHE (TTL-based, for safe data only) ─────────────────────────
+import threading
+_cache = {}
+_cache_lock = threading.Lock()
+_CACHE_TTL = {'config': 60, 'cursos': 60, 'materias': 60, 'jornadas': 60, 'colegio': 300}
+
+def _cache_get(key):
+    with _cache_lock:
+        entry = _cache.get(key)
+        if entry and entry['expires'] > time.time():
+            return entry['value']
+        if entry:
+            del _cache[key]
+    return None
+
+def _cache_set(key, value, ttl=60):
+    with _cache_lock:
+        _cache[key] = {'value': value, 'expires': time.time() + ttl}
+
+def _cache_invalidate(slug=None, prefix=None):
+    with _cache_lock:
+        to_del = [k for k in _cache if (slug and slug in k) or (prefix and k.startswith(prefix))]
+        for k in to_del:
+            del _cache[k]
+
+def config_get(slug):
+    """Cached config lookup. Invalidated on config save."""
+    key = f'cfg_{slug}'
+    cached = _cache_get(key)
+    if cached: return cached
+    conn = conectar(slug)
+    cfg = conn.execute('SELECT * FROM config_institucion WHERE slug=?', (slug,)).fetchone()
+    conn.close()
+    if cfg:
+        _cache_set(key, dict(cfg), ttl=_CACHE_TTL['config'])
+        return dict(cfg)
+    return {}
+
+def get_colegio(slug):
+    """Cached colegio lookup. Invalidated when colegio is updated."""
+    key = f'col_{slug}'
+    cached = _cache_get(key)
+    if cached: return cached
+    conn = conectar_master()
+    row = conn.execute('SELECT * FROM colegios WHERE slug=?', (slug,)).fetchone()
+    conn.close()
+    if row:
+        val = dict(row)
+        _cache_set(key, val, ttl=_CACHE_TTL['colegio'])
+        return val
+    return None
+
+def get_cursos_cache(slug, jornada=None):
+    """Cached distinct course list."""
+    key = f'cursos_{slug}_{jornada or "all"}'
+    cached = _cache_get(key)
+    if cached: return cached
+    conn = conectar(slug)
+    if jornada:
+        rows = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 AND jornada=? ORDER BY curso', (jornada,)).fetchall()
+    else:
+        rows = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
+    conn.close()
+    val = [r['curso'] for r in rows]
+    _cache_set(key, val, ttl=_CACHE_TTL['cursos'])
+    return val
+
+def get_materias_cache(slug, jornada=None):
+    """Cached distinct materia list."""
+    key = f'mats_{slug}_{jornada or "all"}'
+    cached = _cache_get(key)
+    if cached: return cached
+    conn = conectar(slug)
+    if jornada:
+        rows = conn.execute('SELECT DISTINCT materia FROM asignaciones_materia WHERE jornada=? ORDER BY materia', (jornada,)).fetchall()
+    else:
+        rows = conn.execute('SELECT DISTINCT materia FROM asignaciones_materia ORDER BY materia').fetchall()
+    conn.close()
+    val = [r['materia'] for r in rows]
+    _cache_set(key, val, ttl=_CACHE_TTL['materias'])
+    return val
+
+def get_jornadas_cache(slug):
+    """Cached distinct jornada list."""
+    key = f'jorn_{slug}'
+    cached = _cache_get(key)
+    if cached: return cached
+    conn = conectar(slug)
+    rows = conn.execute('SELECT DISTINCT jornada FROM alumnos WHERE activo=1 ORDER BY jornada').fetchall()
+    conn.close()
+    val = [r['jornada'] for r in rows]
+    _cache_set(key, val, ttl=_CACHE_TTL['jornadas'])
+    return val
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
 def get_profesor(slug):
@@ -1115,16 +1396,26 @@ def audit_log(slug, usuario_id, accion, tabla, registro_id=None, valor_anterior=
     finally:
         if conn: conn.close()
 
-# ── CONFIG HELPERS ────────────────────────────────────────────────────────────
-def config_get(slug):
-    cache_key = f'_cfg_{slug}'
-    if hasattr(g, cache_key): return getattr(g, cache_key)
-    conn = conectar(slug)
-    c = conn.execute('SELECT * FROM config_institucion WHERE slug=?', (slug,)).fetchone()
-    conn.close()
-    val = dict(c) if c else {}
-    setattr(g, cache_key, val)
-    return val
+def auditar_nota(slug, usuario_id, rol, tipo_accion, tabla, aid, curso, materia, periodo, campo=None, actividad_id=None, registro_id=None, valor_anterior=None, valor_nuevo=None, motivo=None):
+    from flask import request as flask_request
+    conn = None
+    try:
+        conn = conectar(slug)
+        conn.execute(
+            '''INSERT INTO auditoria_notas
+               (usuario_id, rol, ip, curso, materia, periodo, tipo_accion, tabla, registro_id, aid, actividad_id, campo, valor_anterior, valor_nuevo, motivo)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+            (usuario_id, rol, flask_request.remote_addr, curso, materia, periodo,
+             tipo_accion, tabla, registro_id, aid, actividad_id, campo,
+             json.dumps(valor_anterior) if valor_anterior is not None else None,
+             json.dumps(valor_nuevo) if valor_nuevo is not None else None,
+             motivo)
+        )
+        conn.commit()
+    except Exception as e:
+        logger.warning(f"[auditar_nota] {e}")
+    finally:
+        if conn: conn.close()
 
 # ── CANALES HELPERS ─────────────────────────────────────────────────────────────
 def canales_usuario(slug, usuario_tipo, usuario_id):
@@ -1317,19 +1608,27 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
     story.append(Spacer(1, 0.4*cm))
 
     todos_finales = []
+    ph = ','.join('?' * len(lista_materias))
+    notas_all = conn.execute(
+        f'''SELECT ac.materia, n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+            WHERE n.aid=? AND ac.materia IN ({ph}) AND ac.curso=? AND ac.jornada=?
+            AND COALESCE(ac.periodo,1)=?''',
+        (alumno['id'],) + tuple(lista_materias) + (curso, jornada, periodo)
+    ).fetchall()
+    ev_all = conn.execute(
+        f'''SELECT materia, evaluacion, autoevaluacion FROM evaluaciones
+            WHERE aid=? AND materia IN ({ph}) AND jornada=? AND COALESCE(periodo,1)=?''',
+        (alumno['id'],) + tuple(lista_materias) + (jornada, periodo)
+    ).fetchall()
+    notas_por_mat = {}
+    for r in notas_all:
+        notas_por_mat.setdefault(r['materia'], []).append(r['val'])
+    ev_por_mat = {}
+    for r in ev_all:
+        ev_por_mat[r['materia']] = r
     for mat in lista_materias:
-        notas_r = conn.execute(
-            '''SELECT n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
-               WHERE n.aid=? AND ac.materia=? AND ac.curso=? AND ac.jornada=?
-               AND COALESCE(ac.periodo,1)=?''',
-            (alumno['id'], mat, curso, jornada, periodo)
-        ).fetchall()
-        ev = conn.execute(
-            '''SELECT evaluacion, autoevaluacion FROM evaluaciones
-               WHERE aid=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
-            (alumno['id'], mat, jornada, periodo)
-        ).fetchone()
-        notas_vals = [r['val'] for r in notas_r]
+        notas_vals = notas_por_mat.get(mat, [])
+        ev = ev_por_mat.get(mat)
         eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
         auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
         final = _promedio_ponderado(notas_vals, eval_v, auto_v)
@@ -1414,7 +1713,7 @@ def admin():
             if bloqueado:
                 error = f'Demasiados intentos. Espera {bloqueado}s.'
                 return render_template('admin_login.html', error=error)
-            if request.form.get('password', '') == ADMIN_PASSWORD:
+            if secrets.compare_digest(request.form.get('password', ''), ADMIN_PASSWORD):
                 session.clear()
                 session.permanent = True
                 session['admin_auth'] = True
@@ -1524,6 +1823,8 @@ def admin():
                             cm.execute('UPDATE colegios SET logo=? WHERE slug=?', (logo_filename, slug_e))
                             cm.commit()
             cm.close()
+            _cache_invalidate(slug_e)
+            _cache_invalidate(prefix='col_')
             exito = f'Colegio "{nombre}" actualizado. Código: {codigo}'
 
         elif accion == 'eliminar_colegio':
@@ -2058,9 +2359,12 @@ def home(slug):
         pendientes = comunicaciones_pendientes(slug, 'profesor', prof['id'])
         num_periodos = int(colegio['num_periodos']) if colegio and colegio['num_periodos'] else 4
         pc = periodo_cerrado(slug, periodo_sel) if curso_sel and materia else False
+        error_msg = request.args.get('error', '')
+        if error_msg == 'periodo_cerrado':
+            error_msg = 'El per\u00edodo est\u00e1 cerrado. No se pueden crear actividades.'
         solicitudes_pend = conn.execute(
-            'SELECT COUNT(*) as c FROM solicitudes_modificacion WHERE solicitado_por=? AND estado=?',
-            (prof['id'], 'pendiente')).fetchone()['c'] if curso_sel else 0
+            'SELECT COUNT(*) as c FROM solicitudes_modificacion WHERE profesor_id=? AND estado=? AND slug=?',
+            (prof['id'], 'pendiente', slug)).fetchone()['c'] if curso_sel else 0
     finally:
         conn.close()
     return render_template('index.html',
@@ -2073,9 +2377,10 @@ def home(slug):
                            hoy_nombre=hoy_nombre, hoy_fecha=hoy_fecha,
                            total_alumnos=total_alumnos, horario_hoy=horario_hoy,
                            asistencia_hoy=asistencia_hoy, notas_pend=notas_pend,
-                            alertas=alertas,
-                            periodo_cerrado=pc,
-                            solicitudes_pendientes_mod=solicitudes_pend,
+                             alertas=alertas,
+                             periodo_cerrado=pc,
+                             error_msg=error_msg,
+                             solicitudes_pendientes_mod=solicitudes_pend,
                             comunicaciones_pendientes=pendientes)
 
 # ── ACTIVIDADES ───────────────────────────────────────────────────────────────
@@ -2090,6 +2395,8 @@ def nueva_actividad(slug):
     curso_sel = request.form.get('curso_sel', '')
     periodo   = request.form.get('periodo_sel', 1, type=int)
     if nombre and curso_sel and materia and jornada:
+        if periodo_cerrado(slug, periodo):
+            return redirect(url_for('home', slug=slug, curso=curso_sel, periodo=periodo, error='periodo_cerrado'))
         conn = conectar(slug)
         max_ord = conn.execute(
             '''SELECT COALESCE(MAX(orden),0) FROM actividades
@@ -2109,12 +2416,27 @@ def borrar_actividad(slug, act_id):
     prof = get_profesor(slug)
     if not prof: return redirect(url_for('login', slug=slug))
     conn = conectar(slug)
-    act = conn.execute('SELECT profesor_id, curso FROM actividades WHERE id=?', (act_id,)).fetchone()
+    act = conn.execute('SELECT profesor_id, curso, materia, COALESCE(periodo,1) as p FROM actividades WHERE id=?', (act_id,)).fetchone()
     curso = ''
     if act and act['profesor_id'] == prof['id']:
+        if periodo_cerrado(slug, act['p']):
+            conn.close()
+            return jsonify({'status':'error','codigo':'PERIODO_CERRADO','mensaje':'El per\u00edodo est\u00e1 cerrado.'}), 403
+        notas_borradas = conn.execute('SELECT aid, val FROM notas WHERE actividad_id=?', (act_id,)).fetchall()
         conn.execute('DELETE FROM notas WHERE actividad_id=?', (act_id,))
         conn.execute('DELETE FROM actividades WHERE id=?', (act_id,))
-        conn.commit(); curso = act['curso']
+        conn.commit()
+        curso = act['curso']
+        jornada_ctx, materia_ctx = get_sesion_jornada_materia(slug)
+        for n in notas_borradas:
+            auditar_nota(slug, prof['id'], 'profesor', 'eliminacion', 'notas', n['aid'],
+                         act['curso'], materia_ctx or act['materia'], act['p'],
+                         campo='nota', actividad_id=act_id,
+                         valor_anterior=n['val'], valor_nuevo=None)
+        auditar_nota(slug, prof['id'], 'profesor', 'eliminacion', 'actividades', None,
+                     act['curso'], materia_ctx or act['materia'], act['p'],
+                     actividad_id=act_id, valor_anterior=act_id, valor_nuevo=None,
+                     motivo='Actividad eliminada')
     conn.close()
     return redirect(url_for('home', slug=slug, curso=curso))
 
@@ -2225,7 +2547,7 @@ def guardar_nota(slug):
         return ('', 403)
     if periodo_cerrado(slug, act['p']):
         conn.close()
-        return ('Periodo cerrado', 423)
+        return jsonify({'status':'error','codigo':'PERIODO_CERRADO','mensaje':'El per\u00edodo est\u00e1 cerrado.'}), 403
     old = conn.execute(
         'SELECT val FROM notas WHERE aid=? AND actividad_id=?',
         (aid, actividad_id)).fetchone()
@@ -2238,13 +2560,51 @@ def guardar_nota(slug):
     audit_log(slug, prof['id'], 'nota_editada', 'notas', registro_id=None,
               valor_anterior={'aid': aid, 'actividad_id': actividad_id, 'val': old_val},
               valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'val': val})
+    tipo_nota = 'creacion' if old_val is None else 'modificacion'
     jornada, materia = get_sesion_jornada_materia(slug)
+    auditar_nota(slug, prof['id'], 'profesor', tipo_nota, 'notas', aid,
+                 act['curso'], materia, act['p'],
+                 campo='nota', actividad_id=actividad_id,
+                 valor_anterior=old_val, valor_nuevo=val)
     prom_est = calcular_stats_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
     nf = calcular_nota_final_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
     curso_stats = calcular_stats_curso(conn, slug, act['curso'], materia, jornada, act['p'], prof['id'])
     conn.close()
     logger.info('guardar_nota: aid=%d actividad_id=%d val=%s prom_est=%s nf=%s', aid, actividad_id, val, prom_est, nf)
     return jsonify({'status':'ok','promedio':prom_est,'nota_final':nf,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
+
+# ── HISTORIAL NOTAS ──────────────────────────────────────────────────────────
+@app.route('/<slug>/historial_notas/<int:aid>')
+def historial_notas(slug, aid):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof: return ('', 403)
+    conn = conectar(slug)
+    rows = conn.execute(
+        '''SELECT a.id, a.tipo_accion, a.tabla, a.campo, a.valor_anterior, a.valor_nuevo,
+                  a.creado, a.materia, a.periodo, a.motivo, a.aid,
+                  COALESCE(ac.nombre, '') as actividad_nombre
+           FROM auditoria_notas a
+           LEFT JOIN actividades ac ON ac.id = a.actividad_id
+           WHERE a.aid = ?
+           ORDER BY a.creado DESC
+           LIMIT 200''',
+        (aid,)).fetchall()
+    conn.close()
+    return jsonify([{
+        'id': r['id'],
+        'tipo_accion': r['tipo_accion'],
+        'tabla': r['tabla'],
+        'campo': r['campo'],
+        'valor_anterior': r['valor_anterior'],
+        'valor_nuevo': r['valor_nuevo'],
+        'creado': r['creado'],
+        'materia': r['materia'],
+        'periodo': r['periodo'],
+        'motivo': r['motivo'],
+        'actividad_nombre': r['actividad_nombre'],
+        'aid': r['aid'],
+    } for r in rows])
 
 # ── EVALUACIONES ──────────────────────────────────────────────────────────────
 @app.route('/<slug>/guardar_evaluacion', methods=['POST'])
@@ -2263,7 +2623,7 @@ def guardar_evaluacion(slug):
     conn = conectar(slug)
     if periodo_cerrado(slug, periodo):
         conn.close()
-        return ('Periodo cerrado', 423)
+        return jsonify({'status':'error','codigo':'PERIODO_CERRADO','mensaje':'El per\u00edodo est\u00e1 cerrado.'}), 403
     if not curso:
         cursos_prof = get_cursos_profesor(slug, prof['id'], materia, jornada)
         curso = cursos_prof[0] if cursos_prof else ''
@@ -2313,6 +2673,16 @@ def guardar_evaluacion(slug):
     audit_log(slug, prof['id'], 'evaluacion_editada', 'evaluaciones', registro_id=None,
               valor_anterior={'aid': aid, 'evaluacion': old_eval, 'autoevaluacion': old_auto},
               valor_nuevo={'aid': aid, 'evaluacion': ev_final, 'autoevaluacion': au_final})
+    if ev is not None:
+        tipo_ev = 'creacion' if old_eval is None else 'modificacion'
+        auditar_nota(slug, prof['id'], 'profesor', tipo_ev, 'evaluaciones', aid,
+                     curso, materia, periodo, campo='evaluacion',
+                     valor_anterior=old_eval, valor_nuevo=ev_final)
+    if au is not None:
+        tipo_au = 'creacion' if old_auto is None else 'modificacion'
+        auditar_nota(slug, prof['id'], 'profesor', tipo_au, 'evaluaciones', aid,
+                     curso, materia, periodo, campo='autoevaluacion',
+                     valor_anterior=old_auto, valor_nuevo=au_final)
     prom_est = calcular_stats_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
     nf = calcular_nota_final_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
     curso_stats = calcular_stats_curso(conn, slug, curso, materia, jornada, periodo, prof['id'])
@@ -2324,65 +2694,987 @@ def guardar_evaluacion(slug):
 def solicitar_modificacion(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return ('', 403)
-    if not validar_csrf(): return ('Error CSRF', 403)
-    aid              = request.form.get('alumno_id', request.form.get('aid'), type=int)
-    actividad_id     = request.form.get('actividad_id', type=int)
-    nombre_actividad = request.form.get('nombre_actividad', '').strip()
-    periodo          = request.form.get('periodo', type=int)
-    nota_actual_raw  = request.form.get('nota_actual', '').strip()
-    nota_solicitada  = request.form.get('nota_solicitada', type=float)
-    motivo           = request.form.get('motivo', '').strip()
-    if None in (aid, nota_solicitada) or not motivo:
-        return ('Datos incompletos', 400)
-    if periodo is None:
-        periodo = 1
+    if not prof: return jsonify({'status':'error','mensaje':'No autorizado'}), 403
+    if not validar_csrf(): return jsonify({'status':'error','mensaje':'Error CSRF'}), 403
+    aid             = request.form.get('aid', type=int)
+    actividad_id    = request.form.get('actividad_id', type=int)
+    tipo            = request.form.get('tipo', '').strip()
+    valor_solicitado = request.form.get('valor_solicitado', type=float)
+    motivo          = request.form.get('motivo', '').strip()
+    periodo         = request.form.get('periodo', 1, type=int)
+    if None in (aid, valor_solicitado) or not motivo or not tipo:
+        return jsonify({'status':'error','mensaje':'Datos incompletos'}), 400
+    if valor_solicitado < 0 or valor_solicitado > 5:
+        return jsonify({'status':'error','mensaje':'Nota debe estar entre 0 y 5'}), 400
+    if tipo not in ('actividad', 'evaluacion', 'autoevaluacion'):
+        return jsonify({'status':'error','mensaje':'Tipo inv\u00e1lido'}), 400
+    if not periodo_cerrado(slug, periodo):
+        return jsonify({'status':'error','mensaje':'El per\u00edodo no est\u00e1 cerrado'}), 400
     conn = conectar(slug)
-    campo = 'nota'
     jornada_ctx, materia_ctx = get_sesion_jornada_materia(slug)
     materia = materia_ctx or ''
-    nota_actual_val = None
-    if actividad_id is not None:
+    jornada = jornada_ctx or ''
+    curso = ''
+    valor_actual = None
+    if tipo == 'actividad':
+        if actividad_id is None:
+            conn.close()
+            return jsonify({'status':'error','mensaje':'actividad_id requerido para tipo actividad'}), 400
         act = conn.execute(
-            'SELECT a.id, a.nombre, a.materia, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
+            'SELECT id, profesor_id, curso, materia, COALESCE(periodo,1) as p FROM actividades WHERE id=?',
             (actividad_id,)).fetchone()
         if not act:
             conn.close()
-            return ('Actividad no encontrada', 404)
+            return jsonify({'status':'error','mensaje':'Actividad no encontrada'}), 404
+        if act['profesor_id'] != prof['id']:
+            conn.close()
+            return jsonify({'status':'error','mensaje':'No eres el propietario de esta actividad'}), 403
         materia = act['materia']
+        curso = act['curso']
         nota_db = conn.execute(
             'SELECT val FROM notas WHERE aid=? AND actividad_id=?',
             (aid, actividad_id)).fetchone()
-        nota_actual_val = nota_db['val'] if nota_db else None
-    else:
-        if nombre_actividad == 'Evaluación':
-            campo = 'evaluacion'
-            alumno = conn.execute(
-                'SELECT evaluacion FROM evaluaciones WHERE aid=? AND profesor_id=? AND materia=? AND COALESCE(periodo,1)=?',
-                (aid, prof['id'], materia, periodo)).fetchone()
-            nota_actual_val = alumno['evaluacion'] if alumno else None
-        elif nombre_actividad == 'Autoevaluación':
-            campo = 'autoevaluacion'
-            alumno = conn.execute(
-                'SELECT autoevaluacion FROM evaluaciones WHERE aid=? AND profesor_id=? AND materia=? AND COALESCE(periodo,1)=?',
-                (aid, prof['id'], materia, periodo)).fetchone()
-            nota_actual_val = alumno['autoevaluacion'] if alumno else None
-        else:
-            conn.close()
-            return ('Actividad no especificada', 400)
+        valor_actual = nota_db['val'] if nota_db else None
+    elif tipo == 'evaluacion':
+        curso = request.form.get('curso', '')
+        alumno = conn.execute(
+            'SELECT evaluacion FROM evaluaciones WHERE aid=? AND profesor_id=? AND materia=? AND COALESCE(periodo,1)=?',
+            (aid, prof['id'], materia, periodo)).fetchone()
+        valor_actual = alumno['evaluacion'] if alumno else None
+    elif tipo == 'autoevaluacion':
+        curso = request.form.get('curso', '')
+        alumno = conn.execute(
+            'SELECT autoevaluacion FROM evaluaciones WHERE aid=? AND profesor_id=? AND materia=? AND COALESCE(periodo,1)=?',
+            (aid, prof['id'], materia, periodo)).fetchone()
+        valor_actual = alumno['autoevaluacion'] if alumno else None
+    if not curso:
+        curso = request.form.get('curso', '')
     conn.execute(
         '''INSERT INTO solicitudes_modificacion
-           (periodo, aid, actividad_id, campo, materia, nota_actual, nota_solicitada, motivo, solicitado_por)
-           VALUES (?,?,?,?,?,?,?,?,?)''',
-        (periodo, aid, actividad_id, campo, materia,
-         nota_actual_val, nota_solicitada, motivo, prof['id']))
+           (slug, aid, profesor_id, materia, curso, jornada, periodo, tipo, actividad_id,
+            valor_actual, valor_solicitado, motivo, estado)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,'pendiente')''',
+        (slug, aid, prof['id'], materia, curso, jornada, periodo, tipo, actividad_id,
+         str(valor_actual) if valor_actual is not None else None, str(valor_solicitado), motivo))
+    sid = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
     conn.commit()
-    audit_log(slug, prof['id'], 'solicitud_creada', 'solicitudes_modificacion',
-              valor_anterior={'aid': aid, 'actividad_id': actividad_id, 'campo': campo, 'val': nota_actual_val},
-              valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'campo': campo, 'val': nota_solicitada,
-                           'motivo': motivo})
+    auditar_nota(slug, prof['id'], 'profesor', 'solicitud_creada', 'solicitudes_modificacion', aid,
+                 curso, materia, periodo, campo=tipo, actividad_id=actividad_id,
+                 valor_anterior=valor_actual, valor_nuevo=valor_solicitado,
+                 motivo='Solicitud #%d: %s' % (sid, motivo))
+    # Notify all rectores
+    rectores = conn.execute('SELECT id FROM rectores WHERE activo=1').fetchall()
+    for r in rectores:
+        crear_notificacion(slug, 'rector', r['id'],
+            'Nueva solicitud de modificaci\u00f3n de %s' % prof['nombre'],
+            'El profesor %s solicita cambiar %s de %s a %s. Motivo: %s' % (
+                prof['nombre'], tipo, valor_actual or 'sin nota', valor_solicitado, motivo),
+            link=url_for('rector_solicitudes', slug=slug))
     conn.close()
-    return redirect(url_for('home', slug=slug))
+    return jsonify({'status':'ok','mensaje':'Solicitud enviada correctamente.','id':sid})
+
+    conn.close()
+    return jsonify({'status':'ok','mensaje':'Solicitud enviada correctamente.','id':sid})
+
+# ── EXCEL IMPORT / EXPORT (Fase 5) ───────────────────────────────────────
+def _excel_armar_wb(slug, prof, materia, jornada, curso_sel, periodo, actividades, alumnos):
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Notas'
+    header_fill = PatternFill('solid', fgColor='6D28D9')
+    header_font = Font(bold=True, size=11, color='FFFFFF')
+    thin = Side(style='thin')
+    border = Border(left=thin, right=thin, top=thin, bottom=thin)
+    center = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    headers = ['N°', 'Estudiante', 'AID'] + [a['nombre'] for a in actividades] + ['Evaluación', 'Autoevaluación', 'Promedio']
+    for col, h in enumerate(headers, 1):
+        c = ws.cell(row=1, column=col, value=h)
+        c.font = header_font
+        c.fill = header_fill
+        c.alignment = center
+        c.border = border
+    conn = conectar(slug)
+    try:
+        aid_list = [a['id'] for a in alumnos]
+        if aid_list:
+            placeholders = ','.join('?' * len(aid_list))
+            notas_all = conn.execute(
+                f'''SELECT n.aid, n.actividad_id, n.val FROM notas n
+                    JOIN actividades ac ON ac.id=n.actividad_id
+                    WHERE n.aid IN ({placeholders}) AND ac.materia=? AND ac.jornada=? AND ac.curso=?
+                    AND COALESCE(ac.periodo,1)=? AND ac.profesor_id=?''',
+                (*aid_list, materia, jornada, curso_sel, periodo, prof['id'])).fetchall()
+            notas_by_aid = {}
+            for r in notas_all:
+                notas_by_aid.setdefault(r['aid'], {})[r['actividad_id']] = r['val']
+            evals_all = conn.execute(
+                f'''SELECT aid, evaluacion, autoevaluacion FROM evaluaciones
+                    WHERE aid IN ({placeholders}) AND profesor_id=? AND materia=? AND jornada=?
+                    AND COALESCE(periodo,1)=?''',
+                (*aid_list, prof['id'], materia, jornada, periodo)).fetchall()
+            evals_by_aid = {r['aid']: {'ev': r['evaluacion'], 'auto': r['autoevaluacion']} for r in evals_all}
+        else:
+            notas_by_aid, evals_by_aid = {}, {}
+        for i, a in enumerate(alumnos, 1):
+            row = i + 1
+            ws.cell(row=row, column=1, value=i).alignment = center
+            ws.cell(row=row, column=2, value=a['nombre'])
+            ws.cell(row=row, column=3, value=a['id']).alignment = center
+            for j, act in enumerate(actividades, 4):
+                val = None
+                if a['id'] in notas_by_aid:
+                    val = notas_by_aid[a['id']].get(act['id'])
+                if val is not None:
+                    ws.cell(row=row, column=j, value=float(val)).alignment = center
+            ev = evals_by_aid.get(a['id'], {})
+            ev_val = ev.get('ev')
+            auto_val = ev.get('auto')
+            ecol = 4 + len(actividades)
+            if ev_val is not None:
+                ws.cell(row=row, column=ecol, value=float(ev_val)).alignment = center
+            if auto_val is not None:
+                ws.cell(row=row, column=ecol + 1, value=float(auto_val)).alignment = center
+            notas_dict = notas_by_aid.get(a['id'], {})
+            prom = _promedio_ponderado([notas_dict.get(act['id']) for act in actividades], ev_val, auto_val)
+            ws.cell(row=row, column=ecol + 2, value=round(prom, 2) if prom is not None else '').alignment = center
+    finally:
+        conn.close()
+    ws.column_dimensions['A'].width = 5
+    ws.column_dimensions['B'].width = 35
+    ws.column_dimensions['C'].width = 8
+    for j in range(len(actividades)):
+        ws.column_dimensions[chr(68 + j)].width = 14
+    return wb
+
+@app.route('/<slug>/plantilla_notas')
+def plantilla_notas(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof: return redirect(url_for('login', slug=slug))
+    jornada, materia = get_sesion_jornada_materia(slug)
+    if not jornada or not materia:
+        return redirect(url_for('seleccionar_jornada', slug=slug))
+    mis_cursos = get_cursos_profesor(slug, prof['id'], materia, jornada)
+    curso_sel = request.args.get('curso', mis_cursos[0] if mis_cursos else '')
+    periodo = request.args.get('periodo', 1, type=int)
+    conn = conectar(slug)
+    actividades = conn.execute(
+        '''SELECT * FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND curso=?
+           AND COALESCE(periodo,1)=? ORDER BY orden''',
+        (prof['id'], materia, jornada, curso_sel, periodo)).fetchall()
+    conn.close()
+    alumnos = []
+    if curso_sel:
+        conn = conectar(slug)
+        alumnos = conn.execute(
+            'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
+            (curso_sel, jornada)).fetchall()
+        conn.close()
+    wb = _excel_armar_wb(slug, prof, materia, jornada, curso_sel, periodo, actividades, alumnos)
+    bio = BytesIO()
+    wb.save(bio)
+    bio.seek(0)
+    fname = f'plantilla_lumini_{slug}_{curso_sel}_{periodo}.xlsx'
+    return Response(bio.getvalue(), mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    headers={'Content-Disposition': f'attachment; filename="{fname}"'})
+
+@app.route('/<slug>/exportar_notas')
+def exportar_notas(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof: return redirect(url_for('login', slug=slug))
+    jornada, materia = get_sesion_jornada_materia(slug)
+    if not jornada or not materia:
+        return redirect(url_for('seleccionar_jornada', slug=slug))
+    mis_cursos = get_cursos_profesor(slug, prof['id'], materia, jornada)
+    curso_sel = request.args.get('curso', mis_cursos[0] if mis_cursos else '')
+    periodo = request.args.get('periodo', 1, type=int)
+    conn = conectar(slug)
+    actividades = conn.execute(
+        '''SELECT * FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND curso=?
+           AND COALESCE(periodo,1)=? ORDER BY orden''',
+        (prof['id'], materia, jornada, curso_sel, periodo)).fetchall()
+    conn.close()
+    alumnos = []
+    if curso_sel:
+        conn = conectar(slug)
+        alumnos = conn.execute(
+            'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
+            (curso_sel, jornada)).fetchall()
+        conn.close()
+    wb = _excel_armar_wb(slug, prof, materia, jornada, curso_sel, periodo, actividades, alumnos)
+    bio = BytesIO()
+    wb.save(bio)
+    bio.seek(0)
+    fname = f'notas_{slug}_{curso_sel}_{periodo}.xlsx'
+    return Response(bio.getvalue(), mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    headers={'Content-Disposition': f'attachment; filename="{fname}"'})
+
+@app.route('/<slug>/importar_notas', methods=['GET'])
+def importar_notas(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof: return redirect(url_for('login', slug=slug))
+    jornada, materia = get_sesion_jornada_materia(slug)
+    if not jornada or not materia:
+        return redirect(url_for('seleccionar_jornada', slug=slug))
+    mis_cursos = get_cursos_profesor(slug, prof['id'], materia, jornada)
+    curso_sel = request.args.get('curso', mis_cursos[0] if mis_cursos else '')
+    periodo = request.args.get('periodo', 1, type=int)
+    conn = conectar(slug)
+    actividades = conn.execute(
+        '''SELECT * FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND curso=?
+           AND COALESCE(periodo,1)=? ORDER BY orden''',
+        (prof['id'], materia, jornada, curso_sel, periodo)).fetchall()
+    conn.close()
+    return render_template('importar_notas.html', slug=slug, colegio=get_colegio(slug), profesor=prof,
+                           mis_cursos=mis_cursos, curso_sel=curso_sel, periodo=periodo,
+                           materia=materia, jornada=jornada, actividades=actividades)
+
+@app.route('/<slug>/importar_notas/preview', methods=['POST'])
+def importar_notas_preview(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof: return jsonify({'status':'error','mensaje':'No autorizado'}), 403
+    if not validar_csrf(): return jsonify({'status':'error','mensaje':'Error CSRF'}), 403
+    jornada, materia = get_sesion_jornada_materia(slug)
+    if not jornada or not materia:
+        return jsonify({'status':'error','mensaje':'Sesion no valida'}), 400
+    curso_sel = request.form.get('curso', '')
+    periodo = request.form.get('periodo', 1, type=int)
+    if 'archivo' not in request.files:
+        return jsonify({'status':'error','mensaje':'No se envio ningun archivo'}), 400
+    f = request.files['archivo']
+    if not f.filename or not f.filename.lower().endswith('.xlsx'):
+        return jsonify({'status':'error','mensaje':'El archivo debe ser .xlsx'}), 400
+    try:
+        from openpyxl import load_workbook
+        wb = load_workbook(f, data_only=True)
+        ws = wb.active
+    except Exception as e:
+        logger.error(f'Error al leer archivo de notas: {e}')
+        return jsonify({'status':'error','mensaje':'Error al leer el archivo. Verifica el formato.'}), 400
+    header_row = list(ws.iter_rows(min_row=1, max_row=1, values_only=True))[0]
+    if not header_row or str(header_row[0]).strip() != 'N°':
+        return jsonify({'status':'error','mensaje':'Formato de archivo invalido. La primera columna debe ser N°'}), 400
+    rows_data = list(ws.iter_rows(min_row=2, values_only=False))
+    if not rows_data:
+        return jsonify({'status':'error','mensaje':'El archivo no contiene datos'}), 400
+    conn = conectar(slug)
+    try:
+        actividades_existentes = conn.execute(
+            '''SELECT * FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND curso=?
+               AND COALESCE(periodo,1)=? ORDER BY orden''',
+            (prof['id'], materia, jornada, curso_sel, periodo)).fetchall()
+        existing_act_names = {a['nombre']: a for a in actividades_existentes}
+        act_cols = []
+        eval_col = auto_col = None
+        for col_idx, h in enumerate(header_row):
+            if col_idx <= 2:
+                continue
+            h_str = str(h).strip() if h is not None else ''
+            if h_str == 'Evaluación':
+                eval_col = col_idx
+            elif h_str == 'Autoevaluación':
+                auto_col = col_idx
+            elif h_str == 'Promedio':
+                continue
+            elif h_str:
+                act_cols.append((col_idx, h_str))
+        new_activities = []
+        col_map = {}
+        max_orden = max([a['orden'] for a in actividades_existentes], default=0)
+        for col_idx, act_name in act_cols:
+            if act_name in existing_act_names:
+                col_map[col_idx] = {'tipo': 'actividad', 'nombre': act_name, 'actividad_id': existing_act_names[act_name]['id']}
+            else:
+                max_orden += 1
+                col_map[col_idx] = {'tipo': 'actividad', 'nombre': act_name, 'actividad_id': None, 'orden': max_orden}
+                new_activities.append({'nombre': act_name, 'orden': max_orden})
+        all_ok = True
+        preview_rows = []
+        aid_set = set()
+        for row_cells in rows_data:
+            cells = [c.value for c in row_cells]
+            if not any(c is not None for c in cells):
+                continue
+            raw_nombre = str(cells[1]).strip() if cells[1] is not None else ''
+            raw_aid = cells[2]
+            row_errors = []
+            aid = None
+            if raw_aid is not None:
+                try:
+                    aid = int(raw_aid)
+                except (ValueError, TypeError):
+                    pass
+            alumno = None
+            if aid:
+                al = conn.execute('SELECT * FROM alumnos WHERE id=? AND jornada=? AND activo=1', (aid, jornada)).fetchone()
+                if al and al['curso'] == curso_sel:
+                    alumno = al
+            if not alumno and raw_nombre:
+                al = conn.execute(
+                    'SELECT * FROM alumnos WHERE nombre=? AND curso=? AND jornada=? AND activo=1',
+                    (raw_nombre, curso_sel, jornada)).fetchone()
+                if al:
+                    alumno = al
+                    aid = al['id']
+            if not alumno:
+                row_errors.append('Estudiante no encontrado en este curso')
+                all_ok = False
+            if aid:
+                if aid in aid_set:
+                    row_errors.append('Estudiante duplicado en el archivo')
+                    all_ok = False
+                aid_set.add(aid)
+            changes = {}
+            for col_idx, cinfo in col_map.items():
+                raw_val = cells[col_idx] if col_idx < len(cells) else None
+                val = None
+                if raw_val is not None:
+                    try:
+                        val = float(str(raw_val).replace(',', '.'))
+                        if val < 0 or val > 5:
+                            row_errors.append(f'{cinfo["nombre"]}: nota fuera de rango (0-5)')
+                            all_ok = False
+                            continue
+                    except (ValueError, TypeError):
+                        row_errors.append(f'{cinfo["nombre"]}: valor invalido')
+                        all_ok = False
+                        continue
+                changes[f'act_{col_idx}'] = {'tipo': 'actividad', 'actividad_id': cinfo.get('actividad_id'),
+                                               'valor': val, 'nombre_col': cinfo['nombre']}
+            if alumno:
+                if eval_col is not None and eval_col < len(cells):
+                    raw_val = cells[eval_col]
+                    if raw_val is not None:
+                        try:
+                            val = float(str(raw_val).replace(',', '.'))
+                            if val < 0 or val > 5:
+                                row_errors.append('Evaluación fuera de rango')
+                                all_ok = False
+                            else:
+                                changes['eval'] = {'tipo': 'evaluacion', 'valor': val}
+                        except (ValueError, TypeError):
+                            row_errors.append('Evaluación invalida')
+                            all_ok = False
+                if auto_col is not None and auto_col < len(cells):
+                    raw_val = cells[auto_col]
+                    if raw_val is not None:
+                        try:
+                            val = float(str(raw_val).replace(',', '.'))
+                            if val < 0 or val > 5:
+                                row_errors.append('Autoevaluación fuera de rango')
+                                all_ok = False
+                            else:
+                                changes['auto'] = {'tipo': 'autoevaluacion', 'valor': val}
+                        except (ValueError, TypeError):
+                            row_errors.append('Autoevaluación invalida')
+                            all_ok = False
+            preview_rows.append({
+                'fila': row_cells[0].row,
+                'aid': aid,
+                'nombre': raw_nombre,
+                'alumno': dict(alumno) if alumno else None,
+                'errors': row_errors,
+                'changes': changes,
+                'ok': len(row_errors) == 0,
+            })
+    finally:
+        conn.close()
+    return jsonify({
+        'status': 'ok' if all_ok else 'error',
+        'total': len(preview_rows),
+        'validos': sum(1 for r in preview_rows if r['ok']),
+        'errores': sum(1 for r in preview_rows if not r['ok']),
+        'filas': preview_rows,
+        'nuevas_actividades': new_activities,
+        'curso': curso_sel,
+        'periodo': periodo,
+        'all_ok': all_ok,
+    })
+
+@app.route('/<slug>/importar_notas/confirmar', methods=['POST'])
+def importar_notas_confirmar(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof: return jsonify({'status':'error','mensaje':'No autorizado'}), 403
+    if not validar_csrf(): return jsonify({'status':'error','mensaje':'Error CSRF'}), 403
+    jornada, materia = get_sesion_jornada_materia(slug)
+    if not jornada or not materia:
+        return jsonify({'status':'error','mensaje':'Sesion no valida'}), 400
+    curso_sel = request.form.get('curso', '')
+    periodo = request.form.get('periodo', 1, type=int)
+    data_json = request.form.get('data', '')
+    if not data_json:
+        return jsonify({'status':'error','mensaje':'No hay datos para guardar'}), 400
+    try:
+        data = json.loads(data_json)
+    except (json.JSONDecodeError, TypeError):
+        return jsonify({'status':'error','mensaje':'Datos invalidos'}), 400
+    if not data.get('all_ok'):
+        return jsonify({'status':'error','mensaje':'Hay errores que deben corregirse primero'}), 400
+    conn = conectar(slug)
+    try:
+        new_act_names = {}
+        for na in data.get('nuevas_actividades', []):
+            conn.execute(
+                'INSERT INTO actividades (nombre, profesor_id, materia, jornada, curso, orden, periodo) VALUES (?,?,?,?,?,?,?)',
+                (na['nombre'], prof['id'], materia, jornada, curso_sel, na['orden'], periodo))
+            act_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
+            new_act_names[na['nombre']] = act_id
+        updated = 0
+        for f in data['filas']:
+            if not f.get('ok') or not f.get('alumno'):
+                continue
+            aid = f['aid']
+            for key, ch in f.get('changes', {}).items():
+                if ch['tipo'] == 'actividad':
+                    act_id = ch.get('actividad_id')
+                    if act_id is None:
+                        act_id = new_act_names.get(ch.get('nombre_col', ''))
+                    if act_id is None:
+                        continue
+                    existing = conn.execute(
+                        'SELECT val FROM notas WHERE aid=? AND actividad_id=?', (aid, act_id)).fetchone()
+                    old_val = existing['val'] if existing else None
+                    if old_val != ch['valor']:
+                        if ch['valor'] is not None:
+                            conn.execute(
+                                '''INSERT INTO notas (aid,actividad_id,val) VALUES (?,?,?)
+                                   ON CONFLICT(aid,actividad_id) DO UPDATE SET val=excluded.val''',
+                                (aid, act_id, ch['valor']))
+                        elif existing:
+                            conn.execute('DELETE FROM notas WHERE aid=? AND actividad_id=?', (aid, act_id))
+                        auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'notas', aid,
+                                     curso_sel, materia, periodo,
+                                     campo='nota', actividad_id=act_id,
+                                     valor_anterior=old_val, valor_nuevo=ch['valor'],
+                                     motivo='Importacion masiva Excel')
+                        updated += 1
+                elif ch['tipo'] == 'evaluacion':
+                    existing = conn.execute(
+                        'SELECT evaluacion FROM evaluaciones WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?',
+                        (aid, prof['id'], materia, jornada, periodo)).fetchone()
+                    old_val = existing['evaluacion'] if existing else None
+                    if old_val != ch['valor']:
+                        if ch['valor'] is not None:
+                            conn.execute(
+                                '''INSERT INTO evaluaciones (aid,profesor_id,materia,jornada,evaluacion,periodo)
+                                   VALUES (?,?,?,?,?,?)
+                                   ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
+                                   DO UPDATE SET evaluacion=excluded.evaluacion''',
+                                (aid, prof['id'], materia, jornada, ch['valor'], periodo))
+                        elif existing:
+                            conn.execute(
+                                'UPDATE evaluaciones SET evaluacion=NULL WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?',
+                                (aid, prof['id'], materia, jornada, periodo))
+                        auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'evaluaciones', aid,
+                                     curso_sel, materia, periodo, campo='evaluacion',
+                                     valor_anterior=old_val, valor_nuevo=ch['valor'],
+                                     motivo='Importacion masiva Excel')
+                        updated += 1
+                elif ch['tipo'] == 'autoevaluacion':
+                    existing = conn.execute(
+                        'SELECT autoevaluacion FROM evaluaciones WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?',
+                        (aid, prof['id'], materia, jornada, periodo)).fetchone()
+                    old_val = existing['autoevaluacion'] if existing else None
+                    if old_val != ch['valor']:
+                        if ch['valor'] is not None:
+                            conn.execute(
+                                '''INSERT INTO evaluaciones (aid,profesor_id,materia,jornada,autoevaluacion,periodo)
+                                   VALUES (?,?,?,?,?,?)
+                                   ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
+                                   DO UPDATE SET autoevaluacion=excluded.autoevaluacion''',
+                                (aid, prof['id'], materia, jornada, ch['valor'], periodo))
+                        elif existing:
+                            conn.execute(
+                                'UPDATE evaluaciones SET autoevaluacion=NULL WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?',
+                                (aid, prof['id'], materia, jornada, periodo))
+                        auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'evaluaciones', aid,
+                                     curso_sel, materia, periodo, campo='autoevaluacion',
+                                     valor_anterior=old_val, valor_nuevo=ch['valor'],
+                                     motivo='Importacion masiva Excel')
+                        updated += 1
+        conn.commit()
+    except Exception as e:
+        conn.close()
+        logger.error(f'Error al guardar: {e}')
+        return jsonify({'status':'error','mensaje':'Error al guardar. Intenta de nuevo.'}), 500
+    conn.close()
+    return jsonify({'status':'ok', 'mensaje': f'Importacion completada. {updated} valores actualizados.', 'updated': updated})
+
+# ── DASHBOARD ──────────────────────────────────────────────────────────────────
+
+def _estadisticas_desc(vals):
+    """Compute descriptive statistics for a list of numeric values.
+    Returns {media, mediana, moda, desviacion, maximo, minimo, q1, q2, q3, p10, p90} or None for empty."""
+    if not vals: return None
+    clean = [v for v in vals if v is not None]
+    if not clean: return None
+    n = len(clean)
+    s = sorted(clean)
+    media = round(sum(clean) / n, 2)
+    # mediana
+    if n % 2 == 0:
+        mediana = (s[n // 2 - 1] + s[n // 2]) / 2
+    else:
+        mediana = s[n // 2]
+    # moda
+    from collections import Counter
+    freq = Counter(clean)
+    max_f = max(freq.values())
+    moda = [k for k, v in freq.items() if v == max_f]
+    moda = moda[0] if len(moda) == 1 else None
+    # desviacion estandar (poblacional)
+    var = sum((x - media) ** 2 for x in clean) / n
+    desv = round(var ** 0.5, 2)
+    maximo = max(clean)
+    minimo = min(clean)
+    # cuartiles / percentiles
+    def pct(p):
+        idx = max(0, min(n - 1, round(n * p / 100)))
+        return s[idx]
+    q1 = pct(25)
+    q2 = mediana
+    q3 = pct(75)
+    return {
+        'media': round(media, 2), 'mediana': round(mediana, 2), 'moda': round(moda, 2) if moda is not None else None,
+        'desviacion': desv, 'maximo': round(maximo, 2), 'minimo': round(minimo, 2),
+        'q1': round(q1, 2), 'q2': round(q2, 2), 'q3': round(q3, 2),
+        'p10': round(pct(10), 2), 'p90': round(pct(90), 2),
+    }
+
+def _dashboard_student_grades(conn, slug, profesor_id, materia, jornada, curso=None, periodo=None):
+    """Batch compute weighted final grades for all students in scope. Returns list of dicts."""
+    if curso:
+        alumnos = conn.execute(
+            'SELECT id, nombre, curso FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre',
+            (curso, jornada)).fetchall()
+    else:
+        alumnos = conn.execute(
+            '''SELECT a.id, a.nombre, a.curso FROM alumnos a
+               JOIN asignaciones_curso ac ON ac.curso=a.curso
+               WHERE ac.profesor_id=? AND ac.materia=? AND ac.jornada=?
+                 AND a.jornada=? AND a.activo=1 ORDER BY a.nombre''',
+            (profesor_id, materia, jornada, jornada)).fetchall()
+    if not alumnos: return []
+    aids = [a['id'] for a in alumnos]
+    ph = ','.join('?' * len(aids))
+    notas_rows = conn.execute(
+        f'''SELECT n.aid, n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+            WHERE n.aid IN ({ph}) AND ac.profesor_id=? AND ac.materia=? AND ac.jornada=?
+            AND (? IS NULL OR ac.periodo=?)''',
+        (*aids, profesor_id, materia, jornada, periodo, periodo)).fetchall()
+    notas_by_aid = {}
+    for r in notas_rows:
+        notas_by_aid.setdefault(r['aid'], []).append(r['val'])
+    ev_rows = conn.execute(
+        f'''SELECT aid, evaluacion, autoevaluacion FROM evaluaciones
+            WHERE aid IN ({ph}) AND profesor_id=? AND materia=? AND jornada=?
+            AND (? IS NULL OR periodo=?)''',
+        (*aids, profesor_id, materia, jornada, periodo, periodo)).fetchall()
+    ev_by_aid = {r['aid']: r for r in ev_rows}
+    res = []
+    for a in alumnos:
+        vals = notas_by_aid.get(a['id'], [])
+        ev = ev_by_aid.get(a['id'])
+        ev_v = ev['evaluacion'] if ev and ev['evaluacion'] is not None else None
+        au_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
+        final = _promedio_ponderado(vals, ev_v, au_v)
+        res.append({'id': a['id'], 'nombre': a['nombre'], 'curso': a['curso'],
+                     'nota_final': final, 'actividades': vals})
+    return res
+
+def _dashboard_profesor_data(conn, slug, prof, curso=None, materia=None, jornada=None, periodo=None):
+    """Compute full dashboard JSON for a profesor."""
+    m = materia or ''
+    j = jornada or ''
+    cursos_q = [curso] if curso else [r['curso'] for r in conn.execute(
+        'SELECT DISTINCT curso FROM asignaciones_curso WHERE profesor_id=? AND materia=? AND jornada=?',
+        (prof['id'], m, j)).fetchall()]
+    scoped = lambda c: conn.execute(
+        'SELECT id, nombre, curso FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre',
+        (c, j)).fetchall()
+    all_alumnos = []
+    for c in cursos_q:
+        all_alumnos.extend(scoped(c))
+    aids = [a['id'] for a in all_alumnos]
+    # cards
+    total_estudiantes = len(all_alumnos)
+    total_actividades = conn.execute(
+        'SELECT COUNT(*) FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND (? IS NULL OR curso=?) AND (? IS NULL OR periodo=?)',
+        (prof['id'], m, j, curso, curso, periodo, periodo)).fetchone()[0]
+    calificadas = conn.execute(
+        '''SELECT COUNT(*) FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+           WHERE ac.profesor_id=? AND ac.materia=? AND ac.jornada=?
+           AND (? IS NULL OR ac.curso=?) AND (? IS NULL OR ac.periodo=?)''',
+        (prof['id'], m, j, curso, curso, periodo, periodo)).fetchone()[0] if aids else 0
+    pendientes = max(0, total_actividades * total_estudiantes - calificadas)
+    students = _dashboard_student_grades(conn, slug, prof['id'], m, j, curso, periodo) if total_estudiantes else []
+    finals = [s['nota_final'] for s in students if s['nota_final'] is not None]
+    # config threshold
+    cfg = config_get(slug)
+    escala_max = float(cfg.get('escala_max', 5.0))
+    nota_min_aprobar = float(cfg.get('nota_minima_aprobar', 3.0))
+    if escala_max > 5.0:
+        nota_min_aprobar = nota_min_aprobar / 2.0  # normalize 1-10 -> 1-5
+    aprobados = sum(1 for f in finals if f >= nota_min_aprobar)
+    reprobados = sum(1 for f in finals if f < nota_min_aprobar)
+    nota_max = max(finals) if finals else None
+    nota_min = min(finals) if finals else None
+    # grade distribution (raw grades, not weighted)
+    dist = {'0-1': 0, '1-2': 0, '2-3': 0, '3-4': 0, '4-5': 0}
+    all_vals = conn.execute(
+        f'''SELECT n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+            WHERE ac.profesor_id=? AND ac.materia=? AND ac.jornada=?
+            AND (? IS NULL OR ac.curso=?) AND (? IS NULL OR ac.periodo=?)''',
+        (prof['id'], m, j, curso, curso, periodo, periodo)).fetchall()
+    for r in all_vals:
+        v = r['val']
+        if v < 1: dist['0-1'] += 1
+        elif v < 2: dist['1-2'] += 1
+        elif v < 3: dist['2-3'] += 1
+        elif v < 4: dist['3-4'] += 1
+        else: dist['4-5'] += 1
+    distribucion = [{'label': k, 'count': v} for k, v in dist.items()]
+    # batch-fetch all notas + evaluaciones for ALL periods (used by course avg + evolution)
+    _batch_aids = aids or []
+    if _batch_aids:
+        ph_b = ','.join('?' * len(_batch_aids))
+        all_notas_periodos = conn.execute(
+            f'''SELECT n.aid, n.val, ac.periodo FROM notas n
+                JOIN actividades ac ON ac.id=n.actividad_id
+                WHERE n.aid IN ({ph_b}) AND ac.profesor_id=? AND ac.materia=? AND ac.jornada=?''',
+            (*_batch_aids, prof['id'], m, j)).fetchall()
+        all_ev_periodos = conn.execute(
+            f'''SELECT aid, evaluacion, periodo FROM evaluaciones
+                WHERE aid IN ({ph_b}) AND profesor_id=? AND materia=? AND jornada=?''',
+            (*_batch_aids, prof['id'], m, j)).fetchall()
+    else:
+        all_notas_periodos = []; all_ev_periodos = []
+    # average by course (from batch data, 0 extra queries)
+    notas_by_aid_c = {}
+    for r in all_notas_periodos:
+        notas_by_aid_c.setdefault(r['aid'], []).append(r['val'])
+    ev_by_aid_c = {}
+    for r in all_ev_periodos:
+        ev_by_aid_c[r['aid']] = r['evaluacion']
+    prom_curso = []
+    for c in cursos_q:
+        cur_finals = []
+        for a in all_alumnos:
+            if a['curso'] != c: continue
+            v = notas_by_aid_c.get(a['id'], [])
+            e = ev_by_aid_c.get(a['id'])
+            ff = _promedio_ponderado(v, e, None)
+            if ff is not None: cur_finals.append(ff)
+        prom_curso.append({'curso': c, 'promedio': round(sum(cur_finals) / len(cur_finals), 2) if cur_finals else None, 'count': len(cur_finals)})
+    # promedio por materia (only current materia for teacher)
+    prom_materia = [{'materia': m, 'promedio': round(sum(finals) / len(finals), 2) if finals else None, 'count': len(finals)}]
+    # evolution by period (from batch data, 0 extra queries)
+    notas_by_aid_p = {}
+    for r in all_notas_periodos:
+        notas_by_aid_p.setdefault((r['aid'], r['periodo']), []).append(r['val'])
+    ev_by_aid_p = {}
+    for r in all_ev_periodos:
+        ev_by_aid_p[(r['aid'], r['periodo'])] = r['evaluacion']
+    evol = []
+    for p in range(1, 5):
+        finals_p = []
+        for a in all_alumnos:
+            vals_p = notas_by_aid_p.get((a['id'], p), [])
+            ev_p = ev_by_aid_p.get((a['id'], p))
+            ff = _promedio_ponderado(vals_p, ev_p, None)
+            if ff is not None: finals_p.append(ff)
+        evol.append({'periodo': p, 'promedio': round(sum(finals_p) / len(finals_p), 2) if finals_p else None, 'count': len(finals_p)})
+    # rendimiento por actividad (batch all grades in 1 query instead of N)
+    acts = conn.execute(
+        'SELECT id, nombre FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND (? IS NULL OR curso=?) AND (? IS NULL OR periodo=?) ORDER BY orden',
+        (prof['id'], m, j, curso, curso, periodo, periodo)).fetchall()
+    rend_acts = []
+    if acts:
+        act_ids = [a['id'] for a in acts]
+        ph = ','.join('?' * len(act_ids))
+        all_grades = conn.execute(
+            f'SELECT actividad_id, val FROM notas WHERE actividad_id IN ({ph})', act_ids).fetchall()
+        grades_by_act = {}
+        for r in all_grades:
+            grades_by_act.setdefault(r['actividad_id'], []).append(r['val'])
+        for act in acts:
+            vals = grades_by_act.get(act['id'], [])
+            cnt = len(vals)
+            prom = round(sum(vals) / cnt, 2) if cnt else None
+            aprob = sum(1 for v in vals if v >= nota_min_aprobar) if vals else 0
+            pct_aprob = round(aprob / cnt * 100, 1) if cnt else None
+            rend_acts.append({'actividad': act['nombre'], 'promedio': prom, 'calificadas': cnt, 'porcentaje_aprobacion': pct_aprob})
+    # rankings
+    top_students = sorted(students, key=lambda s: s['nota_final'] or 0, reverse=True)[:10]
+    top_cursos = sorted(prom_curso, key=lambda c: c['promedio'] or 0, reverse=True)
+    # alerts
+    threshold_bajo = 3.0
+    bajo_est = [s for s in students if s['nota_final'] is not None and s['nota_final'] < threshold_bajo]
+    bajo_cursos = [c for c in prom_curso if c['promedio'] is not None and c['promedio'] < 3.2]
+    bajo_acts = [a for a in rend_acts if a['promedio'] is not None and a['promedio'] < 2.5]
+    destacados = [s for s in students if s['nota_final'] is not None and s['nota_final'] > 4.5]
+    # statistics
+    stats = _estadisticas_desc(finals)
+    return {
+        'cards': {
+            'promedio_curso': round(sum(finals) / len(finals), 2) if finals else None,
+            'promedio_materia': round(sum(finals) / len(finals), 2) if finals else None,
+            'total_estudiantes': total_estudiantes,
+            'total_actividades': total_actividades,
+            'actividades_calificadas': calificadas,
+            'actividades_pendientes': pendientes,
+            'aprobados': aprobados, 'reprobados': reprobados,
+            'nota_max': nota_max, 'nota_min': nota_min,
+        },
+        'charts': {
+            'distribucion': distribucion,
+            'promedio_por_curso': prom_curso,
+            'promedio_por_materia': prom_materia,
+            'evolucion_periodos': evol,
+            'rendimiento_actividades': rend_acts,
+        },
+        'rankings': {
+            'top_estudiantes': [{'nombre': s['nombre'], 'promedio': s['nota_final']} for s in top_students],
+            'top_cursos': top_cursos,
+        },
+        'alerts': {
+            'estudiantes_bajo': [{'nombre': s['nombre'], 'promedio': s['nota_final'], 'curso': s['curso']} for s in bajo_est],
+            'cursos_bajo': bajo_cursos,
+            'actividades_bajo': bajo_acts,
+            'destacados': [{'nombre': s['nombre'], 'promedio': s['nota_final'], 'curso': s['curso']} for s in destacados],
+        },
+        'estadisticas': stats,
+    }
+
+def _dashboard_rector_data(conn, slug, rector):
+    """Compute full dashboard JSON for rector using batch queries."""
+    # ── card-level aggregates (6 single-row queries) ──
+    total_estudiantes = conn.execute('SELECT COUNT(*) FROM alumnos WHERE activo=1').fetchone()[0]
+    total_profesores = conn.execute('SELECT COUNT(*) FROM profesores WHERE activo=1').fetchone()[0]
+    total_cursos = conn.execute('SELECT COUNT(DISTINCT curso) FROM alumnos WHERE activo=1').fetchone()[0]
+    total_materias = conn.execute('SELECT COUNT(DISTINCT materia) FROM asignaciones_materia').fetchone()[0]
+    total_actividades = conn.execute('SELECT COUNT(*) FROM actividades').fetchone()[0]
+    solicitudes_pend = conn.execute("SELECT COUNT(*) FROM solicitudes_modificacion WHERE estado='pendiente' AND slug=?", (slug,)).fetchone()[0]
+    periodos = conn.execute('SELECT periodo, estado FROM periodos_estado').fetchall()
+    periodos_abiertos = sum(1 for p in periodos if p['estado'] == 'abierto')
+    periodos_cerrados = sum(1 for p in periodos if p['estado'] == 'cerrado')
+    cfg = config_get(slug)
+    escala_max = float(cfg.get('escala_max', 5.0))
+    nota_min_aprobar = float(cfg.get('nota_minima_aprobar', 3.0))
+    if escala_max > 5.0:
+        nota_min_aprobar /= 2.0
+
+    # ── batch 1: all active students ──
+    alumnos = conn.execute(
+        'SELECT id, nombre, curso, jornada FROM alumnos WHERE activo=1 ORDER BY id'
+    ).fetchall()
+    alumno_map = {a['id']: a for a in alumnos}
+
+    # ── batch 2: all active teachers with their subject assignments ──
+    profes = conn.execute('SELECT id, nombre FROM profesores WHERE activo=1').fetchall()
+    prof_map = {p['id']: p for p in profes}
+
+    asignaciones = conn.execute(
+        'SELECT profesor_id, materia, jornada FROM asignaciones_materia'
+    ).fetchall()
+    prof_subjects = {}
+    for a in asignaciones:
+        prof_subjects.setdefault(a['profesor_id'], []).append((a['materia'], a['jornada']))
+
+    # ── batch 3: all notas with their subject context ──
+    notas_all = conn.execute('''
+        SELECT n.aid, n.val, ac.materia, ac.jornada, ac.profesor_id, ac.curso
+        FROM notas n
+        JOIN actividades ac ON ac.id = n.actividad_id
+    ''').fetchall()
+
+    # ── batch 4: all evaluaciones ──
+    ev_all = conn.execute(
+        'SELECT aid, materia, jornada, evaluacion, autoevaluacion FROM evaluaciones'
+    ).fetchall()
+
+    # ── compute final grade for every (student, materia, jornada) pair ──
+    notas_idx = {}
+    for r in notas_all:
+        key = (r['aid'], r['materia'], r['jornada'])
+        notas_idx.setdefault(key, []).append(r['val'])
+    ev_idx = {}
+    for r in ev_all:
+        key = (r['aid'], r['materia'], r['jornada'])
+        ev_idx[key] = r
+
+    student_subject_grades = {}
+    all_keys = set(notas_idx) | set(ev_idx)
+    for aid, materia, jornada in all_keys:
+        if aid not in alumno_map:
+            continue
+        vals = notas_idx.get((aid, materia, jornada), [])
+        ev = ev_idx.get((aid, materia, jornada))
+        ev_v = ev['evaluacion'] if ev and ev['evaluacion'] is not None else None
+        au_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
+        final = _promedio_ponderado(vals, ev_v, au_v)
+        key = (aid, materia, jornada)
+        student_subject_grades[key] = final
+
+    # ── aggregate: per-student average across all subjects ──
+    student_avgs = {}
+    for (aid, materia, jornada), final in student_subject_grades.items():
+        if final is not None:
+            student_avgs.setdefault(aid, []).append(final)
+    student_overall = {}
+    for aid, vals in student_avgs.items():
+        student_overall[aid] = round(sum(vals) / len(vals), 2)
+    all_finals = list(student_overall.values())
+
+    # ── teacher-level averages ──
+    prof_avgs = {}
+    for p in profes:
+        p_vals = []
+        for (aid, materia, jornada), final in student_subject_grades.items():
+            if final is not None:
+                is_teacher_subject = any(
+                    m == materia and j == jornada
+                    for m, j in prof_subjects.get(p['id'], [])
+                )
+                if is_teacher_subject:
+                    p_vals.append(final)
+        if p_vals:
+            prof_avgs[p['nombre']] = round(sum(p_vals) / len(p_vals), 2)
+
+    prom_institucional = round(sum(all_finals) / len(all_finals), 2) if all_finals else None
+
+    # ── course averages ──
+    curso_avgs = {}
+    for a in alumnos:
+        avg = student_overall.get(a['id'])
+        if avg is not None:
+            curso_avgs.setdefault(a['curso'], []).append(avg)
+    curso_avgs = {k: round(sum(v) / len(v), 2) for k, v in curso_avgs.items()}
+    mejor_curso = max(curso_avgs, key=curso_avgs.get) if curso_avgs else None
+    peor_curso = min(curso_avgs, key=curso_avgs.get) if curso_avgs else None
+
+    # ── subject averages ──
+    subj_vals = {}
+    for (aid, materia, jornada), final in student_subject_grades.items():
+        if final is not None:
+            subj_vals.setdefault(materia, []).append(final)
+    subj_avgs = {k: round(sum(v) / len(v), 2) for k, v in subj_vals.items()}
+    mejor_materia = max(subj_avgs, key=subj_avgs.get) if subj_avgs else None
+    peor_materia = min(subj_avgs, key=subj_avgs.get) if subj_avgs else None
+
+    # ── grade distribution (single query with CASE) ──
+    dist = {'0-1': 0, '1-2': 0, '2-3': 0, '3-4': 0, '4-5': 0}
+    for row in conn.execute('SELECT val FROM notas').fetchall():
+        v = row['val']
+        if v < 1: dist['0-1'] += 1
+        elif v < 2: dist['1-2'] += 1
+        elif v < 3: dist['2-3'] += 1
+        elif v < 4: dist['3-4'] += 1
+        else: dist['4-5'] += 1
+
+    top_docentes = sorted(prof_avgs.items(), key=lambda x: x[1], reverse=True)[:10]
+
+    # ── low-performing students (using computed averages) ──
+    bajo_list = []
+    for aid, avg in sorted(student_overall.items(), key=lambda x: x[1]):
+        if avg < nota_min_aprobar:
+            a = alumno_map.get(aid)
+            if a:
+                bajo_list.append({'nombre': a['nombre'], 'promedio': avg, 'curso': a['curso']})
+                if len(bajo_list) >= 20:
+                    break
+
+    stats = _estadisticas_desc(all_finals)
+    return {
+        'cards': {
+            'total_estudiantes': total_estudiantes, 'total_profesores': total_profesores,
+            'total_cursos': total_cursos, 'total_materias': total_materias,
+            'total_actividades': total_actividades,
+            'promedio_institucional': prom_institucional,
+            'mejor_curso': mejor_curso, 'peor_curso': peor_curso,
+            'mejor_materia': mejor_materia, 'peor_materia': peor_materia,
+            'solicitudes_pendientes': solicitudes_pend,
+            'periodos_abiertos': periodos_abiertos, 'periodos_cerrados': periodos_cerrados,
+        },
+        'charts': {
+            'distribucion': [{'label': k, 'count': v} for k, v in dist.items()],
+            'promedio_por_curso': [{'curso': k, 'promedio': v} for k, v in sorted(curso_avgs.items(), key=lambda x: x[1], reverse=True)],
+            'promedio_por_materia': [{'materia': k, 'promedio': v} for k, v in sorted(subj_avgs.items(), key=lambda x: x[1], reverse=True)],
+            'rendimiento_actividades': [],
+        },
+        'rankings': {
+            'top_estudiantes': [],
+            'top_cursos': [{'curso': k, 'promedio': v} for k, v in sorted(curso_avgs.items(), key=lambda x: x[1], reverse=True)[:10]],
+            'top_docentes': [{'nombre': n, 'promedio': v} for n, v in top_docentes],
+        },
+        'alerts': {
+            'estudiantes_bajo': bajo_list,
+            'cursos_bajo': [{'curso': k, 'promedio': v} for k, v in sorted(curso_avgs.items(), key=lambda x: x[1]) if v < 3.2],
+            'destacados': [],
+        },
+        'estadisticas': stats,
+    }
+
+@app.route('/<slug>/dashboard')
+def dashboard(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    rector = get_rector(slug)
+    if not prof and not rector:
+        return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    num_periodos = colegio['num_periodos'] if colegio and 'num_periodos' in colegio.keys() else 4
+    conn = conectar(slug)
+    if prof:
+        jornada, materia = get_sesion_jornada_materia(slug)
+        mis_cursos = get_cursos_profesor(slug, prof['id'], materia or '', jornada or '')
+        instance = 'profesor'
+        nombre = prof['nombre']
+    elif rector:
+        jornada = ''
+        materia = ''
+        mis_cursos = [r['curso'] for r in conn.execute(
+            'SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()]
+        materias_list = [r['materia'] for r in conn.execute(
+            'SELECT DISTINCT materia FROM asignaciones_materia ORDER BY materia').fetchall()]
+        instance = 'rector'
+        nombre = rector['nombre']
+    conn.close()
+    colegio_dash = get_colegio(slug)
+    return render_template('dashboard.html', slug=slug, colegio=colegio_dash, instance=instance, nombre=nombre,
+                           num_periodos=num_periodos, mis_cursos=mis_cursos,
+                           materias_list=materias_list if rector else [materia],
+                           jornada=jornada, materia=materia)
+
+@app.route('/<slug>/dashboard_data')
+def dashboard_data(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    rector = get_rector(slug)
+    if not prof and not rector:
+        return jsonify({'error': 'no_auth'}), 401
+    curso = request.args.get('curso') or None
+    materia = request.args.get('materia') or None
+    jornada_sel = request.args.get('jornada') or None
+    periodo = request.args.get('periodo', type=int) or None
+    conn = conectar(slug)
+    try:
+        if prof:
+            sess_jornada, sess_materia = get_sesion_jornada_materia(slug)
+            m = materia or sess_materia or ''
+            j = jornada_sel or sess_jornada or ''
+            data = _dashboard_profesor_data(conn, slug, prof, curso, m, j, periodo)
+        else:
+            data = _dashboard_rector_data(conn, slug, rector)
+    finally:
+        conn.close()
+    return jsonify(data)
 
 # ── AGENDA ────────────────────────────────────────────────────────────────────
 @app.route('/<slug>/nuevo_trabajo', methods=['POST'])
@@ -2433,8 +3725,9 @@ def registrar(slug):
             todos = conn.execute(
                 'SELECT id FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
                 (cur, jornada)).fetchall()
-            for i, a in enumerate(todos, 1):
-                conn.execute('UPDATE alumnos SET num_curso=? WHERE id=?', (i, a['id']))
+            with conn:
+                for i, a in enumerate(todos, 1):
+                    conn.execute('UPDATE alumnos SET num_curso=? WHERE id=?', (i, a['id']))
         audit_log(slug, prof['id'], 'crear', 'alumnos')
         conn.close()
     return redirect(url_for('home', slug=slug, curso=curso_sel))
@@ -2517,30 +3810,46 @@ def archivados(slug):
         'SELECT * FROM profesores WHERE activo=0 ORDER BY nombre COLLATE NOCASE').fetchall()
     profs_raw = conn.execute(
         'SELECT * FROM profesores WHERE activo=1 ORDER BY nombre COLLATE NOCASE').fetchall()
+    # batch-fetch all assignments in 2 queries instead of N*3
+    all_mat = conn.execute(
+        'SELECT id, profesor_id, materia, jornada FROM asignaciones_materia ORDER BY jornada, materia').fetchall()
+    all_cur = conn.execute(
+        'SELECT profesor_id, materia, jornada, curso FROM asignaciones_curso').fetchall()
+    # index by profesor_id
+    mat_by_prof = {}
+    for r in all_mat:
+        mat_by_prof.setdefault(r['profesor_id'], []).append(r)
+    cur_by_prof_mat_jor = {}
+    for r in all_cur:
+        cur_by_prof_mat_jor[(r['profesor_id'], r['materia'], r['jornada'])] = r['curso']
+    # batch-fetch all other active profs by materia/jornada
+    other_profs_raw = conn.execute(
+        '''SELECT p2.id, p2.nombre, am.materia, am.jornada
+           FROM profesores p2
+           JOIN asignaciones_materia am ON am.profesor_id=p2.id
+           WHERE p2.activo=1''').fetchall()
+    other_by_mat_jor = {}
+    for r in other_profs_raw:
+        other_by_mat_jor.setdefault((r['materia'], r['jornada']), []).append(r)
     profesores_activos = []
     for p in profs_raw:
-        mjs = conn.execute(
-            'SELECT materia, jornada FROM asignaciones_materia WHERE profesor_id=? ORDER BY jornada, materia',
-            (p['id'],)).fetchall()
+        mjs = mat_by_prof.get(p['id'], [])
         cursos_info = []
         for mj in mjs:
-            cursos = conn.execute(
-                'SELECT curso FROM asignaciones_curso WHERE profesor_id=? AND materia=? AND jornada=?',
-                (p['id'], mj['materia'], mj['jornada'])).fetchall()
-            for c in cursos:
-                cursos_info.append({'curso': c['curso'], 'materia': mj['materia'], 'jornada': mj['jornada']})
+            curso_val = cur_by_prof_mat_jor.get((p['id'], mj['materia'], mj['jornada']))
+            if curso_val:
+                cursos_info.append({'curso': curso_val, 'materia': mj['materia'], 'jornada': mj['jornada']})
         otros_profesores = []
+        seen_otros = set()
         for mj in mjs:
-            otros = conn.execute(
-                '''SELECT p2.id, p2.nombre, am.materia, am.jornada
-                   FROM profesores p2
-                   JOIN asignaciones_materia am ON am.profesor_id=p2.id
-                   WHERE am.materia=? AND am.jornada=? AND p2.id!=? AND p2.activo=1''',
-                (mj['materia'], mj['jornada'], p['id'])).fetchall()
-            for o in otros:
-                entry = {'id': o['id'], 'nombre': o['nombre'], 'materia': o['materia'], 'jornada': o['jornada']}
-                if entry not in otros_profesores:
-                    otros_profesores.append(entry)
+            for o in other_by_mat_jor.get((mj['materia'], mj['jornada']), []):
+                if o['id'] == p['id']: continue
+                entry_key = (o['id'], o['materia'], o['jornada'])
+                if entry_key not in seen_otros:
+                    seen_otros.add(entry_key)
+                    entry = {'id': o['id'], 'nombre': o['nombre'], 'materia': o['materia'], 'jornada': o['jornada']}
+                    if entry not in otros_profesores:
+                        otros_profesores.append(entry)
         profesores_activos.append({
             'id': p['id'], 'nombre': p['nombre'], 'usuario': p['usuario'],
             'email': p['email'] or '',
@@ -2560,8 +3869,8 @@ def archivados(slug):
 def archivar_profesor(slug, id):
     if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'}), 403
     require_colegio(slug)
-    prof = get_profesor(slug)
-    if not prof: return jsonify({'ok': False, 'mensaje': 'No autorizado'}), 403
+    rector = get_rector(slug)
+    if not rector: return jsonify({'ok': False, 'mensaje': 'Solo el rector puede archivar profesores'}), 403
     conn = conectar(slug)
     conn.execute('UPDATE profesores SET activo=0 WHERE id=?', (id,))
     conn.commit(); conn.close()
@@ -2570,8 +3879,8 @@ def archivar_profesor(slug, id):
 @app.route('/<slug>/archivar_profesor_con_reasignacion', methods=['POST'])
 def archivar_profesor_con_reasignacion(slug):
     require_colegio(slug)
-    prof = get_profesor(slug)
-    if not prof: return jsonify({'ok': False, 'mensaje': 'No autorizado'})
+    rector = get_rector(slug)
+    if not rector: return jsonify({'ok': False, 'mensaje': 'Solo el rector puede archivar profesores'})
     if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
     profesor_id      = request.form.get('profesor_id', type=int)
     prof_destino_id  = request.form.get('prof_destino_id', type=int)
@@ -2617,8 +3926,8 @@ def archivar_profesor_con_reasignacion(slug):
 def reactivar_profesor(slug, id):
     if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'}), 403
     require_colegio(slug)
-    prof = get_profesor(slug)
-    if not prof: return jsonify({'ok': False, 'mensaje': 'No autorizado'}), 403
+    rector = get_rector(slug)
+    if not rector: return jsonify({'ok': False, 'mensaje': 'Solo el rector puede reactivar profesores'}), 403
     conn = conectar(slug)
     conn.execute('UPDATE profesores SET activo=1 WHERE id=?', (id,))
     conn.commit(); conn.close()
@@ -2628,8 +3937,8 @@ def reactivar_profesor(slug, id):
 def eliminar_profesor(slug, id):
     if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'}), 403
     require_colegio(slug)
-    prof = get_profesor(slug)
-    if not prof: return jsonify({'ok': False, 'mensaje': 'No autorizado'}), 403
+    rector = get_rector(slug)
+    if not rector: return jsonify({'ok': False, 'mensaje': 'Solo el rector puede eliminar profesores'}), 403
     conn = conectar(slug)
     conn.execute('DELETE FROM profesores WHERE id=?', (id,))
     conn.execute('DELETE FROM asignaciones_materia WHERE profesor_id=?', (id,))
@@ -2637,7 +3946,108 @@ def eliminar_profesor(slug, id):
     conn.commit(); conn.close()
     return jsonify({'ok': True})
 
-# ── ASISTENCIA ────────────────────────────────────────────────────────────────
+# ── ASISTENCIA HELPERS ──────────────────────────────────────────────────────────
+ESTADOS_ASISTENCIA = {'P': 'Presente', 'A': 'Ausente', 'T': 'Tardanza', 'E': 'Excusa', 'X': 'Permiso', 'S': 'Salida anticipada'}
+COLORES_ASISTENCIA = {'P': 'green', 'A': 'red', 'T': 'yellow', 'E': 'blue', 'X': 'purple', 'S': 'orange'}
+
+def _asistencia_stats(conn, curso=None, jornada=None, aid=None):
+    where = 'WHERE activo=1'
+    params = []
+    if curso:
+        where += ' AND curso=?'; params.append(curso)
+    if jornada:
+        where += ' AND jornada=?'; params.append(jornada)
+    if aid:
+        where += ' AND id=?'; params.append(aid)
+    stats = {k: 0 for k in ESTADOS_ASISTENCIA}
+    stats['total'] = 0
+    rows = conn.execute(
+        f'SELECT a.id FROM alumnos a {where} ORDER BY a.id', params).fetchall()
+    if not rows:
+        stats['porcentaje_asistencia'] = 0
+        stats['porcentaje_inasistencia'] = 0
+        stats['porcentaje_tardanzas'] = 0
+        return stats
+    aids = [r['id'] for r in rows]
+    placeholders = ','.join('?' * len(aids))
+    asis_rows = conn.execute(
+        f'SELECT estado, COUNT(*) as c FROM asistencia WHERE aid IN ({placeholders}) GROUP BY estado',
+        aids).fetchall()
+    total = 0
+    for ar in asis_rows:
+        stats[ar['estado']] = ar['c']
+        total += ar['c']
+    stats['total'] = total
+    stats['porcentaje_asistencia'] = round(stats['P'] / total * 100, 1) if total else 0
+    stats['porcentaje_inasistencia'] = round((stats['A'] + stats['E'] + stats['X'] + stats['S']) / total * 100, 1) if total else 0
+    stats['porcentaje_tardanzas'] = round(stats['T'] / total * 100, 1) if total else 0
+    return stats
+
+def _asistencia_alertas(conn, slug, curso, jornada):
+    from collections import defaultdict
+    alertas = []
+    alumnos = conn.execute(
+        'SELECT id, nombre, num_curso FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre COLLATE NOCASE',
+        (curso, jornada)).fetchall()
+    if not alumnos:
+        return alertas
+    aids = [a['id'] for a in alumnos]
+    placeholders = ','.join('?' * len(aids))
+
+    # >3 consecutive absences
+    abs_consec = conn.execute(
+        f'''SELECT aid, fecha FROM asistencia
+            WHERE aid IN ({placeholders}) AND estado='A' AND fecha >= date('now','-30 days')
+            ORDER BY aid, fecha''', aids).fetchall()
+    por_alumno = defaultdict(list)
+    for r in abs_consec:
+        por_alumno[r['aid']].append(r['fecha'])
+    for aid, fechas in por_alumno.items():
+        fechas = sorted(set(fechas))
+        streak = 1
+        max_streak = 1
+        for i in range(1, len(fechas)):
+            from datetime import datetime as _dt
+            diff = (_dt.strptime(fechas[i], '%Y-%m-%d') - _dt.strptime(fechas[i-1], '%Y-%m-%d')).days
+            if diff == 1:
+                streak += 1
+                max_streak = max(max_streak, streak)
+            else:
+                streak = 1
+        if max_streak >= 3:
+            alumno = next((a for a in alumnos if a['id'] == aid), None)
+            if alumno:
+                alertas.append({'aid': aid, 'nombre': alumno['nombre'], 'tipo': 'ausencias_consecutivas', 'detalle': f'{max_streak} ausencias consecutivas', 'severidad': 'alta'})
+
+    # >5 tardanzas
+    tardanzas = conn.execute(
+        f'SELECT aid, COUNT(*) as c FROM asistencia WHERE aid IN ({placeholders}) AND estado="T" GROUP BY aid',
+        aids).fetchall()
+    tard_map = {r['aid']: r['c'] for r in tardanzas}
+    for aid, c in tard_map.items():
+        if c > 5:
+            alumno = next((a for a in alumnos if a['id'] == aid), None)
+            if alumno:
+                alertas.append({'aid': aid, 'nombre': alumno['nombre'], 'tipo': 'tardanzas_excesivas', 'detalle': f'{c} tardanzas registradas', 'severidad': 'media' if c <= 10 else 'alta'})
+
+    # <80% attendance (batch query)
+    asis_stats = conn.execute(
+        f'SELECT aid, estado, COUNT(*) as c FROM asistencia WHERE aid IN ({placeholders}) GROUP BY aid, estado',
+        aids).fetchall()
+    stats_por_aid = {}
+    for r in asis_stats:
+        stats_por_aid.setdefault(r['aid'], {})[r['estado']] = r['c']
+    for alumno in alumnos:
+        s = stats_por_aid.get(alumno['id'], {})
+        total = sum(s.values())
+        if total > 0:
+            pct = round((s.get('P', 0) + s.get('X', 0)) / total * 100)
+            if pct < 80:
+                alertas.append({'aid': alumno['id'], 'nombre': alumno['nombre'], 'tipo': 'baja_asistencia', 'detalle': f'{pct}% asistencia', 'severidad': 'alta'})
+
+    return alertas
+
+# ── ASISTENCIA (PROFESOR) ──────────────────────────────────────────────────────
 @app.route('/<slug>/asistencia', methods=['GET'])
 def asistencia(slug):
     require_colegio(slug)
@@ -2658,13 +4068,16 @@ def asistencia(slug):
     fecha_sel_dia_anterior  = (fecha_dt - timedelta(days=1)).strftime('%Y-%m-%d')
     fecha_sel_dia_siguiente = (fecha_dt + timedelta(days=1)).strftime('%Y-%m-%d')
     hoy_fecha  = datetime.today().strftime('%Y-%m-%d')
+    hoy_hora   = datetime.today().strftime('%H:%M')
     if not curso_sel:
         return render_template('asistencia.html', profesor=prof, slug=slug, colegio=colegio,
                                materia=materia, jornada=jornada, mis_cursos=mis_cursos,
                                curso_sel=None, estudiantes=[], fecha_sel=fecha_sel,
                                fecha_sel_dia_anterior=fecha_sel_dia_anterior,
                                fecha_sel_dia_siguiente=fecha_sel_dia_siguiente,
-                               hoy_fecha=hoy_fecha,
+                               hoy_fecha=hoy_fecha, hoy_hora=hoy_hora,
+                               estados_asistencia=ESTADOS_ASISTENCIA,
+                               colores_asistencia=COLORES_ASISTENCIA,
                                materias_jornadas=get_materias_profesor(slug, prof['id']))
     conn = conectar(slug)
     try:
@@ -2676,16 +4089,20 @@ def asistencia(slug):
             placeholders = ','.join('?' * len(alumnos))
             aid_tuple = tuple(a['id'] for a in alumnos)
             asis_rows = conn.execute(
-                f'SELECT aid, estado FROM asistencia WHERE fecha=? AND aid IN ({placeholders})',
+                f'SELECT aid, estado, observacion, hora FROM asistencia WHERE fecha=? AND aid IN ({placeholders})',
                 (fecha_sel,) + aid_tuple).fetchall()
-        asis_map = {r['aid']: r['estado'] for r in asis_rows}
+        asis_map = {r['aid']: {'estado': r['estado'], 'observacion': r['observacion'] or '', 'hora': r['hora'] or ''} for r in asis_rows}
         datos = []
         for a in alumnos:
+            info = asis_map.get(a['id'], {})
             datos.append({
                 'id': a['id'], 'nombre': a['nombre'],
                 'num_curso': a['num_curso'],
-                'asistencia': asis_map.get(a['id'], '')
+                'asistencia': info.get('estado', ''),
+                'observacion': info.get('observacion', ''),
+                'hora': info.get('hora', ''),
             })
+        stats = _asistencia_stats(conn, curso=curso_sel, jornada=jornada)
     finally:
         conn.close()
     return render_template('asistencia.html', profesor=prof, slug=slug, colegio=colegio,
@@ -2693,7 +4110,10 @@ def asistencia(slug):
                            curso_sel=curso_sel, estudiantes=datos, fecha_sel=fecha_sel,
                            fecha_sel_dia_anterior=fecha_sel_dia_anterior,
                            fecha_sel_dia_siguiente=fecha_sel_dia_siguiente,
-                           hoy_fecha=hoy_fecha,
+                           hoy_fecha=hoy_fecha, hoy_hora=hoy_hora,
+                           stats=stats,
+                           estados_asistencia=ESTADOS_ASISTENCIA,
+                           colores_asistencia=COLORES_ASISTENCIA,
                            materias_jornadas=get_materias_profesor(slug, prof['id']))
 
 @app.route('/<slug>/marcar_asistencia', methods=['POST'])
@@ -2705,8 +4125,10 @@ def marcar_asistencia(slug):
     aid    = request.form.get('aid', type=int)
     estado = request.form.get('estado')
     fecha  = request.form.get('fecha', '')
+    observacion = request.form.get('observacion', '').strip()
+    hora  = request.form.get('hora', '')
     if aid is None or not estado: return ('', 400)
-    if estado not in ('P', 'A', 'T'): return ('', 400)
+    if estado not in ESTADOS_ASISTENCIA: return ('', 400)
     if fecha:
         try:
             datetime.strptime(fecha, '%Y-%m-%d')
@@ -2724,18 +4146,128 @@ def marcar_asistencia(slug):
     if not alumno:
         conn.close(); return ('', 403)
     if fecha:
-        conn.execute('INSERT INTO asistencia (aid,fecha,estado) VALUES (?,?,?) '
-                     'ON CONFLICT(aid,fecha) DO UPDATE SET estado=excluded.estado',
-                     (aid, fecha, estado))
+        conn.execute('''INSERT INTO asistencia (aid,fecha,estado,observacion,hora,usuario_tipo,usuario_id)
+                        VALUES (?,?,?,?,?,?,?)
+                        ON CONFLICT(aid,fecha) DO UPDATE SET estado=excluded.estado,
+                                                             observacion=excluded.observacion,
+                                                             hora=excluded.hora,
+                                                             usuario_tipo=excluded.usuario_tipo,
+                                                             usuario_id=excluded.usuario_id''',
+                     (aid, fecha, estado, observacion, hora, 'profesor', prof['id']))
     else:
-        conn.execute('INSERT INTO asistencia (aid,fecha,estado) VALUES (?,date("now"),?) '
-                     'ON CONFLICT(aid,fecha) DO UPDATE SET estado=excluded.estado',
-                     (aid, estado))
+        conn.execute('''INSERT INTO asistencia (aid,fecha,estado,observacion,hora,usuario_tipo,usuario_id)
+                        VALUES (?,date("now"),?,?,?,?,?)
+                        ON CONFLICT(aid,fecha) DO UPDATE SET estado=excluded.estado,
+                                                             observacion=excluded.observacion,
+                                                             hora=excluded.hora,
+                                                             usuario_tipo=excluded.usuario_tipo,
+                                                             usuario_id=excluded.usuario_id''',
+                     (aid, estado, observacion, hora, 'profesor', prof['id']))
     conn.commit()
     audit_log(slug, prof['id'], 'asistencia_editada', 'asistencia', aid,
-              None, {'estado': estado})
+              None, {'estado': estado, 'observacion': observacion, 'hora': hora})
     conn.close()
     return jsonify({'status':'ok'})
+
+# ── ASISTENCIA DATA (AJAX) ──────────────────────────────────────────────────────
+@app.route('/<slug>/asistencia_data')
+def asistencia_data(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof or not validar_csrf(): return jsonify({'error': 'No autorizado'}), 403
+    jornada, materia = get_sesion_jornada_materia(slug)
+    if not jornada or not materia: return jsonify({'error': 'Sin jornada/materia'}), 400
+    conn = conectar(slug)
+    try:
+        curso = request.args.get('curso', '')
+        if not curso:
+            conn.close(); return jsonify({'error': 'Curso requerido'}), 400
+        stats = _asistencia_stats(conn, curso=curso, jornada=jornada)
+        alertas = _asistencia_alertas(conn, slug, curso, jornada)
+        from collections import defaultdict
+        MESES = {'01':'Ene','02':'Feb','03':'Mar','04':'Abr','05':'May','06':'Jun',
+                 '07':'Jul','08':'Ago','09':'Sep','10':'Oct','11':'Nov','12':'Dic'}
+        alumnos = conn.execute(
+            'SELECT id FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
+            (curso, jornada)).fetchall()
+        aids = tuple(a['id'] for a in alumnos)
+        calendario = defaultdict(lambda: defaultdict(int))
+        if aids:
+            placeholders = ','.join('?' * len(aids))
+            rows = conn.execute(
+                f'SELECT fecha, estado FROM asistencia WHERE aid IN ({placeholders}) ORDER BY fecha',
+                aids).fetchall()
+            for r in rows:
+                calendario[r['fecha']][r['estado']] += 1
+    finally:
+        conn.close()
+    return jsonify({
+        'stats': stats,
+        'alertas': alertas,
+        'calendario': {k: dict(v) for k, v in calendario.items()},
+        'estados': dict(ESTADOS_ASISTENCIA),
+        'colores': COLORES_ASISTENCIA,
+    })
+
+# ── ASISTENCIA REPORTE EXCEL ──────────────────────────────────────────────────
+@app.route('/<slug>/asistencia_reporte_excel')
+def asistencia_reporte_excel(slug):
+    require_colegio(slug)
+    prof = get_profesor(slug)
+    if not prof: return ('', 403)
+    jornada, materia = get_sesion_jornada_materia(slug)
+    if not jornada or not materia: return ('', 400)
+    conn = conectar(slug)
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        wb = Workbook()
+        ws = wb.active
+        ws.title = 'Asistencia'
+        hd_font = Font(bold=True, color='FFFFFF', size=11)
+        hd_fill = PatternFill('solid', fgColor='1E293B')
+        thin = Side(style='thin', color='334155')
+        border = Border(top=thin, left=thin, right=thin, bottom=thin)
+        curso = request.args.get('curso', '')
+        if not curso:
+            conn.close(); return ('Curso requerido', 400)
+        alumnos = conn.execute(
+            'SELECT id, nombre, num_curso FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre',
+            (curso, jornada)).fetchall()
+        if not alumnos:
+            conn.close(); return ('Sin estudiantes', 404)
+        aids = [a['id'] for a in alumnos]
+        placeholder = ','.join('?' * len(aids))
+        asis_rows = conn.execute(
+            f'SELECT aid, fecha, estado, observacion FROM asistencia WHERE aid IN ({placeholder}) ORDER BY aid, fecha',
+            aids).fetchall()
+        fechas = sorted(set(r['fecha'] for r in asis_rows))
+        header = ['#', 'Estudiante'] + fechas
+        ws.append(header)
+        for c in range(1, len(header) + 1):
+            cell = ws.cell(row=1, column=c)
+            cell.font = hd_font; cell.fill = hd_fill; cell.border = border
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+        asis_map = {}
+        for r in asis_rows:
+            asis_map.setdefault(r['aid'], {})[r['fecha']] = {'estado': r['estado'], 'obs': r['observacion'] or ''}
+        for i, a in enumerate(alumnos, start=2):
+            ws.append([a['num_curso'], a['nombre']] + [asis_map.get(a['id'], {}).get(f, {}).get('estado', '') for f in fechas])
+            for c in range(1, len(header) + 1):
+                ws.cell(row=i, column=c).border = border
+        ws.column_dimensions['A'].width = 5
+        ws.column_dimensions['B'].width = 30
+        for ci in range(3, len(header) + 1):
+            ws.column_dimensions[chr(64 + ci) if ci <= 26 else 'A'].width = 7
+    finally:
+        conn.close()
+    from flask import Response
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return Response(output.getvalue(),
+                    mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    headers={'Content-Disposition': f'attachment; filename=asistencia_{slug}_{curso}.xlsx'})
 
 # ── OBSERVACIONES ─────────────────────────────────────────────────────────────
 @app.route('/<slug>/agregar_observacion', methods=['POST'])
@@ -3065,8 +4597,9 @@ def vista_estudiante(slug):
         if prom is not None: todos_finales.append(prom)
     promedio_general = round(sum(todos_finales) / len(todos_finales), 2) if todos_finales else None
     asist_raw   = conn.execute(
-        'SELECT fecha, estado FROM asistencia WHERE aid=? ORDER BY fecha', (aid,)).fetchall()
-    asist_stats = {'P': 0, 'A': 0, 'T': 0, 'total': 0}
+        'SELECT fecha, estado, observacion FROM asistencia WHERE aid=? ORDER BY fecha', (aid,)).fetchall()
+    asist_stats = {k: 0 for k in ESTADOS_ASISTENCIA}
+    asist_stats['total'] = 0
     MESES = {'01': 'Ene', '02': 'Feb', '03': 'Mar', '04': 'Abr', '05': 'May', '06': 'Jun',
              '07': 'Jul', '08': 'Ago', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dic'}
     historial_meses = {}
@@ -3077,7 +4610,11 @@ def vista_estudiante(slug):
             p = h['fecha'].split('-')
             if len(p) >= 2:
                 label = f"{MESES.get(p[1], p[1])} {p[0]}"
-                historial_meses.setdefault(label, []).append({'fecha': h['fecha'], 'estado': h['estado']})
+                historial_meses.setdefault(label, []).append({'fecha': h['fecha'], 'estado': h['estado'], 'observacion': h['observacion'] or ''})
+    total = asist_stats['total']
+    asist_stats['porcentaje_asistencia'] = round(asist_stats['P'] / total * 100, 1) if total else 0
+    asist_stats['porcentaje_inasistencia'] = round((asist_stats['A'] + asist_stats['E'] + asist_stats['X'] + asist_stats['S']) / total * 100, 1) if total else 0
+    asist_stats['porcentaje_tardanzas'] = round(asist_stats['T'] / total * 100, 1) if total else 0
     observaciones = conn.execute(
         'SELECT materia, texto, fecha FROM observaciones WHERE aid=? ORDER BY fecha DESC', (aid,)).fetchall()
     horario_raw = conn.execute(
@@ -3445,7 +4982,83 @@ def rector_reportes(slug):
                            total_est=total_est, total_prof=total_prof,
                            total_cursos=total_cursos,
                            total_directoras=total_directoras,
+                            notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+# ── RECTOR: ASISTENCIA ──────────────────────────────────────────────────────────
+@app.route('/<slug>/rector/asistencia')
+def rector_asistencia(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return redirect(url_for('login', slug=slug))
+    colegio = get_colegio(slug)
+    conn = conectar(slug)
+    cursos = [r['curso'] for r in conn.execute(
+        'SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()]
+    jornadas = [r['jornada'] for r in conn.execute(
+        'SELECT DISTINCT jornada FROM alumnos WHERE activo=1 ORDER BY jornada').fetchall()]
+    profesores = conn.execute(
+        'SELECT id, nombre FROM profesores WHERE activo=1 ORDER BY nombre').fetchall()
+    conn.close()
+    return render_template('rector_asistencia.html',
+                           slug=slug, colegio=colegio, rector=rector,
+                           cursos=cursos, jornadas=jornadas,
+                           profesores=profesores,
+                           estados_asistencia=ESTADOS_ASISTENCIA,
+                           hoy_fecha=datetime.today().strftime('%Y-%m-%d'),
                            notif_count=notificaciones_no_leidas(slug, 'rector', rector['id']))
+
+@app.route('/<slug>/rector/asistencia_data')
+def rector_asistencia_data(slug):
+    require_colegio(slug)
+    rector = get_rector(slug)
+    if not rector: return jsonify({'error': 'No autorizado'}), 403
+    conn = conectar(slug)
+    try:
+        curso   = request.args.get('curso', '')
+        jornada = request.args.get('jornada', '')
+        materia = request.args.get('materia', '')
+        profesor_id = request.args.get('profesor_id', type=int)
+        fecha   = request.args.get('fecha', datetime.today().strftime('%Y-%m-%d'))
+        try:
+            datetime.strptime(fecha, '%Y-%m-%d')
+        except ValueError:
+            fecha = datetime.today().strftime('%Y-%m-%d')
+        where = 'a.activo=1'
+        params = []
+        if curso:
+            where += ' AND a.curso=?'; params.append(curso)
+        if jornada:
+            where += ' AND a.jornada=?'; params.append(jornada)
+        alumnos = conn.execute(
+            f'SELECT a.id, a.nombre, a.num_curso, a.curso, a.jornada FROM alumnos a WHERE {where} ORDER BY a.curso, a.nombre',
+            params).fetchall()
+        for a in alumnos:
+            a = dict(a)
+        if not alumnos:
+            conn.close(); return jsonify({'estudiantes': [], 'stats': _asistencia_stats(conn, curso, jornada)})
+
+        aids = [a['id'] for a in alumnos]
+        placeholders = ','.join('?' * len(aids))
+        asis_rows = conn.execute(
+            f'SELECT aid, estado, observacion, hora FROM asistencia WHERE fecha=? AND aid IN ({placeholders})',
+            (fecha,) + tuple(aids)).fetchall()
+        asis_map = {r['aid']: {'estado': r['estado'], 'observacion': r['observacion'] or '', 'hora': r['hora'] or ''} for r in asis_rows}
+        estudiantes = []
+        for a in alumnos:
+            info = asis_map.get(a['id'], {})
+            estudiantes.append({
+                'id': a['id'], 'nombre': a['nombre'],
+                'num_curso': a['num_curso'], 'curso': a['curso'],
+                'asistencia': info.get('estado', ''),
+                'observacion': info.get('observacion', ''),
+                'hora': info.get('hora', ''),
+            })
+        stats = _asistencia_stats(conn, curso=curso, jornada=jornada)
+        alertas = _asistencia_alertas(conn, slug, curso or '', jornada or '') if curso and jornada else []
+    finally:
+        conn.close()
+    return jsonify({'estudiantes': estudiantes, 'stats': stats, 'alertas': alertas,
+                    'estados': dict(ESTADOS_ASISTENCIA)})
 
 # ── RECTOR: CONFIGURACIÓN ──────────────────────────────────────────────────────
 @app.route('/<slug>/rector/configuracion', methods=['GET', 'POST'])
@@ -3515,6 +5128,7 @@ def rector_configuracion(slug):
                 (tipo_ev, esc_min, esc_max, nota_min, decimales, num_per,
                  acuse, roles_json, jornadas_json, slug))
             conn.commit()
+            _cache_invalidate(slug)
             exito = 'Configuración institucional guardada.'
 
     config = config_get(slug)
@@ -3560,12 +5174,13 @@ def rector_solicitudes(slug):
     conn = conectar(slug)
     solicitudes = conn.execute(
         '''SELECT s.*, a.nombre as alumno_nombre, p.nombre as profesor_nombre,
-                  COALESCE(ac.nombre, s.campo) as actividad_nombre
+                  COALESCE(ac.nombre, s.tipo) as actividad_nombre
            FROM solicitudes_modificacion s
            JOIN alumnos a ON a.id=s.aid
            LEFT JOIN actividades ac ON ac.id=s.actividad_id
-           JOIN profesores p ON p.id=s.solicitado_por
-           ORDER BY s.creado DESC''').fetchall()
+           JOIN profesores p ON p.id=s.profesor_id
+           WHERE s.slug=?
+           ORDER BY s.fecha_solicitud DESC''', (slug,)).fetchall()
     conn.close()
     return render_template('rector_solicitudes.html',
                            slug=slug, colegio=get_colegio(slug), rector=rector,
@@ -3576,66 +5191,88 @@ def rector_solicitudes(slug):
 def rector_solicitud_accion(slug, sid, accion):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return ('No autorizado', 403)
-    if not validar_csrf(): return ('Error CSRF', 403)
-    if accion not in ('aprobar', 'rechazar'): return ('Accion invalida', 400)
+    if not rector: return jsonify({'status':'error','mensaje':'No autorizado'}), 403
+    if not validar_csrf(): return jsonify({'status':'error','mensaje':'Error CSRF'}), 403
+    if accion not in ('aprobar', 'rechazar'): return jsonify({'status':'error','mensaje':'Accion invalida'}), 400
     conn = conectar(slug)
     sol = conn.execute(
-        'SELECT * FROM solicitudes_modificacion WHERE id=?', (sid,)).fetchone()
+        'SELECT * FROM solicitudes_modificacion WHERE id=? AND slug=?', (sid, slug)).fetchone()
     if not sol:
         conn.close()
-        return ('Solicitud no encontrada', 404)
-    respuesta = request.form.get('respuesta', '').strip()
+        return jsonify({'status':'error','mensaje':'Solicitud no encontrada'}), 404
+    if sol['estado'] != 'pendiente':
+        conn.close()
+        return jsonify({'status':'error','mensaje':'La solicitud ya fue ' + sol['estado']}), 400
+    if sol['profesor_id'] == rector['id']:
+        conn.close()
+        return jsonify({'status':'error','mensaje':'No puedes aprobar tu propia solicitud'}), 403
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     if accion == 'aprobar':
-        conn.execute(
-            '''UPDATE solicitudes_modificacion
-               SET estado='aprobada', revisado_por=?, respuesta=?, actualizado=datetime('now','localtime')
-               WHERE id=?''',
-            (rector['id'], respuesta, sid))
-        campo = sol['campo'] or 'nota'
-        if campo == 'nota' and sol['actividad_id'] is not None:
+        valor_sol = float(sol['valor_solicitado']) if sol['valor_solicitado'] else None
+        curso_ctx = sol['curso']
+        materia_ctx = sol['materia']
+        if sol['tipo'] == 'actividad' and sol['actividad_id'] is not None:
             conn.execute(
                 '''INSERT INTO notas (aid,actividad_id,val) VALUES (?,?,?)
                    ON CONFLICT(aid,actividad_id) DO UPDATE SET val=excluded.val''',
-                (sol['aid'], sol['actividad_id'], sol['nota_solicitada']))
-        elif campo in ('evaluacion', 'autoevaluacion'):
-            profe = conn.execute(
-                'SELECT id, jornada FROM asignaciones_materia WHERE profesor_id=? AND materia=? LIMIT 1',
-                (sol['solicitado_por'], sol['materia'] or '')).fetchone()
-            jornada_eval = profe['jornada'] if profe else ''
-            if campo == 'evaluacion':
+                (sol['aid'], sol['actividad_id'], valor_sol))
+            conn.commit()  # commit before auditar_nota opens its own connection
+            auditar_nota(slug, rector['id'], 'rector', 'modificacion', 'notas', sol['aid'],
+                         curso_ctx, materia_ctx, sol['periodo'],
+                         campo='nota', actividad_id=sol['actividad_id'],
+                         valor_anterior=sol['valor_actual'], valor_nuevo=valor_sol,
+                         motivo='Aprobado por rector (solicitud #%d)' % sid)
+        elif sol['tipo'] in ('evaluacion', 'autoevaluacion'):
+            jornada_eval = sol['jornada']
+            if sol['tipo'] == 'evaluacion':
                 conn.execute(
                     '''INSERT INTO evaluaciones (aid,profesor_id,materia,jornada,evaluacion,periodo)
                        VALUES (?,?,?,?,?,?)
                        ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
                        DO UPDATE SET evaluacion=excluded.evaluacion''',
-                    (sol['aid'], sol['solicitado_por'], sol['materia'],
-                     jornada_eval, sol['nota_solicitada'], sol['periodo']))
+                    (sol['aid'], sol['profesor_id'], materia_ctx,
+                     jornada_eval, valor_sol, sol['periodo']))
             else:
                 conn.execute(
                     '''INSERT INTO evaluaciones (aid,profesor_id,materia,jornada,autoevaluacion,periodo)
                        VALUES (?,?,?,?,?,?)
                        ON CONFLICT(aid,profesor_id,materia,jornada,periodo)
                        DO UPDATE SET autoevaluacion=excluded.autoevaluacion''',
-                    (sol['aid'], sol['solicitado_por'], sol['materia'],
-                     jornada_eval, sol['nota_solicitada'], sol['periodo']))
-        audit_log(slug, rector['id'], 'solicitud_aprobada', 'solicitudes_modificacion',
-                  registro_id=sid,
-                  valor_anterior={'aid': sol['aid'], 'actividad_id': sol['actividad_id'],
-                                  'campo': campo, 'val': sol['nota_actual']},
-                  valor_nuevo={'aid': sol['aid'], 'actividad_id': sol['actividad_id'],
-                               'campo': campo, 'val': sol['nota_solicitada']})
+                    (sol['aid'], sol['profesor_id'], materia_ctx,
+                     jornada_eval, valor_sol, sol['periodo']))
+            conn.commit()  # commit before auditar_nota opens its own connection
+            auditar_nota(slug, rector['id'], 'rector', 'modificacion', 'evaluaciones', sol['aid'],
+                         curso_ctx, materia_ctx, sol['periodo'],
+                         campo=sol['tipo'],
+                         valor_anterior=sol['valor_actual'], valor_nuevo=valor_sol,
+                         motivo='Aprobado por rector (solicitud #%d)' % sid)
+        conn.execute(
+            '''UPDATE solicitudes_modificacion
+               SET estado='aprobada', aprobado_por=?, fecha_respuesta=?
+               WHERE id=?''',
+            (rector['id'], now, sid))
+        conn.commit()
+        # Notify teacher
+        crear_notificacion(slug, 'profesor', sol['profesor_id'],
+            'Solicitud aprobada',
+            'Tu solicitud #%d fue aprobada por el rector.' % sid)
     else:
         conn.execute(
             '''UPDATE solicitudes_modificacion
-               SET estado='rechazada', revisado_por=?, respuesta=?, actualizado=datetime('now','localtime')
+               SET estado='rechazada', aprobado_por=?, fecha_respuesta=?
                WHERE id=?''',
-            (rector['id'], respuesta, sid))
-        audit_log(slug, rector['id'], 'solicitud_rechazada', 'solicitudes_modificacion',
-                  registro_id=sid)
-    conn.commit()
+            (rector['id'], now, sid))
+        conn.commit()  # commit before auditar_nota opens its own connection
+        auditar_nota(slug, rector['id'], 'rector', 'solicitud_rechazada', 'solicitudes_modificacion', sol['aid'],
+                     sol['curso'], sol['materia'], sol['periodo'],
+                     campo=sol['tipo'], actividad_id=sol['actividad_id'],
+                     valor_anterior=sol['valor_actual'], valor_nuevo=sol['valor_solicitado'],
+                     motivo='Rechazado por rector (solicitud #%d)' % sid)
+        crear_notificacion(slug, 'profesor', sol['profesor_id'],
+            'Solicitud rechazada',
+            'Tu solicitud #%d fue rechazada por el rector.' % sid)
     conn.close()
-    return redirect(url_for('rector_solicitudes', slug=slug))
+    return jsonify({'status':'ok','mensaje':'Solicitud ' + ('aprobada' if accion == 'aprobar' else 'rechazada')})
 
 @app.route('/<slug>/rector/auditoria')
 def rector_auditoria(slug):
@@ -4201,10 +5838,10 @@ def rector_canales_miembros(slug, cid):
     canal = conn.execute('SELECT * FROM canales WHERE id=?', (cid,)).fetchone()
     conn.close()
     data = [dict(m) for m in miembros]
+    conn2 = conectar(slug)
     for m in data:
-        conn2 = conectar(slug)
         m['nombre_usuario'] = nombre_usuario_canal(conn2, m['usuario_tipo'], m['usuario_id'])
-        conn2.close()
+    conn2.close()
     return jsonify({'ok':True, 'miembros':data, 'canal':dict(canal) if canal else None})
 
 # ── CANALES API (usuarios) ─────────────────────────────────────────────────────
@@ -4243,6 +5880,62 @@ def _enriquecer_mensaje(conn, d):
             }
     return d
 
+def _enriquecer_mensajes_batch(conn, mensajes):
+    """Batch enrich a list of message dicts: 4 queries instead of 3*N."""
+    if not mensajes: return
+    mids = [m['id'] for m in mensajes]
+    ph = ','.join('?' * len(mids))
+    # batch files
+    arch_rows = conn.execute(
+        f'SELECT * FROM mensajes_archivos WHERE mensaje_id IN ({ph}) ORDER BY id', mids).fetchall()
+    arch_by_mid = {}
+    for r in arch_rows:
+        arch_by_mid.setdefault(r['mensaje_id'], []).append(dict(r))
+    # batch reactions
+    reac_rows = conn.execute(
+        f'SELECT mensaje_id, reaccion, usuario_tipo, usuario_id FROM mensajes_reacciones WHERE mensaje_id IN ({ph})',
+        mids).fetchall()
+    reac_by_mid = {}
+    for r in reac_rows:
+        reac_by_mid.setdefault(r['mensaje_id'], {}).setdefault(r['reaccion'], []).append({'tipo': r['usuario_tipo'], 'id': r['usuario_id']})
+    # batch author names (collect unique tipo+uid pairs)
+    seen = set()
+    tipo_ids = {'profesor': set(), 'estudiante': set(), 'rector': set(), 'directora': set()}
+    for m in mensajes:
+        key = (m['usuario_tipo'], m['usuario_id'])
+        if key not in seen:
+            seen.add(key)
+            if m['usuario_tipo'] in tipo_ids:
+                tipo_ids[m['usuario_tipo']].add(m['usuario_id'])
+    name_map = {}
+    for t, ids in tipo_ids.items():
+        if not ids: continue
+        ph2 = ','.join('?' * len(ids))
+        table_map = {'profesor': 'profesores', 'estudiante': 'alumnos', 'rector': 'rectores', 'directora': 'directoras'}
+        rows = conn.execute(f'SELECT id, nombre FROM {table_map[t]} WHERE id IN ({ph2})', list(ids)).fetchall()
+        for r in rows:
+            name_map[(t, r['id'])] = r['nombre']
+    # batch reply info
+    reply_ids = set(m['responde_a'] for m in mensajes if m.get('responde_a'))
+    reply_info = {}
+    if reply_ids:
+        ph3 = ','.join('?' * len(reply_ids))
+        padres = conn.execute(
+            f'SELECT id, mensaje, usuario_tipo, usuario_id FROM mensajes_canal WHERE id IN ({ph3})', list(reply_ids)).fetchall()
+        for p in padres:
+            reply_info[p['id']] = {
+                'id': p['id'],
+                'mensaje': p['mensaje'][:120],
+                'autor_nombre': name_map.get((p['usuario_tipo'], p['usuario_id']), nombre_usuario_canal(conn, p['usuario_tipo'], p['usuario_id']))
+            }
+    # apply to messages
+    for m in mensajes:
+        m['archivos'] = arch_by_mid.get(m['id'], [])
+        m['reacciones'] = reac_by_mid.get(m['id'], {})
+        m['autor_nombre'] = name_map.get((m['usuario_tipo'], m['usuario_id']), 'Desconocido')
+        if m.get('responde_a') and m['responde_a'] in reply_info:
+            m['responde_a_info'] = reply_info[m['responde_a']]
+
 @app.route('/<slug>/api/canales/<int:cid>/mensajes')
 def api_canales_mensajes(slug, cid):
     require_colegio(slug)
@@ -4260,12 +5953,8 @@ def api_canales_mensajes(slug, cid):
         FROM mensajes_canal m
         LEFT JOIN mensajes_leidos ml ON ml.mensaje_id=m.id AND ml.usuario_tipo=? AND ml.usuario_id=?
         WHERE m.canal_id=? AND m.eliminado=0 ORDER BY m.id ASC''', (tipo, uid, cid)).fetchall()
-    result = []
-    for r in mensajes:
-        d = dict(r)
-        d['autor_nombre'] = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
-        _enriquecer_mensaje(conn, d)
-        result.append(d)
+    result = [dict(r) for r in mensajes]
+    _enriquecer_mensajes_batch(conn, result)
     conn.close()
     return jsonify(result)
 
@@ -4288,12 +5977,8 @@ def api_canales_mensajes_nuevos(slug, cid):
         LEFT JOIN mensajes_leidos ml ON ml.mensaje_id=m.id AND ml.usuario_tipo=? AND ml.usuario_id=?
         WHERE m.canal_id=? AND m.id > ? AND m.eliminado=0 ORDER BY m.id ASC''',
         (tipo, uid, cid, ultimo_id)).fetchall()
-    result = []
-    for r in mensajes:
-        d = dict(r)
-        d['autor_nombre'] = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
-        _enriquecer_mensaje(conn, d)
-        result.append(d)
+    result = [dict(r) for r in mensajes]
+    _enriquecer_mensajes_batch(conn, result)
     conn.close()
     return jsonify({'ok':True, 'mensajes':result})
 
@@ -4342,10 +6027,11 @@ def api_canales_leer(slug, cid):
     tipo, uid = get_usuario_actual(slug)
     if not tipo: return jsonify({'ok':False})
     conn = conectar(slug)
-    msgs = conn.execute('SELECT id FROM mensajes_canal WHERE canal_id=?', (cid,)).fetchall()
-    for m in msgs:
-        conn.execute('INSERT OR IGNORE INTO mensajes_leidos (mensaje_id,usuario_tipo,usuario_id) VALUES (?,?,?)',
-                    (m['id'], tipo, uid))
+    mids = [r['id'] for r in conn.execute('SELECT id FROM mensajes_canal WHERE canal_id=?', (cid,)).fetchall()]
+    if mids:
+        ph = ','.join('?' * len(mids))
+        conn.execute(f'INSERT OR IGNORE INTO mensajes_leidos (mensaje_id,usuario_tipo,usuario_id) SELECT id,?,? FROM mensajes_canal WHERE canal_id=? AND id IN ({ph})',
+                    (tipo, uid, cid) + tuple(mids))
     conn.commit()
     conn.close()
     return jsonify({'ok':True})
@@ -4475,11 +6161,9 @@ def api_canales_fijados(slug, cid):
            JOIN mensajes_canal m ON m.id=f.mensaje_id
            WHERE f.canal_id=? AND m.eliminado=0
            ORDER BY f.id DESC''', (cid,)).fetchall()
-    result = []
-    for r in rows:
-        d = dict(r)
-        d['autor_nombre'] = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
-        result.append(d)
+    result = [dict(r) for r in rows]
+    for m in result:
+        m['autor_nombre'] = nombre_usuario_canal(conn, m['usuario_tipo'], m['usuario_id'])
     conn.close()
     return jsonify(result)
 
@@ -4524,12 +6208,8 @@ def api_canales_buscar(slug, cid):
         params.append(hasta + ' 23:59:59')
     sql += ' ORDER BY m.id DESC LIMIT 100'
     rows = conn.execute(sql, params).fetchall()
-    result = []
-    for r in rows:
-        d = dict(r)
-        d['autor_nombre'] = nombre_usuario_canal(conn, r['usuario_tipo'], r['usuario_id'])
-        _enriquecer_mensaje(conn, d)
-        result.append(d)
+    result = [dict(r) for r in rows]
+    _enriquecer_mensajes_batch(conn, result)
     conn.close()
     return jsonify(result)
 
@@ -4610,12 +6290,28 @@ def api_canales_lecturas(slug, cid):
            GROUP BY ml.usuario_tipo, ml.usuario_id''',
         (cid,)).fetchall():
         leidos_por_miembro[f"{row['usuario_tipo']}_{row['usuario_id']}"] = row['c']
+    # batch name lookups
+    seen = set()
+    tipo_ids = {'profesor': set(), 'estudiante': set(), 'rector': set(), 'directora': set()}
+    for m in miembros:
+        key = (m['usuario_tipo'], m['usuario_id'])
+        if key not in seen:
+            seen.add(key)
+            if m['usuario_tipo'] in tipo_ids:
+                tipo_ids[m['usuario_tipo']].add(m['usuario_id'])
+    name_map = {}
+    table_map = {'profesor': 'profesores', 'estudiante': 'alumnos', 'rector': 'rectores', 'directora': 'directoras'}
+    for t, ids in tipo_ids.items():
+        if not ids: continue
+        ph2 = ','.join('?' * len(ids))
+        rows = conn.execute(f'SELECT id, nombre FROM {table_map[t]} WHERE id IN ({ph2})', list(ids)).fetchall()
+        for r in rows:
+            name_map[(t, r['id'])] = r['nombre']
     result = {}
     for m in miembros:
-        nombre = nombre_usuario_canal(conn, m['usuario_tipo'], m['usuario_id'])
         key = f"{m['usuario_tipo']}_{m['usuario_id']}"
         result[key] = {
-            'nombre': nombre,
+            'nombre': name_map.get((m['usuario_tipo'], m['usuario_id']), 'Desconocido'),
             'tipo': m['usuario_tipo'],
             'total': total_msg,
             'leidos': leidos_por_miembro.get(key, 0),
@@ -5206,6 +6902,10 @@ def static_files(filename):
     resp.headers['Cache-Control'] = 'public, max-age=604800, immutable'
     return resp
 
+@app.route("/offline")
+def offline():
+    return render_template("offline.html")
+
 @app.route("/")
 def index():
     conn = conectar_master()
@@ -5379,6 +7079,117 @@ def programar_backup():
     t.daemon = True
     t.start()
 
+# ── ENTERPRISE ROUTES (Rector / Observador / Certificados) ─────────────────
+@app.route('/<slug>/rector/expediente')
+def rector_expediente(slug):
+    conn = conectar(slug)
+    colegio = get_colegio(slug)
+    rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
+    aid = request.args.get('aid', type=int)
+    alumno = None
+    desempeno = []
+    observaciones = []
+    notif_count = notificaciones_no_leidas(slug, 'rector', 0)
+    if aid:
+        alumno = conn.execute('SELECT * FROM alumnos WHERE id=?', (aid,)).fetchone()
+        if alumno:
+            desempeno = conn.execute('''
+                SELECT a.materia,
+                       ROUND(AVG(n.val), 1) AS promedio,
+                       COUNT(n.id) AS evaluaciones
+                FROM notas n
+                JOIN actividades a ON a.id = n.actividad_id
+                WHERE n.aid=?
+                GROUP BY a.materia ORDER BY promedio DESC
+            ''', (aid,)).fetchall()
+            observaciones = conn.execute('''
+                SELECT o.*
+                FROM observador_registros o
+                WHERE o.aid=?
+                ORDER BY o.fecha DESC LIMIT 50
+            ''', (aid,)).fetchall()
+    return render_template('rector/expediente.html', slug=slug, colegio=colegio, rector=rector,
+                          alumno=alumno, desempeno=desempeno, observaciones=observaciones,
+                          notif_count=notif_count)
+
+@app.route('/<slug>/rector/observador')
+def rector_observador(slug):
+    conn = conectar(slug)
+    colegio = get_colegio(slug)
+    rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
+    notif_count = notificaciones_no_leidas(slug, 'rector', 0)
+    return render_template('rector/observador.html', slug=slug, colegio=colegio, rector=rector, notif_count=notif_count)
+
+@app.route('/<slug>/rector/certificados')
+def rector_certificados(slug):
+    conn = conectar(slug)
+    colegio = get_colegio(slug)
+    rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
+    notif_count = notificaciones_no_leidas(slug, 'rector', 0)
+    cursos = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
+    return render_template('rector/certificados.html', slug=slug, colegio=colegio, rector=rector, cursos=cursos, notif_count=notif_count)
+
+@app.route('/<slug>/rector/calendario')
+def rector_calendario(slug):
+    conn = conectar(slug)
+    colegio = get_colegio(slug)
+    rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
+    notif_count = notificaciones_no_leidas(slug, 'rector', 0)
+    return render_template('rector/calendario.html', slug=slug, colegio=colegio, rector=rector, notif_count=notif_count)
+
+@app.route('/<slug>/rector/mensajes')
+def rector_mensajes(slug):
+    conn = conectar(slug)
+    colegio = get_colegio(slug)
+    rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
+    notif_count = notificaciones_no_leidas(slug, 'rector', 0)
+    return render_template('rector/mensajes.html', slug=slug, colegio=colegio, rector=rector, notif_count=notif_count)
+
+# ── RECTOR API ──────────────────────────────────────────────────────────────────
+@app.route('/<slug>/api/rector/estudiantes')
+def api_rector_estudiantes(slug):
+    conn = conectar(slug)
+    q = request.args.get('q', '').strip()
+    if len(q) < 2:
+        return jsonify({'ok': False, 'data': []})
+    rows = conn.execute('''
+        SELECT a.id, a.nombre, a.curso
+        FROM alumnos a
+        WHERE a.nombre LIKE ?
+        ORDER BY a.nombre LIMIT 15
+    ''', (f'%{q}%',)).fetchall()
+    return jsonify({'ok': True, 'data': [dict(r) for r in rows]})
+
+@app.route('/<slug>/api/rector/observador/<int:aid>', methods=['GET', 'POST'])
+def api_rector_observador(slug, aid):
+    conn = conectar(slug)
+    if request.method == 'POST':
+        if not validar_csrf():
+            return jsonify({'ok': False, 'error': 'CSRF inválido'}), 400
+        data = request.get_json(silent=True) or {}
+        tipo = data.get('tipo', 'llamado')
+        texto = data.get('texto', '').strip()
+        if not texto:
+            return jsonify({'ok': False, 'error': 'Texto requerido'}), 400
+        conn.execute('''INSERT INTO observador_registros (slug, aid, tipo, texto, docente, estado)
+                        VALUES (?,?,?,?,?,?)''',
+                     (slug, aid, tipo, texto, session.get('nombre', ''), 'pendiente'))
+        conn.commit()
+        return jsonify({'ok': True})
+    rows = conn.execute('''
+        SELECT o.*, CASE o.tipo
+            WHEN 'positivo' THEN 'Positivo'
+            WHEN 'llamado' THEN 'Llamado de atención'
+            WHEN 'compromiso' THEN 'Compromiso'
+            WHEN 'seguimiento' THEN 'Seguimiento'
+        END AS tipo_label
+        FROM observador_registros o
+        WHERE o.aid=? AND o.slug=?
+        ORDER BY o.fecha DESC LIMIT 50
+    ''', (aid, slug)).fetchall()
+    return jsonify({'ok': True, 'data': [dict(r) for r in rows]})
+
+# ── INIT ────────────────────────────────────────────────────────────────────────
 init_master_db()
 threading.Timer(30, programar_backup).start()
 
@@ -5390,4 +7201,4 @@ if __name__ == '__main__':
         serve(app, host='0.0.0.0', port=_port, threads=8)
     except ImportError:
         logger.warning('waitress no instalado. Usando Flask dev server (sin reloader).')
-        app.run(host='0.0.0.0', port=_port, debug=True, use_reloader=False)
+        app.run(host='127.0.0.1', port=_port, debug=(ENV != 'production'), use_reloader=False)

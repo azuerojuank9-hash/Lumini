@@ -1,0 +1,38 @@
+{% macro modal(id, title, body='', confirm_text='Confirmar', cancel_text='Cancelar', confirm_class='btn-primary', size='md') %}
+<div id="{{ id }}" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="{{ id }}-title"
+     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);align-items:center;justify-content:center;"
+     onclick="if(event.target===this) closeModal('{{ id }}')">
+  <div class="modal-box" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;max-width:{% if size == 'sm' %}320{% elif size == 'lg' %}560{% else %}420{% endif %}px;width:90%;box-shadow:var(--shadow-lg);animation:scaleIn .2s ease;">
+    <div class="flex-between mb-md">
+      <h3 id="{{ id }}-title" style="font-size:var(--font-lg);font-weight:700;">{{ title }}</h3>
+      <button class="btn-icon-sm btn-ghost" onclick="closeModal('{{ id }}')" aria-label="Cerrar">
+        <i data-lucide="x" width="16" height="16"></i>
+      </button>
+    </div>
+    {% if body %}
+    <p style="font-size:var(--font-md);color:var(--muted);margin-bottom:20px;">{{ body }}</p>
+    {% endif %}
+    <div id="{{ id }}-body">{{ caller() if caller else '' }}</div>
+    {% if confirm_text or cancel_text %}
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+      <button class="btn btn-ghost" onclick="closeModal('{{ id }}')">{{ cancel_text }}</button>
+      <button class="btn {{ confirm_class }}" id="{{ id }}-confirm">{{ confirm_text }}</button>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro modal_script() %}
+<script>
+function openModal(id) { document.getElementById(id).style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; document.body.style.overflow = ''; }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay[style*="flex"]').forEach(function(m) {
+      m.style.display = 'none'; document.body.style.overflow = '';
+    });
+  }
+});
+</script>
+{% endmacro %}

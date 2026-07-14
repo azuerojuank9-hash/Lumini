@@ -1,21 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
+{% extends "base.html" %}
+{% block title %}Lumini — Centro de Correos{% endblock %}
 
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumini — Centro de Correos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <style>
-
-        :root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--shadow:0 1px 4px rgba(0,0,0,.2);}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 4px rgba(0,0,0,.06);}
-        *{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
-        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;padding-top:80px;color:var(--text);-webkit-font-smoothing:antialiased;}
-        .navbar{position:fixed;top:0;left:0;width:100%;background:rgba(8,8,15,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 28px;z-index:1000;}
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
+.navbar{position:fixed;top:0;left:0;width:100%;background:rgba(8,8,15,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 28px;z-index:1000;}
         .navbar-left{display:flex;align-items:center;gap:14px;}
         .navbar img{height:40px;width:40px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
         .navbar-brand .name{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:5px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -81,15 +69,9 @@
         .historial-item .hfecha{color:var(--muted);font-size:12px;}
         .historial-item .hdest{color:var(--accent2);font-size:12px;}
         .badge-enviado{background:rgba(46,204,113,.12);color:var(--green);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-        @media(max-width:640px){.navbar{padding:8px 16px;}.container{padding:20px 12px 40px;}.tabs{gap:2px;}.tab-btn{padding:8px 12px;font-size:12px;}.form-row{flex-direction:column;}}
-        @media(max-width:375px){.navbar{padding:6px 10px;}.navbar img{height:32px;width:32px;}.navbar-brand .name{font-size:.95rem;letter-spacing:3px;}.nav-link,.logout-btn{font-size:12px;}.container{padding:16px 8px 32px;}.page-header h1{font-size:1.3rem;}.card{padding:16px;}.card-title{font-size:13px;}.tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}.colegios-grid{grid-template-columns:1fr;}.form-row>*{min-width:100%;}.btn{font-size:13px;padding:8px 16px;min-height:36px;}}
+{% endblock %}
 
-</style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-
-<body>
-
+{% block content %}
 <nav class="navbar">
     <div class="navbar-left">
         <img src="/static/lumini_logo.webp" alt="Lumini">
@@ -101,7 +83,6 @@
     </div>
     <div class="navbar-right">
         <a href="/admin" class="nav-link"><i data-lucide="arrow-left"></i> Panel principal</a>
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;padding:6px 12px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;" aria-label="Cambiar tema">🌙</button>
         <a href="/admin/logout" class="logout-btn">🚪 Salir</a>
     </div>
 </nav>
@@ -412,52 +393,4 @@ Miles de profesores ya la usan para:
     </div>
 
 </div><!-- /container -->
-
-<script>
-// Tabs
-function showTab(id, btn) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('panel-' + id).classList.add('active');
-    btn.classList.add('active');
-}
-
-// Seleccionar todos los checkboxes de una clase
-function toggleAll(cls, val) {
-    document.querySelectorAll('.' + cls).forEach(cb => cb.checked = val);
-}
-
-// Plantillas rápidas
-const plantillas = {
-    mantenimiento: {
-        asunto: 'Mantenimiento programado en Lumini',
-        mensaje: 'Estimados usuarios de Lumini,\n\nLes informamos que realizaremos un mantenimiento programado en nuestra plataforma.\n\nFecha: [FECHA]\nHora: [HORA] - [HORA FIN]\n\nDurante este tiempo la plataforma no estará disponible. Disculpen los inconvenientes.\n\nGracias por su comprensión.\n— Equipo Lumini'
-    },
-    bienvenida_masivo: {
-        asunto: '🎉 ¡Bienvenidos a Lumini!',
-        mensaje: 'Hola,\n\n¡Es un placer tenerlos en la familia Lumini! Estamos muy contentos de que su institución confíe en nuestra plataforma para gestionar su información académica.\n\nRecuerden que pueden contactarnos en cualquier momento si necesitan ayuda.\n\n— Equipo Lumini'
-    },
-    novedad: {
-        asunto: 'Nueva funcionalidad disponible en Lumini',
-        mensaje: 'Hola,\n\nTenemos novedades para ustedes. Hemos lanzado una nueva funcionalidad en Lumini:\n\n[DESCRIPCIÓN DE LA FUNCIONALIDAD]\n\nIngresen a la plataforma para explorarla. Como siempre, cualquier duda o comentario es bienvenido.\n\n— Equipo Lumini'
-    }
-};
-
-function cargarPlantilla(key) {
-    const p = plantillas[key];
-    if (!p) return;
-    const asuntoInput = document.querySelector('#panel-anuncios input[name=asunto]');
-    const mensajeInput = document.querySelector('#panel-anuncios textarea[name=mensaje]');
-    if (asuntoInput) asuntoInput.value = p.asunto;
-    if (mensajeInput) mensajeInput.value = p.mensaje;
-    // Scroll al formulario
-    document.querySelector('#panel-anuncios .card').scrollIntoView({ behavior: 'smooth' });
-}
-</script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-
-</html>
-
-
-
+{% endblock %}

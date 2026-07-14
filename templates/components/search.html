@@ -1,0 +1,16 @@
+{% macro search_bar(name='q', placeholder='Buscar...', value='', id='search-input') %}
+<div class="table-search" style="max-width:320px;width:100%;">
+  <i data-lucide="search" class="search-icon" width="14" height="14"></i>
+  <input type="text" name="{{ name }}" id="{{ id }}" value="{{ value }}"
+         class="form-input" style="padding-left:32px;"
+         placeholder="{{ placeholder }}" aria-label="{{ placeholder }}">
+</div>
+{% endmacro %}
+
+{% macro filter_chips(filters, active_filter='') %}
+<div class="flex flex-wrap gap-sm" role="group" aria-label="Filtros">
+  {% for key, label in filters %}
+  <a href="?filtro={{ key }}" class="btn btn-sm {% if key == active_filter %}btn-primary{% else %}btn-secondary{% endif %}">{{ label }}</a>
+  {% endfor %}
+</div>
+{% endmacro %}

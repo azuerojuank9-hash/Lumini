@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% block title %}Importar Notas &mdash; Lumini{% endblock %}
+
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.topbar-left h1{font-size:20px;font-weight:700;letter-spacing:-.4px;}
+.topbar-left .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow);}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;min-height:44px;}
+.card-title{font-size:12px;font-weight:600;color:var(--text);}
+.card-body{padding:14px 16px;flex:1;}
+.finput{padding:8px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;transition:all var(--tr);width:100%;}
+.finput:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
+.bsm{padding:8px 16px;border:none;border-radius:var(--rsm);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;min-height:36px;transition:all var(--tr);display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
+.bsm:active{transform:scale(.96);}
+.badd{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.badd:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(var(--accent-rgb),.35);}
+.bout{background:transparent;color:var(--muted);border:1.5px solid var(--border);}
+.bout:hover{background:rgba(var(--accent-rgb),.06);color:var(--text);border-color:rgba(var(--accent-rgb),.2);}
+.bgreen{background:linear-gradient(135deg,var(--green),#16A34A);color:#fff;}
+.bgreen:hover{transform:translateY(-1px);box-shadow:0 3px 12px rgba(34,197,94,.3);}
+.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow);animation:fadeSlideIn .4s ease;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.qaction{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;font-family:'Inter',sans-serif;transition:all .2s ease;}
+.qaction:hover{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.25);color:var(--accent);transform:translateY(-1px);}
+.tw{overflow-x:auto;border-radius:0 0 var(--rmd) var(--rmd);}
+table{border-collapse:collapse;min-width:100%;font-size:12px;}
+th{padding:8px 6px;text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3);font-weight:600;vertical-align:middle;}
+td{padding:7px 5px;border-bottom:1px solid rgba(255,255,255,.04);text-align:center;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(var(--accent-rgb),.02);}
+.ta{text-align:left;font-weight:500;}
+.err-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
+.err-badge.ok{background:rgba(34,197,94,.12);color:var(--green);}
+.err-badge.fail{background:rgba(239,68,68,.12);color:var(--red);}
+.file-zone{border:2px dashed var(--border);border-radius:var(--rmd);padding:40px 20px;text-align:center;cursor:pointer;transition:all var(--tr);margin-bottom:14px;}
+.file-zone:hover{border-color:var(--accent);background:rgba(var(--accent-rgb),.03);}
+.file-zone.dragover{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);}
+.file-zone .icon{font-size:36px;color:var(--muted);margin-bottom:8px;}
+.file-zone .label{font-size:14px;color:var(--muted);margin-bottom:4px;}
+.file-zone .hint{font-size:11px;color:var(--sub);}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.preview-section{display:none;}
+.preview-section.show{display:block;animation:fadeSlideIn .4s ease;}
+.errlist{list-style:none;padding:0;margin:4px 0 0;}
+.errlist li{font-size:10px;color:var(--red);padding:1px 0;}
+.curso-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;}
+.ctab{padding:8px 16px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all var(--tr);}
+.ctab:hover{background:rgba(var(--accent-rgb),.06);color:var(--text);}
+.ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;}
+{% endblock %}
+
+{% block sidebar %}
+<nav class="sidebar" id="sidebar">
+  <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
+  <div class="sidebar-header">
+    {% if colegio and colegio.logo %}
+    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    {% else %}
+    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
+    {% endif %}
+    <div class="brand-text">
+      <div class="brand-name">LUMINI</div>
+      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div></div></div></a>
+  <div class="sidebar-nav">
+    <div class="sidebar-section">Notas</div>
+    <a href="/{{ slug }}/" class="sidebar-item"><span class="icon">&#9783;</span><span>Captura de notas</span></a>
+    <a href="/{{ slug }}/importar_notas" class="sidebar-item active"><span class="icon">&#8593;</span><span>Importar Excel</span></a>
+    <a href="/{{ slug }}/exportar_notas?curso={{ curso_sel }}&periodo={{ periodo }}" class="sidebar-item"><span class="icon">&#8595;</span><span>Exportar Excel</span></a>
+    <a href="/{{ slug }}/plantilla_notas?curso={{ curso_sel }}&periodo={{ periodo }}" class="sidebar-item"><span class="icon">&#9733;</span><span>Plantilla oficial</span></a>
+    <div class="sidebar-section" style="margin-top:12px;">Navegaci&oacute;n</div>
+    <a href="/{{ slug }}/asistencia" class="sidebar-item"><span class="icon">&#9783;</span><span>Asistencia</span></a>
+    <a href="/{{ slug }}/horarios" class="sidebar-item"><span class="icon">&#9783;</span><span>Horario</span></a>
+    <a href="/{{ slug }}/transferir_curso" class="sidebar-item"><span class="icon">&#9783;</span><span>Transferir</span></a>
+    <a href="/{{ slug }}/logout" class="sidebar-item" style="color:var(--red);"><span class="icon">&#9783;</span><span>Salir</span></a>
+  </div>
+  <div class="sidebar-user">
+    <div class="name">{{ profesor.nombre }}</div>
+    <div class="role">{{ materia }} &middot; {{ jornada }}</div>
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="dash-wrap">
+<div class="topbar">
+    <div class="topbar-left">
+        <h1>Importar notas desde Excel</h1>
+        <div class="breadcrumb">{{ materia }} &middot; {{ jornada }}</div>
+    </div>
+    <div class="topbar-right">
+        <a href="/{{ slug }}/plantilla_notas?curso={{ curso_sel }}&periodo={{ periodo }}" class="qaction">Descargar plantilla</a>
+        <a href="/{{ slug }}/exportar_notas?curso={{ curso_sel }}&periodo={{ periodo }}" class="qaction">Exportar actual</a>
+    </div>
+</div>
+
+<div class="curso-tabs">
+    {% for c in mis_cursos %}
+    <a href="/{{ slug }}/importar_notas?curso={{ c }}&periodo={{ periodo }}" class="ctab{% if c == curso_sel %} active{% endif %}">{{ c }}</a>
+    {% endfor %}
+</div>
+
+<form id="uploadForm" enctype="multipart/form-data" onsubmit="return uploadFile(event)">
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">Seleccionar archivo Excel</div>
+        </div>
+        <div class="card-body">
+            <div class="file-zone" id="fileZone" onclick="document.getElementById('fileInput').click()">
+                <div class="icon">&#128196;</div>
+                <div class="label">Haz clic o arrastra un archivo .xlsx aqu&iacute;</div>
+                <div class="hint">El archivo debe tener el formato oficial de LUMINI (columnas: N&deg;, Estudiante, AID, actividades, Evaluaci&oacute;n, Autoevaluaci&oacute;n, Promedio)</div>
+                <input type="file" id="fileInput" name="archivo" accept=".xlsx" style="display:none" onchange="updateFileLabel(this)">
+            </div>
+            <div id="fileInfo" style="display:none;margin-bottom:10px;padding:10px 14px;background:rgba(var(--accent-rgb),.08);border-radius:var(--rsm);font-size:13px;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <input type="hidden" name="curso" value="{{ curso_sel }}">
+                <input type="hidden" name="periodo" value="{{ periodo }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" id="previewBtn" class="bsm badd" disabled>Previsualizar</button>
+                <button type="button" class="bsm bout" onclick="window.location.href='/{{ slug }}/'">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div id="previewSection" class="preview-section">
+    <div class="card">
+        <div class="card-head">
+            <div class="card-title">Vista previa</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <span id="previewSummary" style="font-size:12px;color:var(--muted);"></span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="newActivitiesNotice" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(var(--blue),.08);border-radius:var(--rsm);font-size:12px;color:var(--blue);"></div>
+            <div class="tw" id="previewTableWrap">
+                <table id="previewTable">
+                    <thead id="previewHead"><tr></tr></thead>
+                    <tbody id="previewBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="confirmBtn" class="bsm bgreen" onclick="confirmImport()" disabled>Guardar todo</button>
+        <button class="bsm bout" onclick="resetPage()">Volver a subir</button>
+    </div>
+</div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% macro table(headers, rows, id="", class="", sortable=true, searchable=true, sticky=true, compact=false, striped=false) %}
+{% if searchable or caller %}
+<div class="table-toolbar" id="{{ id }}-toolbar">
+  {% if searchable %}
+  <div class="table-search">
+    <i data-lucide="search" class="search-icon" width="14" height="14"></i>
+    <input type="text" class="table-filter-input" data-table="{{ id }}"
+           placeholder="Buscar..." aria-label="Buscar en la tabla"
+           oninput="filterTable(this, '{{ id }}')">
+  </div>
+  {% endif %}
+  <div class="table-col-toggle" id="{{ id }}-col-toggle"></div>
+  {% if caller %}{{ caller() }}{% endif %}
+</div>
+{% endif %}
+<div class="table-wrap">
+  <table class="{% if sticky %}table-sticky {% endif %}{% if compact %}table-compact {% endif %}{% if striped %}table-striped {% endif %}{% if class %}{{ class }}{% endif %}" id="{{ id }}" role="table">
+    <thead>
+      <tr>
+        {% if selectable %}<th style="width:30px"><input type="checkbox" onchange="toggleAllRows(this, '{{ id }}')" aria-label="Seleccionar todo"></th>{% endif %}
+        {% for h in headers %}
+        <th class="{% if sortable %}sortable{% endif %}" data-col="{{ loop.index0 }}"
+            onclick="{% if sortable %}sortTable('{{ id }}', {{ loop.index0 }}){% endif %}"
+            role="columnheader" aria-sort="none">
+          {{ h }}
+        </th>
+        {% endfor %}
+        {% if actions %}<th style="width:80px">Acciones</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr data-id="{{ row.get('id', loop.index) }}"{% if selectable %} onclick="toggleRow(this)"{% endif %}>
+        {% if selectable %}<td><input type="checkbox" class="row-checkbox" aria-label="Seleccionar fila"></td>{% endif %}
+        {% for cell in row.get('cells', []) %}
+        <td>{{ cell }}</td>
+        {% endfor %}
+        {% if actions %}
+        <td>
+          <div class="flex" style="gap:4px">
+            {% for a in actions %}
+            <button class="btn-icon-sm btn-ghost" onclick="{{ a.action }}" title="{{ a.label }}" aria-label="{{ a.label }}">
+              <i data-lucide="{{ a.icon }}" width="14" height="14"></i>
+            </button>
+            {% endfor %}
+          </div>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="flex-between mt-sm">
+  <span class="table-count" id="{{ id }}-count">{{ rows|length }} registro(s)</span>
+  {% if paginate and total_pages > 1 %}
+  <div class="flex gap-sm">
+    {% macro pagination(current, total) %}
+    {% if total > 1 %}
+    {% for p in range(1, total + 1) %}
+    <a href="?page={{ p }}" class="btn btn-sm {% if p == current %}btn-primary{% else %}btn-ghost{% endif %}">{{ p }}</a>
+    {% endfor %}
+    {% endif %}
+    {% endmacro %}
+    {{ pagination(page, total_pages) }}
+  </div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro table_script() %}
+<script>
+function filterTable(input, tableId) {
+  var q = input.value.toLowerCase();
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var rows = table.querySelectorAll('tbody tr');
+  var count = 0;
+  rows.forEach(function(r) {
+    var match = false;
+    r.querySelectorAll('td').forEach(function(c) { if (c.textContent.toLowerCase().includes(q)) match = true; });
+    r.style.display = match ? '' : 'none';
+    if (match) count++;
+  });
+  var c = document.getElementById(tableId + '-count');
+  if (c) c.textContent = count + ' registro(s)';
+}
+function sortTable(tableId, col) {
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var tbody = table.querySelector('tbody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  var header = table.querySelectorAll('th')[col];
+  var asc = header.classList.contains('sort-asc');
+  table.querySelectorAll('th').forEach(function(h) { h.classList.remove('sort-asc', 'sort-desc'); });
+  header.classList.add(asc ? 'sort-desc' : 'sort-asc');
+  rows.sort(function(a, b) {
+    var av = (a.querySelectorAll('td')[col] || {}).textContent || '';
+    var bv = (b.querySelectorAll('td')[col] || {}).textContent || '';
+    var an = parseFloat(av), bn = parseFloat(bv);
+    if (!isNaN(an) && !isNaN(bn)) { av = an; bv = bn; }
+    if (av < bv) return asc ? 1 : -1;
+    if (av > bv) return asc ? -1 : 1;
+    return 0;
+  });
+  rows.forEach(function(r) { tbody.appendChild(r); });
+}
+function toggleAllRows(cb, tableId) {
+  document.querySelectorAll('#' + tableId + ' .row-checkbox').forEach(function(r) { r.checked = cb.checked; });
+  document.querySelectorAll('#' + tableId + ' tbody tr').forEach(function(r) { r.classList.toggle('selected', cb.checked); });
+}
+function toggleRow(row) {
+  var cb = row.querySelector('.row-checkbox');
+  if (cb) { cb.checked = !cb.checked; row.classList.toggle('selected', cb.checked); }
+}
+</script>
+{% endmacro %}

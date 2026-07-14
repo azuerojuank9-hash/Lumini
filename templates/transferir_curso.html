@@ -1,24 +1,11 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
+{% extends "base.html" %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% block title %}Lumini — Transferir Curso{% endblock %}
 
-
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumini — Transferir Curso</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.15);}
-*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.sidebar-logo{padding:14px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
 .sidebar-logo img{height:30px;width:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
-.sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
-.sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}
 .sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}
 .sidebar-link:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
 .sidebar-link .icon{font-size:16px;width:20px;text-align:center;}
@@ -57,52 +44,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .step{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
 .step-num{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;box-shadow:0 2px 8px rgba(var(--accent-rgb),.25);}
 .step-text{font-size:12px;color:var(--muted);line-height:1.6;}
-.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:36px;height:36px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
-.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
-.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);}
-@media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 24px;}}
-@media(max-width:480px){.card-body{padding:12px 14px;}.card-head{padding:10px 14px;}.field select,.field input{font-size:15px;padding:10px 12px;}.btn-submit{font-size:13px;min-height:36px;padding:8px 16px;}.periodo-check{padding:7px 10px;}.periodo-check span{font-size:12px;}.main{padding:20px 24px;}.page-title{font-size:1.1rem;}}
-@media(max-width:375px){.card-body{padding:12px 14px;}.field label{font-size:9px;}.field select,.field input{font-size:14px;padding:8px 10px;}.btn-submit{font-size:13px;min-height:36px;padding:8px 16px;}.btn-back{font-size:13px;min-height:36px;padding:8px 16px;}}
-</style>
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
+{% endblock %}
 
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<body>
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<aside class="sidebar" id="sidebar">
-    <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
-    <div class="sidebar-logo">
-        {% if colegio and colegio.logo %}
-        <img src="/static/logos/{{ colegio.logo }}" alt="">
-        {% else %}
-        <img src="/static/lumini_logo.webp" alt="">
-        {% endif %}
-        <div>
-            <div class="sidebar-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
-            <div class="sidebar-brand-sub">{{ profesor.nombre }} · {{ materia }}</div>
-        </div>
-    </div>
-    </a>
-    <nav class="sidebar-nav">
-        <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
-        <a href="/{{ slug }}/horarios" class="sidebar-link"><span class="icon"><i data-lucide="calendar"></i></span> Horarios</a>
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>️</span> Mi Perfil</a>
-        <a href="/{{ slug }}/archivados" class="sidebar-link"><span class="icon"><i data-lucide="archive"></i></span> Archivados</a>
-    </nav>
-    <div class="sidebar-footer">
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
-        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
-    </div>
-</aside>
-
-<div class="main">
-
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú">☰</button>
-
-    <div class="page-title"><i data-lucide="refresh-cw"></i> Transferir Curso</div>
+{% block content %}
+<div class="page-title"><i data-lucide="refresh-cw"></i> Transferir Curso</div>
     <p class="page-sub">Pasa el historial completo de un curso a otro profesor de la misma materia</p>
 
     {% if error %}
@@ -207,55 +152,4 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         </div>
     </div>
     {% endif %}
-
-</div>
-
-<script>
-function toggleSidebar(){
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
-}
-function toggleChecked(checkbox, labelId){
-    const label = document.getElementById(labelId);
-    if(label) label.classList.toggle('checked', checkbox.checked);
-}
-
-function actualizarResumen(){
-    const curso = document.getElementById('selectCurso').value;
-    const prof  = document.getElementById('selectProf');
-    const profNombre = prof.options[prof.selectedIndex]?.text || '';
-    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'Â°');
-    const resumen  = document.getElementById('resumen');
-    const resumenT = document.getElementById('resumenTexto');
-    if(curso && profNombre && periodos.length){
-        resumenT.innerHTML = `<i data-lucide="clipboard-list"></i> Vas a transferir el curso <strong>${curso}</strong> (periodos ${periodos.join(', ')}) al profesor <strong>${profNombre}</strong>.`;
-        resumen.style.display = 'block';
-    } else {
-        resumen.style.display = 'none';
-    }
-}
-
-function confirmarTransferencia(){
-    const curso = document.getElementById('selectCurso').value;
-    const prof  = document.getElementById('selectProf');
-    const profNombre = prof.options[prof.selectedIndex]?.text || '';
-    const periodos = [...document.querySelectorAll('input[name=periodos]:checked')].map(c=>c.value+'Â°');
-    if(!curso || !profNombre || !periodos.length){
-        alert('Por favor completa todos los campos y selecciona al menos un periodo.');
-        return false;
-    }
-    return confirm(`¿Confirmas transferir el curso ${curso} (periodos ${periodos.join(', ')}) a ${profNombre}?\n\nEsta acción no se puede deshacer.`);
-}
-</script>
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-  <script src="/static/js/lumini.js"></script>
-
-</html>
-
-
-
-
-
-
-
-
+{% endblock %}

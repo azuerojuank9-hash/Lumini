@@ -1,0 +1,47 @@
+/* LUMINI Design System — Utilities */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+.text-accent { color: var(--accent); }
+.text-danger { color: var(--danger); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+.text-muted { color: var(--muted); }
+.text-sub { color: var(--sub); }
+.text-sm { font-size: var(--font-sm); }
+.text-xs { font-size: var(--font-xs); }
+.text-lg { font-size: var(--font-lg); }
+.text-xl { font-size: var(--font-xl); }
+.text-bold { font-weight: 700; }
+.text-semibold { font-weight: 600; }
+.text-mono { font-family: var(--font-mono); }
+.text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.ml-sm { margin-left: var(--spacing-sm); }
+.mr-sm { margin-right: var(--spacing-sm); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.hidden { display: none !important; }
+.visible { display: block !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+.bg-accent { background: var(--accent); color: #fff; }
+.bg-danger { background: var(--danger); color: #fff; }
+.bg-success { background: var(--success); color: #fff; }
+.bg-warning { background: var(--warning); color: #fff; }
+.radius-sm { border-radius: var(--radius-sm); }
+.radius-md { border-radius: var(--radius-md); }
+.nowrap { white-space: nowrap; }
+.w-full { width: 100%; }
+.gap { gap: var(--spacing-md); }
+.gap-sm { gap: var(--spacing-sm); }
+.divider { border: none; height: 1px; background: var(--border); margin: var(--spacing-md) 0; }
+.clickable { cursor: pointer; }
+.no-select { user-select: none; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 100px; font-size: var(--font-xs); background: var(--bg3); color: var(--muted); }

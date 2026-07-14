@@ -1,0 +1,34 @@
+/* LUMINI Design System — Layout */
+.main { flex: 1; margin-left: var(--sidebar-w); max-width: calc(100% - var(--sidebar-w)); padding: 24px 32px; min-height: 100vh; transition: margin var(--tr), max-width var(--tr); }
+.main-full { margin-left: 0; max-width: 100%; }
+.container { max-width: 1200px; margin: 0 auto; width: 100%; }
+.container-narrow { max-width: 800px; }
+.container-wide { max-width: 1400px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-lg); }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: var(--spacing-md); }
+.flex { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-center { align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-gap { gap: var(--spacing-md); }
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+.page-header { margin-bottom: var(--spacing-lg); }
+.page-title { font-size: var(--font-xl); font-weight: 700; }
+.page-subtitle { font-size: var(--font-sm); color: var(--muted); margin-top: 2px; }
+@media(max-width:1024px) {
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width:768px) {
+  .main { margin-left: 0; max-width: 100%; padding: 16px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .page-header { margin-bottom: var(--spacing-md); }
+}
+@media(max-width:480px) {
+  .main { padding: 12px; }
+  .card { padding: 16px; }
+  .card-head { padding: 10px 12px; font-size: var(--font-sm); }
+  .card-body { padding: 10px 12px; }
+}

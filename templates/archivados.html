@@ -1,43 +1,14 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% block title %}Archivados — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
-<html lang="es">
-
-<head>
-
-<meta charset="UTF-8">
-
-
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-<script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();</script>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Archivados — {{ colegio.nombre if colegio else slug }}</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-<style>
-
-:root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);--accent:#7C3AED;--accent2:#6D28D9;--accent-rgb:124,58,237;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--yellow:#EAB308;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.15s ease;--sidebar:200px;--shadow:0 1px 3px rgba(0,0,0,.15);}
-
-[data-theme="light"]{--bg:#F8FAFC;--bg2:#FFFFFF;--bg3:#F1F5F9;--bg4:#E2E8F0;--border:rgba(0,0,0,.08);--text:#0F172A;--muted:#64748B;--sub:#94A3B8;--shadow:0 1px 3px rgba(0,0,0,.15);}
-
-*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation;}
-
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;}
-
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-
-.sidebar-logo{padding:14px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
 .sidebar-logo img{height:30px;width:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(var(--accent-rgb),.4);}
 
-.sidebar-brand{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;letter-spacing:4px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 
 .sidebar-brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
 
-.sidebar-nav{flex:1;padding:8px 6px;display:flex;flex-direction:column;gap:2px;}
 
 .sidebar-link{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;transition:all var(--tr);}
 
@@ -149,15 +120,10 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
 .toast.show{opacity:1;transform:translateY(0);}
 
-.hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:36px;height:36px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:18px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--tr);}
 
-.hamburger:hover{background:var(--bg3);border-color:var(--accent);}
 
-.sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);}
 
-@media(max-width:768px){.hamburger{display:flex;}.sidebar{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}.sidebar.open{transform:translateX(0);}.sidebar-overlay.open{display:block;}.main{margin-left:0;width:100%;padding:20px 24px;}}
 
-@media(max-width:600px){
 
   table,thead,tbody,tr,td,th{display:block;}
 
@@ -176,80 +142,10 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
   tr:hover td{background:none;}
 
 }
+{% endblock %}
 
-@media(max-width:375px){.main{padding:20px 24px;}.card-head{padding:10px 14px;}.card-title{font-size:12px;}.card-body{padding:12px;}.h1{font-size:1.3rem;}.bsm{font-size:13px;min-height:36px;padding:8px 16px;}.curso-tabs{gap:4px;}.hamburger{width:36px;height:36px;}}
-
-</style>
-
-<!-- Datadog RUM -->
-
-<script>(function(h,o,u,n,d){h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}};d=o.createElement(u);d.async=1;d.src=n;n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)})(window,document,"script","https://www.datadoghq-browser-agent.com/us3/v6/datadog-rum.js","DD_RUM");window.DD_RUM.onReady(function(){window.DD_RUM.init({applicationId:"270e5b0e-989e-42c7-aac0-aa32c5fa73d9",clientToken:"pub9783645017fb5532ad36678372bc8fab",site:"us3.datadoghq.com",service:"lumini",env:"production",version:"1.0.0",sessionSampleRate:100,sessionReplaySampleRate:20,trackResources:true,trackUserInteractions:true,trackLongTasks:true})})</script>
-
-  <link rel="stylesheet" href="/static/css/lumini.css">
-<link rel="stylesheet" href="/static/css/enhanced.css">
-
-
-<body>
-
-<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<aside class="sidebar" id="sidebar">
-
-    <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
-
-    <div class="sidebar-logo">
-
-        {% if colegio and colegio.logo %}
-
-        <img src="/static/logos/{{ colegio.logo }}" alt="">
-
-        {% else %}
-
-        <img src="/static/lumini_logo.webp" alt="">
-
-        {% endif %}
-
-        <div>
-
-            <div class="sidebar-brand">{{ colegio.nombre if colegio else 'LUMINI' }}</div>
-
-            <div class="sidebar-brand-sub">{{ profesor.nombre }} · Archivados</div>
-
-        </div>
-
-    </div>
-
-    </a>
-
-    <nav class="sidebar-nav">
-
-        <a href="/{{ slug }}/" class="sidebar-link"><span class="icon"><i data-lucide="bar-chart-3"></i></span> Dashboard</a>
-
-        <a href="/{{ slug }}/horarios" class="sidebar-link"><span class="icon"><i data-lucide="calendar"></i></span> Horarios</a>
-
-        <a href="/{{ slug }}/cambiar_password" class="sidebar-link"><span class="icon"><i data-lucide="settings"></i>ï¸</span> Mi Perfil</a>
-
-        <a href="/{{ slug }}/archivados" class="sidebar-link active"><span class="icon"><i data-lucide="archive"></i></span> Archivados</a>
-
-    </nav>
-
-    <div class="sidebar-footer">
-
-        <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-bottom:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
-
-        <a href="/{{ slug }}/logout" class="sidebar-link" style="color:#EF4444;"><span class="icon"><i data-lucide="log-out"></i></span> Cerrar sesión</a>
-
-    </div>
-
-</aside>
-
-<div class="main">
-
-<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Menú"><i data-lucide="menu"></i></button>
-
-  <h1><i data-lucide="archive"></i> Gestión de usuarios</h1>
+{% block content %}
+<h1><i data-lucide="archive"></i> Gestión de usuarios</h1>
 
   <p class="subtitle">Administra profesores y estudiantes · Los datos archivados se conservan</p>
 
@@ -539,239 +435,5 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
 <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">↑</button>
 
-<div class="toast" id="toast"></div>
-
-<script>
-
-function toggleSidebar(){
-
-    document.getElementById('sidebar').classList.toggle('open');
-
-    document.getElementById('sidebarOverlay').classList.toggle('open');
-
-}
-
-const SLUG = "{{ slug }}";
-
-const CURSO_SEL = "{{ curso_sel or '' }}";
-
-function getCsrf(){
-
-    return document.getElementById('csrf-global').value;
-
-}
-
-function showToast(msg, ok){
-
-    var t = document.getElementById('toast');
-    t.innerHTML = msg;
-    t.className = 'toast ' + (ok !== false ? 'ok' : 'err');
-
-    t.classList.add('show');
-
-    setTimeout(function(){ t.classList.remove('show'); }, 2200);
-
-}
-
-function eliminarProfesor(id, nombre){
-
-    if(!confirm('<i data-lucide="alert-triangle"></i>ï¸ ¿Eliminar a ' + nombre + ' PERMANENTEMENTE?\nSe borran sus cursos asignados y no se puede deshacer.')){
-
-        return;
-
-    }
-
-    fetch('/' + SLUG + '/eliminar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':csrfToken}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
-
-}
-
-function reactivarProfesor(id, nombre){
-
-    if(!confirm('¿Reactivar a ' + nombre + '?')){
-
-        return;
-
-    }
-
-    fetch('/' + SLUG + '/reactivar_profesor/' + id, {method:'POST', headers:{'X-CSRF-Token':csrfToken}}).then(function(r){if(r.ok)location.reload();else alert('Error');});
-
-}
-
-var _profId = null;
-
-var _cursosInfo = [];
-
-var _otrosProfesores = [];
-
-function abrirModalArchivar(profId, nombre, cursosInfo, otrosProfesores){
-
-    _profId = profId;
-
-    _cursosInfo = cursosInfo;
-
-    _otrosProfesores = otrosProfesores;
-
-    document.getElementById('modal-prof-nombre').textContent = '<i data-lucide="archive"></i> Archivar a ' + nombre;
-
-    var listaCursos = document.getElementById('lista-cursos-modal');
-
-    listaCursos.innerHTML = '';
-
-    if(!cursosInfo || cursosInfo.length === 0){
-
-        document.getElementById('modal-prof-sub').textContent =
-
-            'Este profesor no tiene cursos asignados actualmente.';
-
-        document.getElementById('bloque-reasignar').style.display = 'none';
-
-        listaCursos.innerHTML = '<p style="font-size:12px;color:var(--muted);padding:8px;">Sin cursos asignados.</p>';
-
-    } else {
-
-        document.getElementById('modal-prof-sub').textContent =
-
-            'Antes de archivar, puedes reasignar sus cursos a otro profesor activo de la misma materia.';
-
-        cursosInfo.forEach(function(c){
-
-            var label = document.createElement('label');
-
-            label.className = 'curso-item';
-
-            label.innerHTML =
-
-                '<input type="checkbox" value="' + c.curso + '|' + c.materia + '|' + c.jornada + '" checked>'
-
-                + '<span><strong>' + c.curso + '</strong> · ' + c.materia + ' · ' + c.jornada + '</span>';
-
-            listaCursos.appendChild(label);
-
-        });
-
-        var sel = document.getElementById('select-prof-destino');
-
-        sel.innerHTML = '<option value="">— Solo archivar (sin reasignar) —</option>';
-
-        otrosProfesores.forEach(function(p){
-
-            var opt = document.createElement('option');
-
-            opt.value = p.id;
-
-            opt.textContent = p.nombre + ' · ' + p.materia + ' · ' + p.jornada;
-
-            sel.appendChild(opt);
-
-        });
-
-        document.getElementById('bloque-reasignar').style.display =
-
-            otrosProfesores.length > 0 ? 'block' : 'none';
-
-    }
-
-    document.getElementById('modalArchivar').classList.add('open');
-
-}
-
-function cerrarModal(){
-
-    document.getElementById('modalArchivar').classList.remove('open');
-
-}
-
-function confirmarArchivar(){
-
-    var checkboxes = document.querySelectorAll('#lista-cursos-modal input[type=checkbox]:checked');
-
-    var cursosSeleccionados = [];
-
-    checkboxes.forEach(function(c){ cursosSeleccionados.push(c.value); });
-
-    var profDestino = document.getElementById('select-prof-destino').value;
-
-    var f = new FormData();
-
-    f.append('_csrf_token', getCsrf());
-
-    f.append('profesor_id', _profId);
-
-    f.append('prof_destino_id', profDestino);
-
-    cursosSeleccionados.forEach(function(c){ f.append('cursos_reasignar', c); });
-
-    fetch('/' + SLUG + '/archivar_profesor_con_reasignacion', {method:'POST', body:f})
-
-        .then(function(r){ return r.json(); })
-
-        .then(function(d){
-
-            cerrarModal();
-
-            if(d.ok){
-
-                showToast('<i data-lucide="check-circle"></i> ' + d.mensaje, true);
-
-                setTimeout(function(){ location.reload(); }, 1200);
-
-            } else {
-
-                showToast('“ ' + d.mensaje, false);
-
-            }
-
-        })
-
-        .catch(function(){
-
-            cerrarModal();
-
-            showToast('“ Error de conexión.', false);
-
-        });
-
-}
-
-function addDataLabels(){
-
-    document.querySelectorAll('table').forEach(function(t){
-
-        var ths = t.querySelectorAll('thead th');
-
-        t.querySelectorAll('tbody tr').forEach(function(tr){
-
-            tr.querySelectorAll('td').forEach(function(td,i){
-
-                if(ths[i]) td.setAttribute('data-label', ths[i].textContent.trim());
-
-            });
-
-        });
-
-    });
-
-}
-
-window.addEventListener('scroll',function(){
-
-    var st = document.getElementById('scrollTop');
-
-    if(st) st.classList.toggle('show', window.scrollY > 400);
-
-});
-
-addDataLabels();
-
-</script>
-
-<script>function toggleTheme(){var h=document.documentElement;if(h.getAttribute('data-theme')==='light'){h.removeAttribute('data-theme');localStorage.setItem('theme','dark');}else{h.setAttribute('data-theme','light');localStorage.setItem('theme','light');}}</script>
-
-  <script src="/static/js/lumini.js"></script>
-
-
-</html>
-
-
-
-
+<div class="toast" id="toast">
+{% endblock %}
