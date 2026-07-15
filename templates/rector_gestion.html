@@ -8,13 +8,13 @@
 .topbar-left h1{font-size:20px;font-weight:700;}
 .topbar-left .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
 .topbar-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
-.alert{padding:10px 14px;border-radius:var(--rsm);font-size:13px;margin-bottom:16px;}
-.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);}
-.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.alert{padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;}
+.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--danger);}
+.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--success);}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600;}
-.field input{width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
+.field input{width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
 .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .rector-table{width:100%;border-collapse:collapse;}
@@ -23,7 +23,7 @@
 .rector-table tr:last-child td{border-bottom:none;}
 .rector-table tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .principal-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(var(--accent-rgb),.12);color:var(--accent);}
-.inactive-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(239,68,68,.1);color:var(--red);}
+.inactive-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(239,68,68,.1);color:var(--danger);}
 .you-tag{font-size:10px;color:var(--sub);margin-left:4px;}
 .action-group{display:flex;gap:4px;flex-wrap:wrap;}
   .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
@@ -58,7 +58,7 @@
     <div class="sidebar-section" style="margin-top:12px;">Administración</div>
     <a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item active"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>
     <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -181,7 +181,7 @@
           {% if rec.es_principal %}
           <span class="principal-badge"><i data-lucide="crown"></i> Principal</span>
           {% elif rec.activo %}
-          <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(34,197,94,.1);color:var(--green);"><i data-lucide="check-circle"></i> Activo</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(34,197,94,.1);color:var(--success);"><i data-lucide="check-circle"></i> Activo</span>
           {% else %}
           <span class="inactive-badge"><i data-lucide="minus-circle"></i> Inactivo</span>
           {% endif %}
@@ -220,7 +220,7 @@
   </div>
 </div>
 
-<div style="margin-top:12px;font-size:12px;color:var(--sub);background:var(--bg3);border:1px solid var(--border);border-radius:var(--rmd);padding:14px 18px;">
+<div style="margin-top:12px;font-size:12px;color:var(--sub);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 18px;">
   <i data-lucide="info" style="color:var(--accent);"></i>
   Solo el <strong>Rector Principal</strong> puede gestionar otros rectores.
   Para eliminar o transferir el rol, el rector objetivo debe estar activo.

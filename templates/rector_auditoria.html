@@ -7,20 +7,20 @@
 .topbar{margin-bottom:20px;}
 .topbar h1{font-size:20px;font-weight:700;}
 .topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);overflow-x:auto;}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
 th{text-align:left;padding:10px 8px;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);vertical-align:middle;}
 td{padding:8px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
 tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
-.badge-create{background:rgba(34,197,94,.12);color:var(--green);}
-.badge-update{background:rgba(37,99,235,.12);color:var(--blue);}
-.badge-delete{background:rgba(239,68,68,.12);color:var(--red);}
+.badge-create{background:rgba(34,197,94,.12);color:var(--success);}
+.badge-update{background:rgba(37,99,235,.12);color:var(--info);}
+.badge-delete{background:rgba(239,68,68,.12);color:var(--danger);}
 .badge-login{background:rgba(109,40,217,.12);color:var(--accent);}
 .filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
-.filter-bar select{padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;}
+.filter-bar select{padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;}
 .pagination{display:flex;gap:6px;align-items:center;margin-top:16px;justify-content:center;}
-.pagination a{padding:6px 12px;background:var(--bg3);border-radius:var(--rsm);color:var(--muted);text-decoration:none;font-size:12px;transition:all var(--tr);}
+.pagination a{padding:6px 12px;background:var(--bg3);border-radius:var(--radius-sm);color:var(--muted);text-decoration:none;font-size:12px;transition:all var(--tr);}
 .pagination a:hover{background:var(--accent);color:#fff;}
 .pagination .active{background:var(--accent);color:#fff;}
 .pagination .info{font-size:11px;color:var(--sub);}
@@ -59,7 +59,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
     <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
     {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
     <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -120,9 +120,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         <td>
           {% if r.valor_anterior and r.valor_nuevo %}
           <div class="val-diff">
-            <span style="color:var(--red);"><code>{{ r.valor_anterior[:60] }}</code></span>
+            <span style="color:var(--danger);"><code>{{ r.valor_anterior[:60] }}</code></span>
             <span style="color:var(--sub);"> → </span>
-            <span style="color:var(--green);"><code>{{ r.valor_nuevo[:60] }}</code></span>
+            <span style="color:var(--success);"><code>{{ r.valor_nuevo[:60] }}</code></span>
           </div>
           {% elif r.valor_nuevo %}
           <div class="val-diff"><code>{{ r.valor_nuevo[:80] }}</code></div>

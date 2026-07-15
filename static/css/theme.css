@@ -5,10 +5,10 @@
   --accent: var(--primary);
   --accent2: var(--secondary);
   --accent-rgb: 124, 58, 237;
-  --danger: #EF4444;
-  --warning: #EAB308;
-  --success: #22C55E;
-  --info: #3B82F6;
+  --danger: #EF4444; --danger-rgb: 239, 68, 68;
+  --warning: #EAB308; --warning-rgb: 234, 179, 8;
+  --success: #22C55E; --success-rgb: 34, 197, 94;
+  --info: #3B82F6; --info-rgb: 59, 130, 246;
   --bg: #080B14;
   --bg2: #0F172A;
   --bg3: #1E293B;
@@ -38,6 +38,9 @@
   --tr-slow: .3s ease;
   --sidebar-w: 210px;
   --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  --red: var(--danger); --green: var(--success); --yellow: var(--warning); --blue: var(--info);
+  --rsm: var(--radius-sm); --rmd: var(--radius-md); --rlg: var(--radius-lg); --rxl: var(--radius-xl);
+  --text2: var(--muted); --orange: #F59E0B;
 }
 [data-theme="light"] {
   --bg: #F8FAFC;

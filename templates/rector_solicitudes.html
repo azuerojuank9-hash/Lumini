@@ -7,12 +7,12 @@
 .topbar{margin-bottom:20px;}
 .topbar h1{font-size:20px;font-weight:700;}
 .topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'Inter',sans-serif;border:none;transition:all var(--tr);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'Inter',sans-serif;border:none;transition:all var(--tr);}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
-.btn-ok{background:rgba(34,197,94,.1);color:var(--green);}
+.btn-ok{background:rgba(34,197,94,.1);color:var(--success);}
 .btn-ok:hover{background:rgba(34,197,94,.2);}
-.btn-danger{background:rgba(239,68,68,.1);color:var(--red);}
+.btn-danger{background:rgba(239,68,68,.1);color:var(--danger);}
 .btn-danger:hover{background:rgba(239,68,68,.2);}
 .btn-sm{font-size:10px;padding:4px 10px;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
@@ -20,14 +20,14 @@ th{text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);color:
 td{padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
 .badge-pendiente{background:rgba(245,158,11,.15);color:#F59E0B;}
-.badge-aprobada{background:rgba(34,197,94,.15);color:var(--green);}
-.badge-rechazada{background:rgba(239,68,68,.15);color:var(--red);}
-textarea{width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rsm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;resize:vertical;}
+.badge-aprobada{background:rgba(34,197,94,.15);color:var(--success);}
+.badge-rechazada{background:rgba(239,68,68,.15);color:var(--danger);}
+textarea{width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;resize:vertical;}
 textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
 @keyframes fadeOut{0%{opacity:1}70%{opacity:1}to{opacity:0}}
-.toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:var(--rsm);font-size:13px;font-weight:600;color:#fff;z-index:9999;animation:fadeOut 3s forwards;}
-.toast-ok{background:var(--green);}
-.toast-err{background:var(--red);}
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:#fff;z-index:9999;animation:fadeOut 3s forwards;}
+.toast-ok{background:var(--success);}
+.toast-err{background:var(--danger);}
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;padding:16px;}
@@ -63,7 +63,7 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
     <div class="sidebar-section" style="margin-top:12px;">Configuraci&oacute;n</div>
     {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gesti&oacute;n de Rectores</span></a>{% endif %}
     <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuraci&oacute;n</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesi&oacute;n</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesi&oacute;n</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>

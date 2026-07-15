@@ -4,7 +4,7 @@
 .btn:active { transform: translateY(0); }
 .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 .btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: var(--accent2); color: #fff; box-shadow: 0 4px 12px rgba(124,58,237,.3); }
+.btn-primary:hover { background: var(--accent2); color: #fff; box-shadow: 0 4px 12px rgba(var(--accent-rgb),.3); }
 .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
 .btn-secondary:hover { background: var(--bg4); border-color: var(--accent); }
 .btn-danger { background: var(--danger); color: #fff; }
@@ -23,3 +23,5 @@
 .btn-group .btn:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
 .btn-group .btn:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
 .btn-group .btn + .btn { border-left: 1px solid var(--border); }
+.theme-toggle-btn { position: fixed; bottom: 20px; left: 20px; z-index: 9999; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg2); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,.3); transition: all var(--tr); }
+.theme-toggle-btn:hover { background: var(--bg3); border-color: var(--accent); transform: scale(1.1); }

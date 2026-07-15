@@ -7,24 +7,24 @@
 .topbar{margin-bottom:20px;}
 .topbar h1{font-size:20px;font-weight:700;}
 .topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
 .card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
 .card-title{font-size:18px;font-weight:700;}
 .meta-line{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:16px;}
 .meta-line span{display:inline-flex;align-items:center;gap:5px;}
 .priority-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:600;}
 .priority-baja{background:rgba(100,116,139,.1);color:var(--sub);}
-.priority-normal{background:rgba(37,99,235,.1);color:var(--blue);}
-.priority-alta{background:rgba(250,204,21,.15);color:var(--yellow);}
-.priority-urgente{background:rgba(239,68,68,.15);color:var(--red);}
+.priority-normal{background:rgba(37,99,235,.1);color:var(--info);}
+.priority-alta{background:rgba(250,204,21,.15);color:var(--warning);}
+.priority-urgente{background:rgba(239,68,68,.15);color:var(--danger);}
 .status-badge{font-size:10px;font-weight:600;padding:2px 10px;border-radius:99px;}
 .status-borrador{background:rgba(100,116,139,.1);color:var(--sub);}
-.status-programado{background:rgba(37,99,235,.1);color:var(--blue);}
-.status-publicado{background:rgba(34,197,94,.1);color:var(--green);}
+.status-programado{background:rgba(37,99,235,.1);color:var(--info);}
+.status-publicado{background:rgba(34,197,94,.1);color:var(--success);}
 .status-archivado{background:rgba(100,116,139,.05);color:var(--muted);}
 .content-body{padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:14px;line-height:1.7;white-space:pre-wrap;color:var(--text);}
 .stats-row{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap;}
-.stat{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rmd);padding:12px 16px;flex:1;min-width:120px;text-align:center;}
+.stat{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px;flex:1;min-width:120px;text-align:center;}
 .stat .num{font-size:20px;font-weight:800;}
 .stat .lab{font-size:11px;color:var(--muted);margin-top:4px;}
 .actions{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;}
@@ -62,7 +62,7 @@
     <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
     {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
     <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -88,7 +88,7 @@
     <span><i data-lucide="users"></i> {{ com.destinatario_tipo | replace('_', ' ') }}</span>
     <span class="status-badge status-{{ com.estado }}">{{ com.estado | capitalize }}</span>
     {% if com.fecha_programada %}<span><i data-lucide="clock"></i> Programado: {{ com.fecha_programada[:10] }}</span>{% endif %}
-    {% if com.fecha_publicacion %}<span><i data-lucide="check-circle" style="color:var(--green);"></i> Publicado: {{ com.fecha_publicacion[:10] }}</span>{% endif %}
+    {% if com.fecha_publicacion %}<span><i data-lucide="check-circle" style="color:var(--success);"></i> Publicado: {{ com.fecha_publicacion[:10] }}</span>{% endif %}
   </div>
 
   <div class="content-body">{{ com.contenido }}</div>
@@ -99,11 +99,11 @@
       <div class="lab">Destinatarios</div>
     </div>
     <div class="stat">
-      <div class="num" style="color:var(--green);">{{ leidas }}</div>
+      <div class="num" style="color:var(--success);">{{ leidas }}</div>
       <div class="lab">Leídos</div>
     </div>
     <div class="stat">
-      <div class="num" style="color:var(--red);">{{ no_leidas }}</div>
+      <div class="num" style="color:var(--danger);">{{ no_leidas }}</div>
       <div class="lab">No leídos</div>
     </div>
     <div class="stat">

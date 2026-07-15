@@ -105,14 +105,8 @@ class TestBaseTemplate:
     def test_has_design_system_css(self, env):
         tmpl = env.get_template('base.html')
         html = tmpl.render()
-        assert 'base.css' in html
-        assert 'theme.css' in html
-        assert 'layout.css' in html
-        assert 'buttons.css' in html
-        assert 'forms.css' in html
-        assert 'tables.css' in html
-        assert 'cards.css' in html
-        assert 'badges.css' in html
+        for css in ['base.css','theme.css','layout.css','buttons.css','forms.css','tables.css','cards.css','badges.css','alerts.css','sidebar.css','dashboard.css','attendance.css','animations.css','utilities.css']:
+            assert css in html, f'{css} not in base.html'
 
     def test_has_modular_js(self, env):
         tmpl = env.get_template('base.html')
@@ -134,8 +128,13 @@ class TestFilesExist:
 
     def test_all_css_files(self):
         css_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static', 'css')
-        for f in ['base.css', 'theme.css', 'layout.css', 'buttons.css', 'forms.css', 'tables.css', 'cards.css', 'badges.css', 'alerts.css', 'dashboard.css', 'attendance.css', 'animations.css', 'utilities.css']:
+        for f in ['base.css', 'theme.css', 'layout.css', 'buttons.css', 'forms.css', 'tables.css', 'cards.css', 'badges.css', 'alerts.css', 'sidebar.css', 'dashboard.css', 'attendance.css', 'animations.css', 'utilities.css']:
             assert os.path.exists(os.path.join(css_dir, f)), f"Missing: {f}"
+
+    def test_no_old_css_files(self):
+        css_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static', 'css')
+        assert not os.path.exists(os.path.join(css_dir, 'lumini.css')), 'lumini.css should be removed'
+        assert not os.path.exists(os.path.join(css_dir, 'enhanced.css')), 'enhanced.css should be removed'
 
     def test_all_component_templates(self):
         comp_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'templates', 'components')

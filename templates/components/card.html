@@ -16,7 +16,7 @@
 
 {% macro stats_card(value, label, icon, color="accent", change=None, change_label="", id="") %}
 <div class="stats-card card"{% if id %} id="{{ id }}"{% endif %}>
-  <div class="stats-card-icon bg-{{ color }}" style="background:rgba(124,58,237,.12);color:var(--accent);">
+  <div class="stats-card-icon bg-{{ color }}" style="background:rgba(var(--accent-rgb),.12);color:var(--accent);">
     <i data-lucide="{{ icon }}" width="20" height="20"></i>
   </div>
   <div class="stats-card-info">
@@ -33,7 +33,7 @@
 
 {% macro kpi_card(value, label, icon, color="accent", id="") %}
 <div class="card kpi-card"{% if id %} id="{{ id }}"{% endif %}>
-  <div class="kpi-icon" style="background:rgba(124,58,237,.12);color:var(--accent);">
+  <div class="kpi-icon" style="background:rgba(var(--accent-rgb),.12);color:var(--accent);">
     <i data-lucide="{{ icon }}" width="20" height="20"></i>
   </div>
   <div class="kpi-value">{{ value }}</div>

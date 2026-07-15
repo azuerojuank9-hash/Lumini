@@ -104,10 +104,15 @@ class TestStaticAssets:
         assert r.status_code == 200
         assert 'javascript' in r.content_type
 
-    def test_lumini_css(self, client):
-        r = client.get('/static/css/lumini.css')
+    def test_base_css(self, client):
+        r = client.get('/static/css/base.css')
         assert r.status_code == 200
         assert 'text/css' in r.content_type
+
+    def test_all_design_css(self, client):
+        for f in ['base.css','theme.css','layout.css','buttons.css','forms.css','tables.css','cards.css','badges.css','alerts.css','sidebar.css','dashboard.css','attendance.css','animations.css','utilities.css']:
+            r = client.get(f'/static/css/{f}')
+            assert r.status_code == 200, f'{f} returned {r.status_code}'
 
 # ── Landing Pages ──
 

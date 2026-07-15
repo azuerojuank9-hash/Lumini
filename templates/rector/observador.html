@@ -4,11 +4,11 @@
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
 <style>
-.obs-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rmd);padding:4px;overflow-x:auto;}
-.obs-tab{padding:8px 18px;font-size:12px;font-weight:500;border-radius:var(--rsm);cursor:pointer;border:none;background:transparent;color:var(--muted);white-space:nowrap;transition:all var(--tr);}
+.obs-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-md);padding:4px;overflow-x:auto;}
+.obs-tab{padding:8px 18px;font-size:12px;font-weight:500;border-radius:var(--radius-sm);cursor:pointer;border:none;background:transparent;color:var(--muted);white-space:nowrap;transition:all var(--tr);}
 .obs-tab:hover{color:var(--text);background:var(--bg3);}
 .obs-tab.active{background:var(--accent);color:#fff;}
-.obs-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);overflow:hidden;margin-bottom:16px;}
+.obs-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;}
 .obs-card h3{padding:14px 18px;font-size:13px;font-weight:600;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
 .obs-card .body{padding:14px 18px;}
 .obs-entry{padding:12px 0;border-bottom:1px solid var(--border);}
@@ -17,14 +17,14 @@
 .obs-entry .texto{font-size:13px;line-height:1.5;}
 .obs-entry .meta{font-size:11px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;}
 .obs-entry .tag{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;}
-.tag-positivo{background:rgba(34,197,94,.15);color:var(--green);}
-.tag-llamado{background:rgba(234,179,8,.15);color:var(--yellow);}
+.tag-positivo{background:rgba(34,197,94,.15);color:var(--success);}
+.tag-llamado{background:rgba(234,179,8,.15);color:var(--warning);}
 .tag-compromiso{background:rgba(108,99,255,.15);color:var(--accent);}
 .tag-seguimiento{background:rgba(100,116,139,.15);color:var(--sub);}
 .badge-estado{padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600;}
-.badge-pendiente{background:rgba(234,179,8,.15);color:var(--yellow);}
-.badge-aprobado{background:rgba(34,197,94,.15);color:var(--green);}
-.badge-rechazado{background:rgba(239,68,68,.15);color:var(--red);}
+.badge-pendiente{background:rgba(234,179,8,.15);color:var(--warning);}
+.badge-aprobado{background:rgba(34,197,94,.15);color:var(--success);}
+.badge-rechazado{background:rgba(239,68,68,.15);color:var(--danger);}
 </style>
 {% endblock %}
 {% block sidebar %}
@@ -48,7 +48,7 @@
   <div class="obs-card">
     <h3><i data-lucide="search" style="width:14px;height:14px;"></i> Buscar Estudiante</h3>
     <div class="body">
-      <input type="text" id="searchObs" placeholder="Nombre del estudiante..." oninput="buscarEstudiante()" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-size:13px;outline:none;">
+      <input type="text" id="searchObs" placeholder="Nombre del estudiante..." oninput="buscarEstudiante()" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none;">
       <div id="obsResults" style="margin-top:12px;"></div>
     </div>
   </div>
@@ -60,7 +60,7 @@
         <input type="hidden" id="obsAid" value="">
         <div style="margin-bottom:10px;">
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">Tipo</label>
-          <select id="obsTipo" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-size:13px;">
+          <select id="obsTipo" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
             <option value="positivo">Positivo</option>
             <option value="llamado">Llamado de atención</option>
             <option value="compromiso">Compromiso</option>
@@ -69,9 +69,9 @@
         </div>
         <div style="margin-bottom:10px;">
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">Descripción</label>
-          <textarea id="obsTexto" rows="3" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);font-size:13px;resize:vertical;outline:none;"></textarea>
+          <textarea id="obsTexto" rows="3" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;resize:vertical;outline:none;"></textarea>
         </div>
-        <button type="submit" style="background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;">Guardar</button>
+        <button type="submit" style="background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;">Guardar</button>
       </form>
     </div>
   </div>
@@ -100,7 +100,7 @@ function buscarEstudiante() {
       }
       var html = '';
       data.data.forEach(function(e) {
-        html += '<div onclick="seleccionarEstudiante(' + e.id + ',\'' + e.nombre.replace(/'/g, "\\'") + '\')" style="padding:8px 12px;cursor:pointer;border-radius:var(--rsm);background:var(--bg3);margin-bottom:4px;font-size:13px;">' +
+        html += '<div onclick="seleccionarEstudiante(' + e.id + ',\'' + e.nombre.replace(/'/g, "\\'") + '\')" style="padding:8px 12px;cursor:pointer;border-radius:var(--radius-sm);background:var(--bg3);margin-bottom:4px;font-size:13px;">' +
           '<strong>' + e.nombre + '</strong> <span style="color:var(--muted);">' + e.curso + '</span></div>';
       });
       container.innerHTML = html;

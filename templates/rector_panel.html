@@ -8,7 +8,7 @@ html{scroll-behavior:smooth;}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
 .topbar-left h1{font-size:20px;font-weight:700;letter-spacing:-.4px;}
 .topbar-left .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
-.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow);animation:fadeSlideIn .4s ease;}
+.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow);animation:fadeSlideIn .4s ease;}
 @keyframes fadeSlideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
 .dash-greeting{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
 .dash-greeting h1{font-size:24px;font-weight:800;letter-spacing:-.6px;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -17,19 +17,19 @@ html{scroll-behavior:smooth;}
 .dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
 @media(max-width:1100px){.dash-cards{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:500px){.dash-cards{grid-template-columns:1fr;}}
-.dash-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rlg);padding:20px 18px 18px;transition:all .25s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.dash-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 18px 18px;transition:all .25s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;}
 .dash-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
 .dash-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.2);border-color:rgba(var(--accent-rgb),.2);}
 .dash-card.purple::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
 .dash-card.blue::before{background:linear-gradient(90deg,var(--blue),#1D4ED8);}
-.dash-card.green::before{background:linear-gradient(90deg,var(--green),#16A34A);}
+.dash-card.green::before{background:linear-gradient(90deg,var(--success),#16A34A);}
 .dash-card.orange::before{background:linear-gradient(90deg,#F59E0B,#D97706);}
 .dash-card.teal::before{background:linear-gradient(90deg,#14B8A6,#0D9488);}
 .dash-card.pink::before{background:linear-gradient(90deg,#EC4899,#DB2777);}
 .dash-card .icon-wrap{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;}
 .dash-card.purple .icon-wrap{background:rgba(109,40,217,.12);color:var(--accent);}
 .dash-card.blue .icon-wrap{background:rgba(37,99,235,.12);color:var(--blue);}
-.dash-card.green .icon-wrap{background:rgba(34,197,94,.12);color:var(--green);}
+.dash-card.green .icon-wrap{background:rgba(34,197,94,.12);color:var(--success);}
 .dash-card.orange .icon-wrap{background:rgba(245,158,11,.12);color:#F59E0B;}
 .dash-card.teal .icon-wrap{background:rgba(20,184,166,.12);color:#14B8A6;}
 .dash-card.pink .icon-wrap{background:rgba(236,72,153,.12);color:#EC4899;}
@@ -38,7 +38,7 @@ html{scroll-behavior:smooth;}
 .dash-card .dlabel{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
 .dash-card .dtag{font-size:11px;color:var(--sub);margin-top:3px;}
 .quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
-.qaction{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rsm);border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;transition:all .2s ease;font-family:'Inter',sans-serif;touch-action:manipulation;}
+.qaction{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;transition:all .2s ease;font-family:'Inter',sans-serif;touch-action:manipulation;}
 .qaction:hover{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.25);color:var(--accent);transform:translateY(-1px);}
 .qaction.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
 .qaction.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.35);}
@@ -84,7 +84,7 @@ html{scroll-behavior:smooth;}
     <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
     {% if rector.es_principal %}{{ sidebar_item('/' + slug + '/rector/gestion-rectores', 'shield', 'Gestión de Rectores') }}{% endif %}
     {{ sidebar_item('/' + slug + '/rector/configuracion', 'settings', 'Configuración') }}
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>
@@ -102,7 +102,7 @@ html{scroll-behavior:smooth;}
   <div class="topbar-actions" style="display:flex;gap:8px;">
     <a href="/{{ slug }}/notificaciones" style="position:relative;color:var(--muted);font-size:18px;text-decoration:none;padding:6px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);transition:all var(--tr);">
       <i data-lucide="bell"></i>
-      {% if notif_count > 0 %}<span style="position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px;min-width:16px;text-align:center;">{{ notif_count }}</span>{% endif %}
+      {% if notif_count > 0 %}<span style="position:absolute;top:-2px;right:-2px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px;min-width:16px;text-align:center;">{{ notif_count }}</span>{% endif %}
     </a>
   </div>
 </div>
@@ -199,7 +199,7 @@ html{scroll-behavior:smooth;}
             {% if comunicaciones %}
             {% for c in comunicaciones %}
             <div class="comm-item" onclick="location.href='/{{ slug }}/rector/comunicaciones/{{ c.id }}'">
-                <div class="comm-priority" style="background:{% if c.prioridad == 'urgente' %}var(--red){% elif c.prioridad == 'alta' %}var(--yellow){% elif c.prioridad == 'normal' %}var(--blue){% else %}var(--sub){% endif %};"></div>
+                <div class="comm-priority" style="background:{% if c.prioridad == 'urgente' %}var(--danger){% elif c.prioridad == 'alta' %}var(--warning){% elif c.prioridad == 'normal' %}var(--blue){% else %}var(--sub){% endif %};"></div>
                 <div class="comm-body">
                     <div class="comm-title">{{ c.titulo[:50] }}{% if c.titulo|length > 50 %}...{% endif %}</div>
                     <div class="comm-meta">
@@ -382,10 +382,10 @@ html{scroll-behavior:smooth;}
             <div class="summary-row">
                 <span class="summary-item"><span class="dot" style="background:var(--accent);"></span> {{ total_estudiantes if total_estudiantes > 0 else 0 }} estudiantes</span>
                 <span class="summary-item"><span class="dot" style="background:var(--blue);"></span> {{ total_profesores if total_profesores > 0 else 0 }} profesores</span>
-                <span class="summary-item"><span class="dot" style="background:var(--green);"></span> {{ total_cursos if total_cursos > 0 else 0 }} cursos</span>
-                <span class="summary-item"><span class="dot" style="background:var(--yellow);"></span> {{ total_materias if total_materias > 0 else 0 }} materias</span>
+                <span class="summary-item"><span class="dot" style="background:var(--success);"></span> {{ total_cursos if total_cursos > 0 else 0 }} cursos</span>
+                <span class="summary-item"><span class="dot" style="background:var(--warning);"></span> {{ total_materias if total_materias > 0 else 0 }} materias</span>
                 <span class="summary-item"><span class="dot" style="background:#14B8A6;"></span> {{ total_directoras if total_directoras > 0 else 0 }} directores</span>
-                <span class="summary-item"><span class="dot" style="background:var(--red);"></span> {{ asistencia_hoy if asistencia_hoy > 0 else 0 }} asistencias hoy</span>
+                <span class="summary-item"><span class="dot" style="background:var(--danger);"></span> {{ asistencia_hoy if asistencia_hoy > 0 else 0 }} asistencias hoy</span>
             </div>
         </div>
     </div>

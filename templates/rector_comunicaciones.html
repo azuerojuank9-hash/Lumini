@@ -12,13 +12,13 @@
 .filter-btn{padding:6px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--bg3);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;text-decoration:none;font-family:'Inter',sans-serif;transition:all var(--tr);}
 .filter-btn:hover{border-color:var(--accent);color:var(--text);}
 .filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-.com-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:18px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;transition:all var(--tr);}
+.com-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;transition:all var(--tr);}
 .com-card:hover{border-color:rgba(var(--accent-rgb),.2);box-shadow:0 2px 8px rgba(0,0,0,.1);}
 .com-priority{width:4px;height:40px;border-radius:2px;flex-shrink:0;margin-top:2px;}
 .com-priority.baja{background:var(--sub);}
-.com-priority.normal{background:var(--blue);}
-.com-priority.alta{background:var(--yellow);}
-.com-priority.urgente{background:var(--red);}
+.com-priority.normal{background:var(--info);}
+.com-priority.alta{background:var(--warning);}
+.com-priority.urgente{background:var(--danger);}
 .com-body{flex:1;min-width:0;}
 .com-title{font-size:14px;font-weight:600;color:var(--text);text-decoration:none;}
 .com-title:hover{color:var(--accent);}
@@ -27,8 +27,8 @@
 .com-footer{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
 .status-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:4px;}
 .status-borrador{background:rgba(100,116,139,.1);color:var(--sub);}
-.status-programado{background:rgba(37,99,235,.1);color:var(--blue);}
-.status-publicado{background:rgba(34,197,94,.1);color:var(--green);}
+.status-programado{background:rgba(37,99,235,.1);color:var(--info);}
+.status-publicado{background:rgba(34,197,94,.1);color:var(--success);}
 .status-archivado{background:rgba(100,116,139,.05);color:var(--muted);}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
 .empty-state .icon{font-size:48px;opacity:.2;margin-bottom:16px;color:var(--accent);}
@@ -68,7 +68,7 @@
     <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
     {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
     <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>

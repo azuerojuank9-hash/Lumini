@@ -7,15 +7,15 @@
 .topbar{margin-bottom:20px;}
 .topbar h1{font-size:20px;font-weight:700;}
 .topbar .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:20px;}
-.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rmd);padding:20px;text-align:center;}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;text-align:center;}
 .stat-card .icon{font-size:24px;margin-bottom:8px;}
 .stat-card .num{font-size:28px;font-weight:800;color:var(--text);}
 .stat-card .label{font-size:11px;color:var(--muted);margin-top:4px;}
 .stat-card.purple .icon{color:var(--accent);}
-.stat-card.blue .icon{color:var(--blue);}
-.stat-card.green .icon{color:var(--green);}
+.stat-card.blue .icon{color:var(--info);}
+.stat-card.green .icon{color:var(--success);}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
@@ -52,7 +52,7 @@
     <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
     {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
     <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--red);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="name">{{ rector.nombre }}</div>

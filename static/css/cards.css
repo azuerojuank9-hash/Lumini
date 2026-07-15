@@ -23,3 +23,4 @@
 .kpi-value { font-size: 28px; font-weight: 800; line-height: 1.1; }
 .kpi-label { font-size: var(--font-xs); color: var(--muted); margin-top: 4px; }
 .kpi-icon { width: 40px; height: 40px; margin: 0 auto 12px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+.stats-card-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }

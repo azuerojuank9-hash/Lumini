@@ -11,7 +11,7 @@ th.sort-desc::after { content: '▼'; opacity: 1; color: var(--accent); }
 td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: var(--bg3); }
-tr.selected td { background: rgba(124,58,237,.08); }
+tr.selected td { background: rgba(var(--accent-rgb),.08); }
 .table-sticky th { position: sticky; top: 0; z-index: 1; }
 .table-compact td, .table-compact th { padding: 6px 10px; font-size: var(--font-xs); }
 .table-striped tbody tr:nth-child(even) td { background: var(--bg3); }
