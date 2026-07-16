@@ -3,43 +3,6 @@
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
-/* -- LUMINI Design System --------------------------------------------- */
-:root {
-  --bg: #080B14;
-  --bg2: #0F172A;
-  --bg3: #1E293B;
-  --bg4: #334155;
-  --border: rgba(255,255,255,.06);
-  {{ accent_css(colegio) }}
-  --blue: #2563EB;
-  --blue-rgb: 37,99,235;
-  --text: #F8FAFC;
-  --muted: #94A3B8;
-  --sub: #64748B;
-  --green: #22C55E;
-  --red: #EF4444;
-  --yellow: #EAB308;
-  --rsm: 6px;
-  --rmd: 10px;
-  --rlg: 14px;
-  --tr: .2s cubic-bezier(.4,0,.2,1);
-  --sidebar: 200px;
-  --shadow: 0 1px 3px rgba(0,0,0,.15);
-  --shadow-lg: 0 4px 20px rgba(0,0,0,.2);
-}
-  --bg: #F8FAFC;
-  --bg2: #FFFFFF;
-  --bg3: #F1F5F9;
-  --bg4: #E2E8F0;
-  --border: rgba(0,0,0,.08);
-  --text: #0F172A;
-  --muted: #64748B;
-  --sub: #94A3B8;
-  --shadow: 0 1px 3px rgba(0,0,0,.06);
-  --shadow-lg: 0 4px 16px rgba(0,0,0,.08);
-}
-
-/* -- Reset & Base ----------------------------------------------------- */
 html{scroll-behavior:smooth;}
 
 /* -- Sidebar ---------------------------------------------------------- */
@@ -63,58 +26,43 @@ html{scroll-behavior:smooth;}
 .slabel{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-weight:600;}
 .sval{font-size:1.4rem;font-weight:700;letter-spacing:-.4px;}
 
-/* -- Cards (unified) -------------------------------------------------- */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:all var(--tr);}
-.card:hover{box-shadow:var(--shadow-lg);}
-.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;min-height:44px;}
-.card-title{font-size:12px;font-weight:600;color:var(--text);}
-.card-body{padding:14px 16px;flex:1;}
 
-/* -- Forms & Inputs --------------------------------------------------- */
-.finput{padding:8px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;transition:all var(--tr);}
-.finput:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-.fi{display:flex;gap:8px;flex-wrap:wrap;}
 
-/* -- Buttons ---------------------------------------------------------- */
-.bsm{padding:8px 16px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;min-height:36px;transition:all var(--tr);display:inline-flex;align-items:center;gap:6px;touch-action:manipulation;}
-.bsm:active{transform:scale(.96);}
-.badd{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 12px rgba(var(--accent-rgb),.25);}
-.badd:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(var(--accent-rgb),.35);}
-.bdel{background:rgba(239,68,68,.08);color:var(--danger);border:1px solid rgba(239,68,68,.2);}
-.bdel:hover{background:rgba(239,68,68,.2);}
+
+
+
 
 /* -- Dashboard -------------------------------------------------------- */
-.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow);animation:fadeSlideIn .4s ease;}
+.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px;box-shadow:var(--shadow);animation:fadeSlideIn .4s ease;}
 @keyframes fadeSlideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
-.dash-greeting{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
-.dash-greeting h1{font-size:24px;font-weight:800;letter-spacing:-.6px;background:linear-gradient(135deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.dash-greeting{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.dash-greeting h1{font-size:22px;font-weight:800;letter-spacing:-.5px;color:var(--text);}
 .dash-greeting .date{font-size:12px;color:var(--muted);margin-top:4px;}
 .dash-greeting .school-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);font-size:12px;color:var(--muted);}
 
-.dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
-.dash-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 18px 18px;transition:all .25s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.dash-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 16px 14px;transition:all .25s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;}
 .dash-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-lg) var(--radius-lg) 0 0;}
 .dash-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.2);border-color:rgba(var(--accent-rgb),.2);}
 .dash-card.purple::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
 .dash-card.blue::before{background:linear-gradient(90deg,var(--blue),#1D4ED8);}
 .dash-card.green::before{background:linear-gradient(90deg,var(--success),#16A34A);}
 .dash-card.orange::before{background:linear-gradient(90deg,#F59E0B,#D97706);}
-.dash-card .icon-wrap{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;}
+.dash-card .icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:16px;}
 .dash-card.purple .icon-wrap{background:rgba(109,40,217,.12);color:var(--accent);}
 .dash-card.blue .icon-wrap{background:rgba(37,99,235,.12);color:var(--blue);}
 .dash-card.green .icon-wrap{background:rgba(34,197,94,.12);color:var(--success);}
 .dash-card.orange .icon-wrap{background:rgba(245,158,11,.12);color:#F59E0B;}
-.dash-card .dval{font-size:1.8rem;font-weight:800;letter-spacing:-.7px;line-height:1.1;}
-.dash-card .dlabel{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
-.dash-card .dtag{font-size:11px;color:var(--sub);margin-top:3px;}
+.dash-card .dval{font-size:1.6rem;font-weight:800;letter-spacing:-.7px;line-height:1.1;}
+.dash-card .dlabel{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+.dash-card .dtag{font-size:10px;color:var(--sub);margin-top:2px;}
+@media(max-width:900px){.dash-cards{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.dash-cards{grid-template-columns:1fr;}}
 
-.quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
-.qaction{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;transition:all .2s ease;font-family:'Inter',sans-serif;touch-action:manipulation;}
-.qaction:hover{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.25);color:var(--accent);transform:translateY(-1px);}
-.qaction.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
-.qaction.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.35);}
-.dash-divider{height:1px;background:var(--border);margin:0 0 18px 0;border:none;}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+.dash-divider{height:1px;background:var(--border);margin:0 0 14px 0;border:none;}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:640px){.dash-grid{grid-template-columns:1fr;}}
 .dash-section{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all .2s ease;}
 .dash-section:hover{border-color:rgba(var(--accent-rgb),.12);}
 .dash-section-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;}
@@ -139,19 +87,30 @@ html{scroll-behavior:smooth;}
 /* -- Tables ----------------------------------------------------------- */
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0 0 var(--radius-md) var(--radius-md);}
 table{border-collapse:collapse;min-width:100%;font-size:12px;}
-th{padding:8px 6px;text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3);position:sticky;top:0;font-weight:600;vertical-align:middle;}
-th.tnombre{text-align:left;min-width:140px;}
+th{padding:8px 7px;text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3);position:sticky;top:0;font-weight:600;vertical-align:middle;}
+th.tnombre{text-align:left;min-width:150px;}
 td{padding:7px 5px;border-bottom:1px solid rgba(255,255,255,.04);text-align:center;vertical-align:middle;transition:background var(--tr);}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .tnum{color:var(--sub);font-size:10px;width:24px;font-weight:500;}
 .tnombrecell{text-align:left;font-weight:500;cursor:pointer;transition:color var(--tr);font-size:12px;}
 .tnombrecell:hover{color:var(--accent);}
-.ni{width:38px;padding:5px 4px;background:var(--bg3);border:1.5px solid var(--border);border-radius:5px;color:var(--text);font-size:11px;text-align:center;font-family:'Inter',sans-serif;transition:all var(--tr);}
+.ni{width:42px;padding:5px 4px;background:var(--bg3);border:1.5px solid var(--border);border-radius:5px;color:var(--text);font-size:11px;text-align:center;font-family:'Inter',sans-serif;transition:all var(--tr);}
 .ni:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.1);}
 .ni.guardado{border-color:var(--success);box-shadow:0 0 0 3px rgba(34,197,94,.12);}
 .pc{font-weight:700;font-size:12px;}
 .ph{color:var(--success);}.pm{color:var(--warning);}.pb{color:var(--danger);}
+th.th-eval,th.th-autoev{font-weight:600;color:var(--text);background:rgba(var(--accent-rgb),.04);}
+th.th-prom{font-weight:700;color:var(--text);background:rgba(var(--accent-rgb),.06);border-left:2px solid rgba(var(--accent-rgb),.2);min-width:44px;}
+th.th-nf{font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:11px;letter-spacing:.08em;min-width:50px;}
+th.th-eval{border-left:1px solid rgba(var(--accent-rgb),.12);}
+.prom-cell{background:rgba(var(--accent-rgb),.03);border-left:2px solid rgba(var(--accent-rgb),.1);}
+.nf-cell{background:rgba(var(--accent-rgb),.06);border-left:2px solid var(--accent);font-size:13px;font-weight:700;}
+th.th-nf .tip-wrap{color:#fff;}
+th.th-nf .info-icon{background:rgba(255,255,255,.25);color:#fff;}
+.th-pct{font-size:9px;font-weight:400;opacity:.7;display:block;line-height:1.2;}
+.del-act-btn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;color:var(--danger);border:1px solid rgba(239,68,68,.2);background:none;cursor:pointer;transition:all var(--tr);font-size:12px;}
+.del-act-btn:hover{background:rgba(239,68,68,.1);border-color:var(--danger);}
 
 /* -- Locked period ---------------------------------------------------- */
 .td-locked{position:relative;}
@@ -161,7 +120,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 
 /* -- Attendance ------------------------------------------------------- */
 .asist-wrap{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:nowrap;}
-.asist-badge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;font-size:11px;font-weight:800;transition:all .2s ease;}
+.asist-badge{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:800;transition:all .2s ease;}
 .asist-badge.bp{background:linear-gradient(135deg,var(--success),#16A34A);color:#fff;}
 .asist-badge.ba{background:linear-gradient(135deg,var(--danger),#DC2626);color:#fff;}
 .asist-badge.bt{background:linear-gradient(135deg,var(--warning),#CA8A04);color:#fff;}
@@ -184,7 +143,6 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .abtn.as{background:rgba(251,146,60,.10);color:#FB923C;border:1px solid rgba(251,146,60,.18);}
 .abtn.as:hover,.abtn.active.as{background:linear-gradient(135deg,#FB923C,#F97316);color:#fff;border-color:transparent;}
 .abtn.at:hover,.abtn.active.at{background:linear-gradient(135deg,var(--warning),#CA8A04);color:#fff;border-color:transparent;}
-.btable{padding:5px 10px;font-size:10px;min-height:28px;}
 
 /* -- Overlay / Modal -------------------------------------------------- */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;animation:fadeIn .15s ease;}
@@ -374,6 +332,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 /* -- Detail card ------------------------------------------------------- */
 .detail-row td{padding:0 !important;border:none !important;}
 .detail-card{background:var(--bg3);border-top:1px solid var(--border);padding:16px 20px;animation:fadeSlideIn .25s ease;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:768px){.detail-card{grid-template-columns:1fr;}}
 .detail-card .dc-section{background:var(--bg2);border-radius:var(--radius-sm);padding:12px 14px;border:1px solid var(--border);}
 .detail-card .dc-title{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:8px;}
 .detail-card .dc-item{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;color:var(--muted);}
@@ -421,6 +380,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .tl-empty{padding:24px;text-align:center;color:var(--muted);font-size:14px;}
 {% endblock %}
 
+{% block sidebar %}{% include "components/sidebar_teacher.html" %}{% endblock %}
+
 {% block content %}
 <div class="dash-wrap">
 <div class="dash-greeting">
@@ -435,7 +396,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 
 <div class="dash-cards fade-in fade-in-d1">
     <div class="dash-card purple">
-        <div class="icon-wrap"><i data-lucide="users" style="width:20px;height:20px;"></i></div>
+        <div class="icon-wrap"><i data-lucide="users" ></i></div>
         <div class="dval">{{ estudiantes|length }}</div>
         <div class="dlabel">Estudiantes</div>
         <div class="dash-trend up">+{{ (estudiantes|length * 0.12)|int if estudiantes else 0 }}% vs mes ant.</div>
@@ -445,7 +406,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         </div>
     </div>
     <div class="dash-card blue">
-        <div class="icon-wrap"><i data-lucide="book-open" style="width:20px;height:20px;"></i></div>
+        <div class="icon-wrap"><i data-lucide="book-open" ></i></div>
         <div class="dval">{{ mis_cursos|length }}</div>
         <div class="dlabel">Cursos</div>
         <div class="dtag">asignados este periodo</div>
@@ -456,7 +417,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         </div>
     </div>
     <div class="dash-card green">
-        <div class="icon-wrap"><i data-lucide="calendar-check" style="width:20px;height:20px;"></i></div>
+        <div class="icon-wrap"><i data-lucide="calendar-check" ></i></div>
         <div class="dval">{{ asistencia_hoy }}</div>
         <div class="dlabel">Asistencia hoy</div>
         <div class="dtag">de {{ estudiantes|length }} estudiantes</div>
@@ -467,7 +428,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         </div>
     </div>
     <div class="dash-card orange">
-        <div class="icon-wrap"><i data-lucide="clipboard-list" style="width:20px;height:20px;"></i></div>
+        <div class="icon-wrap"><i data-lucide="clipboard-list" ></i></div>
         <div class="dval">{{ notas_pend if notas_pend else '0' }}</div>
         <div class="dlabel">Notas pendientes</div>
         <div class="dtag">por registrar</div>
@@ -482,10 +443,10 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 </div>
 
 <div class="quick-actions">
-    <a href="#notas-card" class="qaction primary"><i data-lucide="plus-circle"></i> Registrar notas</a>
-    <a href="#agenda-card" class="qaction"><i data-lucide="list-checks"></i> Agregar trabajo</a>
-    <a href="/{{ slug }}/horarios" class="qaction"><i data-lucide="calendar"></i> Ver horario</a>
-    <a href="/{{ slug }}/archivados" class="qaction"><i data-lucide="archive"></i> Archivados</a>
+    <a href="#notas-card" class="btn btn-primary"><i data-lucide="plus-circle"></i> Registrar notas</a>
+    <a href="#agenda-card" class="btn btn-secondary"><i data-lucide="list-checks"></i> Agregar trabajo</a>
+    <a href="/{{ slug }}/horarios" class="btn btn-secondary"><i data-lucide="calendar"></i> Ver horario</a>
+    <a href="/{{ slug }}/archivados" class="btn btn-secondary"><i data-lucide="archive"></i> Archivados</a>
 </div>
 
 <hr class="dash-divider">
@@ -796,9 +757,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="curso" value="{{ curso_sel }}">
             <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
-            <div class="fi">
-                <input class="finput" type="text" name="nombre" placeholder="Nombre completo" required style="flex:1;min-width:140px;">
-                <button type="submit" class="bsm badd">Agregar</button>
+<div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <input class="form-input" type="text" name="nombre" placeholder="Nombre completo" required style="flex:1;min-width:140px;">
+                <button type="submit" class="btn btn-primary">Agregar</button>
             </div>
         </form>
         <p style="font-size:11px;color:var(--muted);margin-top:5px;">Se ordenan alfabéticamente automáticamente.</p>
@@ -811,10 +772,10 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         <form method="POST" action="/{{ slug }}/nuevo_trabajo">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
-            <div class="fi" style="margin-bottom:12px;">
-                <input class="finput" type="text" name="titulo" placeholder="Título del trabajo/evaluación" required style="flex:1;min-width:150px;">
-                <input class="finput" type="date" name="fecha" required>
-                <button type="submit" class="bsm badd">Agregar</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                <input class="form-input" type="text" name="titulo" placeholder="Título del trabajo/evaluación" required style="flex:1;min-width:150px;">
+                <input class="form-input" type="date" name="fecha" required>
+                <button type="submit" class="btn btn-primary">Agregar</button>
             </div>
         </form>
         {% if compromisos %}
@@ -823,7 +784,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                 <div><span style="font-weight:500">{{ t.titulo }}</span><span style="font-size:10px;color:var(--muted);margin-left:7px">{{ t.materia }}</span></div>
                 <div style="display:flex;align-items:center;gap:7px;">
                     <span class="agfecha">{{ t.fecha }}</span>
-                    <form action="/{{ slug }}/borrar_trabajo/{{ t.id }}" method="POST" style="display:inline"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="bsm bdel" style="font-size:10px;padding:3px 8px;border:none;cursor:pointer;">??</button></form>
+                    <form action="/{{ slug }}/borrar_trabajo/{{ t.id }}" method="POST" style="display:inline"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-danger btn-sm">&#10005;</button></form>
                 </div>
             </div>
             {% endfor %}
@@ -838,9 +799,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 </div>
 
 <div class="panel-tabs">
-    <button class="ptab active" onclick="switchPanel('notas')"><i data-lucide="edit-3" style="width:14px;height:14px;"></i> Notas</button>
-    <button class="ptab" onclick="switchPanel('asistencia')"><i data-lucide="calendar-check" style="width:14px;height:14px;"></i> Asistencia</button>
-    <button class="ptab" onclick="switchPanel('observaciones')"><i data-lucide="eye" style="width:14px;height:14px;"></i> Observaciones</button>
+    <button class="ptab active" onclick="switchPanel('notas')"><i data-lucide="edit-3" ></i> Notas</button>
+    <button class="ptab" onclick="switchPanel('asistencia')"><i data-lucide="calendar-check" ></i> Asistencia</button>
+    <button class="ptab" onclick="switchPanel('observaciones')"><i data-lucide="eye" ></i> Observaciones</button>
 </div>
 
 <div id="panelNotas">
@@ -851,8 +812,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
             <input type="hidden" name="periodo_sel" value="{{ periodo_sel }}">
-            <input class="finput" type="text" name="nombre" placeholder="Nueva actividad..." style="width:170px;font-size:12px;padding:6px 10px;" {% if periodo_cerrado %}disabled{% endif %}>
-            <button type="submit" class="bsm badd" {% if periodo_cerrado %}disabled style="opacity:.5;cursor:not-allowed;"{% endif %}>+ Actividad</button>
+            <input class="form-input" type="text" name="nombre" placeholder="Nueva actividad..." style="width:170px;" {% if periodo_cerrado %}disabled{% endif %}>
+            <button type="submit" class="btn btn-primary" {% if periodo_cerrado %}disabled{% endif %}>+ Actividad</button>
         </form>
     </div>
     <div class="tw zebra">
@@ -862,16 +823,16 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                     <th style="width:28px">#</th>
                     <th class="tnombre">Estudiante</th>
                     {% for act in actividades %}
-                    <th>{{ act.nombre if act.nombre else 'Act. ' ~ loop.index }}{% if not periodo_cerrado %}<form action="/{{ slug }}/borrar_actividad/{{ act.id }}" method="POST" style="display:inline;margin-left:3px;" onsubmit="return confirm('¿Borrar actividad?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" style="color:var(--danger);font-size:9px;border:none;background:none;cursor:pointer;padding:0;">?</button></form>{% endif %}</th>
+                    <th>{{ act.nombre if act.nombre else 'Act. ' ~ loop.index }}{% if not periodo_cerrado %}<form action="/{{ slug }}/borrar_actividad/{{ act.id }}" method="POST" style="display:inline;margin-left:3px;" onsubmit="return confirm('¿Borrar actividad?')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="del-act-btn" title="Borrar actividad"><i data-lucide="x"></i></button></form>{% endif %}</th>
                     {% endfor %}
-                    <th>Eval.</th>
-                    <th>Autoev.</th>
-                    <th class="tip-wrap">Prom.<span class="tip"><div class="label">Promedio de actividades</div>Promedio simple de todas las actividades calificadas.<br>Las actividades vac&iacute;as no cuentan.<br><span style="color:var(--muted);font-size:11px;">Ej: (3.0 + 1.8) / 2 = 2.40</span></span></th>
-                    <th>N.Final<span class="tip-wrap"><span class="info-icon">i</span><span class="tip"><div class="label">Nota Final del Per&iacute;odo</div>Promedio Actividades &times; 65%<br>+ Evaluaci&oacute;n &times; 25%<br>+ Autoevaluaci&oacute;n &times; 10%</span></span></th>
-                    <th>Asist.</th>
-                    <th>Obs.</th>
-                    <th style="width:30px">Hist.</th>
-                    <th>Del</th>
+                    <th class="th-eval">Eval.<br><span class="th-pct">25%</span></th>
+                    <th class="th-autoev">Autoev.<br><span class="th-pct">10%</span></th>
+                    <th class="th-prom tip-wrap">Prom.<span class="tip"><div class="label">Promedio de actividades</div>Promedio simple de todas las actividades calificadas.<br>Las actividades vac&iacute;as no cuentan.<br><span style="color:var(--muted);font-size:11px;">Ej: (3.0 + 1.8) / 2 = 2.40</span></span></th>
+                    <th class="th-nf">N.Final<span class="tip-wrap"><span class="info-icon">i</span><span class="tip"><div class="label">Nota Final del Per&iacute;odo</div>Promedio Actividades &times; 65%<br>+ Evaluaci&oacute;n &times; 25%<br>+ Autoevaluaci&oacute;n &times; 10%</span></span></th>
+                    <th style="min-width:80px;">Asist.</th>
+                    <th style="width:40px">Obs.</th>
+                    <th style="width:36px">Hist.</th>
+                    <th style="width:36px">Del</th>
                 </tr>
             </thead>
             <tbody>
@@ -917,9 +878,9 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
                         </div>
                     </div>
                 </td>
-                <td><button class="bsm badd btable" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">{{ e.observaciones|length }}</button></td>
-                <td><button class="bsm binfo btable" onclick="abrirHistorial({{ e.id }})" title="Historial de notas"><i data-lucide="clock"></i></button></td>
-                <td><form action="/{{ slug }}/archivar_alumno/{{ e.id }}" method="POST" style="display:inline" onsubmit="return confirm('¿Archivar a {{ e.nombre }}? Sus datos se conservan.')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="bsm bdel btable"><i data-lucide="archive"></i></button></form></td>
+                <td><button class="btn btn-primary btn-sm" onclick="abrirObs({{ e.id }},'{{ e.nombre|replace("'", "\\'") }}')">{{ e.observaciones|length }}</button></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="abrirHistorial({{ e.id }})" title="Historial de notas"><i data-lucide="clock"></i></button></td>
+                <td><form action="/{{ slug }}/archivar_alumno/{{ e.id }}" method="POST" style="display:inline" onsubmit="return confirm('¿Archivar a {{ e.nombre }}? Sus datos se conservan.')"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="curso" value="{{ curso_sel }}"><button type="submit" class="btn btn-danger btn-sm"><i data-lucide="archive"></i></button></form></td>
             </tr>
             <tr class="detail-row" id="detail-{{ e.id }}" style="display:none;" data-aid="{{ e.id }}">
                 <td colspan="20">
@@ -979,7 +940,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 <div id="panelAsistencia" style="display:none;">
 <div class="card">
     <div class="card-head">
-        <span class="card-title"><i data-lucide="calendar-check" style="width:14px;height:14px;"></i> Asistencia &mdash; {{ curso_sel }} &middot; {{ materia }}</span>
+        <span class="card-title"><i data-lucide="calendar-check" ></i> Asistencia &mdash; {{ curso_sel }} &middot; {{ materia }}</span>
     </div>
     <div class="tw zebra">
         <table>
@@ -1024,7 +985,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 <div id="panelObservaciones" style="display:none;">
 <div class="card">
     <div class="card-head">
-        <span class="card-title"><i data-lucide="eye" style="width:14px;height:14px;"></i> Observaciones &mdash; {{ curso_sel }} &middot; {{ materia }}</span>
+        <span class="card-title"><i data-lucide="eye" ></i> Observaciones &mdash; {{ curso_sel }} &middot; {{ materia }}</span>
     </div>
     <div class="card-body">
         <div style="margin-bottom:14px;">
@@ -1054,7 +1015,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 <div class="grid-2col">
   <div class="card">
     <div class="card-head">
-      <span class="card-title"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i> Resumen del curso</span>
+      <span class="card-title"><i data-lucide="bar-chart-3" ></i> Resumen del curso</span>
       <span class="trend-badge up"><i data-lucide="trending-up" style="width:10px;height:10px;"></i> Activo</span>
     </div>
     <div class="card-body">
@@ -1080,13 +1041,13 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   </div>
   <div class="card">
     <div class="card-head">
-      <span class="card-title"><i data-lucide="zap" style="width:14px;height:14px;"></i> Acciones rápidas</span>
+      <span class="card-title"><i data-lucide="zap" ></i> Acciones rápidas</span>
     </div>
     <div class="card-body">
       <div class="quick-actions" style="margin:0;">
-        <a href="#notas-card" class="qaction primary" style="flex:1;" onclick="switchPanel('notas')"><i data-lucide="plus" style="width:14px;height:14px;"></i> Nueva actividad</a>
-        <a href="#centroComunicacion" class="qaction" style="flex:1;"><i data-lucide="megaphone" style="width:14px;height:14px;"></i> Comunicados</a>
-        <a href="#" onclick="switchPanel('asistencia');return false;" class="qaction" style="flex:1;"><i data-lucide="calendar-check" style="width:14px;height:14px;"></i> Asistencia</a>
+        <a href="#notas-card" class="btn btn-primary" style="flex:1;" onclick="switchPanel('notas')"><i data-lucide="plus"></i> Nueva actividad</a>
+        <a href="#centroComunicacion" class="btn btn-secondary" style="flex:1;"><i data-lucide="megaphone"></i> Comunicados</a>
+        <a href="#" onclick="switchPanel('asistencia');return false;" class="btn btn-secondary" style="flex:1;"><i data-lucide="calendar-check"></i> Asistencia</a>
       </div>
     </div>
   </div>
@@ -1141,7 +1102,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Motivo</label>
         <textarea id="sol-motivo" rows="3" placeholder="Indique el motivo de la solicitud..." style="width:100%;padding:8px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;resize:vertical;"></textarea>
     </div>
-    <button onclick="enviarSolicitud()" class="bsm badd" style="width:100%;padding:10px;font-size:13px;">
+    <button onclick="enviarSolicitud()" class="btn btn-primary btn-block">
         <i data-lucide="send"></i> Enviar solicitud
     </button>
 </div>

@@ -4,26 +4,16 @@
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
-*{margin:0;padding:0;box-sizing:border-box;}
-.main{margin-left:var(--sidebar);padding:20px 24px;max-width:1400px;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px;}
 .topbar-left h1{font-size:20px;font-weight:800;letter-spacing:-.03em;}
 .breadcrumb{font-size:11px;color:var(--muted);margin-top:2px;}
 .curso-tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;}
-.ctab{padding:6px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:all var(--tr);font-family:'Inter',sans-serif;}
+.ctab{padding:6px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:all var(--tr);font-family:inherit;}
 .ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;}
 .ctab:hover:not(.active){background:var(--bg3);color:var(--text);}
-.card{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg2);overflow:hidden;}
-.card-head{padding:12px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
-.card-title{display:flex;align-items:center;gap:6px;}
-.card-body{padding:14px 16px;}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-th{padding:8px 10px;text-align:left;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;border-bottom:1px solid var(--border);}
-td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
-tr:last-child td{border-bottom:none;}
 .tnum{width:32px;text-align:center;color:var(--muted);font-size:11px;}
 .tnombre{font-weight:600;color:var(--text);}
-.abtn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 12px;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s ease;min-height:32px;touch-action:manipulation;}
+.abtn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 12px;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s ease;min-height:32px;touch-action:manipulation;}
 .abtn:active{transform:scale(.88);}
 .abtn.ap{background:rgba(34,197,94,.10);color:var(--success);border:1px solid rgba(34,197,94,.18);}
 .abtn.ap:hover,.abtn.active.ap{background:linear-gradient(135deg,var(--success),#16A34A);color:#fff;border-color:transparent;}
@@ -39,10 +29,8 @@ tr:last-child td{border-bottom:none;}
 .abtn.as:hover,.abtn.active.as{background:linear-gradient(135deg,#FB923C,#F97316);color:#fff;border-color:transparent;}
 .asist-group{display:inline-flex;gap:3px;background:var(--bg3);padding:3px;border-radius:10px;border:1px solid var(--border);flex-wrap:wrap;max-width:360px;}
 .date-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
-.date-nav-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);text-decoration:none;}
-.date-nav-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--accent);}
 .date-display{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
-.date-input{font-family:'Inter',sans-serif;font-size:13px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);cursor:pointer;}
+.date-input{font-family:inherit;font-size:13px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);cursor:pointer;}
 .date-input:focus{outline:none;border-color:var(--accent);}
 .stats-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 .stat-card{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--bg2);flex:1;min-width:120px;}
@@ -56,12 +44,20 @@ tr:last-child td{border-bottom:none;}
 .stat-card .stat-icon.blue{background:rgba(59,130,246,.15);color:#3B82F6;}
 .stat-card .stat-icon.purple{background:rgba(168,85,247,.15);color:#A855F7;}
 .stat-card .stat-icon.orange{background:rgba(251,146,60,.15);color:#FB923C;}
+.stat-card .stat-icon.muted{background:var(--bg3);color:var(--muted);}
+.card-head-meta{font-size:11px;color:var(--muted);font-weight:400;}
+.stat-badges{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;}
+.stat-badge{padding:6px 14px;border-radius:8px;font-weight:700;}
+.stat-badge.success{background:rgba(34,197,94,.10);color:var(--success);}
+.stat-badge.danger{background:rgba(239,68,68,.10);color:var(--danger);}
+.stat-badge.warning{background:rgba(234,179,8,.10);color:var(--warning);}
+.sidebar-theme-btn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border-top:1px solid var(--border);margin-top:8px;border-radius:0;justify-content:flex-start;}
 .alerts-panel{padding:12px 16px;}
 .alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:6px;font-size:12px;}
 .alert-item.high{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);}
 .alert-item.medium{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.15);}
 .alert-item .alert-icon{width:20px;height:20px;flex-shrink:0;margin-top:1px;}
-.obs-input{font-family:'Inter',sans-serif;font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg3);color:var(--text);width:100%;max-width:180px;}
+.obs-input{font-family:inherit;font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg3);color:var(--text);width:100%;max-width:180px;}
 .obs-input:focus{outline:none;border-color:var(--accent);}
   .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
   .sidebar.open{transform:translateX(0);}
@@ -78,39 +74,7 @@ tr:last-child td{border-bottom:none;}
 }
 {% endblock %}
 
-{% block sidebar %}
-<nav class="sidebar" id="sidebar">
-  <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
-  <div class="sidebar-header">
-    {% if colegio and colegio.logo %}
-    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
-    {% else %}
-    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
-    {% endif %}
-    <div class="brand-text">
-      <div class="brand-name">LUMINI</div>
-      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div></div></div></a>
-  <div class="sidebar-nav">
-    <div class="sidebar-section">Navegación</div>
-    <a href="/{{ slug }}/" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Notas</span></a>
-    <a href="/{{ slug }}/asistencia" class="sidebar-item active"><span class="icon"><i data-lucide="calendar-check"></i></span><span>Asistencia</span></a>
-    <a href="/{{ slug }}/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horario</span></a>
-    <a href="/{{ slug }}/archivados" class="sidebar-item"><span class="icon"><i data-lucide="archive"></i></span><span>Archivados</span></a>
-    <a href="/{{ slug }}/transferir_curso" class="sidebar-item"><span class="icon"><i data-lucide="refresh-cw"></i></span><span>Transferir</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
-    <a href="/{{ slug }}/cambiar_password" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Perfil</span></a>
-    {% if materias_jornadas|length > 1 %}
-    <a href="/{{ slug }}/seleccionar" class="sidebar-item"><span class="icon"><i data-lucide="refresh-cw"></i></span><span>Cambiar materia</span></a>
-    {% endif %}
-    <a href="/{{ slug }}/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Salir</span></a>
-  </div>
-  <div class="sidebar-user">
-    <div class="name">{{ profesor.nombre }}</div>
-    <div class="role">{{ materia }} · {{ jornada }}</div>
-  </div>
-  <button onclick="toggleTheme()" style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border:none;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;border-top:1px solid var(--border);margin-top:8px;" aria-label="Cambiar tema"><i data-lucide="moon"></i> Cambiar tema</button>
-</nav>
-{% endblock %}
+{% block sidebar %}{% include "components/sidebar_teacher.html" %}{% endblock %}
 
 {% block content %}
 <div class="topbar">
@@ -119,7 +83,7 @@ tr:last-child td{border-bottom:none;}
     <div class="breadcrumb">{{ materia }} · {{ jornada }} · {{ profesor.nombre }}</div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;">
-    <a href="#" onclick="exportarExcel();return false;" class="date-nav-btn" style="font-size:12px;"><i data-lucide="file-spreadsheet" style="width:14px;height:14px;"></i> Excel</a>
+    <a href="#" onclick="exportarExcel();return false;" class="btn btn-secondary btn-sm"><i data-lucide="file-spreadsheet"></i> Excel</a>
   </div>
 </div>
 
@@ -133,11 +97,11 @@ tr:last-child td{border-bottom:none;}
 
 {% if curso_sel %}
 <div class="date-nav">
-  <a href="/{{ slug }}/asistencia?curso={{ curso_sel }}&fecha={{ fecha_sel_dia_anterior }}" class="date-nav-btn" id="btnPrev"><i data-lucide="chevron-left" style="width:14px;height:14px;"></i> Día anterior</a>
+  <a href="/{{ slug }}/asistencia?curso={{ curso_sel }}&fecha={{ fecha_sel_dia_anterior }}" class="btn btn-secondary btn-sm" id="btnPrev"><i data-lucide="chevron-left"></i> Día anterior</a>
   <span class="date-display" id="dateDisplay">{{ fecha_sel }}</span>
   <input type="date" id="datePicker" class="date-input" value="{{ fecha_sel }}" onchange="irAFecha(this.value)">
-  <a href="/{{ slug }}/asistencia?curso={{ curso_sel }}&fecha={{ fecha_sel_dia_siguiente }}" class="date-nav-btn" id="btnNext">Día siguiente <i data-lucide="chevron-right" style="width:14px;height:14px;"></i></a>
-  <a href="/{{ slug }}/asistencia?curso={{ curso_sel }}&fecha={{ hoy_fecha }}" class="date-nav-btn" style="margin-left:4px;">Hoy</a>
+  <a href="/{{ slug }}/asistencia?curso={{ curso_sel }}&fecha={{ fecha_sel_dia_siguiente }}" class="btn btn-secondary btn-sm" id="btnNext">Día siguiente <i data-lucide="chevron-right"></i></a>
+  <a href="/{{ slug }}/asistencia?curso={{ curso_sel }}&fecha={{ hoy_fecha }}" class="btn btn-secondary btn-sm" style="margin-left:4px;">Hoy</a>
 </div>
 
 <div class="stats-row" id="statsRow">
@@ -147,11 +111,11 @@ tr:last-child td{border-bottom:none;}
   <div class="stat-card"><div class="stat-icon blue"><i data-lucide="file-text"></i></div><div class="stat-info"><span class="stat-num" id="statE">0</span><span class="stat-label">Excusas</span></div></div>
   <div class="stat-card"><div class="stat-icon purple"><i data-lucide="check-square"></i></div><div class="stat-info"><span class="stat-num" id="statX">0</span><span class="stat-label">Permisos</span></div></div>
   <div class="stat-card"><div class="stat-icon orange"><i data-lucide="log-out"></i></div><div class="stat-info"><span class="stat-num" id="statS">0</span><span class="stat-label">Salidas</span></div></div>
-  <div class="stat-card"><div class="stat-icon" style="background:var(--bg3);color:var(--muted);"><i data-lucide="users"></i></div><div class="stat-info"><span class="stat-num" id="statTotal">{{ estudiantes|length }}</span><span class="stat-label">Total</span></div></div>
+  <div class="stat-card"><div class="stat-icon muted"><i data-lucide="users"></i></div><div class="stat-info"><span class="stat-num" id="statTotal">{{ estudiantes|length }}</span><span class="stat-label">Total</span></div></div>
 </div>
 
 <div class="card">
-  <div class="card-head"><span class="card-title"><i data-lucide="users" style="width:14px;height:14px;"></i> Estudiantes · {{ curso_sel }}</span> <span style="font-size:11px;color:var(--muted);font-weight:400;" id="horaDisplay">Hoy: {{ hoy_hora }}</span></div>
+  <div class="card-head"><span class="card-title"><i data-lucide="users"></i> Estudiantes · {{ curso_sel }}</span> <span class="card-head-meta" id="horaDisplay">Hoy: {{ hoy_hora }}</span></div>
   <div class="card-body" style="padding:0;">
     <div style="overflow-x:auto;">
     <table>
@@ -194,19 +158,19 @@ tr:last-child td{border-bottom:none;}
 
 {% if stats and stats.total > 0 %}
 <div class="card" style="margin-top:16px;">
-  <div class="card-head"><span class="card-title"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i> Estadísticas del curso</span></div>
+  <div class="card-head"><span class="card-title"><i data-lucide="bar-chart-3"></i> Estadísticas del curso</span></div>
   <div class="card-body">
-    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;">
-      <span style="padding:6px 14px;border-radius:8px;background:rgba(34,197,94,.10);color:var(--success);font-weight:700;">{{ stats.porcentaje_asistencia }}% Asistencia</span>
-      <span style="padding:6px 14px;border-radius:8px;background:rgba(239,68,68,.10);color:var(--danger);font-weight:700;">{{ stats.porcentaje_inasistencia }}% Inasistencia</span>
-      <span style="padding:6px 14px;border-radius:8px;background:rgba(234,179,8,.10);color:var(--warning);font-weight:700;">{{ stats.porcentaje_tardanzas }}% Tardanzas</span>
+    <div class="stat-badges">
+      <span class="stat-badge success">{{ stats.porcentaje_asistencia }}% Asistencia</span>
+      <span class="stat-badge danger">{{ stats.porcentaje_inasistencia }}% Inasistencia</span>
+      <span class="stat-badge warning">{{ stats.porcentaje_tardanzas }}% Tardanzas</span>
     </div>
   </div>
 </div>
 {% endif %}
 
 <div class="card" style="margin-top:16px;" id="alertasCard">
-  <div class="card-head"><span class="card-title"><i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Alertas</span><span id="alertCount" style="font-size:11px;color:var(--muted);font-weight:400;">Cargando...</span></div>
+  <div class="card-head"><span class="card-title"><i data-lucide="alert-triangle"></i> Alertas</span><span class="card-head-meta" id="alertCount">Cargando...</span></div>
   <div class="alerts-panel" id="alertasContent">
     <div style="text-align:center;padding:16px;color:var(--muted);font-size:13px;">Cargando alertas...</div>
   </div>

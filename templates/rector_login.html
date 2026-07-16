@@ -1,239 +1,277 @@
 {% extends "base.html" %}
 {% block title %}Rector — {{ colegio.nombre if colegio else slug }}{% endblock %}
-
+{% block main_attrs %} class="main main-full"{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block hamburger %}{% endblock %}
+{% block sidebar_overlay %}{% endblock %}
+{% block theme_toggle %}{% endblock %}
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
-body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.08) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
-        .bg-orb{position:fixed;border-radius:50%;filter:blur(100px);opacity:.15;animation:float 10s ease-in-out infinite;pointer-events:none;}
-        .orb1{width:450px;height:450px;background:var(--accent);top:-120px;left:-120px;animation-delay:0s;}
-        .orb2{width:300px;height:300px;background:var(--accent2);bottom:-80px;right:-80px;animation-delay:4s;}
-        @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-25px) scale(1.03);}}
-        .logo-wrap{margin-bottom:8px;text-align:center;}
-        .logo-wrap img{height:90px;width:90px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px rgba(var(--accent-rgb),.5),0 8px 40px rgba(var(--accent-rgb),.2);transition:transform var(--tr);}
-        .logo-wrap img:hover{transform:scale(1.05);}
-        .brand{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:5px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
-        .subtitle{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;margin-bottom:10px;text-align:center;}
-        .badge-rector{display:inline-flex;align-items:center;gap:6px;background:rgba(var(--accent-rgb),.1);border:1px solid rgba(var(--accent-rgb),.2);border-radius:99px;padding:5px 16px;font-size:12px;color:var(--accent);margin-bottom:18px;font-weight:500;}
-        .tabs{display:flex;background:#0F172A;border:1px solid #1E293B;border-radius:var(--radius-md);padding:4px;margin-bottom:18px;width:100%;max-width:480px;}
-        .tab-btn{flex:1;padding:8px 4px;background:none;border:none;border-radius:var(--radius-sm);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all var(--tr);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
-        .tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 12px rgba(var(--accent-rgb),.25);}
-        .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:480px;backdrop-filter:blur(20px);box-shadow:0 4px 30px rgba(0,0,0,.3);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
-        @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-        .section{display:none;}
-        .section.active{display:block;}
-        .field{margin-bottom:14px;}
-        .field label{display:block;font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:600;}
-        .field input,.field select{width:100%;padding:11px 14px;background:#0F172A;border:1.5px solid #1E293B;border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;transition:border-color var(--tr),box-shadow var(--tr);}
-        .field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-        .field input::placeholder{color:var(--sub);}
-        .field select option{background:#0F172A;}
-        .pass-wrapper{position:relative;}
-        .pass-wrapper input{padding-right:2.5rem;width:100%;}
-        .toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);font-size:1.1rem;transition:color var(--tr);display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;}
-        .toggle-pass:hover{color:var(--accent);}
-        .btn-submit{width:100%;padding:8px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);}
-        .btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(var(--accent-rgb),.3);}
-        .btn-submit:active{transform:scale(.98);}
-        .alert{padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;}
-        .alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;}
-        .alert-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10B981;}
-        .forgot-link{display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--accent);text-decoration:none;transition:opacity var(--tr);cursor:pointer;}
-        .forgot-link:hover{text-decoration:underline;opacity:.8;}
-        .back-link{display:block;text-align:center;margin-top:20px;font-size:12px;color:var(--muted);text-decoration:none;transition:color var(--tr);}
-        .back-link:hover{color:var(--accent);}
-        .divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--sub);font-size:11px;}
-        .divider::before,.divider::after{content:'';flex:1;height:1px;background:#1E293B;}
-        .pregunta-box{background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.5;}
-        .msg-error{display:none;margin-top:10px;padding:9px 12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;border-radius:var(--radius-sm);font-size:12px;}
-        .msg-ok{display:none;margin-top:10px;padding:9px 12px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#10B981;border-radius:var(--radius-sm);font-size:12px;}
-        .codigo-field{background:rgba(var(--accent-rgb),.06);border:1.5px solid rgba(var(--accent-rgb),.2);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:14px;}
-        .codigo-field label{display:block;font-size:10px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
-        .codigo-field input{width:100%;padding:11px 14px;background:#0F172A;border:1.5px solid rgba(var(--accent-rgb),.3);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;letter-spacing:1px;}
-        .codigo-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
-        .codigo-field .hint{font-size:11px;color:var(--sub);margin-top:6px;}
-        .pwd-strength{height:3px;border-radius:2px;margin-top:5px;transition:all .3s;background:#1E293B;}
-        .pwd-strength.weak{background:#EF4444;width:33%;}
-        .pwd-strength.medium{background:#F59E0B;width:66%;}
-        .pwd-strength.strong{background:#10B981;width:100%;}
-        .pwd-label{font-size:10px;color:var(--sub);margin-top:3px;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(120px);opacity:.12;animation:float 10s ease-in-out infinite;pointer-events:none}
+.orb1{width:500px;height:500px;background:var(--accent);top:-200px;left:-200px;animation-delay:0s}
+.orb2{width:400px;height:400px;background:var(--accent2);bottom:-150px;right:-150px;animation-delay:4s}
+.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.logo-wrap{margin-bottom:8px;text-align:center}
+.logo-wrap img{height:80px;width:80px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px rgba(var(--accent-rgb),.4),0 8px 40px rgba(0,0,0,.4);transition:transform var(--tr)}
+.logo-wrap img:hover{transform:scale(1.05)}
+.brand{font-size:1.5rem;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center}
+.subtitle{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px;margin-bottom:10px;text-align:center}
+.badge-role{display:inline-flex;align-items:center;gap:6px;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.2);border-radius:99px;padding:5px 16px;font-size:12px;color:var(--accent);margin-bottom:18px;font-weight:500}
+.login-tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-md);padding:4px;margin-bottom:18px;width:100%;max-width:480px}
+.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:480px;box-shadow:0 1px 4px rgba(0,0,0,.3);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both}
+.section{display:none}
+.section.active{display:block}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:var(--font-xs);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-weight:600}
+.pass-wrapper{position:relative}
+.pass-wrapper input{padding-right:2.5rem;width:100%}
+.toggle-pass{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);cursor:pointer;background:none;border:none;color:var(--sub);transition:color var(--tr);display:flex;align-items:center;justify-content:center;width:24px;height:24px}
+.toggle-pass:hover{color:var(--accent)}
+.forgot-link{display:block;text-align:right;margin-top:10px;font-size:12px;color:var(--accent);text-decoration:none;transition:opacity var(--tr);cursor:pointer}
+.forgot-link:hover{opacity:.8;text-decoration:underline}
+.back-link{display:block;text-align:center;margin-top:20px;font-size:12px;color:var(--muted);text-decoration:none;transition:color var(--tr)}
+.back-link:hover{color:var(--accent)}
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--sub);font-size:11px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.codigo-box{background:rgba(var(--accent-rgb),.06);border:1.5px solid rgba(var(--accent-rgb),.2);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:14px}
+.codigo-box label{display:block;font-size:var(--font-xs);color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-weight:700}
+.codigo-box .hint{font-size:11px;color:var(--sub);margin-top:6px}
+.pwd-bar{height:3px;border-radius:2px;margin-top:5px;transition:all .3s;background:var(--border)}
+.pwd-bar.weak{background:var(--danger);width:33%}
+.pwd-bar.medium{background:var(--warning);width:66%}
+.pwd-bar.strong{background:var(--success);width:100%}
+.pwd-label{font-size:var(--font-xs);color:var(--sub);margin-top:3px}
+.pregunta-box{background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.5}
+.msg-box{display:none;margin-top:10px;padding:9px 12px;border-radius:var(--radius-sm);font-size:12px}
+.msg-box.error{display:block;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--danger)}
+.msg-box.success{display:block;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--success)}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.04)}}
 {% endblock %}
-
 {% block content %}
 <div class="bg-orb orb1"></div>
 <div class="bg-orb orb2"></div>
-
-<a href="/{{ slug }}/rector/login" style="text-decoration:none;color:inherit;display:block;">
-<div class="logo-wrap">
+<div class="login-wrap">
+  <a href="/{{ slug }}/rector/login" class="logo-wrap" style="text-decoration:none;color:inherit;display:block">
     {% if colegio and colegio.logo %}
     <img src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
     {% else %}
     <img src="/static/lumini_logo.webp" alt="Lumini">
     {% endif %}
-</div>
-<div class="brand">LUMINI</div>
-</a>
-<p class="subtitle">{{ colegio.nombre if colegio else slug }}</p>
-<div class="badge-rector"><i data-lucide="graduation-cap"></i> Portal Rector</div>
-
-<div class="tabs">
-    <button class="tab-btn active" id="btn-login"     onclick="switchTab('login',this)"><i data-lucide="lock"></i> Ingresar</button>
-    <button class="tab-btn"        id="btn-registro"  onclick="switchTab('registro',this)"><i data-lucide="pen"></i> Registrarse</button>
-    <button class="tab-btn"        id="btn-recuperar" onclick="switchTab('recuperar',this)"><i data-lucide="key"></i> Recuperar</button>
-</div>
-
-<div class="card">
-    {% if error %}<div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>{% endif %}
-    {% if exito %}<div class="alert alert-success">{{ exito }}</div>{% endif %}
-
+  </a>
+  <div class="brand">LUMINI</div>
+  <p class="subtitle">{{ colegio.nombre if colegio else slug }}</p>
+  <div class="badge-role"><i data-lucide="graduation-cap" width="14" height="14"></i> Portal Rector</div>
+  <div class="login-tabs">
+    <button class="btn btn-sm btn-ghost active" style="flex:1" onclick="switchTab('login',this)"><i data-lucide="lock" width="14" height="14"></i> Ingresar</button>
+    <button class="btn btn-sm btn-ghost" style="flex:1" onclick="switchTab('registro',this)"><i data-lucide="pen" width="14" height="14"></i> Registrarse</button>
+    <button class="btn btn-sm btn-ghost" style="flex:1" onclick="switchTab('recuperar',this)"><i data-lucide="key" width="14" height="14"></i> Recuperar</button>
+  </div>
+  <div class="login-card">
+    {% if error %}<div class="alert alert-error mb-md"><i data-lucide="alert-triangle" width="14" height="14"></i> {{ error }}</div>{% endif %}
+    {% if exito %}<div class="alert alert-success mb-md">{{ exito }}</div>{% endif %}
     <div id="tab-login" class="section active">
-        <form method="POST" action="/{{ slug }}/rector/login">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <div class="field">
-                <label>Usuario</label>
-                <input type="text" name="usuario" placeholder="Tu usuario" required autocomplete="username" autofocus>
-            </div>
-            <div class="field">
-                <label>Contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-            <button type="submit" class="btn-submit">Ingresar <i data-lucide="arrow-right"></i></button>
-        </form>
-        <a href="#" class="forgot-link" onclick="switchTabById('recuperar');return false;">¿Olvidaste tu contraseña?</a>
+      <form method="POST" action="/{{ slug }}/rector/login">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+          <label>Usuario</label>
+          <input type="text" name="usuario" class="form-input" placeholder="Tu usuario" required autocomplete="username" autofocus>
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <div class="pass-wrapper">
+            <input type="password" name="password" class="form-input" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
+            <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye" width="16" height="16"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Ingresar <i data-lucide="arrow-right" width="14" height="14"></i></button>
+      </form>
+      <a href="#" class="forgot-link" onclick="switchTabById('recuperar');return false;">¿Olvidaste tu contraseña?</a>
     </div>
-
     <div id="tab-registro" class="section">
-        <form method="POST" action="/{{ slug }}/rector/registrar" onsubmit="return validarRegistro()">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-
-            <div class="field">
-                <label>Nombre completo</label>
-                <input type="text" name="nombre" id="reg-nombre" placeholder="Tu nombre completo" required>
-            </div>
-
-            <div class="field">
-                <label>Usuario</label>
-                <input type="text" name="usuario" id="reg-usuario" placeholder="ej: rector_colegio" required autocomplete="off">
-            </div>
-
-            <div class="field">
-                <label>Correo electrónico (opcional)</label>
-                <input type="email" name="email" placeholder="tu@correo.com">
-            </div>
-
-            <div class="field">
-                <label>Contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" name="password" id="reg-pwd"
-                           placeholder="Mínimo 6 caracteres" required minlength="6"
-                           oninput="checkPwd(this)">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-                <div class="pwd-strength" id="pwd-bar"></div>
-                <div class="pwd-label" id="pwd-label"></div>
-            </div>
-
-            <div class="field">
-                <label>Confirmar contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" name="confirmar_password" id="reg-pwd2"
-                           placeholder="Repite tu contraseña" required minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-
-            <div class="field">
-                <label>Jornada</label>
-                <select name="jornada" id="reg-jornada" required>
-                    <option value="" disabled selected>Selecciona tu jornada</option>
-                    <option value="Mañana">Mañana</option>
-                    <option value="Tarde">Tarde</option>
-                    <option value="Nocturna">Nocturna</option>
-                </select>
-            </div>
-
-            <div class="codigo-field">
-                <label><i data-lucide="key"></i> Código de invitación</label>
-                <input type="text" name="codigo_registro_rec" id="reg-codigo"
-                       placeholder="Código dado por el administrador" required autocomplete="off">
-                <p class="hint">El código lo entrega el administrador del colegio.</p>
-            </div>
-
-            <div class="divider">Pregunta secreta — para recuperar contraseña</div>
-
-            <div class="field">
-                <label>Pregunta secreta</label>
-                <select name="pregunta_secreta" id="reg-pregunta" required>
-                    <option value="" disabled selected>Selecciona una pregunta</option>
-                    <option>¿Cuál es el nombre de tu mascota?</option>
-                    <option>¿En qué ciudad naciste?</option>
-                    <option>¿Cuál es el nombre de tu colegio favorito?</option>
-                    <option>¿Cuál es tu comida favorita?</option>
-                    <option>¿Cuál es el nombre de tu mejor amigo(a)?</option>
-                    <option>¿Cuál es tu color favorito?</option>
-                    <option>¿Cuál es el nombre de tu madre?</option>
-                    <option>¿Cuál es tu deporte favorito?</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label>Respuesta secreta</label>
-                <input type="text" name="respuesta_secreta" id="reg-respuesta"
-                       placeholder="Tu respuesta (recuérdala bien)" required autocomplete="off">
-            </div>
-
-            <div id="reg-err" class="msg-error"></div>
-
-            <button type="submit" class="btn-submit" style="margin-top:8px;">Crear cuenta <i data-lucide="arrow-right"></i></button>
-        </form>
+      <form method="POST" action="/{{ slug }}/rector/registrar" onsubmit="return validarRegistro()">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+          <label>Nombre completo</label>
+          <input type="text" name="nombre" id="reg-nombre" class="form-input" placeholder="Tu nombre completo" required>
+        </div>
+        <div class="field">
+          <label>Usuario</label>
+          <input type="text" name="usuario" id="reg-usuario" class="form-input" placeholder="ej: rector_colegio" required autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Correo electrónico (opcional)</label>
+          <input type="email" name="email" class="form-input" placeholder="tu@correo.com">
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <div class="pass-wrapper">
+            <input type="password" name="password" id="reg-pwd" class="form-input" placeholder="Mínimo 6 caracteres" required minlength="6" oninput="checkPwd(this)">
+            <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye" width="16" height="16"></i></button>
+          </div>
+          <div class="pwd-bar" id="pwd-bar"></div>
+          <div class="pwd-label" id="pwd-label"></div>
+        </div>
+        <div class="field">
+          <label>Confirmar contraseña</label>
+          <div class="pass-wrapper">
+            <input type="password" name="confirmar_password" id="reg-pwd2" class="form-input" placeholder="Repite tu contraseña" required minlength="6">
+            <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye" width="16" height="16"></i></button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Jornada</label>
+          <select name="jornada" id="reg-jornada" class="form-select" required>
+            <option value="" disabled selected>Selecciona tu jornada</option>
+            <option value="Mañana">Mañana</option>
+            <option value="Tarde">Tarde</option>
+            <option value="Nocturna">Nocturna</option>
+          </select>
+        </div>
+        <div class="codigo-box">
+          <label><i data-lucide="key" width="12" height="12"></i> Código de invitación</label>
+          <input type="text" name="codigo_registro_rec" id="reg-codigo" class="form-input" placeholder="Código dado por el administrador" required autocomplete="off">
+          <p class="hint">El código lo entrega el administrador del colegio.</p>
+        </div>
+        <div class="divider">Pregunta secreta — para recuperar contraseña</div>
+        <div class="field">
+          <label>Pregunta secreta</label>
+          <select name="pregunta_secreta" id="reg-pregunta" class="form-select" required>
+            <option value="" disabled selected>Selecciona una pregunta</option>
+            <option>¿Cuál es el nombre de tu mascota?</option>
+            <option>¿En qué ciudad naciste?</option>
+            <option>¿Cuál es el nombre de tu colegio favorito?</option>
+            <option>¿Cuál es tu comida favorita?</option>
+            <option>¿Cuál es el nombre de tu mejor amigo(a)?</option>
+            <option>¿Cuál es tu color favorito?</option>
+            <option>¿Cuál es el nombre de tu madre?</option>
+            <option>¿Cuál es tu deporte favorito?</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Respuesta secreta</label>
+          <input type="text" name="respuesta_secreta" id="reg-respuesta" class="form-input" placeholder="Tu respuesta (recuérdala bien)" required autocomplete="off">
+        </div>
+        <div id="reg-err" class="msg-box error"></div>
+        <button type="submit" class="btn btn-primary btn-block">Crear cuenta <i data-lucide="arrow-right" width="14" height="14"></i></button>
+      </form>
     </div>
-
     <div id="tab-recuperar" class="section">
-        <p style="font-size:13px;color:#94A3B8;margin-bottom:18px;line-height:1.6;">
-            Ingresa tu usuario, responde tu pregunta secreta y crea una nueva contraseña.
-        </p>
-
-        <div id="rec-paso1">
-            <div class="field">
-                <label>Tu usuario</label>
-                <input type="text" id="rec-usuario" placeholder="ej: rector_colegio" autocomplete="username">
-            </div>
-            <button type="button" class="btn-submit" onclick="recBuscar()">Continuar <i data-lucide="arrow-right"></i></button>
-            <div id="rec-err1" class="msg-error"></div>
+      <p class="text-sm text-muted mb-md" style="line-height:1.6">Ingresa tu usuario, responde tu pregunta secreta y crea una nueva contraseña.</p>
+      <div id="rec-paso1">
+        <div class="field">
+          <label>Tu usuario</label>
+          <input type="text" id="rec-usuario" class="form-input" placeholder="ej: rector_colegio" autocomplete="username">
         </div>
-
-        <div id="rec-paso2" style="display:none;">
-            <div class="pregunta-box" id="rec-pregunta-txt"><i data-lucide="key"></i> ...</div>
-            <div class="field">
-                <label>Tu respuesta</label>
-                <input type="text" id="rec-respuesta" placeholder="Escribe tu respuesta..." autocomplete="off">
-            </div>
-            <div class="field">
-                <label>Nueva contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" id="rec-nueva" placeholder="Mínimo 6 caracteres" minlength="6">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-            <div class="field">
-                <label>Confirmar contraseña</label>
-                <div class="pass-wrapper">
-                    <input type="password" id="rec-confirmar" placeholder="Repite la contraseña">
-                    <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-                </div>
-            </div>
-            <button type="button" class="btn-submit" onclick="recCambiar()">Guardar nueva contraseña</button>
-            <div id="rec-err2" class="msg-error"></div>
-            <div id="rec-ok2"  class="msg-ok"></div>
-            <button type="button" onclick="recReset()"
-                style="background:none;border:none;color:#94A3B8;font-size:12px;margin-top:12px;cursor:pointer;width:100%;text-align:center;">
-                <i data-lucide="arrow-left"></i> Volver
-            </button>
+        <button type="button" class="btn btn-primary btn-block" onclick="recBuscar()">Continuar <i data-lucide="arrow-right" width="14" height="14"></i></button>
+        <div id="rec-err1" class="msg-box error"></div>
+      </div>
+      <div id="rec-paso2" style="display:none">
+        <div class="pregunta-box" id="rec-pregunta-txt"><i data-lucide="key" width="14" height="14"></i> ...</div>
+        <div class="field">
+          <label>Tu respuesta</label>
+          <input type="text" id="rec-respuesta" class="form-input" placeholder="Escribe tu respuesta..." autocomplete="off">
         </div>
+        <div class="field">
+          <label>Nueva contraseña</label>
+          <div class="pass-wrapper">
+            <input type="password" id="rec-nueva" class="form-input" placeholder="Mínimo 6 caracteres" minlength="6">
+            <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye" width="16" height="16"></i></button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Confirmar contraseña</label>
+          <div class="pass-wrapper">
+            <input type="password" id="rec-confirmar" class="form-input" placeholder="Repite la contraseña">
+            <button type="button" class="toggle-pass" onclick="togglePass(this)" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye" width="16" height="16"></i></button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary btn-block" onclick="recCambiar()">Guardar nueva contraseña</button>
+        <div id="rec-err2" class="msg-box error"></div>
+        <div id="rec-ok2" class="msg-box success"></div>
+        <button type="button" onclick="recReset()" class="btn btn-ghost btn-block mt-sm">Volver</button>
+      </div>
     </div>
+  </div>
+  <a href="/{{ slug }}/login" class="back-link"> Volver al login principal</a>
 </div>
-
-<a href="/{{ slug }}/login" class="back-link"><i data-lucide="arrow-left"></i> Volver al login principal</a>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+function switchTab(tabId,btn){
+ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+ document.getElementById('tab-'+tabId).classList.add('active');
+ document.querySelectorAll('.login-tabs .btn').forEach(b=>b.classList.remove('active'));
+ btn.classList.add('active');
+}
+function switchTabById(tabId){
+ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+ document.getElementById('tab-'+tabId).classList.add('active');
+ document.querySelectorAll('.login-tabs .btn').forEach(b=>b.classList.remove('active'));
+ document.querySelectorAll('.login-tabs .btn').forEach(function(b){
+  if(b.textContent.trim().toLowerCase().indexOf(tabId)!==-1||
+     b.textContent.trim().toLowerCase()==='ingresar'&&tabId==='login')b.classList.add('active');
+ });
+}
+function togglePass(btn){
+ var inp=btn.parentElement.querySelector('input');
+ if(inp.type==='password'){inp.type='text';btn.innerHTML='<i data-lucide="eye-off" width="16" height="16"></i>'}
+ else{inp.type='password';btn.innerHTML='<i data-lucide="eye" width="16" height="16"></i>'}
+ if(window.lucide)lucide.createIcons();
+}
+function checkPwd(inp){
+ var bar=document.getElementById('pwd-bar');var lbl=document.getElementById('pwd-label');var v=inp.value;
+ bar.className='pwd-bar';
+ if(v.length===0){lbl.textContent='';return}
+ if(v.length<6){bar.classList.add('weak');lbl.textContent='Débil — mínimo 6 caracteres';lbl.style.color='var(--danger)'}
+ else if(v.length<10&&!/[^a-zA-Z0-9]/.test(v)){bar.classList.add('medium');lbl.textContent='Media';lbl.style.color='var(--warning)'}
+ else{bar.classList.add('strong');lbl.textContent='Fuerte';lbl.style.color='var(--success)'}
+}
+function validarRegistro(){
+ var pwd=document.getElementById('reg-pwd');var pwd2=document.getElementById('reg-pwd2');
+ var err=document.getElementById('reg-err');
+ if(pwd.value!==pwd2.value){err.textContent='Las contraseñas no coinciden';err.className='msg-box error';return false}
+ err.className='msg-box error';return true;
+}
+function recBuscar(){
+ var u=document.getElementById('rec-usuario').value;var e1=document.getElementById('rec-err1');
+ if(!u.trim()){e1.textContent='Ingresa tu usuario';e1.className='msg-box error';return}
+ fetch(window.location.pathname.replace('/login','')+'/recuperar_pregunta?usuario='+encodeURIComponent(u))
+ .then(r=>r.json()).then(d=>{
+  if(d.error){e1.textContent=d.error;e1.className='msg-box error';return}
+  document.getElementById('rec-pregunta-txt').innerHTML='<i data-lucide="key" width="14" height="14"></i> '+d.pregunta;
+  document.getElementById('rec-paso1').style.display='none';
+  document.getElementById('rec-paso2').style.display='block';
+  if(window.lucide)lucide.createIcons();
+ }).catch(function(){e1.textContent='Error de conexión';e1.className='msg-box error'});
+}
+function recCambiar(){
+ var respuesta=document.getElementById('rec-respuesta').value;
+ var nueva=document.getElementById('rec-nueva').value;
+ var conf=document.getElementById('rec-confirmar').value;
+ var e2=document.getElementById('rec-err2');var o2=document.getElementById('rec-ok2');
+ e2.className='msg-box error';o2.className='msg-box success';
+ if(!respuesta.trim()){e2.textContent='Escribe tu respuesta';return}
+ if(nueva.length<6){e2.textContent='La contraseña debe tener al menos 6 caracteres';return}
+ if(nueva!==conf){e2.textContent='Las contraseñas no coinciden';return}
+ var u=document.getElementById('rec-usuario').value;
+ fetch(window.location.pathname.replace('/login','')+'/recuperar_cambiar',{
+  method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token() }}'},
+  body:JSON.stringify({usuario:u,respuesta:respuesta,nueva_password:nueva})
+ }).then(r=>r.json()).then(d=>{
+  if(d.error){e2.textContent=d.error;return}
+  o2.innerHTML=d.mensaje+' <a href="." class="forgot-link" style="display:inline">Ingresar ahora</a>';
+  document.getElementById('rec-err2').className='msg-box error';
+  document.getElementById('rec-ok2').className='msg-box success';
+ }).catch(function(){e2.textContent='Error de conexión'});
+}
+function recReset(){
+ document.getElementById('rec-usuario').value='';
+ document.getElementById('rec-paso2').style.display='none';
+ document.getElementById('rec-paso1').style.display='block';
+ document.getElementById('rec-err1').className='msg-box error';
+ document.getElementById('rec-err2').className='msg-box error';
+ document.getElementById('rec-ok2').className='msg-box success';
+}
+</script>
 {% endblock %}

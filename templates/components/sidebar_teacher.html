@@ -1,0 +1,39 @@
+<nav class="sidebar" id="sidebar">
+  <a href="/{{ slug }}/" style="text-decoration:none;color:inherit;">
+  <div class="sidebar-header">
+    {% if colegio and colegio.logo %}
+    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    {% else %}
+    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
+    {% endif %}
+    <div class="brand-text">
+      <div class="brand-name">LUMINI</div>
+      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div>
+    </div>
+  </div>
+  </a>
+  <div class="sidebar-nav">
+    <div class="sidebar-section">Navegación</div>
+    <a href="/{{ slug }}/dashboard" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Dashboard</span></a>
+    <a href="/{{ slug }}/" class="sidebar-item"><span class="icon"><i data-lucide="edit-3"></i></span><span>Notas</span></a>
+    <a href="/{{ slug }}/asistencia" class="sidebar-item"><span class="icon"><i data-lucide="calendar-check"></i></span><span>Asistencia</span></a>
+    <a href="/{{ slug }}/importar_notas" class="sidebar-item"><span class="icon"><i data-lucide="upload"></i></span><span>Importar Excel</span></a>
+    <a href="/{{ slug }}/exportar_notas?curso={{ mis_cursos[0] if mis_cursos else '' }}&periodo=1" class="sidebar-item"><span class="icon"><i data-lucide="download"></i></span><span>Exportar Excel</span></a>
+    <a href="/{{ slug }}/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horario</span></a>
+    <a href="/{{ slug }}/archivados" class="sidebar-item"><span class="icon"><i data-lucide="archive"></i></span><span>Archivados</span></a>
+    <a href="/{{ slug }}/transferir_curso" class="sidebar-item"><span class="icon"><i data-lucide="refresh-cw"></i></span><span>Transferir</span></a>
+    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i data-lucide="bell"></i></span><span>Notificaciones</span>{% if notif_count %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+    <div class="sidebar-section divider">Configuración</div>
+    <a href="/{{ slug }}/cambiar_password" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Perfil</span></a>
+    <a href="/{{ slug }}/logout" class="sidebar-item" style="color:var(--danger)"><span class="icon"><i data-lucide="log-out"></i></span><span>Salir</span></a>
+  </div>
+  <div class="sidebar-user">
+    <div class="avatar" style="background:var(--accent);">{% if profesor is defined and profesor %}{{ profesor.nombre[:1] }}{% else %}{{ (nombre[:1] if nombre else '?') }}{% endif %}</div>
+    <div class="info">
+      <div class="name">{% if profesor is defined and profesor %}{{ profesor.nombre }}{% else %}{{ (nombre if nombre else 'Usuario') }}{% endif %}</div>
+      <div class="role">{% if materia is defined and jornada is defined %}{{ materia }} · {{ jornada }}{% elif instancia is defined %}{{ instancia }}{% elif instance is defined %}{{ instance }}{% endif %}</div>
+    </div>
+  </div>
+  <button onclick="toggleTheme()" class="btn btn-ghost sidebar-theme-btn"><i data-lucide="moon"></i> Cambiar tema</button>
+</nav>
+<script>(function(){var p=window.location.pathname.replace(/\/+$/,'');document.querySelectorAll('#sidebar .sidebar-item').forEach(function(a){var h=a.getAttribute('href').replace(/\/+$/,'');if(p===h){a.classList.add('active')}});})()</script>

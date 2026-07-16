@@ -1,67 +1,70 @@
 {% extends "base.html" %}
 {% block title %}Lumini — Admin{% endblock %}
-
+{% block main_attrs %} class="main main-full"{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block hamburger %}{% endblock %}
+{% block sidebar_overlay %}{% endblock %}
+{% block theme_toggle %}{% endblock %}
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
-.bg-orb{position:fixed;border-radius:50%;filter:blur(100px);opacity:.12;animation:float 10s ease-in-out infinite;pointer-events:none;}
-        .orb1{width:450px;height:450px;background:var(--accent);top:-100px;left:-120px;animation-delay:0s;}
-        .orb2{width:300px;height:300px;background:var(--accent2);bottom:-80px;right:-80px;animation-delay:4s;}
-        .orb3{width:200px;height:200px;background:var(--accent2);top:55%;left:60%;animation-delay:7s;}
-        @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-28px) scale(1.04);}}
-        body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.08) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
-        .box{background:var(--bg2);border:1px solid var(--border);border-radius:22px;padding:44px 40px 40px;width:100%;max-width:400px;text-align:center;backdrop-filter:blur(20px);box-shadow:0 0 0 1px rgba(255,255,255,.04),0 24px 60px rgba(0,0,0,.5),0 0 80px rgba(var(--accent-rgb),.06);position:relative;z-index:1;animation:slideUp .5s cubic-bezier(.16,1,.3,1) both;}
-        @keyframes slideUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
-        .shield{width:58px;height:58px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.2),rgba(var(--accent-rgb),.1));border:1px solid rgba(var(--accent-rgb),.3);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px;}
-        .logo{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:7px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;}
-        .logo-link{text-decoration:none;color:inherit;display:inline-block;transition:opacity var(--tr);}
-        .logo-link:hover{opacity:.85;}
-        .sub{color:var(--sub);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:34px;}
-        .error{display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#EF4444;padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:20px;text-align:left;animation:shake .4s ease;}
-        @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
-        .input-wrap{position:relative;margin-bottom:16px;}
-        .input-wrap input{width:100%;padding:13px 44px 13px 16px;background:#0F172A;border:1.5px solid #1E293B;border-radius:var(--radius-md);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;letter-spacing:3px;transition:border-color var(--tr),box-shadow var(--tr);}
-        .input-wrap input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.15);}
-        .input-wrap input::placeholder{letter-spacing:2px;color:var(--sub);}
-        .eye-btn{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--sub);font-size:16px;cursor:pointer;padding:4px;transition:color var(--tr);display:inline-flex;align-items:center;justify-content:center;}
-        .eye-btn:hover{color:var(--accent);}
-        body .btn{width:100%;padding:8px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.5px;min-height:36px;transition:all var(--tr);box-shadow:0 4px 20px rgba(var(--accent-rgb),.3);position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
-        body .btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(var(--accent-rgb),.4);}
-        body .btn:active{transform:translateY(0);}
-        body .btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .5s;}
-        body .btn:hover::after{transform:translateX(100%);}
-        .footer{margin-top:24px;font-size:11px;color:var(--sub);}
-        .footer span{color:var(--muted);}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(120px);opacity:.12;animation:float 10s ease-in-out infinite;pointer-events:none}
+.orb1{width:500px;height:500px;background:var(--accent);top:-200px;left:-200px;animation-delay:0s}
+.orb2{width:400px;height:400px;background:var(--accent2);bottom:-150px;right:-150px;animation-delay:4s}
+.orb3{width:250px;height:250px;background:var(--accent2);top:50%;left:55%;animation-delay:7s}
+.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.shield{width:58px;height:58px;background:linear-gradient(135deg,rgba(var(--accent-rgb),.2),rgba(var(--accent-rgb),.1));border:1px solid rgba(var(--accent-rgb),.3);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px}
+.brand{font-size:1.9rem;font-weight:800;letter-spacing:7px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:4px}
+.logo-link{text-decoration:none;color:inherit;display:inline-block;transition:opacity var(--tr)}
+.logo-link:hover{opacity:.85}
+.sub{color:var(--sub);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:28px;text-align:center}
+.admin-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px 28px;width:100%;max-width:380px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.3);animation:slideUp .5s cubic-bezier(.16,1,.3,1) both}
+.field{margin-bottom:16px}
+.field input{width:100%;padding:12px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);color:var(--text);font-size:16px;letter-spacing:3px;transition:border-color var(--tr),box-shadow var(--tr)}
+.field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
+.field input::placeholder{color:var(--sub)}
+.eye-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--sub);cursor:pointer;padding:4px;transition:color var(--tr);display:flex;align-items:center;justify-content:center}
+.eye-btn:hover{color:var(--accent)}
+.footer{margin-top:24px;font-size:11px;color:var(--sub);text-align:center}
+.footer span{color:var(--muted)}
+.error-box{display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--danger);padding:11px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;text-align:left;animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.04)}}
 {% endblock %}
-
 {% block content %}
 <div class="bg-orb orb1"></div>
 <div class="bg-orb orb2"></div>
 <div class="bg-orb orb3"></div>
-
-<div class="box">
+<div class="login-wrap">
+  <div class="admin-card">
     <a href="/admin" class="logo-link">
-    <div class="shield">🛡️</div>
-    <div class="logo">LUMINI</div>
+      <div class="shield"><i data-lucide="shield" width="28" height="28" style="color:var(--accent)"></i></div>
+      <div class="brand">LUMINI</div>
     </a>
     <div class="sub">Acceso administrativo</div>
-
     {% if error %}
-    <div class="error"><i data-lucide="alert-triangle"></i> {{ error }}</div>
+    <div class="error-box"><i data-lucide="alert-triangle" width="14" height="14"></i> {{ error }}</div>
     {% endif %}
-
     <form method="POST" autocomplete="off">
-        <input type="hidden" name="accion" value="admin_login">
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-        <div class="input-wrap">
-            <input type="password" name="password" id="pwdInput"
-                   placeholder="••••••••" autofocus autocomplete="current-password">
-            <button type="button" class="eye-btn" onclick="togglePwd()" id="eyeBtn" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye"></i></button>
-        </div>
-        <button type="submit" class="btn">Ingresar <i data-lucide="arrow-right"></i></button>
+      <input type="hidden" name="accion" value="admin_login">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+      <div class="field" style="position:relative">
+        <input type="password" name="password" id="pwdInput" placeholder="Contraseña de administrador" autofocus autocomplete="current-password">
+        <button type="button" class="eye-btn" onclick="togglePwd()" id="eyeBtn" aria-label="Mostrar/ocultar contraseña"><i data-lucide="eye" width="18" height="18"></i></button>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Ingresar <i data-lucide="arrow-right" width="14" height="14"></i></button>
     </form>
-
-    <div class="footer">
-        Lumini &nbsp;·&nbsp; <span>Panel de administración</span>
-    </div>
+    <div class="footer">Lumini <span>&nbsp;·&nbsp;</span> <span>Panel de administración</span></div>
+  </div>
 </div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+function togglePwd(){
+ var inp=document.getElementById('pwdInput');var btn=document.getElementById('eyeBtn');
+ if(inp.type==='password'){inp.type='text';btn.innerHTML='<i data-lucide="eye-off" width="18" height="18"></i>'}
+ else{inp.type='password';btn.innerHTML='<i data-lucide="eye" width="18" height="18"></i>'}
+ if(window.lucide)lucide.createIcons();
+}
+</script>
 {% endblock %}

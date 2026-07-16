@@ -2,12 +2,13 @@
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}Rector — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
-{% block accent_css %}{{ accent_css(colegio) }}--blue:#2563EB;--blue-rgb:37,99,235;--shadow-lg:0 4px 20px rgba(0,0,0,.2);{% endblock %}
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
 html{scroll-behavior:smooth;}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
 .topbar-left h1{font-size:20px;font-weight:700;letter-spacing:-.4px;}
 .topbar-left .breadcrumb{font-size:12px;color:var(--muted);margin-top:2px;}
+.topbar-actions{display:flex;gap:8px;}
 .dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow);animation:fadeSlideIn .4s ease;}
 @keyframes fadeSlideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
 .dash-greeting{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
@@ -15,8 +16,8 @@ html{scroll-behavior:smooth;}
 .dash-greeting .date{font-size:12px;color:var(--muted);margin-top:4px;}
 .dash-greeting .school-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);font-size:12px;color:var(--muted);}
 .dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
-@media(max-width:1100px){.dash-cards{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:500px){.dash-cards{grid-template-columns:1fr;}}
+@media(max-width:1024px){.dash-cards{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){.dash-cards{grid-template-columns:1fr;}}
 .dash-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 18px 18px;transition:all .25s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;}
 .dash-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
 .dash-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.2);border-color:rgba(var(--accent-rgb),.2);}
@@ -37,14 +38,10 @@ html{scroll-behavior:smooth;}
 .dash-card .dval.na{font-size:1rem;color:var(--sub);font-weight:500;letter-spacing:0;}
 .dash-card .dlabel{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
 .dash-card .dtag{font-size:11px;color:var(--sub);margin-top:3px;}
-.quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
-.qaction{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;transition:all .2s ease;font-family:'Inter',sans-serif;touch-action:manipulation;}
-.qaction:hover{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.25);color:var(--accent);transform:translateY(-1px);}
-.qaction.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
-.qaction.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.35);}
 .dash-divider{height:1px;background:var(--border);margin:0 0 18px 0;border:none;}
-@media(max-width:375px){
-  .main{padding:10px;}
+.notif-badge{position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;padding:0 4px;line-height:16px;text-align:center;border-radius:99px;}
+.dot-accent{background:var(--accent)}.dot-blue{background:var(--blue)}.dot-success{background:var(--success)}.dot-warning{background:var(--warning)}.dot-teal{background:#14B8A6}.dot-danger{background:var(--danger)}
+@media(max-width:480px){
   .dash-wrap{padding:16px;}
   .dash-cards{gap:8px;}
   .dash-card{padding:16px 14px;}
@@ -53,45 +50,7 @@ html{scroll-behavior:smooth;}
 }
 {% endblock %}
 
-{% block sidebar %}
-<nav class="sidebar" id="sidebar">
-  <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
-  <div class="sidebar-header">
-    {% if colegio and colegio.logo %}
-    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
-    {% else %}
-    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
-    {% endif %}
-    <div class="brand-text">
-      <div class="brand-name">LUMINI</div>
-      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div>
-    </div>
-  </div>
-  </a>
-  <div class="sidebar-nav">
-    <div class="sidebar-section">Rector</div>
-    {{ sidebar_item('/' + slug + '/rector', 'pie-chart', 'Dashboard', active=true) }}
-    {{ sidebar_item('/' + slug + '/rector/asistencia', 'calendar-check', 'Asistencia') }}
-    {{ sidebar_item('/' + slug + '/rector/comunicaciones', 'megaphone', 'Comunicaciones') }}
-    {{ sidebar_item('/' + slug + '/rector/canales', 'message-square', 'Canales') }}
-    {{ sidebar_item('/' + slug + '/notificaciones', 'bell', 'Notificaciones', count=notif_count) }}
-    {{ sidebar_item('/' + slug + '/rector/horarios', 'calendar', 'Horarios') }}
-    {{ sidebar_item('/' + slug + '/rector/profesores', 'presentation', 'Profesores') }}
-    {{ sidebar_item('/' + slug + '/rector/estudiantes', 'graduation-cap', 'Estudiantes') }}
-    {{ sidebar_item('/' + slug + '/rector/cursos', 'book', 'Cursos') }}
-    {{ sidebar_item('/' + slug + '/rector/reportes', 'bar-chart-3', 'Reportes') }}
-    {{ sidebar_item('/' + slug + '/rector/auditoria', 'clock-rewind', 'Auditoría') }}
-    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
-    {% if rector.es_principal %}{{ sidebar_item('/' + slug + '/rector/gestion-rectores', 'shield', 'Gestión de Rectores') }}{% endif %}
-    {{ sidebar_item('/' + slug + '/rector/configuracion', 'settings', 'Configuración') }}
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
-  </div>
-  <div class="sidebar-user">
-    <div class="name">{{ rector.nombre }}</div>
-    <div class="role">{% if rector.es_principal %}Rector Principal{% else %}Rector{% endif %}</div>
-  </div>
-</nav>
-{% endblock %}
+{% block sidebar %}{% include "components/sidebar_rector.html" %}{% endblock %}
 
 {% block content %}
 <div class="topbar">
@@ -99,10 +58,10 @@ html{scroll-behavior:smooth;}
     <h1>Panel del Rector</h1>
     <div class="breadcrumb">{{ colegio.nombre if colegio else slug }} · {{ rector.nombre }}</div>
   </div>
-  <div class="topbar-actions" style="display:flex;gap:8px;">
-    <a href="/{{ slug }}/notificaciones" style="position:relative;color:var(--muted);font-size:18px;text-decoration:none;padding:6px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);transition:all var(--tr);">
+  <div class="topbar-actions">
+    <a href="/{{ slug }}/notificaciones" class="btn btn-icon" style="position:relative;">
       <i data-lucide="bell"></i>
-      {% if notif_count > 0 %}<span style="position:absolute;top:-2px;right:-2px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px;min-width:16px;text-align:center;">{{ notif_count }}</span>{% endif %}
+      {% if notif_count > 0 %}<span class="notif-badge">{{ notif_count }}</span>{% endif %}
     </a>
   </div>
 </div>
@@ -174,13 +133,13 @@ html{scroll-behavior:smooth;}
     </div>
 </div>
 
-<div class="quick-actions">
-    <a href="/{{ slug }}/rector/comunicaciones/nueva" class="qaction primary"><i data-lucide="megaphone" style="width:14px;height:14px;"></i> Nueva comunicación</a>
-    <a href="/{{ slug }}/rector/horarios" class="qaction"><i data-lucide="calendar" style="width:14px;height:14px;"></i> Ver horarios</a>
-    <a href="/{{ slug }}/rector/profesores" class="qaction"><i data-lucide="chalkboard-teacher" style="width:14px;height:14px;"></i> Profesores</a>
-    <a href="/{{ slug }}/rector/estudiantes" class="qaction"><i data-lucide="graduation-cap" style="width:14px;height:14px;"></i> Estudiantes</a>
-    <a href="/{{ slug }}/rector/cursos" class="qaction"><i data-lucide="book" style="width:14px;height:14px;"></i> Cursos</a>
-    <a href="/{{ slug }}/rector/reportes" class="qaction"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i> Reportes</a>
+<div class="btn-group" style="gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+    <a href="/{{ slug }}/rector/comunicaciones/nueva" class="btn btn-primary"><i data-lucide="megaphone"></i> Nueva comunicación</a>
+    <a href="/{{ slug }}/rector/horarios" class="btn btn-secondary"><i data-lucide="calendar"></i> Ver horarios</a>
+    <a href="/{{ slug }}/rector/profesores" class="btn btn-secondary"><i data-lucide="chalkboard-teacher"></i> Profesores</a>
+    <a href="/{{ slug }}/rector/estudiantes" class="btn btn-secondary"><i data-lucide="graduation-cap"></i> Estudiantes</a>
+    <a href="/{{ slug }}/rector/cursos" class="btn btn-secondary"><i data-lucide="book"></i> Cursos</a>
+    <a href="/{{ slug }}/rector/reportes" class="btn btn-secondary"><i data-lucide="bar-chart-3"></i> Reportes</a>
 </div>
 
 <hr class="dash-divider">
@@ -211,12 +170,7 @@ html{scroll-behavior:smooth;}
             </div>
             {% endfor %}
             {% else %}
-            <div class="empty-state" style="min-height:120px;padding:20px;">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M22 17a2 2 0 01-2 2H4a2 2 0 01-2-2V9.5C2 7 4 5 6.5 5H18c2.2 0 4 1.8 4 4v8z"/><polyline points="15,9 18,9 18,11"/><path d="M6.5 5C9 5 11 7 11 9.5V17H4V9.5C4 7 6 5 6.5 5z"/></svg>
-                <div class="empty-title">Sin comunicaciones</div>
-                <div class="empty-desc">No hay comunicaciones aún. Crea la primera para mantener informada a la comunidad.</div>
-                <a href="/{{ slug }}/rector/comunicaciones/nueva" class="empty-action"><i data-lucide="plus" style="width:12px;height:12px;"></i> Crear primera</a>
-            </div>
+            {{ empty_state('mail', 'Sin comunicaciones', 'No hay comunicaciones aún. Crea la primera para mantener informada a la comunidad.', action_url='/' + slug + '/rector/comunicaciones/nueva', action_text='Crear primera') }}
             {% endif %}
         </div>
     </div>
@@ -247,11 +201,7 @@ html{scroll-behavior:smooth;}
             </div>
             {% endfor %}
             {% else %}
-            <div class="empty-state" style="min-height:120px;padding:20px;">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-                <div class="empty-title">Sin actividad reciente</div>
-                <div class="empty-desc">Las últimas acciones institucionales aparecerán aquí.</div>
-            </div>
+            {{ empty_state('clock', 'Sin actividad reciente', 'Las últimas acciones institucionales aparecerán aquí.') }}
             {% endif %}
         </div>
     </div>
@@ -276,11 +226,7 @@ html{scroll-behavior:smooth;}
             </div>
             {% endfor %}
             {% else %}
-            <div class="empty-state" style="min-height:100px;padding:20px;">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                <div class="empty-title">Sin estudiantes</div>
-                <div class="empty-desc">Aún no hay estudiantes registrados en el sistema.</div>
-            </div>
+            {{ empty_state('users', 'Sin estudiantes', 'Aún no hay estudiantes registrados en el sistema.') }}
             {% endif %}
         </div>
     </div>
@@ -303,11 +249,7 @@ html{scroll-behavior:smooth;}
             </div>
             {% endfor %}
             {% else %}
-            <div class="empty-state" style="min-height:100px;padding:20px;">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                <div class="empty-title">Sin profesores</div>
-                <div class="empty-desc">Aún no hay profesores registrados en el sistema.</div>
-            </div>
+            {{ empty_state('presentation', 'Sin profesores', 'Aún no hay profesores registrados en el sistema.') }}
             {% endif %}
         </div>
     </div>
@@ -335,11 +277,7 @@ html{scroll-behavior:smooth;}
             </div>
             {% endfor %}
             {% else %}
-            <div class="empty-state" style="min-height:100px;padding:20px;">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                <div class="empty-title">Sin eventos próximos</div>
-                <div class="empty-desc">No hay evaluaciones o compromisos programados.</div>
-            </div>
+            {{ empty_state('calendar', 'Sin eventos próximos', 'No hay evaluaciones o compromisos programados.') }}
             {% endif %}
         </div>
     </div>
@@ -360,32 +298,26 @@ html{scroll-behavior:smooth;}
                 </div>
             </div>
             {% else %}
-            <div class="empty-state" style="min-height:80px;padding:16px;">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:6px;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-                <div class="empty-title" style="font-size:13px;">Sin notificaciones</div>
-                <div class="empty-desc" style="font-size:11px;">Todo está al día.</div>
-            </div>
+            {{ empty_state('bell', 'Sin notificaciones', 'Todo está al día.') }}
             {% endif %}
         </div>
     </div>
 </div>
 
 <div class="fade-in fade-in-d4" style="margin-top:4px;">
-    <div class="card" style="padding:0;">
+    <div class="card">
         <div class="card-head">
-            <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;">
-                <i data-lucide="bar-chart-3" style="width:15px;height:15px;color:var(--accent);"></i>
-                Resumen institucional
-            </div>
+            <i data-lucide="bar-chart-3"></i>
+            Resumen institucional
         </div>
-        <div class="card-body" style="padding:14px 18px;">
+        <div class="card-body">
             <div class="summary-row">
-                <span class="summary-item"><span class="dot" style="background:var(--accent);"></span> {{ total_estudiantes if total_estudiantes > 0 else 0 }} estudiantes</span>
-                <span class="summary-item"><span class="dot" style="background:var(--blue);"></span> {{ total_profesores if total_profesores > 0 else 0 }} profesores</span>
-                <span class="summary-item"><span class="dot" style="background:var(--success);"></span> {{ total_cursos if total_cursos > 0 else 0 }} cursos</span>
-                <span class="summary-item"><span class="dot" style="background:var(--warning);"></span> {{ total_materias if total_materias > 0 else 0 }} materias</span>
-                <span class="summary-item"><span class="dot" style="background:#14B8A6;"></span> {{ total_directoras if total_directoras > 0 else 0 }} directores</span>
-                <span class="summary-item"><span class="dot" style="background:var(--danger);"></span> {{ asistencia_hoy if asistencia_hoy > 0 else 0 }} asistencias hoy</span>
+                <span class="summary-item"><span class="dot dot-accent"></span> {{ total_estudiantes if total_estudiantes > 0 else 0 }} estudiantes</span>
+                <span class="summary-item"><span class="dot dot-blue"></span> {{ total_profesores if total_profesores > 0 else 0 }} profesores</span>
+                <span class="summary-item"><span class="dot dot-success"></span> {{ total_cursos if total_cursos > 0 else 0 }} cursos</span>
+                <span class="summary-item"><span class="dot dot-warning"></span> {{ total_materias if total_materias > 0 else 0 }} materias</span>
+                <span class="summary-item"><span class="dot dot-teal"></span> {{ total_directoras if total_directoras > 0 else 0 }} directores</span>
+                <span class="summary-item"><span class="dot dot-danger"></span> {{ asistencia_hoy if asistencia_hoy > 0 else 0 }} asistencias hoy</span>
             </div>
         </div>
     </div>

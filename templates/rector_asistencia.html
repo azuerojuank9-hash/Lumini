@@ -10,10 +10,8 @@
 .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:flex-end;}
 .filter-group{display:flex;flex-direction:column;gap:3px;}
 .filter-group label{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
-.filter-group select,.filter-group input{padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;min-width:130px;}
+.filter-group select,.filter-group input{padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--text);font-size:12px;font-family:inherit;cursor:pointer;min-width:130px;}
 .filter-group select:focus,.filter-group input:focus{outline:none;border-color:var(--accent);}
-.date-nav-btn{padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all var(--tr);text-decoration:none;}
-.date-nav-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--accent);}
 .stats-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 .stat-card{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--bg2);flex:1;min-width:100px;}
 .stat-card .stat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
@@ -26,15 +24,7 @@
 .stat-card .stat-icon.blue{background:rgba(59,130,246,.15);color:#3B82F6;}
 .stat-card .stat-icon.purple{background:rgba(168,85,247,.15);color:#A855F7;}
 .stat-card .stat-icon.orange{background:rgba(251,146,60,.15);color:#FB923C;}
-.card{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg2);overflow:hidden;}
-.card-head{padding:12px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
-.card-title{display:flex;align-items:center;gap:6px;}
-.card-body{padding:14px 16px;}
-table{width:100%;border-collapse:collapse;font-size:12px;}
-th{padding:8px 10px;text-align:left;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;border-bottom:1px solid var(--border);}
-td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
-tr:last-child td{border-bottom:none;}
-.abtn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 10px;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s ease;min-height:30px;}
+.abtn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 10px;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s ease;min-height:30px;}
 .abtn:active{transform:scale(.88);}
 .abtn.ap{background:rgba(34,197,94,.10);color:var(--success);border:1px solid rgba(34,197,94,.18);}
 .abtn.ap.active{background:linear-gradient(135deg,var(--success),#16A34A);color:#fff;border-color:transparent;}
@@ -52,7 +42,6 @@ tr:last-child td{border-bottom:none;}
 .alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:6px;font-size:12px;}
 .alert-item.high{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);}
 .alert-item.medium{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.15);}
-.empty-state{text-align:center;padding:28px;color:var(--muted);font-size:13px;}
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;padding:16px;}
@@ -67,42 +56,7 @@ tr:last-child td{border-bottom:none;}
 }
 {% endblock %}
 
-{% block sidebar %}
-<nav class="sidebar" id="sidebar">
-  <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
-  <div class="sidebar-header">
-    {% if colegio and colegio.logo %}
-    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
-    {% else %}
-    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
-    {% endif %}
-    <div class="brand-text">
-      <div class="brand-name">LUMINI</div>
-      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div></div></div></a>
-  <div class="sidebar-nav">
-    <div class="sidebar-section">Rector</div>
-    <a href="/{{ slug }}/rector" class="sidebar-item"><span class="icon"><i data-lucide="pie-chart"></i></span><span>Dashboard</span></a>
-    <a href="/{{ slug }}/rector/asistencia" class="sidebar-item active"><span class="icon"><i data-lucide="calendar-check"></i></span><span>Asistencia</span></a>
-    <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item"><span class="icon"><i data-lucide="megaphone"></i></span><span>Comunicaciones</span></a>
-    <a href="/{{ slug }}/rector/canales" class="sidebar-item"><span class="icon"><i data-lucide="message-square"></i></span><span>Canales</span></a>
-    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i data-lucide="bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
-    <a href="/{{ slug }}/rector/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horarios</span></a>
-    <a href="/{{ slug }}/rector/profesores" class="sidebar-item"><span class="icon"><i data-lucide="presentation"></i></span><span>Profesores</span></a>
-    <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
-    <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
-    <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
-  </div>
-  <div class="sidebar-user">
-    <div class="name">{{ rector.nombre }}</div>
-    <div class="role">Rector</div>
-  </div>
-</nav>
-{% endblock %}
+{% block sidebar %}{% include "components/sidebar_rector.html" %}{% endblock %}
 
 {% block content %}
 <div class="topbar">
@@ -111,7 +65,7 @@ tr:last-child td{border-bottom:none;}
     <div class="page-sub">Vista general de asistencia institucional</div>
   </div>
   <div style="display:flex;gap:8px;">
-    <a href="#" onclick="exportarExcel();return false;" class="date-nav-btn" style="font-size:12px;"><i data-lucide="file-spreadsheet" style="width:14px;height:14px;"></i> Excel</a>
+    <a href="#" onclick="exportarExcel();return false;" class="btn btn-secondary btn-sm"><i data-lucide="file-spreadsheet"></i> Excel</a>
   </div>
 </div>
 
@@ -148,7 +102,7 @@ tr:last-child td{border-bottom:none;}
     <input type="date" id="filtroFecha" value="{{ hoy_fecha }}" onchange="cargarDatos()">
   </div>
   <div class="filter-group" style="align-self:flex-end;">
-    <button class="date-nav-btn" onclick="document.getElementById('filtroFecha').value = '{{ hoy_fecha }}';cargarDatos();">Hoy</button>
+    <button class="btn btn-secondary btn-sm" onclick="document.getElementById('filtroFecha').value = '{{ hoy_fecha }}';cargarDatos();">Hoy</button>
   </div>
 </div>
 

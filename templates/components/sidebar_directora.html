@@ -1,0 +1,32 @@
+<nav class="sidebar" id="sidebar">
+  <a href="{{ url_for('directora_panel', slug=slug) }}" style="text-decoration:none;color:inherit;">
+  <div class="sidebar-header">
+    {% if colegio and colegio.logo %}
+    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
+    {% else %}
+    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
+    {% endif %}
+    <div class="brand-text">
+      <div class="brand-name">LUMINI</div>
+      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div>
+    </div>
+  </div>
+  </a>
+  <div class="sidebar-nav">
+    <div class="sidebar-section">Directora</div>
+    <a href="{{ url_for('directora_panel', slug=slug) }}" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Dashboard</span></a>
+    <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="sidebar-item"><span class="icon"><i data-lucide="file-text"></i></span><span>Boletín PDF</span></a>
+    <div class="sidebar-section divider">Acciones</div>
+    <button onclick="abrirModalRegistro()" class="sidebar-item" style="cursor:pointer;"><span class="icon"><i data-lucide="plus-circle"></i></span><span>Crear directora</span></button>
+    <a href="{{ url_for('directora_logout', slug=slug) }}" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+  </div>
+  <div class="sidebar-user">
+    <div class="avatar" style="background:var(--accent);">{{ directora.nombre[:1] }}</div>
+    <div class="info">
+      <div class="name">{{ directora.nombre }}</div>
+      <div class="role">Curso {{ curso }} · {{ jornada }}</div>
+    </div>
+  </div>
+  <button onclick="toggleTheme()" class="btn btn-ghost sidebar-theme-btn"><i data-lucide="moon"></i> Cambiar tema</button>
+</nav>
+<script>(function(){var p=window.location.pathname.replace(/\/+$/,'');document.querySelectorAll('#sidebar .sidebar-item').forEach(function(a){var h=a.getAttribute('href');if(h&&p===h.replace(/\/+$/,'')){a.classList.add('active')}});})()</script>

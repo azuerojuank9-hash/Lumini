@@ -38,9 +38,10 @@
   --tr-slow: .3s ease;
   --sidebar-w: 210px;
   --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-  --red: var(--danger); --green: var(--success); --yellow: var(--warning); --blue: var(--info);
+  --red: var(--danger); --green: var(--success); --yellow: var(--warning);
+  --blue: #2563EB; --blue-rgb: 37, 99, 235;
   --rsm: var(--radius-sm); --rmd: var(--radius-md); --rlg: var(--radius-lg); --rxl: var(--radius-xl);
-  --text2: var(--muted); --orange: #F59E0B;
+  --text2: var(--muted); --orange: #F59E0B; --shadow: var(--shadow-sm);
 }
 [data-theme="light"] {
   --bg: #F8FAFC;

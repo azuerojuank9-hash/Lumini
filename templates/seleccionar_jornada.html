@@ -1,70 +1,67 @@
 {% extends "base.html" %}
 {% block title %}Seleccionar jornada — Lumini{% endblock %}
-
+{% block main_attrs %} class="main main-full"{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block hamburger %}{% endblock %}
+{% block sidebar_overlay %}{% endblock %}
+{% block theme_toggle %}{% endblock %}
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
-body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.08) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
-        .bg-orb{position:fixed;border-radius:50%;filter:blur(100px);opacity:.15;animation:float 10s ease-in-out infinite;pointer-events:none;}
-        .orb1{width:450px;height:450px;background:var(--accent);top:-120px;left:-120px;animation-delay:0s;}
-        .orb2{width:300px;height:300px;background:var(--accent2);bottom:-80px;right:-80px;animation-delay:4s;}
-        @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-25px) scale(1.03);}}
-        .brand{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:6px;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:4px;}
-        .sub{font-size:11px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;text-align:center;margin-bottom:24px;}
-        .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px 28px;width:100%;max-width:480px;backdrop-filter:blur(20px);box-shadow:0 4px 30px rgba(0,0,0,.3);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
-        @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-        .card-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:4px;}
-        .card-desc{font-size:13px;color:var(--muted);margin-bottom:24px;}
-        .greeting{font-size:14px;color:color-mix(in srgb,var(--accent) 70%,white);margin-bottom:20px;padding:10px 14px;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--radius-sm);}
-        .opciones{display:flex;flex-direction:column;gap:10px;}
-        .opcion-btn{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;min-height:56px;background:rgba(15,23,42,.6);border:1.5px solid var(--border);border-radius:var(--radius-md);cursor:pointer;transition:all var(--tr);text-decoration:none;color:var(--text);width:100%;text-align:left;font-family:'DM Sans',sans-serif;}
-        .opcion-btn:hover{border-color:rgba(var(--accent-rgb),.5);background:rgba(var(--accent-rgb),.08);transform:translateY(-2px);box-shadow:0 4px 20px rgba(var(--accent-rgb),.1);}
-        .opcion-left{display:flex;flex-direction:column;gap:3px;}
-        .opcion-materia{font-size:15px;font-weight:600;}
-        .opcion-jornada{font-size:11px;color:var(--muted);}
-        .badge-jornada{padding:4px 12px;border-radius:99px;font-size:11px;font-weight:600;}
-        .jornada-manana{background:rgba(245,158,11,.1);color:#F59E0B;border:1px solid rgba(245,158,11,.25);}
-        .jornada-tarde{background:rgba(var(--accent-rgb),.1);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.25);}
-        .jornada-nocturna{background:rgba(124,58,237,.1);color:var(--accent2);border:1px solid rgba(124,58,237,.25);}
-        .alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#EF4444;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;}
-        .logout-link{display:block;text-align:center;margin-top:20px;font-size:12px;color:var(--muted);text-decoration:none;transition:color var(--tr);}
-        .logout-link:hover{color:#EF4444;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(var(--accent-rgb),.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(120px);opacity:.12;animation:float 10s ease-in-out infinite;pointer-events:none}
+.orb1{width:500px;height:500px;background:var(--accent);top:-200px;left:-200px;animation-delay:0s}
+.orb2{width:400px;height:400px;background:var(--accent2);bottom:-150px;right:-150px;animation-delay:4s}
+.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.brand{font-size:1.5rem;font-weight:800;letter-spacing:3px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:4px}
+.sub{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:20px}
+.greeting{font-size:14px;color:var(--text);margin-bottom:20px;padding:12px 16px;background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),.18);border-radius:var(--radius-sm)}
+.opciones{display:flex;flex-direction:column;gap:10px}
+.opcion-btn{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;min-height:52px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-md);cursor:pointer;transition:all var(--tr);text-decoration:none;color:var(--text);width:100%;text-align:left;font-family:inherit;font-size:inherit}
+.opcion-btn:hover{border-color:rgba(var(--accent-rgb),.5);background:rgba(var(--accent-rgb),.06);transform:translateY(-2px);box-shadow:0 4px 20px rgba(var(--accent-rgb),.1)}
+.opcion-left{display:flex;flex-direction:column;gap:2px}
+.opcion-materia{font-size:15px;font-weight:600}
+.opcion-jornada{font-size:11px;color:var(--muted)}
+.badge-jornada{padding:4px 12px;border-radius:99px;font-size:11px;font-weight:600}
+.jornada-manana{background:rgba(245,158,11,.1);color:#F59E0B;border:1px solid rgba(245,158,11,.25)}
+.jornada-tarde{background:rgba(var(--accent-rgb),.1);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.25)}
+.jornada-nocturna{background:rgba(var(--accent2-rgb),.1);color:var(--accent2);border:1px solid rgba(var(--accent2-rgb),.25)}
+.logout-link{display:block;text-align:center;margin-top:20px;font-size:12px;color:var(--muted);text-decoration:none;transition:color var(--tr)}
+.logout-link:hover{color:var(--danger)}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.04)}}
 {% endblock %}
-
 {% block content %}
 <div class="bg-orb orb1"></div>
 <div class="bg-orb orb2"></div>
-<a href="/{{ slug }}/login" style="text-decoration:none;color:inherit;display:block;">
-<div class="brand">LUMINI</div>
-<p class="sub">{{ colegio.nombre if colegio else slug }}</p>
-</a>
-
-<div class="card">
-    <div class="card-title"><i data-lucide="hand"></i> Bienvenido, {{ profesor.nombre }}</div>
-    <p class="card-desc">Selecciona con qué jornada y materia quieres trabajar hoy.</p>
-
+<div class="login-wrap">
+  <a href="/{{ slug }}/login" class="logo-link" style="text-decoration:none;color:inherit">
+    <div class="brand">LUMINI</div>
+    <p class="sub">{{ colegio.nombre if colegio else slug }}</p>
+  </a>
+  <div class="card">
+    <div class="greeting"><i data-lucide="hand" width="16" height="16"></i> Bienvenido, {{ profesor.nombre }}</div>
+    <p class="card-desc text-sm text-muted" style="margin-bottom:16px">Selecciona con qué jornada y materia quieres trabajar hoy.</p>
     {% if error %}
-    <div class="alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>
+    <div class="alert alert-error mb-md">{{ error }}</div>
     {% endif %}
-
     <div class="opciones">
-        {% for mj in materias_jornadas %}
-        <form method="POST">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="materia" value="{{ mj.materia }}">
-            <input type="hidden" name="jornada" value="{{ mj.jornada }}">
-            <button type="submit" class="opcion-btn" style="width:100%;text-align:left;">
-                <div class="opcion-left">
-                    <span class="opcion-materia">{{ mj.materia }}</span>
-                    <span class="opcion-jornada">Jornada {{ mj.jornada }}</span>
-                </div>
-                <span class="badge-jornada {% if mj.jornada == 'Mañana' %}jornada-manana{% elif mj.jornada == 'Tarde' %}jornada-tarde{% else %}jornada-nocturna{% endif %}">
-                    {% if mj.jornada == 'Mañana' %}<i data-lucide="sun"></i>{% elif mj.jornada == 'Tarde' %}🌤{% else %}🌙{% endif %} {{ mj.jornada }}
-                </span>
-            </button>
-        </form>
-        {% endfor %}
+      {% for mj in materias_jornadas %}
+      <form method="POST" style="width:100%">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="materia" value="{{ mj.materia }}">
+        <input type="hidden" name="jornada" value="{{ mj.jornada }}">
+        <button type="submit" class="opcion-btn">
+          <div class="opcion-left">
+            <span class="opcion-materia">{{ mj.materia }}</span>
+            <span class="opcion-jornada">Jornada {{ mj.jornada }}</span>
+          </div>
+          <span class="badge-jornada {% if mj.jornada == 'Mañana' %}jornada-manana{% elif mj.jornada == 'Tarde' %}jornada-tarde{% else %}jornada-nocturna{% endif %}">
+            {% if mj.jornada == 'Mañana' %}<i data-lucide="sun" width="14" height="14"></i>{% elif mj.jornada == 'Tarde' %}<i data-lucide="sunset" width="14" height="14"></i>{% else %}<i data-lucide="moon" width="14" height="14"></i>{% endif %} {{ mj.jornada }}
+          </span>
+        </button>
+      </form>
+      {% endfor %}
     </div>
+  </div>
+  <a href="/{{ slug }}/logout" class="logout-link"> Cerrar sesión</a>
 </div>
-
-<a href="/{{ slug }}/logout" class="logout-link"><i data-lucide="arrow-left"></i> Cerrar sesión</a>
 {% endblock %}

@@ -1,19 +1,32 @@
-/* ── Shared rector/teacher sidebar (`.sidebar-item` variant) ── */
-.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;overflow:hidden;}
-.sidebar .sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.sidebar .sidebar-header .logo{width:32px;height:32px;border-radius:8px;object-fit:cover;}
-.sidebar .sidebar-header .brand-text{flex:1;}
-.sidebar .sidebar-header .brand-text .brand-name{font-size:14px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.sidebar .sidebar-header .brand-text .brand-sub{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
-.sidebar .sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;}
-.sidebar .sidebar-section{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:12px 10px 4px;font-weight:600;}
-.sidebar .sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;color:var(--text);text-decoration:none;cursor:pointer;position:relative;transition:all var(--tr);}
-.sidebar .sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text);}
-.sidebar .sidebar-item.active,.sidebar .sidebar-item.active-page{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600;}
-.sidebar .sidebar-item .icon{width:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);}
-.sidebar .sidebar-item.active .icon,.sidebar .sidebar-item.active-page .icon{color:#fff;}
-.sidebar .sidebar-item .badge-count{margin-left:auto;background:var(--danger);color:#fff;border-radius:99px;padding:1px 6px;font-size:9px;font-weight:700;min-width:16px;text-align:center;}
-.sidebar .sidebar-user{padding:12px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.sidebar .sidebar-user .name{font-size:12px;font-weight:600;}
-.sidebar .sidebar-user .role{font-size:10px;color:var(--muted);margin-top:1px;}
-.sidebar .sidebar-user .avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;overflow:hidden;transition:transform var(--tr)}
+.sidebar-header{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar-header .logo{width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.sidebar-header .brand-text{flex:1;min-width:0}
+.sidebar-header .brand-name{font-size:14px;font-weight:800;letter-spacing:1px;background:linear-gradient(135deg,#fff 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sidebar-header .brand-sub{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-nav{flex:1;padding:8px 6px;overflow-y:auto;overflow-x:hidden}
+.sidebar-nav::-webkit-scrollbar{width:3px}
+.sidebar-nav::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:99px}
+.sidebar-section{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:12px 10px 4px;font-weight:600}
+.sidebar-section.divider{border-top:1px solid var(--border);margin-top:4px;padding-top:14px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;color:var(--text);text-decoration:none;cursor:pointer;position:relative;transition:all var(--tr);min-height:36px}
+.sidebar-item:hover{background:rgba(var(--accent-rgb),.12);color:var(--text)}
+.sidebar-item.active,.sidebar-item.active-page{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600}
+.sidebar-item .icon{width:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);transition:color var(--tr)}
+.sidebar-item:hover .icon{color:var(--text)}
+.sidebar-item.active .icon,.sidebar-item.active-page .icon{color:#fff}
+.sidebar-item .badge-count{margin-left:auto;background:var(--danger);color:#fff;border-radius:99px;padding:1px 6px;font-size:9px;font-weight:700;min-width:16px;text-align:center}
+.sidebar-item .chevron{margin-left:auto;width:14px;height:14px;color:var(--muted);transition:transform var(--tr)}
+.sidebar-item.open .chevron{transform:rotate(90deg)}
+.sidebar-submenu{overflow:hidden;max-height:0;transition:max-height .25s ease;padding-left:8px}
+.sidebar-submenu.open{max-height:500px}
+.sidebar-submenu .sidebar-item{padding-left:14px;font-size:11px}
+.sidebar-user{padding:12px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.sidebar-user .avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.sidebar-user .info{flex:1;min-width:0}
+.sidebar-user .name{font-size:12px;font-weight:600}
+.sidebar-user .role{font-size:10px;color:var(--muted);margin-top:1px}
+@media(max-width:768px){
+.sidebar{transform:translateX(-100%)}
+.sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.4)}
+}

@@ -31,45 +31,11 @@
   .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;padding:16px;}
-  .card{padding:18px;}
+  
 }
 {% endblock %}
 
-{% block sidebar %}
-<nav class="sidebar" id="sidebar">
-  <a href="/{{ slug }}/rector" style="text-decoration:none;color:inherit;">
-  <div class="sidebar-header">
-    {% if colegio and colegio.logo %}
-    <img class="logo" src="/static/logos/{{ colegio.logo }}" alt="{{ colegio.nombre }}">
-    {% else %}
-    <img class="logo" src="/static/lumini_logo.webp" alt="Lumini">
-    {% endif %}
-    <div class="brand-text">
-      <div class="brand-name">LUMINI</div>
-      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div></div></div></a>
-  <div class="sidebar-nav">
-    <div class="sidebar-section">Rector</div>
-    <a href="/{{ slug }}/rector" class="sidebar-item"><span class="icon"><i data-lucide="pie-chart"></i></span><span>Dashboard</span></a>
-    <a href="/{{ slug }}/rector/comunicaciones" class="sidebar-item active"><span class="icon"><i data-lucide="megaphone"></i></span><span>Comunicaciones</span></a>
-    <a href="/{{ slug }}/rector/canales" class="sidebar-item"><span class="icon"><i data-lucide="message-square"></i></span><span>Canales</span></a>
-    <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i data-lucide="bell"></i></span><span>Notificaciones</span>{% if notif_count > 0 %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
-    <a href="/{{ slug }}/rector/horarios" class="sidebar-item"><span class="icon"><i data-lucide="calendar"></i></span><span>Horarios</span></a>
-    <a href="/{{ slug }}/rector/profesores" class="sidebar-item"><span class="icon"><i data-lucide="presentation"></i></span><span>Profesores</span></a>
-    <a href="/{{ slug }}/rector/estudiantes" class="sidebar-item"><span class="icon"><i data-lucide="graduation-cap"></i></span><span>Estudiantes</span></a>
-    <a href="/{{ slug }}/rector/cursos" class="sidebar-item"><span class="icon"><i data-lucide="book"></i></span><span>Cursos</span></a>
-    <a href="/{{ slug }}/rector/reportes" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Reportes</span></a>
-    <a href="/{{ slug }}/rector/auditoria" class="sidebar-item"><span class="icon"><i data-lucide="clock-rewind"></i></span><span>Auditoría</span></a>
-    <div class="sidebar-section" style="margin-top:12px;">Configuración</div>
-    {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión de Rectores</span></a>{% endif %}
-    <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
-  </div>
-  <div class="sidebar-user">
-    <div class="name">{{ rector.nombre }}</div>
-    <div class="role">{% if rector.es_principal %}Rector Principal{% else %}Rector{% endif %}</div>
-  </div>
-</nav>
-{% endblock %}
+{% block sidebar %}{% include "components/sidebar_rector.html" %}{% endblock %}
 
 {% block content %}
 <div class="topbar">
