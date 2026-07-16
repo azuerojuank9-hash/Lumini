@@ -27,7 +27,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .eye-btn:hover{color:var(--accent)}
 .footer{margin-top:24px;font-size:11px;color:var(--sub);text-align:center}
 .footer span{color:var(--muted)}
-.error-box{display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--danger);padding:11px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;text-align:left;animation:shake .4s ease}
+.error-box{display:flex;align-items:center;gap:8px;background:rgba(var(--danger-rgb),.1);border:1px solid rgba(var(--danger-rgb),.25);color:var(--danger);padding:11px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;text-align:left;animation:shake .4s ease}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 @keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.04)}}
 {% endblock %}
@@ -59,12 +59,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 </div>
 {% endblock %}
 {% block extra_scripts %}
-<script>
 function togglePwd(){
  var inp=document.getElementById('pwdInput');var btn=document.getElementById('eyeBtn');
  if(inp.type==='password'){inp.type='text';btn.innerHTML='<i data-lucide="eye-off" width="18" height="18"></i>'}
  else{inp.type='password';btn.innerHTML='<i data-lucide="eye" width="18" height="18"></i>'}
  if(window.lucide)lucide.createIcons();
 }
-</script>
 {% endblock %}

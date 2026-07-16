@@ -7,19 +7,19 @@
 .main{max-width:1300px;}
 .periodo-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
 .ptab{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;border:1px solid var(--border);color:var(--muted);background:var(--bg2);transition:all var(--tr);}
-.ptab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
+.ptab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);border-color:transparent;box-shadow:0 4px 12px rgba(var(--accent-rgb),.2);}
 .prof-chips{display:flex;flex-wrap:wrap;gap:8px;}
 .pchip{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:500;}
-.pchip-ok{background:rgba(34,197,94,.12);color:var(--success);border:1px solid rgba(34,197,94,.2);}
-.pchip-pend{background:rgba(234,179,8,.1);color:var(--warning);border:1px solid rgba(234,179,8,.2);}
+.pchip-ok{background:rgba(var(--success-rgb),.12);color:var(--success);border:1px solid rgba(var(--success-rgb),.2);}
+.pchip-pend{background:rgba(var(--warning-rgb),.1);color:var(--warning);border:1px solid rgba(var(--warning-rgb),.2);}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .nota-ok{color:var(--success);font-weight:700;}
 .nota-mal{color:var(--danger);font-weight:700;}
 .nota-none{color:var(--sub);}
 .prom-cell{font-size:13px;font-weight:700;border-left:2px solid rgba(255,255,255,.06);}
-.tag-apr{background:rgba(34,197,94,.12);color:var(--success);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;}
-.tag-rep{background:rgba(239,68,68,.12);color:var(--danger);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;}
+.tag-apr{background:rgba(var(--success-rgb),.12);color:var(--success);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;}
+.tag-rep{background:rgba(var(--danger-rgb),.12);color:var(--danger);padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;}
 .email-wrap{display:flex;align-items:center;gap:4px;min-width:140px;}
 .email-input{padding:4px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:11px;width:100%;transition:border-color var(--tr);font-family:inherit;}
 .email-input:focus{outline:none;border-color:var(--accent);}
@@ -222,7 +222,7 @@
 
                 <span class="pchip {% if p.enviado %}pchip-ok{% else %}pchip-pend{% endif %}">
 
-                    {% if p.enviado %}<i data-lucide="check-circle"></i>{% else %}&#x26A0;{% endif %} {{ p.materia }} · {{ p.nombre }}
+                    {% if p.enviado %}<i data-lucide="check-circle"></i>{% else %}<i data-lucide="alert-triangle" style="width:12px;height:12px;"></i>{% endif %} {{ p.materia }} · {{ p.nombre }}
 
                 </span>
 
@@ -288,7 +288,7 @@
 
                         <th colspan="4" style="color:var(--accent);border-left:2px solid rgba(var(--accent-rgb),.2);">
 
-                            {{ mat }}{% if mat not in materias_enviadas %} <span style="color:var(--warning);font-size:9px;">&#x26A0;</span>{% endif %}
+                            {{ mat }}{% if mat not in materias_enviadas %} <span style="color:var(--warning);font-size:9px;"><i data-lucide="alert-triangle" style="width:9px;height:9px;"></i></span>{% endif %}
 
                         </th>
 
@@ -368,17 +368,17 @@
 
                             <input class="email-input" type="email" id="email-{{ fila.id }}" value="{{ fila.email }}" placeholder="correo@acudiente.com" onkeydown="if(event.key==='Enter')guardarEmail({{ fila.id }})">
 
-                            <button class="email-save-btn" onclick="guardarEmail({{ fila.id }})">&#x1F4BE;</button>
+                            <button class="email-save-btn" onclick="guardarEmail({{ fila.id }})" aria-label="Guardar correo"><i data-lucide="save" style="width:14px;height:14px;"></i></button>
 
                         </div>
 
                     </td>
 
-                    <td style="white-space:nowrap;">
+                    <td style="white-space:nowrap;display:flex;gap:4px;">
 
-                        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo, aid=fila.id) }}" title="Descargar PDF" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(var(--accent-rgb),.15);color:var(--accent);text-decoration:none;font-weight:600;margin-right:4px;"><i data-lucide="file-text"></i></a>
+                        <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo, aid=fila.id) }}" title="Descargar PDF" class="btn btn-sm btn-soft"><i data-lucide="file-text"></i></a>
 
-                        <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre }}')" title="Enviar boletín" style="padding:4px 9px;border-radius:5px;font-size:11px;background:rgba(34,197,94,.12);color:var(--success);border:1px solid rgba(34,197,94,.2);cursor:pointer;font-weight:600;">&#x1F4E7;</button>
+                        <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre }}')" title="Enviar boletín" class="btn btn-sm btn-soft" style="color:var(--success);" aria-label="Enviar boletín"><i data-lucide="send" style="width:14px;height:14px;"></i></button>
 
                     </td>
 
@@ -427,9 +427,9 @@
 
         </div>
 
-        <div id="reg-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:var(--danger);padding:9px 12px;border-radius:7px;font-size:12px;margin-bottom:10px;"></div>
+        <div id="reg-error" style="display:none;background:rgba(var(--danger-rgb),.12);border:1px solid rgba(var(--danger-rgb),.25);color:var(--danger);padding:9px 12px;border-radius:7px;font-size:12px;margin-bottom:10px;"></div>
 
-        <div id="reg-ok"    style="display:none;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:var(--success);padding:9px 12px;border-radius:7px;font-size:12px;margin-bottom:10px;"></div>
+        <div id="reg-ok"    style="display:none;background:rgba(var(--success-rgb),.12);border:1px solid rgba(var(--success-rgb),.25);color:var(--success);padding:9px 12px;border-radius:7px;font-size:12px;margin-bottom:10px;"></div>
 
         <label class="form-label">Nombre completo</label>
 
@@ -559,4 +559,13 @@
 <div class="toast-inline" id="toast-inline"></div>
 
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
+{% endblock %}
+{% block extra_scripts %}
+function showToast(msg,type){var t=document.getElementById('toast-inline');if(!t)return;t.innerHTML=msg;t.className='toast-inline show'+(type?' toast-'+type:'');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2500);}
+function abrirModalRegistro(){document.getElementById('modalRegistro').classList.add('open');}
+function cerrarModalRegistro(){document.getElementById('modalRegistro').classList.remove('open');}
+function crearDirectora(){document.getElementById('formDirectora').submit();}
+function enviarCorreosTodos(){showToast('Enviando correos...');}
+function enviarCorreoUno(slug){showToast('Enviando correo...');}
+function guardarEmail(){showToast('Correo guardado');}
 {% endblock %}

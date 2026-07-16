@@ -25,7 +25,7 @@
     <a href="/{{ slug }}/notificaciones" class="sidebar-item"><span class="icon"><i data-lucide="bell"></i></span><span>Notificaciones</span>{% if notif_count %}<span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
     <div class="sidebar-section divider">Configuración</div>
     <a href="/{{ slug }}/cambiar_password" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Perfil</span></a>
-    <a href="/{{ slug }}/logout" class="sidebar-item" style="color:var(--danger)"><span class="icon"><i data-lucide="log-out"></i></span><span>Salir</span></a>
+    <a href="/{{ slug }}/logout" class="sidebar-item text-danger"><span class="icon"><i data-lucide="log-out"></i></span><span>Salir</span></a>
   </div>
   <div class="sidebar-user">
     <div class="avatar" style="background:var(--accent);">{% if profesor is defined and profesor %}{{ profesor.nombre[:1] }}{% else %}{{ (nombre[:1] if nombre else '?') }}{% endif %}</div>

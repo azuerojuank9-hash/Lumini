@@ -16,12 +16,12 @@
 .finput:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
 .bsm{padding:8px 16px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;min-height:36px;transition:all var(--tr);display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
 .bsm:active{transform:scale(.96);}
-.badd{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.badd{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);}
 .badd:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(var(--accent-rgb),.35);}
 .bout{background:transparent;color:var(--muted);border:1.5px solid var(--border);}
 .bout:hover{background:rgba(var(--accent-rgb),.06);color:var(--text);border-color:rgba(var(--accent-rgb),.2);}
-.bgreen{background:linear-gradient(135deg,var(--success),#16A34A);color:#fff;}
-.bgreen:hover{transform:translateY(-1px);box-shadow:0 3px 12px rgba(34,197,94,.3);}
+.bgreen{background:linear-gradient(135deg,var(--success),var(--green-dark));color:var(--text-on-accent);}
+.bgreen:hover{transform:translateY(-1px);box-shadow:0 3px 12px rgba(var(--success-rgb),.3);}
 .dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow);animation:fadeSlideIn .4s ease;}
 @keyframes fadeSlideIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
 .qaction{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;font-family:'Inter',sans-serif;transition:all .2s ease;}
@@ -34,15 +34,15 @@ tr:last-child td{border-bottom:none;}
 tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .ta{text-align:left;font-weight:500;}
 .err-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
-.err-badge.ok{background:rgba(34,197,94,.12);color:var(--success);}
-.err-badge.fail{background:rgba(239,68,68,.12);color:var(--danger);}
+.err-badge.ok{background:rgba(var(--success-rgb),.12);color:var(--success);}
+.err-badge.fail{background:rgba(var(--danger-rgb),.12);color:var(--danger);}
 .file-zone{border:2px dashed var(--border);border-radius:var(--radius-md);padding:40px 20px;text-align:center;cursor:pointer;transition:all var(--tr);margin-bottom:14px;}
 .file-zone:hover{border-color:var(--accent);background:rgba(var(--accent-rgb),.03);}
 .file-zone.dragover{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);}
 .file-zone .icon{font-size:36px;color:var(--muted);margin-bottom:8px;}
 .file-zone .label{font-size:14px;color:var(--muted);margin-bottom:4px;}
 .file-zone .hint{font-size:11px;color:var(--sub);}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--text-on-accent);border-radius:50%;animation:spin .6s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .preview-section{display:none;}
 .preview-section.show{display:block;animation:fadeSlideIn .4s ease;}
@@ -51,7 +51,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .curso-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;}
 .ctab{padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all var(--tr);}
 .ctab:hover{background:rgba(var(--accent-rgb),.06);color:var(--text);}
-.ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;}
+.ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);border-color:transparent;}
 {% endblock %}
 
 {% block sidebar %}{% include "components/sidebar_teacher.html" %}{% endblock %}
@@ -82,7 +82,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         </div>
         <div class="card-body">
             <div class="file-zone" id="fileZone" onclick="document.getElementById('fileInput').click()">
-                <div class="icon">&#128196;</div>
+                <div class="icon"><i data-lucide="file-spreadsheet" style="width:40px;height:40px;"></i></div>
                 <div class="label">Haz clic o arrastra un archivo .xlsx aqu&iacute;</div>
                 <div class="hint">El archivo debe tener el formato oficial de LUMINI (columnas: N&deg;, Estudiante, AID, actividades, Evaluaci&oacute;n, Autoevaluaci&oacute;n, Promedio)</div>
                 <input type="file" id="fileInput" name="archivo" accept=".xlsx" style="display:none" onchange="updateFileLabel(this)">
@@ -124,4 +124,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 </div>
 
 </div>
+{% endblock %}
+{% block extra_scripts %}
+function confirmImport(){ document.getElementById('importForm').submit(); }
+function resetPage(){ window.location.href=window.location.pathname; }
 {% endblock %}

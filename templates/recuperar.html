@@ -95,12 +95,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 </div>
 {% endblock %}
 {% block extra_scripts %}
-<script>
 function togglePass(btn){
  var inp=btn.parentElement.querySelector('input');
  if(inp.type==='password'){inp.type='text';btn.innerHTML='<i data-lucide="eye-off" width="16" height="16"></i>'}
  else{inp.type='password';btn.innerHTML='<i data-lucide="eye" width="16" height="16"></i>'}
- if(window.lucide)lucide.createIcons();
+  if(window.lucide)lucide.createIcons();
 }
-</script>
 {% endblock %}

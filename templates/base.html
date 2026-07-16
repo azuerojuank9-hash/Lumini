@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 {% block fonts %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 {% endblock %}
 <link rel="stylesheet" href="/static/css/base.css">
 <link rel="stylesheet" href="/static/css/theme.css">
@@ -35,10 +35,10 @@
 <style>:root{ {% block accent_css %}{% endblock %} }{% block extra_styles %}{% endblock %}</style>
 </head>
 <body>
-{% block hamburger %}<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu"><span>☰</span></button>{% endblock %}
+{% block hamburger %}<button class="hamburger" onclick="toggleSidebar()" aria-label="Menú"><i data-lucide="menu"></i></button>{% endblock %}
 {% block sidebar_overlay %}<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()" role="presentation"></div>{% endblock %}
 {% block sidebar %}{% endblock %}
-<main class="main"{% block main_attrs %}{% endblock %}>
+<main {% block main_attrs %}class="main"{% endblock %}>
 {% block content %}{% endblock %}
 </main>
 {% block theme_toggle %}

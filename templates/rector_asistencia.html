@@ -18,30 +18,30 @@
 .stat-card .stat-info{display:flex;flex-direction:column;}
 .stat-card .stat-num{font-size:18px;font-weight:800;line-height:1.2;}
 .stat-card .stat-label{font-size:10px;color:var(--muted);}
-.stat-card .stat-icon.green{background:rgba(34,197,94,.15);color:var(--success);}
-.stat-card .stat-icon.red{background:rgba(239,68,68,.15);color:var(--danger);}
-.stat-card .stat-icon.yellow{background:rgba(234,179,8,.15);color:#EAB308;}
-.stat-card .stat-icon.blue{background:rgba(59,130,246,.15);color:#3B82F6;}
-.stat-card .stat-icon.purple{background:rgba(168,85,247,.15);color:#A855F7;}
-.stat-card .stat-icon.orange{background:rgba(251,146,60,.15);color:#FB923C;}
+.stat-card .stat-icon.green{background:rgba(var(--success-rgb),.15);color:var(--success);}
+.stat-card .stat-icon.red{background:rgba(var(--danger-rgb),.15);color:var(--danger);}
+.stat-card .stat-icon.yellow{background:rgba(var(--warning-rgb),.15);color:var(--warning);}
+.stat-card .stat-icon.blue{background:rgba(var(--info-blue-rgb),.15);color:var(--info-blue);}
+.stat-card .stat-icon.purple{background:rgba(var(--purple-rgb),.15);color:var(--purple);}
+.stat-card .stat-icon.orange{background:rgba(var(--coral-rgb),.15);color:var(--coral);}
 .abtn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 10px;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s ease;min-height:30px;}
 .abtn:active{transform:scale(.88);}
-.abtn.ap{background:rgba(34,197,94,.10);color:var(--success);border:1px solid rgba(34,197,94,.18);}
-.abtn.ap.active{background:linear-gradient(135deg,var(--success),#16A34A);color:#fff;border-color:transparent;}
-.abtn.aa{background:rgba(239,68,68,.10);color:var(--danger);border:1px solid rgba(239,68,68,.18);}
-.abtn.aa.active{background:linear-gradient(135deg,var(--danger),#DC2626);color:#fff;border-color:transparent;}
-.abtn.at{background:rgba(234,179,8,.10);color:#EAB308;border:1px solid rgba(234,179,8,.18);}
-.abtn.at.active{background:linear-gradient(135deg,#EAB308,#CA8A04);color:#fff;border-color:transparent;}
-.abtn.ae{background:rgba(59,130,246,.10);color:#3B82F6;border:1px solid rgba(59,130,246,.18);}
-.abtn.ae.active{background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;border-color:transparent;}
-.abtn.ax{background:rgba(168,85,247,.10);color:#A855F7;border:1px solid rgba(168,85,247,.18);}
-.abtn.ax.active{background:linear-gradient(135deg,#A855F7,#9333EA);color:#fff;border-color:transparent;}
-.abtn.as{background:rgba(251,146,60,.10);color:#FB923C;border:1px solid rgba(251,146,60,.18);}
-.abtn.as.active{background:linear-gradient(135deg,#FB923C,#F97316);color:#fff;border-color:transparent;}
+.abtn.ap{background:rgba(var(--success-rgb),.10);color:var(--success);border:1px solid rgba(var(--success-rgb),.18);}
+.abtn.ap.active{background:linear-gradient(135deg,var(--success),var(--green-dark));color:var(--text-on-accent);border-color:transparent;}
+.abtn.aa{background:rgba(var(--danger-rgb),.10);color:var(--danger);border:1px solid rgba(var(--danger-rgb),.18);}
+.abtn.aa.active{background:linear-gradient(135deg,var(--danger),var(--red-dark));color:var(--text-on-accent);border-color:transparent;}
+.abtn.at{background:rgba(var(--warning-rgb),.10);color:var(--warning);border:1px solid rgba(var(--warning-rgb),.18);}
+.abtn.at.active{background:linear-gradient(135deg,var(--warning),var(--yellow-dark));color:var(--text-on-accent);border-color:transparent;}
+.abtn.ae{background:rgba(var(--info-blue-rgb),.10);color:var(--info-blue);border:1px solid rgba(var(--info-blue-rgb),.18);}
+.abtn.ae.active{background:linear-gradient(135deg,var(--info-blue),var(--blue));color:var(--text-on-accent);border-color:transparent;}
+.abtn.ax{background:rgba(var(--purple-rgb),.10);color:var(--purple);border:1px solid rgba(var(--purple-rgb),.18);}
+.abtn.ax.active{background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:var(--text-on-accent);border-color:transparent;}
+.abtn.as{background:rgba(var(--coral-rgb),.10);color:var(--coral);border:1px solid rgba(var(--coral-rgb),.18);}
+.abtn.as.active{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:var(--text-on-accent);border-color:transparent;}
 .alerts-panel{padding:12px 16px;}
 .alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:6px;font-size:12px;}
-.alert-item.high{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);}
-.alert-item.medium{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.15);}
+.alert-item.high{background:rgba(var(--danger-rgb),.08);border:1px solid rgba(var(--danger-rgb),.15);}
+.alert-item.medium{background:rgba(var(--warning-rgb),.08);border:1px solid rgba(var(--warning-rgb),.15);}
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;padding:16px;}
@@ -136,4 +136,60 @@
 <input type="hidden" id="slug" value="{{ slug }}">
 
 <div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado
+{% endblock %}
+{% block extra_scripts %}
+function exportarExcel(){
+  var curso=document.getElementById('filtroCurso')?document.getElementById('filtroCurso').value:'';
+  if(!curso){if(window.showToast)window.showToast('Selecciona un curso para exportar','warning');return;}
+  window.open('/'+document.getElementById('slug').value+'/asistencia_reporte_excel?curso='+encodeURIComponent(curso),'_blank');
+}
+function cargarDatos(){
+  var slug=document.getElementById('slug').value;
+  var curso=document.getElementById('filtroCurso').value;
+  var jornada=document.getElementById('filtroJornada').value;
+  var prof=document.getElementById('filtroProfesor').value;
+  var fecha=document.getElementById('filtroFecha').value;
+  var p='curso='+encodeURIComponent(curso)+'&jornada='+encodeURIComponent(jornada)+'&profesor_id='+encodeURIComponent(prof)+'&fecha='+encodeURIComponent(fecha);
+  fetch('/'+slug+'/rector/asistencia_data?'+p)
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(!d)return;
+    var statsHtml='',estHtml='',alertsHtml='',estCount=0,alerCount=0;
+    if(d.stats){
+      var icons={presentes:'check-circle',ausentes:'x-circle',tardanzas:'clock',excusas:'file-text',permisos:'check-square',salidas:'log-out'};
+      var cols={presentes:'green',ausentes:'red',tardanzas:'yellow',excusas:'blue',permisos:'purple',salidas:'orange'};
+      for(var k in d.stats){
+        if(k==='total')continue;
+        statsHtml+='<div class="stat-card"><div class="stat-icon '+cols[k]+'"><i data-lucide="'+icons[k]+'"></i></div><div class="stat-info"><span class="stat-num">'+(d.stats[k]||0)+'</span><span class="stat-label">'+k.charAt(0).toUpperCase()+k.slice(1)+'</span></div></div>';
+      }
+      statsHtml+='<div class="stat-card"><div class="stat-icon muted"><i data-lucide="users"></i></div><div class="stat-info"><span class="stat-num">'+(d.stats.total||0)+'</span><span class="stat-label">Total</span></div></div>';
+    }
+    document.getElementById('statsRow').innerHTML=statsHtml;
+    if(d.estudiantes&&d.estudiantes.length){
+      estCount=d.estudiantes.length;
+      estHtml='<div style="overflow-x:auto;"><table><thead><tr><th>#</th><th>Estudiante</th><th>Estado</th><th>Observación</th></tr></thead><tbody>';
+      d.estudiantes.forEach(function(e,i){
+        var estado=e.estado||'—';
+        var cls=e.estado==='P'?'success':e.estado==='A'?'danger':e.estado==='T'?'warning':'muted';
+        estHtml+='<tr><td>'+(i+1)+'</td><td><strong>'+e.nombre+'</strong></td><td><span class="badge badge-'+cls+'">'+estado+'</span></td><td style="font-size:11px;color:var(--sub);">'+(e.observacion||'')+'</td></tr>';
+      });
+      estHtml+='</tbody></table></div>';
+    }else{
+      estHtml='<div class="empty-state">No se encontraron estudiantes con los filtros seleccionados.</div>';
+    }
+    document.getElementById('estudiantesContent').innerHTML=estHtml;
+    document.getElementById('estudiantesCount').textContent=estCount+' estudiantes';
+    if(d.alertas&&d.alertas.length){
+      alerCount=d.alertas.length;
+      d.alertas.forEach(function(a){
+        alertsHtml+='<div class="alert-item '+(a.nivel||'medium')+'"><i data-lucide="alert-triangle" style="width:14px;height:14px;flex-shrink:0;margin-top:2px;"></i><span>'+a.mensaje+'</span></div>';
+      });
+    }else{
+      alertsHtml='<div class="empty-state">Sin alertas activas</div>';
+    }
+    document.getElementById('alertasContent').innerHTML=alertsHtml;
+    document.getElementById('alertasCount').textContent=alerCount;
+    if(typeof lucide!=='undefined')lucide.createIcons();
+  }).catch(function(){document.getElementById('estudiantesContent').innerHTML='<div class="empty-state">Error al cargar datos</div>';});
+}
 {% endblock %}

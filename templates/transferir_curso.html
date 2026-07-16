@@ -22,21 +22,21 @@
 .periodo-check input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;}
 .periodo-check span{font-size:13px;font-weight:500;}
 .periodo-check.checked{border-color:var(--accent);background:rgba(var(--accent-rgb),.06);}
-.btn-submit{width:100%;padding:8px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);margin-top:4px;}
+.btn-submit{width:100%;padding:8px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all var(--tr);box-shadow:0 4px 16px rgba(var(--accent-rgb),.2);margin-top:4px;}
 .btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(var(--accent-rgb),.3);}
 .btn-submit:active{transform:scale(.98);}
 .btn-back{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 16px;background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;margin-top:10px;transition:background var(--tr);}
 .btn-back:hover{background:rgba(255,255,255,.08);}
 .alert{padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:18px;line-height:1.5;}
-.alert-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--danger);}
-.alert-success{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--success);}
-.alert-warn{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.18);color:#F59E0B;}
+.alert-error{background:rgba(var(--danger-rgb),.08);border:1px solid rgba(var(--danger-rgb),.2);color:var(--danger);}
+.alert-success{background:rgba(var(--success-rgb),.08);border:1px solid rgba(var(--success-rgb),.2);color:var(--success);}
+.alert-warn{background:rgba(var(--orange-rgb),.06);border:1px solid rgba(var(--orange-rgb),.18);color:var(--orange);}
 .empty-state{text-align:center;padding:32px 20px;color:var(--muted);}
 .empty-state .icon{font-size:2.2rem;margin-bottom:10px;}
 .empty-state p{font-size:13px;line-height:1.6;}
 .info-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),.18);color:var(--accent);border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;font-weight:500;margin-bottom:18px;}
 .step{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
-.step-num{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;box-shadow:0 2px 8px rgba(var(--accent-rgb),.25);}
+.step-num{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;box-shadow:0 2px 8px rgba(var(--accent-rgb),.25);}
 .step-text{font-size:12px;color:var(--muted);line-height:1.6;}
 {% endblock %}
 
@@ -48,7 +48,7 @@
         {% if '<i data-lucide="check-circle"></i>' in error %}
         <div class="alert alert-success">{{ error }}</div>
         {% else %}
-        <div class="alert alert-error"><i data-lucide="alert-triangle"></i>️ {{ error }}</div>
+        <div class="alert alert-error"><i data-lucide="alert-triangle"></i> {{ error }}</div>
         {% endif %}
     {% endif %}
     {% if exito %}
@@ -63,7 +63,7 @@
     <div class="card">
         <div class="card-body">
             <div class="empty-state">
-                <div class="icon">👥</div>
+                <div class="icon"><i data-lucide="users" style="width:40px;height:40px;"></i></div>
                 <p>No hay otros profesores activos con la materia <strong>{{ materia }}</strong> en la jornada <strong>{{ jornada }}</strong> para recibir el curso.<br><br>El nuevo profesor debe registrarse primero y tener esta materia asignada.</p>
             </div>
         </div>
@@ -82,7 +82,7 @@
     {% else %}
 
     <div class="card">
-        <div class="card-head"><span class="card-title"><i data-lucide="info"></i>️ ¿Cómo funciona?</span></div>
+        <div class="card-head"><span class="card-title"><i data-lucide="info"></i> ¿Cómo funciona?</span></div>
         <div class="card-body">
             <div class="step"><div class="step-num">1</div><div class="step-text">Selecciona el <strong>curso</strong> que quieres transferir y el <strong>profesor</strong> que lo recibirá.</div></div>
             <div class="step"><div class="step-num">2</div><div class="step-text">Elige los <strong>periodos</strong> cuyas actividades, notas y evaluaciones quieres pasar al nuevo profesor.</div></div>
@@ -135,7 +135,7 @@
                 </div>
 
                 <div class="alert alert-warn" style="margin-bottom:16px;">
-                    <i data-lucide="alert-triangle"></i>️ Esta acción <strong>no se puede deshacer</strong>. Todas las actividades, notas y evaluaciones de los periodos seleccionados quedarán bajo el nuevo profesor.
+                    <i data-lucide="alert-triangle"></i> Esta acción <strong>no se puede deshacer</strong>. Todas las actividades, notas y evaluaciones de los periodos seleccionados quedarán bajo el nuevo profesor.
                 </div>
 
                 <button type="submit" class="btn-submit" onclick="return confirmarTransferencia()">

@@ -11,14 +11,14 @@
 .filter-bar select,.filter-bar input{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer}
 .filter-bar select:focus{outline:2px solid var(--accent);outline-offset:2px}
 .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
-.bg-purple{background:rgba(109,40,217,.2);color:#A78BFA}
-.bg-blue{background:rgba(37,99,235,.2);color:#60A5FA}
-.bg-green{background:rgba(34,197,94,.2);color:#4ADE80}
-.bg-red{background:rgba(239,68,68,.2);color:#F87171}
-.bg-yellow{background:rgba(234,179,8,.2);color:#FACC15}
-.bg-orange{background:rgba(249,115,22,.2);color:#FDBA74}
-.bg-pink{background:rgba(236,72,153,.2);color:#F472B6}
-.bg-teal{background:rgba(20,184,166,.2);color:#2DD4BF}
+.bg-purple{background:rgba(var(--accent-rgb),.2);color:var(--accent)}
+.bg-blue{background:rgba(var(--blue-rgb),.2);color:var(--blue)}
+.bg-green{background:rgba(var(--success-rgb),.2);color:var(--success)}
+.bg-red{background:rgba(var(--danger-rgb),.2);color:var(--danger)}
+.bg-yellow{background:rgba(var(--warning-rgb),.2);color:var(--warning)}
+.bg-orange{background:rgba(var(--orange-rgb),.2);color:var(--orange)}
+.bg-pink{background:rgba(var(--pink-rgb),.2);color:var(--pink)}
+.bg-teal{background:rgba(var(--teal-rgb),.2);color:var(--teal)}
 .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 .chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px}
 .chart-card .chart-title{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text)}
@@ -27,18 +27,18 @@
 .alerts-section,.rankings-section,.stats-section{margin-bottom:24px}
 .section-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .alert-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);margin-bottom:6px;font-size:13px}
-.alert-red{background:rgba(239,68,68,.12);border-left:3px solid var(--danger);color:var(--danger)}
-.alert-orange{background:rgba(249,115,22,.12);border-left:3px solid var(--orange);color:var(--orange)}
-.alert-yellow{background:rgba(234,179,8,.12);border-left:3px solid var(--warning);color:var(--warning)}
-.alert-green{background:rgba(34,197,94,.12);border-left:3px solid var(--success);color:var(--success)}
+.alert-red{background:rgba(var(--danger-rgb),.12);border-left:3px solid var(--danger);color:var(--danger)}
+.alert-orange{background:rgba(var(--orange-rgb),.12);border-left:3px solid var(--orange);color:var(--orange)}
+.alert-yellow{background:rgba(var(--warning-rgb),.12);border-left:3px solid var(--warning);color:var(--warning)}
+.alert-green{background:rgba(var(--success-rgb),.12);border-left:3px solid var(--success);color:var(--success)}
 .data-table{width:100%;border-collapse:collapse;font-size:13px}
 .data-table th{padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);color:var(--muted);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:0.5px}
 .data-table td{padding:8px 10px;border-bottom:1px solid var(--border)}
 .data-table tr:hover td{background:var(--bg3)}
 .rank-badge{display:inline-flex;width:22px;height:22px;align-items:center;justify-content:center;border-radius:50%;font-size:11px;font-weight:700;background:var(--bg3);color:var(--muted)}
-.rank-1{background:#FACC15;color:#1E293B}
-.rank-2{background:#94A3B8;color:#1E293B}
-.rank-3{background:#D97706;color:#fff}
+.rank-1{background:var(--warning);color:var(--text)}
+.rank-2{background:var(--sub);color:var(--text)}
+.rank-3{background:var(--orange-dark);color:var(--text-on-accent)}
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
 .stat-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center}
 .stat-item .stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
@@ -123,4 +123,9 @@
       <div class="stat-grid">{% for _ in range(10) %}<div class="stat-item"><div class="skeleton" style="height:40px"></div></div>{% endfor %}</div>
     </div>
   </div>
+{% endblock %}
+{% block extra_scripts %}
+function exportPDF(){ if(window.showToast)window.showToast('Generando PDF...','info'); }
+function exportExcel(){ if(window.showToast)window.showToast('Generando Excel...','info'); }
+function loadDashboard(){ /* loaded on page render */ }
 {% endblock %}

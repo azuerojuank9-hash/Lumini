@@ -25,12 +25,12 @@ select.form-control{cursor:pointer;}
 .canal-meta{font-size:11px;color:var(--muted);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap;}
 .canal-meta span{display:inline-flex;align-items:center;gap:4px;}
 .canal-tipo{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;}
-.tipo-institucional{background:rgba(109,40,217,.1);color:var(--accent);}
-.tipo-rectoria{background:rgba(37,99,235,.1);color:var(--info);}
-.tipo-profesores{background:rgba(34,197,94,.1);color:var(--success);}
-.tipo-director_curso{background:rgba(245,158,11,.1);color:var(--warning);}
-.tipo-curso{background:rgba(239,68,68,.1);color:var(--danger);}
-.tipo-materia{background:rgba(100,116,139,.1);color:var(--sub);}
+.tipo-institucional{background:rgba(var(--accent-rgb),.1);color:var(--accent);}
+.tipo-rectoria{background:rgba(var(--blue-rgb),.1);color:var(--info);}
+.tipo-profesores{background:rgba(var(--success-rgb),.1);color:var(--success);}
+.tipo-director_curso{background:rgba(var(--orange-rgb),.1);color:var(--warning);}
+.tipo-curso{background:rgba(var(--danger-rgb),.1);color:var(--danger);}
+.tipo-materia{background:rgba(var(--sub-rgb),.1);color:var(--sub);}
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
 .empty-state .icon{font-size:48px;opacity:.2;margin-bottom:16px;color:var(--accent);}
 .empty-state h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;}
@@ -131,4 +131,47 @@ select.form-control{cursor:pointer;}
 </div>
 {% endif %}
 </div>
+
+<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
+<input type="hidden" id="slug" value="{{ slug }}">
+{% endblock %}
+{% block extra_scripts %}
+var _slug=document.getElementById('slug')?document.getElementById('slug').value:'';
+var _base='/'+_slug+'/rector';
+function mostrarFormCrear(){document.getElementById('formCrear').style.display='block';if(typeof lucide!=='undefined')lucide.createIcons();}
+function ocultarFormCrear(){document.getElementById('formCrear').style.display='none';}
+function onTipoChange(){
+  var t=document.getElementById('tipoCanal').value;
+  document.getElementById('grupoCurso').classList.toggle('d-none',t!=='curso'&&t!=='materia');
+  document.getElementById('grupoMateria').classList.toggle('d-none',t!=='materia');
+}
+function crearCanal(){
+  var t=document.getElementById('tipoCanal').value;
+  var n=document.getElementById('nombreCanal').value;
+  var d=document.getElementById('descCanal').value;
+  var c=(document.getElementById('cursoCanal')||{}).value||'';
+  var m=(document.getElementById('materiaCanal')||{}).value||'';
+  var csrf=document.getElementById('csrf-global')?document.getElementById('csrf-global').value:'';
+  var b='tipo='+encodeURIComponent(t)+'&nombre='+encodeURIComponent(n)+'&descripcion='+encodeURIComponent(d)+'&curso='+encodeURIComponent(c)+'&materia='+encodeURIComponent(m)+'&_csrf_token='+encodeURIComponent(csrf);
+  fetch(_base+'/canales/crear',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:b})
+  .then(function(r){return r.json();}).then(function(d){if(d.ok){window.location.reload();}else{alert(d.mensaje||'Error');}})
+  .catch(function(){alert('Error de red');});
+}
+function verMiembros(cid){
+  fetch(_base+'/canales/'+cid+'/miembros')
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(!d.ok)return;
+    var h=d.miembros.map(function(m){return '<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><i data-lucide="user" style="width:14px;height:14px;"></i> '+m.nombre_usuario+'</div>';}).join('');
+    if(window.showToast)window.showToast(h,'info');else alert(d.canal.nombre+': '+d.miembros.length+' miembros');
+    if(typeof lucide!=='undefined')lucide.createIcons();
+  }).catch(function(){});
+}
+function eliminarCanal(cid){
+  if(!confirm('Eliminar este canal?'))return;
+  var csrf=document.getElementById('csrf-global')?document.getElementById('csrf-global').value:'';
+  fetch(_base+'/canales/'+cid+'/eliminar',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'_csrf_token='+encodeURIComponent(csrf)})
+  .then(function(r){return r.json();}).then(function(d){if(d.ok){window.location.reload();}else{alert(d.mensaje||'Error');}})
+  .catch(function(){alert('Error de red');});
+}
 {% endblock %}

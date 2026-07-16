@@ -13,16 +13,16 @@ th{text-align:left;padding:10px 8px;color:var(--muted);font-weight:600;font-size
 td{padding:8px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
 tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
-.badge-create{background:rgba(34,197,94,.12);color:var(--success);}
-.badge-update{background:rgba(37,99,235,.12);color:var(--info);}
-.badge-delete{background:rgba(239,68,68,.12);color:var(--danger);}
-.badge-login{background:rgba(109,40,217,.12);color:var(--accent);}
+.badge-create{background:rgba(var(--success-rgb),.12);color:var(--success);}
+.badge-update{background:rgba(var(--blue-rgb),.12);color:var(--info);}
+.badge-delete{background:rgba(var(--danger-rgb),.12);color:var(--danger);}
+.badge-login{background:rgba(var(--accent-rgb),.12);color:var(--accent);}
 .filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
 .filter-bar select{padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;}
 .pagination{display:flex;gap:6px;align-items:center;margin-top:16px;justify-content:center;}
 .pagination a{padding:6px 12px;background:var(--bg3);border-radius:var(--radius-sm);color:var(--muted);text-decoration:none;font-size:12px;transition:all var(--tr);}
-.pagination a:hover{background:var(--accent);color:#fff;}
-.pagination .active{background:var(--accent);color:#fff;}
+.pagination a:hover{background:var(--accent);color:var(--text-on-accent);}
+.pagination .active{background:var(--accent);color:var(--text-on-accent);}
 .pagination .info{font-size:11px;color:var(--sub);}
 .val-diff{font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .val-diff code{background:var(--bg3);padding:1px 4px;border-radius:3px;font-size:10px;}
@@ -87,7 +87,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
           {% if r.valor_anterior and r.valor_nuevo %}
           <div class="val-diff">
             <span style="color:var(--danger);"><code>{{ r.valor_anterior[:60] }}</code></span>
-            <span style="color:var(--sub);"> → </span>
+            <span style="color:var(--sub);"><i data-lucide="arrow-right" style="width:14px;height:14px;vertical-align:middle;"></i></span>
             <span style="color:var(--success);"><code>{{ r.valor_nuevo[:60] }}</code></span>
           </div>
           {% elif r.valor_nuevo %}

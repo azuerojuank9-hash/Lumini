@@ -28,7 +28,7 @@
     <div class="sidebar-section divider">Configuración</div>
     {% if rector.es_principal %}<a href="/{{ slug }}/rector/gestion-rectores" class="sidebar-item"><span class="icon"><i data-lucide="shield"></i></span><span>Gestión Rectores</span></a>{% endif %}
     <a href="/{{ slug }}/rector/configuracion" class="sidebar-item"><span class="icon"><i data-lucide="settings"></i></span><span>Configuración</span></a>
-    <a href="/{{ slug }}/rector/logout" class="sidebar-item" style="color:var(--danger)"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+    <a href="/{{ slug }}/rector/logout" class="sidebar-item text-danger"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="avatar" style="background:var(--accent);">{{ rector.nombre[:1] }}</div>

@@ -9,24 +9,24 @@
 .breadcrumb{font-size:11px;color:var(--muted);margin-top:2px;}
 .curso-tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;}
 .ctab{padding:6px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:all var(--tr);font-family:inherit;}
-.ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;}
+.ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);border-color:transparent;}
 .ctab:hover:not(.active){background:var(--bg3);color:var(--text);}
 .tnum{width:32px;text-align:center;color:var(--muted);font-size:11px;}
 .tnombre{font-weight:600;color:var(--text);}
 .abtn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 12px;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s ease;min-height:32px;touch-action:manipulation;}
 .abtn:active{transform:scale(.88);}
-.abtn.ap{background:rgba(34,197,94,.10);color:var(--success);border:1px solid rgba(34,197,94,.18);}
-.abtn.ap:hover,.abtn.active.ap{background:linear-gradient(135deg,var(--success),#16A34A);color:#fff;border-color:transparent;}
-.abtn.aa{background:rgba(239,68,68,.10);color:var(--danger);border:1px solid rgba(239,68,68,.18);}
-.abtn.aa:hover,.abtn.active.aa{background:linear-gradient(135deg,var(--danger),#DC2626);color:#fff;border-color:transparent;}
-.abtn.at{background:rgba(234,179,8,.10);color:var(--warning);border:1px solid rgba(234,179,8,.18);}
-.abtn.at:hover,.abtn.active.at{background:linear-gradient(135deg,var(--warning),#CA8A04);color:#fff;border-color:transparent;}
-.abtn.ae{background:rgba(59,130,246,.10);color:#3B82F6;border:1px solid rgba(59,130,246,.18);}
-.abtn.ae:hover,.abtn.active.ae{background:linear-gradient(135deg,#3B82F6,#2563EB);color:#fff;border-color:transparent;}
-.abtn.ax{background:rgba(168,85,247,.10);color:#A855F7;border:1px solid rgba(168,85,247,.18);}
-.abtn.ax:hover,.abtn.active.ax{background:linear-gradient(135deg,#A855F7,#9333EA);color:#fff;border-color:transparent;}
-.abtn.as{background:rgba(251,146,60,.10);color:#FB923C;border:1px solid rgba(251,146,60,.18);}
-.abtn.as:hover,.abtn.active.as{background:linear-gradient(135deg,#FB923C,#F97316);color:#fff;border-color:transparent;}
+.abtn.ap{background:rgba(var(--success-rgb),.10);color:var(--success);border:1px solid rgba(var(--success-rgb),.18);}
+.abtn.ap:hover,.abtn.active.ap{background:linear-gradient(135deg,var(--success),var(--green-dark));color:var(--text-on-accent);border-color:transparent;}
+.abtn.aa{background:rgba(var(--danger-rgb),.10);color:var(--danger);border:1px solid rgba(var(--danger-rgb),.18);}
+.abtn.aa:hover,.abtn.active.aa{background:linear-gradient(135deg,var(--danger),var(--red-dark));color:var(--text-on-accent);border-color:transparent;}
+.abtn.at{background:rgba(var(--warning-rgb),.10);color:var(--warning);border:1px solid rgba(var(--warning-rgb),.18);}
+.abtn.at:hover,.abtn.active.at{background:linear-gradient(135deg,var(--warning),var(--yellow-dark));color:var(--text-on-accent);border-color:transparent;}
+.abtn.ae{background:rgba(var(--info-blue-rgb),.10);color:var(--info-blue);border:1px solid rgba(var(--info-blue-rgb),.18);}
+.abtn.ae:hover,.abtn.active.ae{background:linear-gradient(135deg,var(--info-blue),var(--blue));color:var(--text-on-accent);border-color:transparent;}
+.abtn.ax{background:rgba(var(--purple-rgb),.10);color:var(--purple);border:1px solid rgba(var(--purple-rgb),.18);}
+.abtn.ax:hover,.abtn.active.ax{background:linear-gradient(135deg,var(--purple),var(--purple-dark));color:var(--text-on-accent);border-color:transparent;}
+.abtn.as{background:rgba(var(--coral-rgb),.10);color:var(--coral);border:1px solid rgba(var(--coral-rgb),.18);}
+.abtn.as:hover,.abtn.active.as{background:linear-gradient(135deg,var(--coral),var(--coral-dark));color:var(--text-on-accent);border-color:transparent;}
 .asist-group{display:inline-flex;gap:3px;background:var(--bg3);padding:3px;border-radius:10px;border:1px solid var(--border);flex-wrap:wrap;max-width:360px;}
 .date-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
 .date-display{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
@@ -38,24 +38,24 @@
 .stat-card .stat-info{display:flex;flex-direction:column;}
 .stat-card .stat-num{font-size:20px;font-weight:800;line-height:1.2;}
 .stat-card .stat-label{font-size:11px;color:var(--muted);}
-.stat-card .stat-icon.green{background:rgba(34,197,94,.15);color:var(--success);}
-.stat-card .stat-icon.red{background:rgba(239,68,68,.15);color:var(--danger);}
-.stat-card .stat-icon.yellow{background:rgba(234,179,8,.15);color:var(--warning);}
-.stat-card .stat-icon.blue{background:rgba(59,130,246,.15);color:#3B82F6;}
-.stat-card .stat-icon.purple{background:rgba(168,85,247,.15);color:#A855F7;}
-.stat-card .stat-icon.orange{background:rgba(251,146,60,.15);color:#FB923C;}
+.stat-card .stat-icon.green{background:rgba(var(--success-rgb),.15);color:var(--success);}
+.stat-card .stat-icon.red{background:rgba(var(--danger-rgb),.15);color:var(--danger);}
+.stat-card .stat-icon.yellow{background:rgba(var(--warning-rgb),.15);color:var(--warning);}
+.stat-card .stat-icon.blue{background:rgba(var(--info-blue-rgb),.15);color:var(--info-blue);}
+.stat-card .stat-icon.purple{background:rgba(var(--purple-rgb),.15);color:var(--purple);}
+.stat-card .stat-icon.orange{background:rgba(var(--coral-rgb),.15);color:var(--coral);}
 .stat-card .stat-icon.muted{background:var(--bg3);color:var(--muted);}
 .card-head-meta{font-size:11px;color:var(--muted);font-weight:400;}
 .stat-badges{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;}
 .stat-badge{padding:6px 14px;border-radius:8px;font-weight:700;}
-.stat-badge.success{background:rgba(34,197,94,.10);color:var(--success);}
-.stat-badge.danger{background:rgba(239,68,68,.10);color:var(--danger);}
-.stat-badge.warning{background:rgba(234,179,8,.10);color:var(--warning);}
+.stat-badge.success{background:rgba(var(--success-rgb),.10);color:var(--success);}
+.stat-badge.danger{background:rgba(var(--danger-rgb),.10);color:var(--danger);}
+.stat-badge.warning{background:rgba(var(--warning-rgb),.10);color:var(--warning);}
 .sidebar-theme-btn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 16px;border-top:1px solid var(--border);margin-top:8px;border-radius:0;justify-content:flex-start;}
 .alerts-panel{padding:12px 16px;}
 .alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:6px;font-size:12px;}
-.alert-item.high{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);}
-.alert-item.medium{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.15);}
+.alert-item.high{background:rgba(var(--danger-rgb),.08);border:1px solid rgba(var(--danger-rgb),.15);}
+.alert-item.medium{background:rgba(var(--warning-rgb),.08);border:1px solid rgba(var(--warning-rgb),.15);}
 .alert-item .alert-icon{width:20px;height:20px;flex-shrink:0;margin-top:1px;}
 .obs-input{font-family:inherit;font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg3);color:var(--text);width:100%;max-width:180px;}
 .obs-input:focus{outline:none;border-color:var(--accent);}
@@ -138,9 +138,14 @@
             <button onclick="marcarAsistFecha({{ e.id }},'P')" class="abtn ap {% if e.asistencia=='P' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="P"><i data-lucide="check" style="width:14px;height:14px;"></i> P</button>
             <button onclick="marcarAsistFecha({{ e.id }},'A')" class="abtn aa {% if e.asistencia=='A' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="A"><i data-lucide="x" style="width:14px;height:14px;"></i> A</button>
             <button onclick="marcarAsistFecha({{ e.id }},'T')" class="abtn at {% if e.asistencia=='T' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="T"><i data-lucide="clock" style="width:14px;height:14px;"></i> T</button>
-            <button onclick="marcarAsistFecha({{ e.id }},'E')" class="abtn ae {% if e.asistencia=='E' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="E"><i data-lucide="file-text" style="width:14px;height:14px;"></i> E</button>
-            <button onclick="marcarAsistFecha({{ e.id }},'X')" class="abtn ax {% if e.asistencia=='X' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="X"><i data-lucide="check-square" style="width:14px;height:14px;"></i> X</button>
-            <button onclick="marcarAsistFecha({{ e.id }},'S')" class="abtn as {% if e.asistencia=='S' %}active{% endif %}" data-aid="{{ e.id }}" data-estado="S"><i data-lucide="log-out" style="width:14px;height:14px;"></i> S</button>
+            <div class="actions-more" style="display:inline-flex">
+              <button class="actions-trigger" onclick="toggleActionsMenu(this)" aria-label="Más estados" title="Más estados" style="width:32px;height:32px;"><i data-lucide="more-vertical"></i></button>
+              <div class="actions-menu">
+                <button onclick="marcarAsistFecha({{ e.id }},'E');this.closest('.actions-menu').classList.remove('open')" class="menu-item" data-estado="E"><i data-lucide="file-text" style="width:14px;height:14px;"></i> Excusa</button>
+                <button onclick="marcarAsistFecha({{ e.id }},'X');this.closest('.actions-menu').classList.remove('open')" class="menu-item" data-estado="X"><i data-lucide="check-square" style="width:14px;height:14px;"></i> Permiso</button>
+                <button onclick="marcarAsistFecha({{ e.id }},'S');this.closest('.actions-menu').classList.remove('open')" class="menu-item" data-estado="S"><i data-lucide="log-out" style="width:14px;height:14px;"></i> Salida</button>
+              </div>
+            </div>
           </div>
         </td>
         <td>
@@ -186,4 +191,46 @@
 </div>
 
 <div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado
+{% endblock %}
+{% block extra_scripts %}
+function exportarExcel(){
+  var slug=document.getElementById('slug')?document.getElementById('slug').value:'';
+  var curso=document.getElementById('currentCurso')?document.getElementById('currentCurso').value:'';
+  if(curso)window.open('/'+slug+'/asistencia_reporte_excel?curso='+encodeURIComponent(curso),'_blank');
+  else if(window.showToast)window.showToast('No hay curso seleccionado','warning');
+}
+function getCsrf(){var e=document.getElementById('csrf-global');return e?e.value:'';}
+function marcarAsistFecha(id,estado){
+  var slug=document.getElementById('slug').value;
+  var fecha=document.getElementById('currentFecha').value;
+  var csrf=getCsrf();
+  var f='aid='+id+'&estado='+estado+'&fecha='+encodeURIComponent(fecha)+'&_csrf_token='+encodeURIComponent(csrf);
+  fetch('/'+slug+'/marcar_asistencia',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:f})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.ok){
+      var grp=document.getElementById('asistGroup-'+id);
+      if(grp){grp.querySelectorAll('.abtn').forEach(function(b){b.classList.remove('active');});var b=grp.querySelector('[data-estado="'+estado+'"]');if(b)b.classList.add('active');}
+    }
+  }).catch(function(){});
+}
+function guardarObservacion(id,valor){
+  var slug=document.getElementById('slug').value;
+  var fecha=document.getElementById('currentFecha').value;
+  var csrf=getCsrf();
+  fetch('/'+slug+'/marcar_asistencia',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'aid='+id+'&observacion='+encodeURIComponent(valor)+'&fecha='+encodeURIComponent(fecha)+'&_csrf_token='+encodeURIComponent(csrf)})
+  .then(function(r){return r.json();}).catch(function(){});
+}
+function irAFecha(valor){ if(valor)window.location.href=window.location.pathname+'?fecha='+valor; }
+function toggleActionsMenu(btn){
+  var menu=btn.nextElementSibling;if(!menu)return;
+  var open=menu.classList.toggle('open');
+  var all=document.querySelectorAll('.actions-menu.open');
+  for(var i=0;i<all.length;i++){if(all[i]!==menu)all[i].classList.remove('open');}
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.actions-more')){
+    document.querySelectorAll('.actions-menu.open').forEach(function(m){m.classList.remove('open');});
+  }
+});
 {% endblock %}

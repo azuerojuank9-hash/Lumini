@@ -17,8 +17,8 @@
     <a href="{{ url_for('directora_panel', slug=slug) }}" class="sidebar-item"><span class="icon"><i data-lucide="bar-chart-3"></i></span><span>Dashboard</span></a>
     <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="sidebar-item"><span class="icon"><i data-lucide="file-text"></i></span><span>Boletín PDF</span></a>
     <div class="sidebar-section divider">Acciones</div>
-    <button onclick="abrirModalRegistro()" class="sidebar-item" style="cursor:pointer;"><span class="icon"><i data-lucide="plus-circle"></i></span><span>Crear directora</span></button>
-    <a href="{{ url_for('directora_logout', slug=slug) }}" class="sidebar-item" style="color:var(--danger);"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
+    <button onclick="abrirModalRegistro()" class="sidebar-item"><span class="icon"><i data-lucide="plus-circle"></i></span><span>Crear directora</span></button>
+    <a href="{{ url_for('directora_logout', slug=slug) }}" class="sidebar-item text-danger"><span class="icon"><i data-lucide="log-out"></i></span><span>Cerrar sesión</span></a>
   </div>
   <div class="sidebar-user">
     <div class="avatar" style="background:var(--accent);">{{ directora.nombre[:1] }}</div>

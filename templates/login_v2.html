@@ -356,7 +356,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 </div>
 {% endblock %}
 {% block extra_scripts %}
-<script>
 function switchTab(tabId,btn){
  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
  document.getElementById('tab-'+tabId).classList.add('active');
@@ -385,9 +384,10 @@ var matCount=1;
 function agregarMateria(){
  var c=document.getElementById('materias-container');
  var row=document.createElement('div');row.className='materia-row';row.id='mat-row-'+matCount;
- row.innerHTML='<select name="materias_sel" class="form-select" required><option value="" disabled selected>Materia</option>{% for m in materias %}<option value="{{ m }}">{{ m }}</option>{% endfor %}</select><select name="jornadas_sel" class="form-select" required><option value="" disabled selected>Jornada</option>{% for j in jornadas %}<option value="{{ j }}">{{ j }}</option>{% endfor %}</select><button type="button" class="btn btn-icon-sm" style="background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.2)" onclick="this.parentElement.remove()"><i data-lucide="x" width="14" height="14"></i></button>';
+  row.innerHTML='<select name="materias_sel" class="form-select" required><option value="" disabled selected>Materia</option>{% for m in materias %}<option value="{{ m }}">{{ m }}</option>{% endfor %}</select>'+
+    '<select name="jornadas_sel" class="form-select" required><option value="" disabled selected>Jornada</option>{% for j in jornadas %}<option value="{{ j }}">{{ j }}</option>{% endfor %}</select>'+
+    '<button type="button" class="btn btn-icon-sm btn-danger-ghost" onclick="this.parentElement.remove()"><i data-lucide="x" width="14" height="14"></i></button>';
  c.appendChild(row);matCount++;
  if(window.lucide)lucide.createIcons();
 }
-</script>
 {% endblock %}

@@ -17,7 +17,7 @@
   <table class="{% if sticky %}table-sticky {% endif %}{% if compact %}table-compact {% endif %}{% if striped %}table-striped {% endif %}{% if class %}{{ class }}{% endif %}" id="{{ id }}" role="table">
     <thead>
       <tr>
-        {% if selectable %}<th style="width:30px"><input type="checkbox" onchange="toggleAllRows(this, '{{ id }}')" aria-label="Seleccionar todo"></th>{% endif %}
+        {% if selectable %}<th class="col-check"><input type="checkbox" onchange="toggleAllRows(this, '{{ id }}')" aria-label="Seleccionar todo"></th>{% endif %}
         {% for h in headers %}
         <th class="{% if sortable %}sortable{% endif %}" data-col="{{ loop.index0 }}"
             onclick="{% if sortable %}sortTable('{{ id }}', {{ loop.index0 }}){% endif %}"
@@ -25,7 +25,7 @@
           {{ h }}
         </th>
         {% endfor %}
-        {% if actions %}<th style="width:80px">Acciones</th>{% endif %}
+        {% if actions %}<th class="col-actions">Acciones</th>{% endif %}
       </tr>
     </thead>
     <tbody>
@@ -37,7 +37,7 @@
         {% endfor %}
         {% if actions %}
         <td>
-          <div class="flex" style="gap:4px">
+          <div class="table-actions">
             {% for a in actions %}
             <button class="btn-icon-sm btn-ghost" onclick="{{ a.action }}" title="{{ a.label }}" aria-label="{{ a.label }}">
               <i data-lucide="{{ a.icon }}" width="14" height="14"></i>

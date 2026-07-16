@@ -28,6 +28,7 @@
   {% if rector or prof or alumno or directora %}
   <div class="sidebar-footer">
     <form method="post" action="/{{ slug }}/logout" class="logout-form">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <button type="submit" class="sidebar-logout" aria-label="Cerrar sesión">
         <i data-lucide="log-out" width="16" height="16"></i>
         <span>Cerrar sesión</span>

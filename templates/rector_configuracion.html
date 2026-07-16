@@ -14,11 +14,11 @@
 .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
 .field .hint{font-size:11px;color:var(--sub);margin-top:4px;}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;font-family:'Inter',sans-serif;border:none;transition:all var(--tr);}
-.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);box-shadow:0 3px 12px rgba(var(--accent-rgb),.22);}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--accent-rgb),.35);}
 .alert{padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;}
-.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--danger);}
-.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--success);}
+.alert-error{background:rgba(var(--danger-rgb),.1);border:1px solid rgba(var(--danger-rgb),.2);color:var(--danger);}
+.alert-success{background:rgba(var(--success-rgb),.1);border:1px solid rgba(var(--success-rgb),.2);color:var(--success);}
 .separator{border:none;border-top:1px solid var(--border);margin:20px 0;}
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
@@ -124,7 +124,7 @@
         </div>
         <form method="POST" action="/{{ slug }}/rector/periodos/{{ p }}/{{ 'abrir' if estado=='cerrado' else 'cerrar' }}" style="display:inline;">
           <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn" style="font-size:11px;padding:6px 14px;{% if estado=='cerrado' %}background:rgba(34,197,94,.1);color:var(--success);{% else %}background:rgba(239,68,68,.1);color:var(--danger);{% endif %}">
+          <button type="submit" class="btn" style="font-size:11px;padding:6px 14px;{% if estado=='cerrado' %}background:rgba(var(--success-rgb),.1);color:var(--success);{% else %}background:rgba(var(--danger-rgb),.1);color:var(--danger);{% endif %}">
             {{ 'Abrir' if estado=='cerrado' else 'Cerrar' }}
           </button>
         </form>

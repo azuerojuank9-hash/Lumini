@@ -16,7 +16,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
     handlers=[
-        logging.FileHandler('lumini.log'),
+        logging.FileHandler(os.path.join(_basedir, 'lumini.log')),
         logging.StreamHandler()
     ]
 )
@@ -7085,15 +7085,18 @@ def rector_expediente(slug):
     conn = conectar(slug)
     colegio = get_colegio(slug)
     rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
-    aid = request.args.get('aid', type=int)
+    aid = request.args.get('aid', type=int) or request.args.get('alumno_id', type=int)
     alumno = None
-    desempeno = []
+    notas_por_materia = {}
+    asistencia = []
     observaciones = []
+    cursos_raw = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
+    cursos = [r['curso'] for r in cursos_raw]
     notif_count = notificaciones_no_leidas(slug, 'rector', 0)
     if aid:
         alumno = conn.execute('SELECT * FROM alumnos WHERE id=?', (aid,)).fetchone()
         if alumno:
-            desempeno = conn.execute('''
+            notas_raw = conn.execute('''
                 SELECT a.materia,
                        ROUND(AVG(n.val), 1) AS promedio,
                        COUNT(n.id) AS evaluaciones
@@ -7102,6 +7105,10 @@ def rector_expediente(slug):
                 WHERE n.aid=?
                 GROUP BY a.materia ORDER BY promedio DESC
             ''', (aid,)).fetchall()
+            notas_por_materia = {r['materia']: {'promedio': r['promedio'], 'evaluaciones': r['evaluaciones']} for r in notas_raw}
+            asistencia = conn.execute('''
+                SELECT fecha, estado, observacion FROM asistencia WHERE aid=? ORDER BY fecha DESC LIMIT 20
+            ''', (aid,)).fetchall()
             observaciones = conn.execute('''
                 SELECT o.*
                 FROM observador_registros o
@@ -7109,8 +7116,8 @@ def rector_expediente(slug):
                 ORDER BY o.fecha DESC LIMIT 50
             ''', (aid,)).fetchall()
     return render_template('rector/expediente.html', slug=slug, colegio=colegio, rector=rector,
-                          alumno=alumno, desempeno=desempeno, observaciones=observaciones,
-                          notif_count=notif_count)
+                          alumno=alumno, notas_por_materia=notas_por_materia, asistencia=asistencia,
+                          observaciones=observaciones, cursos=cursos, notif_count=notif_count)
 
 @app.route('/<slug>/rector/observador')
 def rector_observador(slug):
@@ -7126,7 +7133,8 @@ def rector_certificados(slug):
     colegio = get_colegio(slug)
     rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
     notif_count = notificaciones_no_leidas(slug, 'rector', 0)
-    cursos = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
+    cursos_raw = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
+    cursos = [r['curso'] for r in cursos_raw]
     return render_template('rector/certificados.html', slug=slug, colegio=colegio, rector=rector, cursos=cursos, notif_count=notif_count)
 
 @app.route('/<slug>/rector/calendario')
@@ -7150,6 +7158,10 @@ def rector_mensajes(slug):
 def api_rector_estudiantes(slug):
     conn = conectar(slug)
     q = request.args.get('q', '').strip()
+    curso = request.args.get('curso', '').strip()
+    if curso:
+        rows = conn.execute('SELECT a.id, a.nombre, a.curso FROM alumnos a WHERE a.curso=? AND a.activo=1 ORDER BY a.nombre', (curso,)).fetchall()
+        return jsonify({'estudiantes': [dict(r) for r in rows]})
     if len(q) < 2:
         return jsonify({'ok': False, 'data': []})
     rows = conn.execute('''

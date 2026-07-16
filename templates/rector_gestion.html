@@ -10,8 +10,8 @@
 .topbar-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.15);}
 .alert{padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;}
-.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--danger);}
-.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--success);}
+.alert-error{background:rgba(var(--danger-rgb),.1);border:1px solid rgba(var(--danger-rgb),.2);color:var(--danger);}
+.alert-success{background:rgba(var(--success-rgb),.1);border:1px solid rgba(var(--success-rgb),.2);color:var(--success);}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:600;}
 .field input{width:100%;padding:10px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;transition:border-color var(--tr),box-shadow var(--tr);}
@@ -23,7 +23,7 @@
 .rector-table tr:last-child td{border-bottom:none;}
 .rector-table tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .principal-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(var(--accent-rgb),.12);color:var(--accent);}
-.inactive-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(239,68,68,.1);color:var(--danger);}
+.inactive-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(var(--danger-rgb),.1);color:var(--danger);}
 .you-tag{font-size:10px;color:var(--sub);margin-left:4px;}
 .action-group{display:flex;gap:4px;flex-wrap:wrap;}
   .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
@@ -152,15 +152,15 @@
           {% if rec.es_principal %}
           <span class="principal-badge"><i data-lucide="crown"></i> Principal</span>
           {% elif rec.activo %}
-          <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(34,197,94,.1);color:var(--success);"><i data-lucide="check-circle"></i> Activo</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;background:rgba(var(--success-rgb),.1);color:var(--success);"><i data-lucide="check-circle"></i> Activo</span>
           {% else %}
           <span class="inactive-badge"><i data-lucide="minus-circle"></i> Inactivo</span>
           {% endif %}
         </td>
         <td style="text-align:right;">
+          {% if rec.id != rector.id %}
           <div class="action-group" style="justify-content:flex-end;">
-            {% if rec.id != rector.id %}
-            <a href="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/editar" class="btn btn-outline btn-sm"><i data-lucide="pencil"></i></a>
+            <a href="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/editar" class="btn btn-outline btn-sm" title="Editar"><i data-lucide="pencil"></i></a>
             <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/toggle" style="display:inline;">
               <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
               <button class="btn btn-sm {% if rec.activo %}btn-outline{% else %}btn-success{% endif %}" title="{% if rec.activo %}Desactivar{% else %}Activar{% endif %}">
@@ -168,21 +168,29 @@
               </button>
             </form>
             {% if not rec.es_principal %}
-            <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/eliminar" style="display:inline;" onsubmit="return confirm('¿Eliminar permanentemente a {{ rec.nombre }}?');">
-              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              <button class="btn btn-danger btn-sm" title="Eliminar"><i data-lucide="trash-2"></i></button>
-            </form>
-            {% endif %}
-            {% if rec.activo and not rec.es_principal %}
-            <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/hacer-principal" style="display:inline;" onsubmit="return confirm('¿Transferir el rol de Rector Principal a {{ rec.nombre }}? Tú perderás el acceso administrativo.');">
-              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-              <button class="btn btn-sm" style="background:rgba(109,40,217,.1);border:1px solid rgba(109,40,217,.2);color:var(--accent);" title="Hacer Rector Principal"><i data-lucide="crown"></i></button>
-            </form>
-            {% endif %}
-            {% else %}
-            <span style="color:var(--sub);font-size:11px;padding:5px 8px;">—</span>
+            <div class="actions-more">
+              <button class="actions-trigger" onclick="toggleActionsMenu(this)" aria-label="Más acciones" title="Más acciones"><i data-lucide="more-vertical"></i></button>
+              <div class="actions-menu">
+                {% if not rec.es_principal %}
+                <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/eliminar" onsubmit="return confirm('¿Eliminar permanentemente a {{ rec.nombre }}?');">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  <button class="menu-item danger"><i data-lucide="trash-2"></i> Eliminar rector</button>
+                </form>
+                {% endif %}
+                {% if rec.activo and not rec.es_principal %}
+                <div class="menu-divider"></div>
+                <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/hacer-principal" onsubmit="return confirm('¿Transferir el rol de Rector Principal a {{ rec.nombre }}? Tú perderás el acceso administrativo.');">
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                  <button class="menu-item"><i data-lucide="crown"></i> Hacer principal</button>
+                </form>
+                {% endif %}
+              </div>
+            </div>
             {% endif %}
           </div>
+          {% else %}
+          <span style="color:var(--sub);font-size:11px;padding:5px 8px;">—</span>
+          {% endif %}
         </td>
       </tr>
       {% endfor %}
@@ -198,4 +206,22 @@
   El Rector Principal no puede eliminarse a sí mismo ni desactivar su propia cuenta.
 </div>
 {% endif %}
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.alert-success, .alert-error').forEach(function(a){
+    setTimeout(function(){a.style.transition='opacity .4s';a.style.opacity='0';setTimeout(function(){a.remove();},400);},4000);
+  });
+});
+function toggleActionsMenu(btn){
+  var menu=btn.nextElementSibling;if(!menu)return;
+  var open=menu.classList.toggle('open');
+  var all=document.querySelectorAll('.actions-menu.open');
+  for(var i=0;i<all.length;i++){if(all[i]!==menu)all[i].classList.remove('open');}
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.actions-more')){
+    document.querySelectorAll('.actions-menu.open').forEach(function(m){m.classList.remove('open');});
+  }
+});
+</script>
 {% endblock %}

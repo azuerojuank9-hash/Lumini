@@ -6,33 +6,57 @@
 {% include "rector_panel.html" %}
 {% endblock %}
 {% block content %}
-<div class="topbar">
-  <h1><i data-lucide="file-text" style="color:var(--accent);"></i> Certificados</h1>
-  <div class="breadcrumb">Generación de documentos oficiales</div>
+<div class="topbar" style="align-items:flex-start;">
+  <div>
+    <h1><i data-lucide="file-text" style="color:var(--accent);"></i> Certificados</h1>
+    <div class="breadcrumb">Generación de documentos oficiales</div>
+  </div>
+</div>
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-head"><span class="card-title"><i data-lucide="search"></i> Seleccionar estudiante</span></div>
+  <div class="card-body">
+    <div class="flex gap-sm" style="align-items:flex-end;flex-wrap:wrap;">
+      <div class="form-group" style="flex:1;min-width:200px;">
+        <label class="form-label">Curso</label>
+        <select id="certCurso" class="form-select" onchange="certCargarEstudiantes()">
+          <option value="">Seleccionar curso...</option>
+          {% for c in cursos %}
+          <option value="{{ c }}">{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group" style="flex:2;min-width:250px;">
+        <label class="form-label">Estudiante</label>
+        <select id="certEstudiante" class="form-select">
+          <option value="">Primero selecciona un curso</option>
+        </select>
+      </div>
+    </div>
+  </div>
 </div>
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
-  <div class="card" onclick="window.open('/{{ slug }}/api/rector/certificados/constancia?curso=','_blank')" style="cursor:pointer;">
+  <div class="card" onclick="certGenerar('constancia')" style="cursor:pointer;">
     <div class="card-body" style="text-align:center;padding:30px 20px;">
       <i data-lucide="graduation-cap" style="width:40px;height:40px;color:var(--accent);margin-bottom:10px;"></i>
       <h3 style="font-size:14px;margin-bottom:6px;">Constancia de Estudio</h3>
       <p style="font-size:12px;color:var(--muted);">Certificado de matrícula vigente</p>
     </div>
   </div>
-  <div class="card" onclick="window.open('/{{ slug }}/api/rector/certificados/estudio?curso=','_blank')" style="cursor:pointer;">
+  <div class="card" onclick="certGenerar('estudio')" style="cursor:pointer;">
     <div class="card-body" style="text-align:center;padding:30px 20px;">
       <i data-lucide="award" style="width:40px;height:40px;color:var(--accent);margin-bottom:10px;"></i>
       <h3 style="font-size:14px;margin-bottom:6px;">Certificado de Estudio</h3>
       <p style="font-size:12px;color:var(--muted);">Certificado final con notas</p>
     </div>
   </div>
-  <div class="card" onclick="window.open('/{{ slug }}/api/rector/certificados/paz-y-salvo?curso=','_blank')" style="cursor:pointer;">
+  <div class="card" onclick="certGenerar('paz-y-salvo')" style="cursor:pointer;">
     <div class="card-body" style="text-align:center;padding:30px 20px;">
       <i data-lucide="check-circle" style="width:40px;height:40px;color:var(--accent);margin-bottom:10px;"></i>
       <h3 style="font-size:14px;margin-bottom:6px;">Paz y Salvo</h3>
       <p style="font-size:12px;color:var(--muted);">Certificado de cuenta en cero</p>
     </div>
   </div>
-  <div class="card" onclick="window.open('/{{ slug }}/api/rector/certificados/conducta?curso=','_blank')" style="cursor:pointer;">
+  <div class="card" onclick="certGenerar('conducta')" style="cursor:pointer;">
     <div class="card-body" style="text-align:center;padding:30px 20px;">
       <i data-lucide="heart" style="width:40px;height:40px;color:var(--accent);margin-bottom:10px;"></i>
       <h3 style="font-size:12px;margin-bottom:6px;">Certificado de Conducta</h3>
@@ -40,4 +64,30 @@
     </div>
   </div>
 </div>
+{% if not cursos %}
+<div class="card" style="margin-top:20px;text-align:center;padding:30px;">
+  <p style="color:var(--muted);">No hay cursos disponibles. Crea cursos primero.</p>
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_scripts %}
+function certCargarEstudiantes(){
+  var curso=document.getElementById('certCurso').value;
+  var sel=document.getElementById('certEstudiante');
+  sel.innerHTML='<option value="">Cargando...</option>';
+  fetch('/{{ slug }}/api/rector/estudiantes?curso='+encodeURIComponent(curso))
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.estudiantes&&d.estudiantes.length){
+      sel.innerHTML='<option value="">Seleccionar estudiante...</option>'+d.estudiantes.map(function(e){return '<option value="'+e.id+'">'+e.nombre+'</option>';}).join('');
+    }else{
+      sel.innerHTML='<option value="">Sin estudiantes en este curso</option>';
+    }
+  }).catch(function(){sel.innerHTML='<option value="">Error al cargar</option>';});
+}
+function certGenerar(tipo){
+  var eid=document.getElementById('certEstudiante').value;
+  if(!eid){alert('Selecciona un estudiante primero.');return;}
+  window.open('/{{ slug }}/api/rector/certificados/'+tipo+'?estudiante_id='+eid,'_blank');
+}
 {% endblock %}

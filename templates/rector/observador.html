@@ -7,7 +7,7 @@
 .obs-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-md);padding:4px;overflow-x:auto;}
 .obs-tab{padding:8px 18px;font-size:12px;font-weight:500;border-radius:var(--radius-sm);cursor:pointer;border:none;background:transparent;color:var(--muted);white-space:nowrap;transition:all var(--tr);}
 .obs-tab:hover{color:var(--text);background:var(--bg3);}
-.obs-tab.active{background:var(--accent);color:#fff;}
+.obs-tab.active{background:var(--accent);color:var(--text-on-accent);}
 .obs-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;}
 .obs-card h3{padding:14px 18px;font-size:13px;font-weight:600;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
 .obs-card .body{padding:14px 18px;}
@@ -17,14 +17,25 @@
 .obs-entry .texto{font-size:13px;line-height:1.5;}
 .obs-entry .meta{font-size:11px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;}
 .obs-entry .tag{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;}
-.tag-positivo{background:rgba(34,197,94,.15);color:var(--success);}
-.tag-llamado{background:rgba(234,179,8,.15);color:var(--warning);}
-.tag-compromiso{background:rgba(108,99,255,.15);color:var(--accent);}
-.tag-seguimiento{background:rgba(100,116,139,.15);color:var(--sub);}
+.tag-positivo{background:rgba(var(--success-rgb),.15);color:var(--success);}
+.tag-llamado{background:rgba(var(--warning-rgb),.15);color:var(--warning);}
+.tag-compromiso{background:rgba(var(--accent-rgb),.15);color:var(--accent);}
+.tag-seguimiento{background:rgba(var(--sub-rgb),.15);color:var(--sub);}
 .badge-estado{padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600;}
-.badge-pendiente{background:rgba(234,179,8,.15);color:var(--warning);}
-.badge-aprobado{background:rgba(34,197,94,.15);color:var(--success);}
-.badge-rechazado{background:rgba(239,68,68,.15);color:var(--danger);}
+.badge-pendiente{background:rgba(var(--warning-rgb),.15);color:var(--warning);}
+.badge-aprobado{background:rgba(var(--success-rgb),.15);color:var(--success);}
+.badge-rechazado{background:rgba(var(--danger-rgb),.15);color:var(--danger);}
+.obs-input{width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none}
+.obs-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
+.obs-select{width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px}
+.obs-textarea{width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;resize:vertical;outline:none}
+.obs-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12)}
+.obs-submit{background:var(--accent);color:var(--text-on-accent);border:none;border-radius:var(--radius-sm);padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr)}
+.obs-submit:hover{box-shadow:0 2px 8px rgba(var(--accent-rgb),.3)}
+.obs-label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+.obs-field{margin-bottom:10px}
+.obs-result-item{padding:8px 12px;cursor:pointer;border-radius:var(--radius-sm);background:var(--bg3);margin-bottom:4px;font-size:13px}
+.obs-result-item:hover{background:rgba(var(--accent-rgb),.08)}
 </style>
 {% endblock %}
 {% block sidebar %}
@@ -48,7 +59,7 @@
   <div class="obs-card">
     <h3><i data-lucide="search" style="width:14px;height:14px;"></i> Buscar Estudiante</h3>
     <div class="body">
-      <input type="text" id="searchObs" placeholder="Nombre del estudiante..." oninput="buscarEstudiante()" style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none;">
+      <input type="text" id="searchObs" placeholder="Nombre del estudiante..." oninput="buscarEstudiante()" class="obs-input">
       <div id="obsResults" style="margin-top:12px;"></div>
     </div>
   </div>
@@ -59,19 +70,19 @@
       <form id="obsForm" onsubmit="guardarRegistro(event)">
         <input type="hidden" id="obsAid" value="">
         <div style="margin-bottom:10px;">
-          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">Tipo</label>
-          <select id="obsTipo" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
+          <label class="obs-label">Tipo</label>
+          <select id="obsTipo" class="obs-select">
             <option value="positivo">Positivo</option>
             <option value="llamado">Llamado de atención</option>
             <option value="compromiso">Compromiso</option>
             <option value="seguimiento">Seguimiento</option>
           </select>
         </div>
-        <div style="margin-bottom:10px;">
-          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">Descripción</label>
-          <textarea id="obsTexto" rows="3" style="width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;resize:vertical;outline:none;"></textarea>
+        <div class="obs-field">
+          <label class="obs-label">Descripción</label>
+          <textarea id="obsTexto" rows="3" class="obs-textarea"></textarea>
         </div>
-        <button type="submit" style="background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;">Guardar</button>
+        <button type="submit" class="obs-submit">Guardar</button>
       </form>
     </div>
   </div>
@@ -137,10 +148,21 @@ function cargarHistorial(aid) {
     });
 }
 
+function obsToast(msg,isErr){
+  var t=document.getElementById('obsToast');
+  if(!t){t=document.createElement('div');t.id='obsToast';t.style.cssText='position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;transition:all .25s;';
+  document.body.appendChild(t);}
+  t.textContent=msg;
+  t.style.background=isErr?'var(--danger)':'var(--success)';
+  t.style.color='#fff';
+  t.style.opacity='1';
+  clearTimeout(t._t);
+  t._t=setTimeout(function(){t.style.opacity='0';},3000);
+}
 function guardarRegistro(e) {
   e.preventDefault();
   var aid = document.getElementById('obsAid').value;
-  if (!aid) { alert('Selecciona un estudiante primero.'); return; }
+  if (!aid) { obsToast('Selecciona un estudiante primero.',true); return; }
   fetch('/{{ slug }}/api/rector/observador/' + aid, {
     method: 'POST',
     headers: {'Content-Type': 'application/json', 'X-CSRF-Token': '{{ csrf_token() }}'},
@@ -153,8 +175,9 @@ function guardarRegistro(e) {
       if (resp.ok) {
         document.getElementById('obsTexto').value = '';
         cargarHistorial(aid);
+        obsToast('Observación guardada correctamente');
       } else {
-        alert('Error: ' + (resp.error || 'desconocido'));
+        obsToast('Error: ' + (resp.error || 'desconocido'), true);
       }
     });
 }
