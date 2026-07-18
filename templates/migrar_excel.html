@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% block title %}Migrar desde Excel &mdash; Lumini{% endblock %}
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
+.steps{display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap;}
+.step{flex:1;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--radius-md);background:var(--bg3);border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--muted);min-width:120px;}
+.step.active{background:rgba(var(--accent-rgb),.08);border-color:var(--accent);color:var(--accent);}
+.step.done{background:rgba(var(--success-rgb),.08);border-color:var(--success);color:var(--success);}
+.step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:var(--bg);border:1px solid var(--border);}
+.step.active .step-num{background:var(--accent);color:var(--text-on-accent);border-color:transparent;}
+.step.done .step-num{background:var(--success);color:var(--text-on-accent);border-color:transparent;}
+.step-content{display:none;}
+.step-content.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.file-zone{border:2px dashed var(--border);border-radius:var(--radius-lg);padding:50px 20px;text-align:center;cursor:pointer;transition:all var(--tr);margin-bottom:16px;}
+.file-zone:hover,.file-zone.dragover{border-color:var(--accent);background:rgba(var(--accent-rgb),.04);}
+.file-zone .fz-icon{font-size:40px;color:var(--muted);margin-bottom:10px;}
+.file-zone .fz-label{font-size:15px;color:var(--text);margin-bottom:6px;font-weight:600;}
+.file-zone .fz-hint{font-size:12px;color:var(--muted);}
+.tw{overflow-x:auto;border-radius:var(--radius-md);border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{padding:8px 10px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3);font-weight:600;}
+td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(var(--accent-rgb),.02);}
+.col-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
+.col-tag.auto{background:rgba(var(--success-rgb),.12);color:var(--success);}
+.col-tag.manual{background:rgba(var(--warning-rgb),.12);color:var(--warning);}
+.col-tag.skip{background:rgba(var(--muted-rgb),.12);color:var(--muted);}
+.col-select{width:100%;padding:4px 6px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:11px;font-family:'Inter',sans-serif;}
+.err-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600;}
+.err-badge.ok{background:rgba(var(--success-rgb),.12);color:var(--success);}
+.err-badge.fail{background:rgba(var(--danger-rgb),.12);color:var(--danger);}
+.curso-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;}
+.ctab{padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all var(--tr);}
+.ctab:hover{background:rgba(var(--accent-rgb),.06);color:var(--text);}
+.ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);border-color:transparent;}
+{% endblock %}
+
+{% block sidebar %}{% include "components/sidebar_teacher.html" %}{% endblock %}
+
+{% block content %}
+<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
+<div class="dash-wrap">
+<div class="topbar">
+  <div class="topbar-left">
+    <h1><i data-lucide="upload" style="color:var(--accent);"></i> Migrar desde Excel</h1>
+    <div class="breadcrumb">Asistente de migración de datos &middot; {{ materia }} &middot; {{ jornada }}</div>
+  </div>
+  <div class="topbar-right">
+    <a href="/{{ slug }}/plantilla_notas?curso={{ curso_sel }}&periodo={{ periodo }}" class="btn btn-outline"><i data-lucide="download"></i> Descargar plantilla</a>
+    <a href="/{{ slug }}/" class="btn btn-ghost"><i data-lucide="arrow-left"></i> Volver a notas</a>
+  </div>
+</div>
+
+<div class="curso-tabs">
+  {% for c in mis_cursos %}
+  <a href="/{{ slug }}/migrar-excel?curso={{ c }}&periodo={{ periodo }}" class="ctab{% if c == curso_sel %} active{% endif %}">{{ c }}</a>
+  {% endfor %}
+</div>
+
+<div class="steps" id="stepIndicator">
+  <div class="step active" data-step="1"><span class="step-num">1</span> Curso</div>
+  <div class="step" data-step="2"><span class="step-num">2</span> Materia</div>
+  <div class="step" data-step="3"><span class="step-num">3</span> Subir archivo</div>
+  <div class="step" data-step="4"><span class="step-num">4</span> Analizar</div>
+  <div class="step" data-step="5"><span class="step-num">5</span> Vista previa</div>
+  <div class="step" data-step="6"><span class="step-num">6</span> Confirmar</div>
+</div>
+
+<div class="step-content active" id="step1">
+  <div class="card">
+    <div class="card-head"><span class="card-title"><i data-lucide="book"></i> Seleccionar curso</span></div>
+    <div class="card-body">
+      <p style="margin-bottom:14px;color:var(--muted);font-size:13px;">Selecciona el curso al que deseas migrar las notas.</p>
+      <div class="flex gap-sm" style="flex-wrap:wrap;">
+        {% for c in mis_cursos %}
+        <button class="btn {% if c == curso_sel %}btn-primary{% else %}btn-outline{% endif %}" onclick="irPaso(2)">{{ c }}</button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="step-content" id="step2">
+  <div class="card">
+    <div class="card-head"><span class="card-title"><i data-lucide="bookmark"></i> Seleccionar materia</span></div>
+    <div class="card-body">
+      <p style="margin-bottom:14px;color:var(--muted);font-size:13px;">Confirma la materia para la migración.</p>
+      <div class="flex gap-sm">
+        <span class="btn btn-primary" style="cursor:default;">{{ materia }}</span>
+        <button class="btn btn-accent" onclick="irPaso(3)">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="step-content" id="step3">
+  <div class="card">
+    <div class="card-head"><span class="card-title"><i data-lucide="file-spreadsheet"></i> Subir archivo Excel</span></div>
+    <div class="card-body">
+      <div class="file-zone" id="fileZone" onclick="document.getElementById('fileInput').click()">
+        <div class="fz-icon"><i data-lucide="file-spreadsheet" style="width:44px;height:44px;"></i></div>
+        <div class="fz-label">Haz clic o arrastra un archivo .xlsx aquí</div>
+        <div class="fz-hint">Lumini analizará automáticamente las columnas del archivo.</div>
+        <input type="file" id="fileInput" name="archivo" accept=".xlsx" style="display:none" onchange="onFileSelect(this)">
+      </div>
+      <div id="fileInfo" style="display:none;padding:10px 14px;background:rgba(var(--accent-rgb),.06);border-radius:var(--radius-sm);font-size:13px;margin-bottom:10px;"></div>
+      <div class="flex gap-sm">
+        <button class="btn btn-primary" id="analyzeBtn" onclick="analizarArchivo()" disabled><i data-lucide="search"></i> Analizar archivo</button>
+        <button class="btn btn-ghost" onclick="irPaso(2)">Atrás</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="step-content" id="step4">
+  <div class="card">
+    <div class="card-head"><span class="card-title"><i data-lucide="cpu"></i> Analizando archivo...</span></div>
+    <div class="card-body" style="text-align:center;padding:40px;">
+      <div class="spinner" style="margin:0 auto 12px;"></div>
+      <p style="color:var(--muted);">Leyendo columnas, detectando estudiantes y validando datos...</p>
+    </div>
+  </div>
+</div>
+
+<div class="step-content" id="step5">
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title"><i data-lucide="eye"></i> Vista previa</span>
+      <div class="flex gap-sm">
+        <span id="previewSummary" style="font-size:12px;color:var(--muted);"></span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="columnMapping" style="margin-bottom:14px;display:none;">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">Algunas columnas no fueron reconocidas automáticamente. Indica qué representan:</p>
+        <div id="columnMappingList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+      <div id="newActivitiesNotice" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(var(--info-blue-rgb),.08);border-radius:var(--radius-sm);font-size:12px;color:var(--info-blue);"></div>
+      <div class="tw"><table id="previewTable"><thead id="previewHead"><tr></tr></thead><tbody id="previewBody"></tbody></table></div>
+    </div>
+  </div>
+  <div class="flex gap-sm" style="justify-content:flex-end;margin-top:12px;">
+    <button class="btn btn-ghost" onclick="irPaso(3)">Volver a subir</button>
+    <button class="btn btn-primary" id="confirmBtn" onclick="confirmarMigracion()" disabled><i data-lucide="check"></i> Confirmar migración</button>
+  </div>
+</div>
+
+<div class="step-content" id="step6">
+  <div class="card" style="text-align:center;padding:50px 30px;">
+    <div id="resultIcon" style="font-size:48px;margin-bottom:12px;"><i data-lucide="check-circle" style="color:var(--success);width:56px;height:56px;"></i></div>
+    <h2 id="resultTitle" style="font-size:20px;font-weight:700;margin-bottom:6px;">Migración completada</h2>
+    <p id="resultMsg" style="color:var(--muted);font-size:14px;margin-bottom:20px;">Los datos han sido importados correctamente.</p>
+    <div class="flex gap-sm" style="justify-content:center;">
+      <a href="/{{ slug }}/" class="btn btn-primary"><i data-lucide="edit-3"></i> Ir a notas</a>
+      <button class="btn btn-outline" onclick="location.reload()"><i data-lucide="upload"></i> Otra migración</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block extra_scripts %}
+var pasoActual = 1;
+var previewData = null;
+var archivoSubido = null;
+
+function irPaso(n){
+  pasoActual = n;
+  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.step-content').forEach(function(c){c.classList.remove('active');});
+  document.querySelector('.step[data-step="'+n+'"]').classList.add('active');
+  document.getElementById('step'+n).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function onFileSelect(inp){
+  var fi=document.getElementById('fileInfo');var btn=document.getElementById('analyzeBtn');
+  if(inp.files&&inp.files.length){
+    archivoSubido=inp.files[0];
+    fi.style.display='block';fi.textContent='Archivo: '+archivoSubido.name+' ('+(archivoSubido.size/1024).toFixed(1)+' KB)';
+    btn.disabled=false;
+  }else{fi.style.display='none';archivoSubido=null;btn.disabled=true;}
+}
+
+function analizarArchivo(){
+  if(!archivoSubido){showToast('Selecciona un archivo primero');return;}
+  irPaso(4);
+  var fd=new FormData();
+  fd.append('archivo',archivoSubido);
+  fd.append('curso','{{ curso_sel }}');
+  fd.append('periodo','{{ periodo }}');
+  fd.append('_csrf_token',document.getElementById('csrf-global').value);
+  fetch('/{{ slug }}/migrar-excel/analizar',{method:'POST',body:fd})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.status==='ok'||d.status==='warning'){
+      previewData=d;
+      mostrarPrevisualizacion(d);
+      irPaso(5);
+    }else{
+      irPaso(3);
+      showToast(d.mensaje||'Error al analizar el archivo');
+    }
+  })
+  .catch(function(){irPaso(3);showToast('Error de conexión al analizar');});
+}
+
+function mostrarPrevisualizacion(d){
+  document.getElementById('previewSummary').textContent=d.total+' estudiantes · '+d.validos+' válidos'+(d.errores?' · '+d.errores+' errores':'');
+  var head=document.getElementById('previewHead').querySelector('tr');
+  if(!head){head=document.createElement('tr');document.getElementById('previewHead').appendChild(head);}
+  head.innerHTML='<th>#</th><th>Estudiante</th><th>Estado</th>';
+  d.columnas.forEach(function(c){
+    head.innerHTML+='<th>'+c.nombre+' <span class="col-tag '+c.tipo+'">'+(c.tipo==='auto'?'Auto':c.tipo==='manual'?'Asignada':'Ignorar')+'</span></th>';
+  });
+  var body=document.getElementById('previewBody');body.innerHTML='';
+  d.filas.forEach(function(f){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+(f.fila||'')+'</td><td>'+(f.nombre||'')+'</td>';
+    tr.innerHTML+='<td><span class="err-badge '+(f.ok?'ok':'fail')+'">'+(f.ok?'Válido':'Error')+'</span></td>';
+    d.columnas.forEach(function(c){
+      var v=f.valores&&f.valores[c.indice]!==undefined?f.valores[c.indice]:'';
+      var cls=f.ok?'':' style="background:rgba(var(--danger-rgb),.05)"';
+      tr.innerHTML+='<td'+cls+'>'+(v!==null&&v!==''?v:'—')+'</td>';
+    });
+    if(f.errores&&f.errores.length){
+      tr.innerHTML+='</tr><tr><td colspan="'+(3+d.columnas.length)+'" style="padding:2px 10px 8px;font-size:10px;color:var(--danger);">';
+      f.errores.forEach(function(e){tr.innerHTML+=e+'<br>';});
+    }
+    body.appendChild(tr);
+  });
+  document.getElementById('newActivitiesNotice').style.display='none';
+  if(d.nuevas_actividades&&d.nuevas_actividades.length){
+    document.getElementById('newActivitiesNotice').style.display='block';
+    document.getElementById('newActivitiesNotice').textContent='Se crearán '+d.nuevas_actividades.length+' nueva(s) actividad(es): '+d.nuevas_actividades.map(function(a){return a.nombre;}).join(', ')+'.';
+  }
+  if(d.columnas_pendientes&&d.columnas_pendientes.length){
+    var mapDiv=document.getElementById('columnMapping');mapDiv.style.display='block';
+    var list=document.getElementById('columnMappingList');list.innerHTML='';
+    d.columnas_pendientes.forEach(function(col,idx){
+      var wrap=document.createElement('div');
+      wrap.style.cssText='padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
+      wrap.innerHTML='<span style="font-weight:600;font-size:12px;">"'+col.nombre+'"</span> <span style="font-size:11px;color:var(--muted);">es:</span> '+
+        '<select class="col-select" data-col-idx="'+col.indice+'" style="width:auto;min-width:160px;" onchange="onColumnMappingChange()">'+
+        '<option value="">— Ignorar columna —</option>'+
+        '<option value="nombre">Nombre del estudiante</option>'+
+        '<option value="documento">Documento / ID</option>'+
+        '<option value="actividad">Actividad (evaluación)</option>'+
+        '<option value="evaluacion">Evaluación (25%)</option>'+
+        '<option value="autoevaluacion">Autoevaluación (10%)</option>'+
+        '<option value="proyecto">Proyecto</option>'+
+        '<option value="recuperacion">Recuperación</option>'+
+        '<option value="nota_final">Nota final</option>'+
+        '</select>';
+      list.appendChild(wrap);
+    });
+  }else{
+    document.getElementById('columnMapping').style.display='none';
+  }
+  document.getElementById('confirmBtn').disabled=false;
+}
+
+function onColumnMappingChange(){}
+
+function confirmarMigracion(){
+  if(!previewData){showToast('No hay datos para confirmar');return;}
+  var mapping={};
+  document.querySelectorAll('#columnMappingList select').forEach(function(sel){
+    if(sel.value)mapping[sel.dataset.colIdx]=sel.value;
+  });
+  previewData.column_mapping=mapping;
+  document.getElementById('confirmBtn').disabled=true;
+  document.getElementById('confirmBtn').textContent='Guardando...';
+  var fd=new FormData();
+  fd.append('data',JSON.stringify(previewData));
+  fd.append('curso','{{ curso_sel }}');
+  fd.append('periodo','{{ periodo }}');
+  fd.append('_csrf_token',document.getElementById('csrf-global').value);
+  fetch('/{{ slug }}/migrar-excel/confirmar',{method:'POST',body:fd})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.status==='ok'){
+      irPaso(6);
+      document.getElementById('resultMsg').textContent=d.mensaje||'Migración completada exitosamente.';
+    }else{
+      showToast(d.mensaje||'Error al guardar');
+      document.getElementById('confirmBtn').disabled=false;
+      document.getElementById('confirmBtn').textContent='<i data-lucide="check"></i> Confirmar migración';
+    }
+  })
+  .catch(function(){showToast('Error de conexión');document.getElementById('confirmBtn').disabled=false;document.getElementById('confirmBtn').innerHTML='<i data-lucide="check"></i> Confirmar migración';});
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  if(!t)return;
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},3000);
+}
+{% endblock %}

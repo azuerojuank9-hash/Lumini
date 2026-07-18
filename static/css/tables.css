@@ -42,16 +42,17 @@ td,th{padding:10px 12px}
 .actions-trigger{background:none;border:1px solid var(--border);border-radius:var(--radius-sm);width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all var(--tr);padding:0;font-family:inherit;font-size:13px}
 .actions-trigger:hover{background:var(--bg3);color:var(--text);border-color:var(--sub)}
 .actions-trigger:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.actions-menu{position:absolute;top:calc(100% + 4px);right:0;min-width:180px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:0 8px 24px rgba(0,0,0,.35);padding:4px;z-index:50;display:none;animation:fadeSlideIn .15s ease}
+.actions-menu{position:absolute;top:calc(100% + 4px);right:0;min-width:190px;background:rgba(15,15,25,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-md);box-shadow:0 12px 36px rgba(0,0,0,.5);padding:5px;z-index:50;display:none;animation:menuFade .15s ease}
+@keyframes menuFade{from{opacity:0;transform:translateY(-4px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 .actions-menu.open{display:block}
-.menu-item{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;font-size:12px;color:var(--text);background:none;border:none;border-radius:var(--radius-sm);cursor:pointer;text-decoration:none;transition:background var(--tr);font-family:inherit;text-align:left;white-space:nowrap;line-height:1.4}
-.menu-item:hover{background:var(--bg3);color:var(--text)}
-.menu-item.danger{color:var(--danger)}
-.menu-item.danger:hover{background:rgba(239,68,68,.1)}
+.menu-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 12px;font-size:12px;color:rgba(255,255,255,.85);background:none;border:none;border-radius:6px;cursor:pointer;text-decoration:none;transition:all .12s ease;font-family:inherit;text-align:left;white-space:nowrap;line-height:1.4}
+.menu-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.menu-item.danger{color:rgb(239,68,68)}
+.menu-item.danger:hover{background:rgba(239,68,68,.15)}
 .menu-item form{display:flex;width:100%}
-.menu-item button{width:100%;padding:8px 12px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:12px;color:inherit;text-align:left;display:flex;align-items:center;gap:8px;border-radius:var(--radius-sm);transition:background var(--tr)}
-.menu-item button:hover{background:var(--bg3)}
-.menu-divider{height:1px;background:var(--border);margin:4px 0}
+.menu-item button{width:100%;padding:8px 12px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:12px;color:inherit;text-align:left;display:flex;align-items:center;gap:9px;border-radius:6px;transition:all .12s ease}
+.menu-item button:hover{background:rgba(255,255,255,.08);color:#fff}
+.menu-divider{height:1px;background:rgba(255,255,255,.08);margin:4px 0}
 .col-check{width:30px;text-align:center}
 .col-actions{width:80px;text-align:center}
 @keyframes fadeSlideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}

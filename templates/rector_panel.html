@@ -59,6 +59,12 @@ html{scroll-behavior:smooth;}
     <div class="breadcrumb">{{ colegio.nombre if colegio else slug }} · {{ rector.nombre }}</div>
   </div>
   <div class="topbar-actions">
+    <button class="btn btn-ghost btn-sm" onclick="abrirHomeRector()" title="Inicio"><i data-lucide="home"></i></button>
+    <button class="btn btn-ghost btn-sm" onclick="abrirAIAssistant()" title="Asistente IA"><i data-lucide="sparkles"></i></button>
+    <button class="btn btn-ghost btn-sm" onclick="abrirGestionAcademica()" title="Gestión Académica"><i data-lucide="school"></i></button>
+    <button class="btn btn-ghost btn-sm" onclick="abrirMatriculas()" title="Matrículas"><i data-lucide="clipboard-check"></i></button>
+    <button class="btn btn-ghost btn-sm" onclick="abrirTesoreria()" title="Tesorería"><i data-lucide="wallet"></i></button>
+    <button class="btn btn-ghost btn-sm" onclick="abrirReportBuilder()" title="Reportes"><i data-lucide="file-bar-chart"></i></button>
     <a href="/{{ slug }}/notificaciones" class="btn btn-icon" style="position:relative;">
       <i data-lucide="bell"></i>
       {% if notif_count > 0 %}<span class="notif-badge">{{ notif_count }}</span>{% endif %}
@@ -324,7 +330,583 @@ html{scroll-behavior:smooth;}
 </div>
 
 </div>
+
+<!-- ── Fase 22: AI Assistant Modal ── -->
+<div class="overlay" id="aiModal" onclick="if(event.target===this)cerrarAI()">
+<div class="modal" style="max-width:650px;">
+    <div class="modal-header">
+        <h2><i data-lucide="sparkles" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Asistente Institucional IA</h2>
+        <button class="close-btn" onclick="cerrarAI()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+        <div id="aiChat" style="max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:14px;padding:4px;">
+            <div class="ai-msg ai-welcome" style="background:var(--bg3);padding:12px 14px;border-radius:var(--radius-md);font-size:13px;color:var(--muted);">
+                Pregunta sobre el estado del colegio. Ejemplos:<br>
+                <span style="display:inline-block;background:var(--bg);padding:3px 8px;border-radius:4px;margin:3px 2px;font-size:11px;cursor:pointer;" onclick="aiAsk(this.textContent)">¿Qué estudiantes tienen riesgo de perder el año?</span>
+                <span style="display:inline-block;background:var(--bg);padding:3px 8px;border-radius:4px;margin:3px 2px;font-size:11px;cursor:pointer;" onclick="aiAsk(this.textContent)">¿Qué materias tienen el promedio más bajo?</span>
+                <span style="display:inline-block;background:var(--bg);padding:3px 8px;border-radius:4px;margin:3px 2px;font-size:11px;cursor:pointer;" onclick="aiAsk(this.textContent)">¿Qué docente no ha registrado notas?</span>
+                <span style="display:inline-block;background:var(--bg);padding:3px 8px;border-radius:4px;margin:3px 2px;font-size:11px;cursor:pointer;" onclick="aiAsk(this.textContent)">¿Qué cursos tienen mayor inasistencia?</span>
+                <span style="display:inline-block;background:var(--bg);padding:3px 8px;border-radius:4px;margin:3px 2px;font-size:11px;cursor:pointer;" onclick="aiAsk(this.textContent)">Resume el rendimiento general</span>
+            </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+            <input type="text" id="aiInput" placeholder="Escribe tu pregunta..." style="flex:1;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;" onkeydown="if(event.key==='Enter')aiAsk(this.value)">
+            <button class="btn btn-primary btn-sm" onclick="aiAsk(document.getElementById('aiInput').value)"><i data-lucide="send" style="width:14px;height:14px;"></i></button>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ── Fase 23-33: Home Dashboard Modal ── -->
+<div class="overlay" id="homeModal" onclick="if(event.target===this)cerrarHomeRector()">
+<div class="modal" style="max-width:800px;">
+    <div class="modal-header">
+        <h2><i data-lucide="home" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Centro de Inicio</h2>
+        <button class="close-btn" onclick="cerrarHomeRector()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body" id="homeBody">
+        <div style="text-align:center;padding:24px;color:var(--muted);">Cargando...</div>
+    </div>
+</div>
+</div>
+
+<!-- ── Fase 23: Matrículas Modal ── -->
+<div class="overlay" id="matModal" onclick="if(event.target===this)cerrarMatriculas()">
+<div class="modal" style="max-width:750px;">
+    <div class="modal-header">
+        <h2><i data-lucide="clipboard-check" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Matr&iacute;culas</h2>
+        <button class="close-btn" onclick="cerrarMatriculas()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+            <input type="text" id="matNombre" placeholder="Nombre del aspirante" style="flex:2;min-width:140px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
+            <input type="text" id="matDoc" placeholder="Documento" style="flex:1;min-width:80px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
+            <input type="email" id="matEmail" placeholder="Email" style="flex:1;min-width:100px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
+            <input type="text" id="matCurso" placeholder="Curso solicitado" style="flex:1;min-width:80px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
+            <button class="btn btn-primary btn-sm" onclick="crearMatricula()"><i data-lucide="plus" style="width:14px;height:14px;"></i> Agregar</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <span id="matCuposInfo" style="font-size:11px;color:var(--muted);"></span>
+        </div>
+        <div id="matList" style="max-height:350px;overflow-y:auto;"></div>
+    </div>
+</div>
+</div>
+
+<!-- ── Fase 24: Tesorería Modal ── -->
+<div class="overlay" id="tesModal" onclick="if(event.target===this)cerrarTesoreria()">
+<div class="modal" style="max-width:800px;">
+    <div class="modal-header">
+        <h2><i data-lucide="wallet" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Tesorer&iacute;a</h2>
+        <button class="close-btn" onclick="cerrarTesoreria()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+            <select id="tesAlumno" style="flex:2;min-width:120px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;"><option value="">Seleccionar estudiante</option></select>
+            <input type="text" id="tesConcepto" placeholder="Concepto (ej: Pensión marzo)" style="flex:2;min-width:120px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
+            <input type="number" id="tesMonto" placeholder="Monto" step="0.01" style="width:90px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
+            <button class="btn btn-primary btn-sm" onclick="crearFactura()"><i data-lucide="plus" style="width:14px;height:14px;"></i> Facturar</button>
+        </div>
+        <div id="tesList" style="max-height:350px;overflow-y:auto;"></div>
+    </div>
+</div>
+</div>
+
+<!-- ── Fase 28: Report Builder Modal ── -->
+<div class="overlay" id="rptModal" onclick="if(event.target===this)cerrarReportes()">
+<div class="modal" style="max-width:750px;">
+    <div class="modal-header">
+        <h2><i data-lucide="file-bar-chart" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Constructor de Reportes</h2>
+        <button class="close-btn" onclick="cerrarReportes()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+            <div>
+                <label style="font-size:11px;font-weight:600;display:block;margin-bottom:4px;">Tabla</label>
+                <select id="rptTabla" style="width:100%;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;" onchange="cargarColumnasReporte()">
+                    <option value="">Seleccionar</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:11px;font-weight:600;display:block;margin-bottom:4px;">Ordenar por</label>
+                <select id="rptOrden" style="width:100%;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;"><option value="">—</option></select>
+            </div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:11px;font-weight:600;display:block;margin-bottom:4px;">Campos a mostrar</label>
+            <div id="rptCampos" style="display:flex;gap:6px;flex-wrap:wrap;max-height:120px;overflow-y:auto;padding:6px;border:1px solid var(--border);border-radius:var(--radius-sm);"></div>
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:11px;font-weight:600;display:block;margin-bottom:4px;">Filtros</label>
+            <div id="rptFiltros"></div>
+            <button class="btn btn-ghost btn-xs" onclick="agregarFiltro()" style="margin-top:4px;font-size:10px;">+ Agregar filtro</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="ejecutarReporte()"><i data-lucide="play" style="width:14px;height:14px;"></i> Ejecutar</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportarReporteCSV()" style="margin-left:6px;"><i data-lucide="download" style="width:14px;height:14px;"></i> Exportar CSV</button>
+        <div id="rptResult" style="margin-top:12px;max-height:300px;overflow:auto;"></div>
+    </div>
+</div>
+</div>
+
+<!-- ── Fase 17: Academic Management Modal ── -->
+<div class="overlay" id="gestionModal" onclick="if(event.target===this)cerrarGestion()">
+<div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+        <h2><i data-lucide="school" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Gesti&oacute;n Acad&eacute;mica</h2>
+        <button class="close-btn" onclick="cerrarGestion()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;">
+                <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;"><i data-lucide="arrow-up" style="width:14px;height:14px;vertical-align:middle;"></i> Promover estudiantes</h4>
+                <label style="font-size:11px;display:block;margin-bottom:4px;">Curso origen</label>
+                <select id="gPromOrigen" style="width:100%;padding:6px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;margin-bottom:8px;" onchange="cargarCursosDestino()"></select>
+                <label style="font-size:11px;display:block;margin-bottom:4px;">Curso destino</label>
+                <select id="gPromDestino" style="width:100%;padding:6px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;margin-bottom:8px;"></select>
+                <button class="btn btn-primary btn-sm" onclick="ejecutarPromocion()"><i data-lucide="check" style="width:14px;height:14px;"></i> Promover</button>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;">
+                <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;"><i data-lucide="move" style="width:14px;height:14px;vertical-align:middle;"></i> Trasladar estudiante</h4>
+                <label style="font-size:11px;display:block;margin-bottom:4px;">Estudiante</label>
+                <input type="text" id="gTrasladoSearch" placeholder="Buscar..." style="width:100%;padding:6px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;margin-bottom:8px;" oninput="buscarAlumnosGestion()">
+                <select id="gTrasladoAlumno" size="3" style="width:100%;padding:4px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:11px;margin-bottom:8px;"></select>
+                <label style="font-size:11px;display:block;margin-bottom:4px;">Nuevo curso</label>
+                <select id="gTrasladoCurso" style="width:100%;padding:6px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;margin-bottom:8px;"></select>
+                <button class="btn btn-primary btn-sm" onclick="ejecutarTraslado()"><i data-lucide="check" style="width:14px;height:14px;"></i> Trasladar</button>
+            </div>
+        </div>
+        <div style="margin-top:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;">
+            <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;"><i data-lucide="clock" style="width:14px;height:14px;vertical-align:middle;"></i> Historial Acad&eacute;mico</h4>
+            <input type="text" id="gHistSearch" placeholder="Buscar estudiante..." style="width:100%;padding:6px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;margin-bottom:8px;box-sizing:border-box;" oninput="buscarHistorial()">
+            <div id="gHistResult" style="font-size:12px;color:var(--muted);">Escribe el nombre de un estudiante para ver su historial.</div>
+        </div>
+    </div>
+</div>
+</div>
+
 {% endblock %}
 
-
+{% block extra_scripts %}
+<script>
+var slug = '{{ slug }}';
+// ── Fase 22: AI Assistant ──
+function abrirAIAssistant(){
+    document.getElementById('aiModal').style.display='flex';
+    document.getElementById('aiInput').value='';
+    document.getElementById('aiInput').focus();
+}
+function cerrarAI(){document.getElementById('aiModal').style.display='none';}
+function aiAsk(pregunta){
+    if(!pregunta||!pregunta.trim()) return;
+    var chat=document.getElementById('aiChat');
+    var input=document.getElementById('aiInput');
+    // User message
+    var userDiv=document.createElement('div');
+    userDiv.style.cssText='background:var(--accent);color:var(--text-on-accent);padding:10px 14px;border-radius:var(--radius-md) var(--radius-md) 4px var(--radius-md);align-self:flex-end;max-width:85%;font-size:13px;';
+    userDiv.textContent=pregunta;
+    chat.appendChild(userDiv);
+    // Loading
+    var loadDiv=document.createElement('div');
+    loadDiv.style.cssText='background:var(--bg3);padding:10px 14px;border-radius:var(--radius-md) var(--radius-md) var(--radius-md) 4px;align-self:flex-start;max-width:85%;font-size:12px;color:var(--muted);';
+    loadDiv.textContent='...';
+    chat.appendChild(loadDiv);
+    chat.scrollTop=chat.scrollHeight;
+    input.value='';
+    fetch('/'+slug+'/ai/ask',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]')?.value||''},body:JSON.stringify({pregunta:pregunta})})
+    .then(function(r){return r.json();}).then(function(d){
+        loadDiv.innerHTML='';
+        if(d.error){loadDiv.textContent='Error: '+d.error;return;}
+        var html='<div style="font-weight:600;margin-bottom:4px;">'+d.respuesta+'</div>';
+        if(d.html){html+=d.html;}
+        if(d.datos&&d.datos.length){
+            html+='<div style="display:flex;flex-direction:column;gap:4px;margin-top:6px;">';
+            d.datos.slice(0,10).forEach(function(item){
+                var label=item.nombre||item.materia||item.curso||'';
+                var val=item.promedio||item.prom||item.faltas||'';
+                html+='<div style="display:flex;justify-content:space-between;padding:4px 6px;background:var(--bg);border-radius:4px;font-size:11px;"><span>'+escHtml(label)+'</span><span style="font-weight:700;">'+val+'</span></div>';
+            });
+            html+='</div>';
+        }
+        loadDiv.innerHTML=html;
+        chat.scrollTop=chat.scrollHeight;
+    }).catch(function(){loadDiv.textContent='Error de conexión';chat.scrollTop=chat.scrollHeight;});
+}
+// ── Fase 17: Academic Management ──
+function abrirGestionAcademica(){
+    document.getElementById('gestionModal').style.display='flex';
+    cargarCursosGestion();
+    cargarCursosTraslado();
+}
+function cerrarGestion(){document.getElementById('gestionModal').style.display='none';}
+function cargarCursosGestion(){
+    var sel=document.getElementById('gPromOrigen');
+    fetch('/'+slug+'/gestion-academica/alumnos').then(function(r){return r.json();}).then(function(d){
+        var cursos={};
+        (d.alumnos||[]).forEach(function(a){cursos[a.curso]=true;});
+        sel.innerHTML='<option value="">Seleccionar</option>';
+        Object.keys(cursos).sort().forEach(function(c){sel.innerHTML+='<option value="'+escHtml(c)+'">'+escHtml(c)+'</option>';});
+        cargarCursosDestino();
+    });
+}
+function cargarCursosDestino(){
+    var sel=document.getElementById('gPromDestino');
+    var orig=document.getElementById('gPromOrigen').value;
+    fetch('/'+slug+'/gestion-academica/alumnos').then(function(r){return r.json();}).then(function(d){
+        var cursos={};
+        (d.alumnos||[]).forEach(function(a){cursos[a.curso]=true;});
+        sel.innerHTML='<option value="">Seleccionar</option>';
+        Object.keys(cursos).sort().forEach(function(c){sel.innerHTML+='<option value="'+escHtml(c)+'"'+(c===orig?' disabled':'')+'>'+escHtml(c)+'</option>';});
+    });
+}
+function ejecutarPromocion(){
+    var origen=document.getElementById('gPromOrigen').value;
+    var destino=document.getElementById('gPromDestino').value;
+    if(!origen||!destino){showToast('Selecciona origen y destino');return;}
+    if(!confirm('Promover todos los estudiantes de '+origen+' a '+destino+'?')) return;
+    fetch('/'+slug+'/gestion-academica/promover',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]')?.value||''},body:JSON.stringify({curso_origen:origen,curso_destino:destino})})
+    .then(function(r){return r.json();}).then(function(d){
+        if(d.status==='ok'){showToast(d.promovidos+' estudiantes promovidos a '+destino);}
+        else showToast('Error: '+d.error);
+    }).catch(function(){showToast('Error de conexión');});
+}
+function cargarCursosTraslado(){
+    var sel=document.getElementById('gTrasladoCurso');
+    fetch('/'+slug+'/gestion-academica/alumnos').then(function(r){return r.json();}).then(function(d){
+        var cursos={};
+        (d.alumnos||[]).forEach(function(a){cursos[a.curso]=true;});
+        sel.innerHTML='<option value="">Seleccionar</option>';
+        Object.keys(cursos).sort().forEach(function(c){sel.innerHTML+='<option value="'+escHtml(c)+'">'+escHtml(c)+'</option>';});
+    });
+}
+var _gAlumnos=[];
+function buscarAlumnosGestion(){
+    var q=document.getElementById('gTrasladoSearch').value.toLowerCase().trim();
+    var sel=document.getElementById('gTrasladoAlumno');
+    if(!_gAlumnos.length){
+        fetch('/'+slug+'/gestion-academica/alumnos').then(function(r){return r.json();}).then(function(d){
+            _gAlumnos=d.alumnos||[];
+            filtrarAlumnosGestion(q);
+        });
+    }else{filtrarAlumnosGestion(q);}
+}
+function filtrarAlumnosGestion(q){
+    var sel=document.getElementById('gTrasladoAlumno');
+    sel.innerHTML='';
+    var filtrados=_gAlumnos.filter(function(a){return a.activo&&(!q||a.nombre.toLowerCase().includes(q)||a.curso.toLowerCase().includes(q));});
+    filtrados.slice(0,20).forEach(function(a){
+        var opt=document.createElement('option');
+        opt.value=a.id;
+        opt.textContent=a.nombre+' - '+a.curso;
+        sel.appendChild(opt);
+    });
+}
+function ejecutarTraslado(){
+    var sel=document.getElementById('gTrasladoAlumno');
+    var aid=sel.value;
+    var curso=document.getElementById('gTrasladoCurso').value;
+    if(!aid||!curso){showToast('Selecciona estudiante y curso');return;}
+    if(!confirm('Trasladar este estudiante a '+curso+'?')) return;
+    fetch('/'+slug+'/gestion-academica/trasladar',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]')?.value||''},body:JSON.stringify({alumno_id:parseInt(aid),curso_nuevo:curso,tipo:'curso'})})
+    .then(function(r){return r.json();}).then(function(d){
+        if(d.status==='ok'){showToast(d.nombre+' trasladado a '+curso+' correctamente');_gAlumnos=[];buscarAlumnosGestion();}
+        else showToast('Error: '+d.error);
+    }).catch(function(){showToast('Error de conexión');});
+}
+function buscarHistorial(){
+    var q=document.getElementById('gHistSearch').value.toLowerCase().trim();
+    var res=document.getElementById('gHistResult');
+    if(q.length<2){res.innerHTML='Escribe al menos 2 caracteres.';return;}
+    fetch('/'+slug+'/gestion-academica/alumnos').then(function(r){return r.json();}).then(function(d){
+        var found=(d.alumnos||[]).filter(function(a){return a.nombre.toLowerCase().includes(q);});
+        if(!found.length){res.innerHTML='No se encontraron estudiantes.';return;}
+        var html='';
+        found.slice(0,5).forEach(function(a){
+            html+='<div style="padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:4px;cursor:pointer;" onclick="verHistorial('+a.id+',\''+escJsStr(a.nombre)+'\')">';
+            html+='<div style="font-weight:600;font-size:13px;">'+escHtml(a.nombre)+'</div>';
+            html+='<div style="font-size:10px;color:var(--muted);">Actual: '+escHtml(a.curso)+(a.activo?'':' - Inactivo')+'</div></div>';
+        });
+        res.innerHTML=html;
+    });
+}
+function verHistorial(aid,nombre){
+    var res=document.getElementById('gHistResult');
+    res.innerHTML='<div style="text-align:center;color:var(--muted);">Cargando historial de '+escHtml(nombre)+'...</div>';
+    fetch('/'+slug+'/gestion-academica/historial/'+aid).then(function(r){return r.json();}).then(function(d){
+        if(d.error){res.innerHTML='<span style="color:var(--danger);">'+d.error+'</span>';return;}
+        var html='<div style="font-weight:700;font-size:14px;margin-bottom:8px;">Historial: '+escHtml(d.alumno?.nombre||nombre)+'</div>';
+        if(!d.historial||!d.historial.length){html+='<div style="color:var(--muted);font-size:12px;">Sin historial previo.</div>';res.innerHTML=html;return;}
+        html+='<div style="display:flex;flex-direction:column;gap:4px;">';
+        d.historial.forEach(function(h){
+            var color=h.estado==='promovido'?'var(--success)':h.estado==='trasladado'?'var(--blue)':'var(--muted)';
+            html+='<div style="display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--border);font-size:12px;">';
+            html+='<span>'+escHtml(h.curso)+' <span style="color:var(--muted);">('+h.fecha+')</span></span>';
+            html+='<span style="color:'+color+';font-weight:600;">'+h.estado+'</span></div>';
+        });
+        html+='</div>';
+        res.innerHTML=html;
+    }).catch(function(){res.innerHTML='<span style="color:var(--danger);">Error al cargar historial</span>';});
+}
+// ── Fase 23-33: Home Dashboard ──
+function abrirHomeRector(){
+    document.getElementById('homeModal').style.display='flex';
+    var body=document.getElementById('homeBody');
+    body.innerHTML='<div style="text-align:center;padding:24px;color:var(--muted);">Cargando...</div>';
+    fetch('/'+slug+'/home').then(function(r){return r.json();}).then(function(d){
+        var h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px;">';
+        if(d.rol==='rector'){
+            var items=[
+                {icon:'graduation-cap',label:'Estudiantes',val:d.total_estudiantes,color:'var(--accent)'},
+                {icon:'chalkboard-teacher',label:'Profesores',val:d.total_profesores,color:'var(--blue)'},
+                {icon:'alert-triangle',label:'En riesgo',val:d.riesgo,color:'var(--danger)'},
+                {icon:'inbox',label:'Solicitudes',val:d.pendientes,color:'var(--warning)'},
+                {icon:'calendar',label:'Eventos 7d',val:d.eventos,color:'var(--success)'}
+            ];
+            items.forEach(function(it){
+                h+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;text-align:center;"><div style="font-size:24px;font-weight:800;color:'+it.color+';">'+it.val+'</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">'+it.label+'</div></div>';
+            });
+        }else if(d.rol==='docente'){
+            h+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;text-align:center;"><div style="font-size:20px;font-weight:700;">'+escHtml(d.nombre)+'</div><div style="font-size:10px;color:var(--muted);">Docente</div></div>';
+            var items2=[
+                {icon:'book',label:'Cursos',val:d.cursos,color:'var(--accent)'},
+                {icon:'file-text',label:'Pendientes',val:d.actividades_pendientes,color:'var(--warning)'},
+                {icon:'alert-triangle',label:'En riesgo',val:d.riesgo,color:'var(--danger)'}
+            ];
+            items2.forEach(function(it){
+                h+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;text-align:center;"><div style="font-size:24px;font-weight:800;color:'+it.color+';">'+it.val+'</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;">'+it.label+'</div></div>';
+            });
+        }else if(d.rol==='padre'){
+            (d.hijos||[]).forEach(function(hijo){
+                h+='<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;text-align:center;"><div style="font-weight:700;">'+escHtml(hijo.nombre)+'</div><div style="font-size:10px;color:var(--muted);">'+escHtml(hijo.curso)+'</div><div style="font-size:28px;font-weight:800;margin:6px 0;color:'+(hijo.promedio<3?'var(--danger)':'var(--success)')+';">'+hijo.promedio+'</div><div style="font-size:10px;color:var(--muted);">Promedio</div></div>';
+            });
+        }
+        h+='</div>';
+        h+='<div style="text-align:center;padding:12px;background:var(--bg3);border-radius:var(--radius-md);border:1px solid var(--border);font-size:12px;color:var(--muted);">Panel de inicio &mdash; Lumini</div>';
+        body.innerHTML=h;
+    }).catch(function(){body.innerHTML='<div style="text-align:center;padding:24px;color:var(--danger);">Error al cargar</div>';});
+}
+function cerrarHomeRector(){document.getElementById('homeModal').style.display='none';}
+// ── Fase 23: Matrículas ──
+function abrirMatriculas(){
+    document.getElementById('matModal').style.display='flex';
+    cargarMatriculas();
+    fetch('/'+slug+'/matriculas/cupos').then(function(r){return r.json();}).then(function(d){
+        var info='';
+        (d.cupos||[]).forEach(function(c){info+=escHtml(c.curso)+' ('+c.jornada+'): '+c.inscritos+' | ';});
+        document.getElementById('matCuposInfo').textContent='Cupos: '+info;
+    });
+}
+function cerrarMatriculas(){document.getElementById('matModal').style.display='none';}
+function cargarMatriculas(){
+    var lst=document.getElementById('matList');
+    lst.innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);">Cargando...</div>';
+    fetch('/'+slug+'/matriculas').then(function(r){return r.json();}).then(function(d){
+        var h='<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:var(--bg3);">';
+        h+='<th style="padding:6px 8px;text-align:left;border-bottom:2px solid var(--border);">Nombre</th>';
+        h+='<th style="padding:6px 8px;text-align:left;border-bottom:2px solid var(--border);">Curso</th>';
+        h+='<th style="padding:6px 8px;text-align:left;border-bottom:2px solid var(--border);">Estado</th>';
+        h+='<th style="padding:6px 8px;text-align:left;border-bottom:2px solid var(--border);">Acciones</th></tr></thead><tbody>';
+        (d.matriculas||[]).forEach(function(m){
+            h+='<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+escHtml(m.nombre)+'</td>';
+            h+='<td style="padding:6px 8px;border-bottom:1px solid var(--border);">'+escHtml(m.curso_solicitado||'')+'</td>';
+            var color=m.estado==='aprobado'?'var(--success)':m.estado==='rechazado'?'var(--danger)':'var(--warning)';
+            h+='<td style="padding:6px 8px;border-bottom:1px solid var(--border);"><span style="color:'+color+';font-weight:600;">'+m.estado+'</span></td>';
+            h+='<td style="padding:6px 8px;border-bottom:1px solid var(--border);">';
+            if(m.estado==='pendiente'){
+                h+='<button onclick="cambiarEstadoMat('+m.id+',\'aprobado\')" style="font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--success);background:none;color:var(--success);cursor:pointer;margin-right:4px;">Aprobar</button>';
+                h+='<button onclick="cambiarEstadoMat('+m.id+',\'rechazado\')" style="font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--danger);background:none;color:var(--danger);cursor:pointer;">Rechazar</button>';
+            }else{h+='<span style="color:var(--muted);font-size:10px;">Procesado</span>';}
+            h+='</td></tr>';
+        });
+        h+='</tbody></table>';
+        if(!d.matriculas||!d.matriculas.length) h='<div style="text-align:center;padding:20px;color:var(--muted);">No hay aspirantes registrados.</div>';
+        lst.innerHTML=h;
+    }).catch(function(){lst.innerHTML='<div style="text-align:center;padding:16px;color:var(--danger);">Error</div>';});
+}
+function crearMatricula(){
+    var data={nombre:document.getElementById('matNombre').value.trim(),documento:document.getElementById('matDoc').value.trim(),email:document.getElementById('matEmail').value.trim(),curso_solicitado:document.getElementById('matCurso').value.trim()};
+    if(!data.nombre){showToast('Nombre requerido');return;}
+    fetch('/'+slug+'/matriculas/crear',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]')?.value||''},body:JSON.stringify(data)})
+    .then(function(r){return r.json();}).then(function(d){
+        if(d.status==='ok'){showToast('Aspirante registrado');document.getElementById('matNombre').value='';document.getElementById('matDoc').value='';document.getElementById('matEmail').value='';document.getElementById('matCurso').value='';cargarMatriculas();}
+        else showToast('Error: '+d.error);
+    }).catch(function(){showToast('Error de conexión');});
+}
+function cambiarEstadoMat(mid,estado){
+    if(!confirm((estado==='aprobado'?'Aprobar':'Rechazar')+' este aspirante?')) return;
+    fetch('/'+slug+'/matriculas/'+mid+'/estado',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]')?.value||''},body:JSON.stringify({estado:estado})})
+    .then(function(r){return r.json();}).then(function(d){
+        if(d.status==='ok'){showToast('Estado actualizado a '+estado);cargarMatriculas();}
+        else showToast('Error: '+d.error);
+    }).catch(function(){showToast('Error de conexión');});
+}
+// ── Fase 24: Tesorería ──
+var _tesAlumnos=[];
+function abrirTesoreria(){
+    document.getElementById('tesModal').style.display='flex';
+    cargarFacturas();
+    // Load students for select
+    fetch('/'+slug+'/gestion-academica/alumnos').then(function(r){return r.json();}).then(function(d){
+        _tesAlumnos=d.alumnos||[];
+        var sel=document.getElementById('tesAlumno');
+        sel.innerHTML='<option value="">Seleccionar estudiante</option>';
+        _tesAlumnos.forEach(function(a){
+            if(a.activo) sel.innerHTML+='<option value="'+a.id+'">'+escHtml(a.nombre)+' - '+escHtml(a.curso)+'</option>';
+        });
+    });
+}
+function cerrarTesoreria(){document.getElementById('tesModal').style.display='none';}
+function cargarFacturas(){
+    var lst=document.getElementById('tesList');
+    lst.innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);">Cargando...</div>';
+    fetch('/'+slug+'/tesoreria/facturas').then(function(r){return r.json();}).then(function(d){
+        var h='<table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="background:var(--bg3);">';
+        h+='<th style="padding:5px 6px;text-align:left;border-bottom:2px solid var(--border);">Alumno</th>';
+        h+='<th style="padding:5px 6px;text-align:left;border-bottom:2px solid var(--border);">Concepto</th>';
+        h+='<th style="padding:5px 6px;text-align:right;border-bottom:2px solid var(--border);">Monto</th>';
+        h+='<th style="padding:5px 6px;text-align:center;border-bottom:2px solid var(--border);">Estado</th>';
+        h+='<th style="padding:5px 6px;text-align:center;border-bottom:2px solid var(--border);">Acci&oacute;n</th></tr></thead><tbody>';
+        (d.facturas||[]).forEach(function(f){
+            h+='<tr><td style="padding:5px 6px;border-bottom:1px solid var(--border);">'+escHtml(f.alumno_nombre||'N/A')+'</td>';
+            h+='<td style="padding:5px 6px;border-bottom:1px solid var(--border);">'+escHtml(f.concepto)+'</td>';
+            h+='<td style="padding:5px 6px;border-bottom:1px solid var(--border);text-align:right;font-weight:700;">$'+f.monto.toFixed(2)+'</td>';
+            var ec=f.estado==='pagado'?'var(--success)':f.estado==='vencido'?'var(--danger)':'var(--warning)';
+            h+='<td style="padding:5px 6px;border-bottom:1px solid var(--border);text-align:center;"><span style="color:'+ec+';font-weight:600;">'+f.estado+'</span></td>';
+            h+='<td style="padding:5px 6px;border-bottom:1px solid var(--border);text-align:center;">';
+            if(f.estado==='pendiente'){
+                h+='<button onclick="pagarFactura('+f.id+')" style="font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid var(--success);background:none;color:var(--success);cursor:pointer;">Pagar</button>';
+            }
+            h+=' <a href="/'+slug+'/tesoreria/facturas/'+f.id+'/recibo" target="_blank" style="font-size:9px;color:var(--accent);">Recibo</a>';
+            h+='</td></tr>';
+        });
+        h+='</tbody></table>';
+        if(!d.facturas||!d.facturas.length) h='<div style="text-align:center;padding:20px;color:var(--muted);">Sin facturas.</div>';
+        lst.innerHTML=h;
+    }).catch(function(){lst.innerHTML='<div style="text-align:center;padding:16px;color:var(--danger);">Error</div>';});
+}
+function crearFactura(){
+    var data={alumno_id:parseInt(document.getElementById('tesAlumno').value)||null,concepto:document.getElementById('tesConcepto').value.trim(),monto:parseFloat(document.getElementById('tesMonto').value)||0};
+    if(!data.concepto||data.monto<=0){showToast('Concepto y monto requeridos');return;}
+    fetch('/'+slug+'/tesoreria/facturas/crear',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]')?.value||''},body:JSON.stringify(data)})
+    .then(function(r){return r.json();}).then(function(d){
+        if(d.status==='ok'){showToast('Factura creada');document.getElementById('tesConcepto').value='';document.getElementById('tesMonto').value='';cargarFacturas();}
+        else showToast('Error: '+d.error);
+    }).catch(function(){showToast('Error de conexión');});
+}
+function pagarFactura(fid){
+    var monto=prompt('Monto a pagar:');
+    if(!monto||parseFloat(monto)<=0) return;
+    fetch('/'+slug+'/tesoreria/facturas/'+fid+'/pagar',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]')?.value||''},body:JSON.stringify({monto:parseFloat(monto),metodo:'efectivo'})})
+    .then(function(r){return r.json();}).then(function(d){
+        if(d.status==='ok'){showToast('Pago registrado');cargarFacturas();}
+        else showToast('Error: '+d.error);
+    }).catch(function(){showToast('Error de conexión');});
+}
+// ── Fase 28: Report Builder ──
+var _rptColumnas=[];
+function abrirReportes(){
+    document.getElementById('rptModal').style.display='flex';
+    var sel=document.getElementById('rptTabla');
+    if(sel.options.length<=1){
+        fetch('/'+slug+'/reportes/tablas').then(function(r){return r.json();}).then(function(d){
+            (d.tablas||[]).forEach(function(t){sel.innerHTML+='<option value="'+t+'">'+t+'</option>';});
+        });
+    }
+}
+function cerrarReportes(){document.getElementById('rptModal').style.display='none';}
+function cargarColumnasReporte(){
+    var tabla=document.getElementById('rptTabla').value;
+    if(!tabla){document.getElementById('rptCampos').innerHTML='';document.getElementById('rptOrden').innerHTML='<option value="">—</option>';return;}
+    fetch('/'+slug+'/reportes/columnas?tabla='+encodeURIComponent(tabla)).then(function(r){return r.json();}).then(function(d){
+        _rptColumnas=d.columnas||[];
+        var h='';
+        var ordSel=document.getElementById('rptOrden');
+        ordSel.innerHTML='<option value="">—</option>';
+        _rptColumnas.forEach(function(c){
+            h+='<label style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--bg);border-radius:4px;font-size:11px;cursor:pointer;"><input type="checkbox" value="'+c.name+'" checked onchange="actualizarOrdenReporte()"> '+c.name+' <span style="color:var(--muted);font-size:9px;">('+c.type+')</span></label>';
+            ordSel.innerHTML+='<option value="'+c.name+'">'+c.name+'</option>';
+        });
+        document.getElementById('rptCampos').innerHTML=h;
+        document.getElementById('rptFiltros').innerHTML='';
+    });
+}
+function actualizarOrdenReporte(){
+    var sel=document.getElementById('rptOrden');
+    sel.innerHTML='<option value="">—</option>';
+    _rptColumnas.forEach(function(c){
+        if(document.querySelector('#rptCampos input[value="'+c.name+'"]:checked')){
+            sel.innerHTML+='<option value="'+c.name+'">'+c.name+'</option>';
+        }
+    });
+}
+var _filtroCount=0;
+function agregarFiltro(){
+    _filtroCount++;
+    var div=document.getElementById('rptFiltros');
+    var h='<div style="display:flex;gap:6px;align-items:center;margin-bottom:4px;" id="rfilt'+_filtroCount+'">';
+    h+='<select style="padding:4px 6px;border-radius:4px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:11px;">';
+    _rptColumnas.forEach(function(c){h+='<option value="'+c.name+'">'+c.name+'</option>';});
+    h+='</select>';
+    h+='<select style="padding:4px 6px;border-radius:4px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:11px;"><option value="contiene">Contiene</option><option value="igual">Igual</option><option value="mayor">Mayor</option><option value="menor">Menor</option></select>';
+    h+='<input type="text" placeholder="Valor" style="padding:4px 6px;border-radius:4px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:11px;width:100px;">';
+    h+='<button onclick="document.getElementById(\'rfilt'+_filtroCount+'\').remove()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;">&times;</button></div>';
+    div.insertAdjacentHTML('beforeend',h);
+}
+function ejecutarReporte(){
+    var tabla=document.getElementById('rptTabla').value;
+    if(!tabla){showToast('Selecciona una tabla');return;}
+    var campos=[];
+    document.querySelectorAll('#rptCampos input:checked').forEach(function(cb){campos.push(cb.value);});
+    if(!campos.length){showToast('Selecciona al menos un campo');return;}
+    var filtros=[];
+    document.querySelectorAll('#rptFiltros > div').forEach(function(d){
+        var sel=d.querySelectorAll('select');
+        var inp=d.querySelector('input');
+        if(sel.length>=2&&inp&&inp.value.trim()){
+            filtros.push({campo:sel[0].value,operador:sel[1].value,valor:inp.value.trim()});
+        }
+    });
+    var orden=document.getElementById('rptOrden').value;
+    document.getElementById('rptResult').innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);">Ejecutando...</div>';
+    fetch('/'+slug+'/reportes/ejecutar',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]')?.value||''},body:JSON.stringify({tabla:tabla,campos:campos,filtros:filtros,orden:orden})})
+    .then(function(r){return r.json();}).then(function(d){
+        if(d.error){document.getElementById('rptResult').innerHTML='<div style="color:var(--danger);">'+d.error+'</div>';return;}
+        _rptResultData=d;
+        if(!d.filas||!d.filas.length){document.getElementById('rptResult').innerHTML='<div style="text-align:center;padding:16px;color:var(--muted);">Sin resultados.</div>';return;}
+        var h='<div style="font-size:10px;color:var(--muted);margin-bottom:4px;">'+d.total+' filas</div>';
+        h+='<table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="background:var(--bg3);">';
+        d.columnas.forEach(function(c){h+='<th style="padding:4px 6px;text-align:left;border-bottom:2px solid var(--border);">'+c+'</th>';});
+        h+='</tr></thead><tbody>';
+        d.filas.forEach(function(fila){
+            h+='<tr>';
+            fila.forEach(function(cell){h+='<td style="padding:3px 6px;border-bottom:1px solid var(--border);">'+escHtml(String(cell))+'</td>';});
+            h+='</tr>';
+        });
+        h+='</tbody></table>';
+        document.getElementById('rptResult').innerHTML=h;
+    }).catch(function(){document.getElementById('rptResult').innerHTML='<div style="color:var(--danger);">Error</div>';});
+}
+var _rptResultData=null;
+function exportarReporteCSV(){
+    if(!_rptResultData||!_rptResultData.filas||!_rptResultData.filas.length){showToast('No hay datos para exportar');return;}
+    var csv=_rptResultData.columnas.join(',')+'\n';
+    _rptResultData.filas.forEach(function(fila){
+        csv+=fila.map(function(c){var s=String(c);return s.includes(',')?'"'+s+'"':s;}).join(',')+'\n';
+    });
+    var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    var link=document.createElement('a');
+    link.href=URL.createObjectURL(blob);
+    link.download='reporte_'+document.getElementById('rptTabla').value+'.csv';
+    link.click();
+}
+function showToast(msg){
+function escHtml(s){
+    if(!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escJsStr(s){
+    if(!s) return '';
+    return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+}
+</script>
+{% endblock %}
 

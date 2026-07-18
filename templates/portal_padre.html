@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Portal Padres — {{ colegio.nombre if colegio else slug }}{% endblock %}
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;min-height:100vh;}
+.pp-login{max-width:400px;margin:80px auto;background:#fff;border-radius:16px;padding:40px;box-shadow:0 4px 24px rgba(0,0,0,.1);}
+.pp-login h1{font-size:22px;font-weight:800;margin-bottom:4px;color:#1a1a2e;}
+.pp-login .sub{font-size:13px;color:#666;margin-bottom:24px;}
+.pp-login label{font-size:12px;font-weight:600;display:block;margin-bottom:4px;color:#333;}
+.pp-login input{width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:16px;transition:border-color .2s;}
+.pp-login input:focus{outline:none;border-color:#6366f1;}
+.pp-btn{width:100%;padding:11px;border:none;border-radius:10px;background:#6366f1;color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .2s;}
+.pp-btn:hover{opacity:.9;}
+.pp-error{color:#e74c3c;font-size:12px;margin-bottom:12px;display:none;}
+.pp-dash{max-width:1000px;margin:30px auto;padding:0 16px;}
+.pp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;}
+.pp-header h1{font-size:20px;font-weight:800;color:#1a1a2e;}
+.pp-header .pp-user{font-size:13px;color:#666;}
+.pp-header button{background:none;border:1px solid #ddd;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:12px;color:#666;transition:all .2s;}
+.pp-header button:hover{background:#f5f5f5;}
+.pp-hijo-card{background:#fff;border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.pp-hijo-card h3{font-size:16px;font-weight:700;margin-bottom:12px;color:#1a1a2e;}
+.pp-hijo-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:14px;}
+.pp-stat{text-align:center;padding:10px;background:#f8f9ff;border-radius:10px;}
+.pp-stat .pp-num{font-size:20px;font-weight:800;color:#6366f1;}
+.pp-stat .pp-lbl{font-size:10px;color:#888;margin-top:2px;text-transform:uppercase;letter-spacing:.04em;}
+.pp-hijo-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.pp-hijo-actions button{padding:7px 14px;border:1px solid #e0e0e0;border-radius:8px;background:#fff;cursor:pointer;font-size:12px;transition:all .2s;}
+.pp-hijo-actions button:hover{border-color:#6366f1;color:#6366f1;}
+.pp-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center;}
+.pp-modal.active{display:flex;}
+.pp-modal-content{background:#fff;border-radius:16px;padding:24px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;}
+.pp-modal-content h2{font-size:18px;font-weight:700;margin-bottom:14px;color:#1a1a2e;}
+.pp-modal-content button.close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:#999;}
+.pp-table{width:100%;border-collapse:collapse;font-size:13px;}
+.pp-table th{text-align:left;padding:8px 10px;border-bottom:2px solid #eee;font-weight:600;color:#555;}
+.pp-table td{padding:7px 10px;border-bottom:1px solid #f0f0f0;}
+.pp-com-list{display:flex;flex-direction:column;gap:8px;}
+.pp-com-item{padding:12px 14px;border:1px solid #eee;border-radius:10px;}
+.pp-com-item h4{font-size:13px;font-weight:600;margin-bottom:4px;}
+.pp-com-item p{font-size:12px;color:#666;}
+.pp-com-item .pp-date{font-size:10px;color:#999;margin-top:4px;}
+.pp-asist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(28px,1fr));gap:3px;margin:8px 0;}
+.pp-asist-item{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;}
+.pp-asist-item.P{background:#2ecc71;}
+.pp-asist-item.X{background:#e74c3c;}
+.pp-asist-item.E{background:#f39c12;}
+.pp-asist-item.S{background:#3498db;}
+.pp-asist-item.T{background:#9b59b6;}
+@media(max-width:600px){
+  .pp-login{margin:40px 16px;padding:24px;}
+  .pp-hijo-stats{grid-template-columns:repeat(2,1fr);}
+}
+{% endblock %}
+{% block content %}
+<div id="ppLogin" class="pp-login" style="display:block;">
+  <h1>Portal de Padres</h1>
+  <div class="sub">Accede al rendimiento académico de tus hijos</div>
+  <div class="pp-error" id="ppError"></div>
+  <label>Correo electrónico</label>
+  <input type="email" id="ppEmail" placeholder="tu@correo.com" autocomplete="email">
+  <label>PIN de acceso</label>
+  <input type="password" id="ppPin" placeholder="Ingresa tu PIN" autocomplete="current-password">
+  <button class="pp-btn" onclick="ppLogin()">Ingresar</button>
+</div>
+<div id="ppDashboard" class="pp-dash" style="display:none;">
+  <div class="pp-header">
+    <div><h1>Portal de Padres</h1><div class="pp-user" id="ppUserInfo"></div></div>
+    <button onclick="ppLogout()">Cerrar sesión</button>
+  </div>
+  <div id="ppHijos"></div>
+</div>
+<div class="pp-modal" id="ppModalNotas"><div class="pp-modal-content">
+  <button class="close" onclick="ppCerrarModal('ppModalNotas')">&times;</button>
+  <h2 id="ppModalTitle">Notas</h2>
+  <table class="pp-table"><thead><tr><th>Actividad</th><th>Tipo</th><th>Peso</th><th>Nota</th></tr></thead><tbody id="ppNotasBody"></tbody></table>
+</div></div>
+<div class="pp-modal" id="ppModalAsistencia"><div class="pp-modal-content">
+  <button class="close" onclick="ppCerrarModal('ppModalAsistencia')">&times;</button>
+  <h2 id="ppModalAsistTitle">Asistencia</h2>
+  <div id="ppAsistBody"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:11px;">
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:3px;background:#2ecc71;display:inline-block;"></span> Presente</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:3px;background:#e74c3c;display:inline-block;"></span> Ausente</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:3px;background:#f39c12;display:inline-block;"></span> Excusa</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:3px;background:#3498db;display:inline-block;"></span> Salida</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:3px;background:#9b59b6;display:inline-block;"></span> Tardanza</span>
+  </div>
+</div></div>
+<div class="pp-modal" id="ppModalComms"><div class="pp-modal-content">
+  <button class="close" onclick="ppCerrarModal('ppModalComms')">&times;</button>
+  <h2>Comunicados</h2>
+  <div id="ppCommsBody" class="pp-com-list"></div>
+</div></div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+var slug = '{{ slug }}';
+function ppLogin(){
+  var email=document.getElementById('ppEmail').value.trim();
+  var pin=document.getElementById('ppPin').value.trim();
+  var err=document.getElementById('ppError');
+  if(!email||!pin){err.textContent='Completa todos los campos';err.style.display='block';return;}
+  err.style.display='none';
+  fetch('/'+slug+'/portal/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,pin:pin})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.error){err.textContent=d.error;err.style.display='block';return;}
+    document.getElementById('ppLogin').style.display='none';
+    document.getElementById('ppUserInfo').textContent='Bienvenido, '+d.padre.nombre;
+    renderHijos(d.hijos);
+    document.getElementById('ppDashboard').style.display='block';
+  }).catch(function(){err.textContent='Error de conexión';err.style.display='block';});
+}
+function renderHijos(hijos){
+  var container=document.getElementById('ppHijos');
+  var h='';
+  hijos.forEach(function(hijo){
+    h+='<div class="pp-hijo-card"><h3>'+escHtml(hijo.nombre)+' <span style="font-weight:400;font-size:13px;color:#888;">· '+escHtml(hijo.curso)+' · '+escHtml(hijo.jornada)+'</span></h3>';
+    h+='<div class="pp-hijo-stats"><div class="pp-stat"><div class="pp-num">'+hijo.promedio+'</div><div class="pp-lbl">Promedio</div></div>';
+    h+='<div class="pp-stat"><div class="pp-num">'+hijo.actividades+'</div><div class="pp-lbl">Actividades</div></div>';
+    if(hijo.asistencia){
+      var total=hijo.asistencia.reduce(function(s,a){return s+a.cnt;},0);
+      var presentes=hijo.asistencia.filter(function(a){return a.estado==='P';}).reduce(function(s,a){return s+a.cnt;},0);
+      h+='<div class="pp-stat"><div class="pp-num">'+Math.round(presentes/total*100)+'%</div><div class="pp-lbl">Asistencia</div></div></div>';
+    }else{h+='<div class="pp-stat"><div class="pp-num">—</div><div class="pp-lbl">Asistencia</div></div></div>';}
+    h+='<div class="pp-hijo-actions">';
+    h+='<button onclick="ppVerNotas('+hijo.id+',\''+escJsStr(hijo.nombre)+'\')">Ver notas</button>';
+    h+='<button onclick="ppVerAsistencia('+hijo.id+',\''+escJsStr(hijo.nombre)+'\')">Asistencia</button>';
+    h+='<button onclick="ppVerComms()">Comunicados</button>';
+    h+='</div></div>';
+  });
+  container.innerHTML=h;
+}
+function ppVerNotas(aid,nombre){
+  document.getElementById('ppModalTitle').textContent='Notas - '+nombre;
+  document.getElementById('ppNotasBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:#999;">Cargando...</td></tr>';
+  document.getElementById('ppModalNotas').classList.add('active');
+  fetch('/'+slug+'/portal/notas/'+aid).then(function(r){return r.json();}).then(function(d){
+    if(d.error){document.getElementById('ppNotasBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:#e74c3c;">'+d.error+'</td></tr>';return;}
+    var h='';
+    (d.actividades||[]).forEach(function(a){
+      h+='<tr><td>'+escHtml(a.nombre)+'</td><td>'+escHtml(a.tipo)+'</td><td>'+a.peso+'</td><td style="font-weight:700;color:'+(a.prom<3.0?'#e74c3c':'#2ecc71')+';">'+a.prom+'</td></tr>';
+    });
+    document.getElementById('ppNotasBody').innerHTML=h;
+  }).catch(function(){document.getElementById('ppNotasBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:#e74c3c;">Error</td></tr>';});
+}
+function ppVerAsistencia(aid,nombre){
+  document.getElementById('ppModalAsistTitle').textContent='Asistencia - '+nombre;
+  document.getElementById('ppAsistBody').innerHTML='<div style="color:#999;text-align:center;">Cargando...</div>';
+  document.getElementById('ppModalAsistencia').classList.add('active');
+  fetch('/'+slug+'/portal/asistencia/'+aid).then(function(r){return r.json();}).then(function(d){
+    if(d.error){document.getElementById('ppAsistBody').innerHTML='<div style="color:#e74c3c;">'+d.error+'</div>';return;}
+    var h='<div class="pp-asist-grid">';
+    (d.asistencia||[]).forEach(function(a){
+      h+='<div class="pp-asist-item '+a.estado+'" title="'+a.fecha+': '+a.estado+'">'+a.estado+'</div>';
+    });
+    h+='</div><div style="font-size:11px;color:#999;margin-top:6px;">Últimos 60 registros</div>';
+    document.getElementById('ppAsistBody').innerHTML=h;
+  }).catch(function(){document.getElementById('ppAsistBody').innerHTML='<div style="color:#e74c3c;">Error</div>';});
+}
+function ppVerComms(){
+  document.getElementById('ppCommsBody').innerHTML='<div style="color:#999;text-align:center;">Cargando...</div>';
+  document.getElementById('ppModalComms').classList.add('active');
+  fetch('/'+slug+'/portal/comunicados').then(function(r){return r.json();}).then(function(d){
+    if(d.error){document.getElementById('ppCommsBody').innerHTML='<div style="color:#e74c3c;">'+d.error+'</div>';return;}
+    var h='';
+    (d.comunicados||[]).forEach(function(c){
+      h+='<div class="pp-com-item"><h4>'+escHtml(c.titulo)+'</h4><p>'+escHtml(c.contenido)+'</p><div class="pp-date">'+c.created_at+'</div></div>';
+    });
+    if(!h) h='<div style="color:#999;text-align:center;">No hay comunicados disponibles</div>';
+    document.getElementById('ppCommsBody').innerHTML=h;
+  }).catch(function(){document.getElementById('ppCommsBody').innerHTML='<div style="color:#e74c3c;">Error</div>';});
+}
+function ppCerrarModal(id){document.getElementById(id).classList.remove('active');}
+function ppLogout(){
+  fetch('/'+slug+'/logout').then(function(){location.reload();});
+}
+function escHtml(s){
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function escJsStr(s){
+  if(!s) return '';
+  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+}
+</script>
+{% endblock %}
