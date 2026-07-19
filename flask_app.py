@@ -153,6 +153,21 @@ try:
 except ImportError as e:
     logger.warning(f"No se pudo registrar API v1: {e}")
 
+# ── NUEVOS BLUEPRINTS (app/) ──────────────────────────────────────────────
+try:
+    from app.routes import rector_bp, admin_bp, parent_bp, student_bp
+    from app.routes.main_routes import main_bp
+    from app.routes.auth import auth_bp
+    app.register_blueprint(rector_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(parent_bp)
+    app.register_blueprint(student_bp)
+    app.register_blueprint(main_bp)
+    app.register_blueprint(auth_bp)
+    logger.info("Blueprints modulares (app/routes/) registrados.")
+except ImportError as e:
+    logger.warning(f"No se pudieron registrar blueprints modulares: {e}")
+
 # ── FUERZA BRUTA ──────────────────────────────────────────────────────────────
 login_intentos = {}
 
@@ -1476,7 +1491,7 @@ def requiere_permiso(permiso, obtener_entidad=None):
             if not slug: abort(400)
             usuario_tipo, usuario_id = get_usuario_actual(slug)
             if not usuario_id:
-                return redirect(url_for('login', slug=slug))
+                return redirect(url_for('auth.login', slug=slug))
             if obtener_entidad:
                 e_tipo, e_id = obtener_entidad(kwargs)
             else:
@@ -1819,461 +1834,14 @@ def enviar_correo(destino, asunto, cuerpo_html, adjunto_bytes=None, adjunto_nomb
         logger.error(f'Error al enviar correo a {destino}: {e}')
         return False
 
-# ── ADMIN ─────────────────────────────────────────────────────────────────────
-@app.route('/admin', methods=['GET', 'POST'])
-def admin():
-    error = exito = None
-    ip = request.remote_addr
-
-    if not session.get('admin_auth'):
-        if request.method == 'POST' and request.form.get('accion') == 'admin_login':
-            if not validar_csrf():
-                error = 'Error de seguridad.'
-                return render_template('admin_login.html', error=error)
-            bloqueado = ip_bloqueada(ip, prefijo='admin')
-            if bloqueado:
-                error = f'Demasiados intentos. Espera {bloqueado}s.'
-                return render_template('admin_login.html', error=error)
-            if secrets.compare_digest(request.form.get('password', ''), ADMIN_PASSWORD):
-                session.clear()
-                session.permanent = True
-                session['admin_auth'] = True
-                limpiar_intentos(ip, prefijo='admin')
-                logger.info(f'Admin login exitoso desde {ip}')
-                return redirect(url_for('admin'))
-            registrar_fallo(ip, prefijo='admin')
-            logger.warning(f'Admin login fallido desde {ip}')
-            error = 'Contraseña incorrecta.'
-        return render_template('admin_login.html', error=error)
-
-    conn = conectar_master()
-    colegios = conn.execute('SELECT * FROM colegios ORDER BY creado DESC').fetchall()
-    conn.close()
-
-    if request.method == 'POST':
-        if not validar_csrf():
-            return redirect(url_for('admin'))
-        accion = request.form.get('accion')
-
-        if accion == 'crear_colegio':
-            nombre   = request.form.get('nombre', '').strip()
-            slug     = request.form.get('slug', '').strip().lower().replace(' ', '-')
-            num_p    = request.form.get('num_periodos', 4, type=int)
-            venc     = request.form.get('vencimiento', '').strip() or None
-            codigo   = request.form.get('codigo_registro', '').strip()
-            pri_col  = request.form.get('primary_color', '#6c63ff').strip()
-            sec_col  = request.form.get('secondary_color', '#3498db').strip()
-            if not nombre or not slug:
-                error = 'Nombre y slug son obligatorios.'
-            elif not slug.replace('-', '').isalnum():
-                error = 'El slug solo puede tener letras, números y guiones.'
-            elif not codigo:
-                error = 'El código de invitación es obligatorio.'
-            else:
-                logo_filename = ''
-                if 'logo' in request.files:
-                    f = request.files['logo']
-                    if f and f.filename:
-                        if not extension_permitida(f.filename):
-                            error = 'Solo se permiten imágenes (png, jpg, jpeg, gif, webp).'
-                        else:
-                            ext = f.filename.rsplit('.', 1)[-1].lower()
-                            logo_filename = f'{slug}.{ext}'
-                            ruta_logo = os.path.join(LOGO_FOLDER, logo_filename)
-                            f.save(ruta_logo)
-                            if not validar_imagen(ruta_logo):
-                                os.remove(ruta_logo)
-                                error = 'El archivo no es una imagen válida.'
-                                logo_filename = ''
-                if not error:
-                    cm = conectar_master()
-                    try:
-                        cm.execute(
-                            'INSERT INTO colegios (slug,nombre,logo,num_periodos,vencimiento,codigo_registro,codigo_profesores,codigo_directoras,codigo_rectores,primary_color,secondary_color) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-                            (slug, nombre, logo_filename, num_p, venc, codigo, codigo, codigo, codigo, pri_col, sec_col))
-                        cm.commit()
-                    except sqlite3.IntegrityError:
-                        error = f'El slug "{slug}" ya existe.'
-                    finally:
-                        cm.close()
-                    if not error:
-                            init_db(slug)
-                            exito = f'Colegio "{nombre}" creado. URL: /{slug}/login · Código: {codigo}'
-                            logger.info(f'Colegio creado: {slug}')
-
-        elif accion == 'toggle_colegio':
-            slug_t = request.form.get('slug')
-            cm = conectar_master()
-            actual = cm.execute('SELECT activo FROM colegios WHERE slug=?', (slug_t,)).fetchone()
-            if actual:
-                cm.execute('UPDATE colegios SET activo=? WHERE slug=?',
-                           (0 if actual['activo'] else 1, slug_t))
-                cm.commit()
-            cm.close()
-            return redirect(url_for('admin'))
-
-        elif accion == 'editar_colegio':
-            slug_e  = request.form.get('slug', '').strip().lower()
-            if not slug_e.replace('-', '').isalnum():
-                error = 'Slug inválido.'
-                return render_template('admin_panel.html', error=error, exito=exito, colegios=colegios)
-            nombre  = request.form.get('nombre', '').strip()
-            num_p   = request.form.get('num_periodos', 4, type=int)
-            venc    = request.form.get('vencimiento', '').strip() or None
-            codigo  = request.form.get('codigo_registro', '').strip()
-            pri_col = request.form.get('primary_color', '#6c63ff').strip()
-            sec_col = request.form.get('secondary_color', '#3498db').strip()
-            cm = conectar_master()
-            cm.execute('UPDATE colegios SET nombre=?, num_periodos=?, vencimiento=?, codigo_registro=?, codigo_profesores=?, codigo_directoras=?, codigo_rectores=?, primary_color=?, secondary_color=? WHERE slug=?',
-                       (nombre, num_p, venc, codigo, codigo, codigo, codigo, pri_col, sec_col, slug_e))
-            cm.commit()
-            if 'logo' in request.files:
-                f = request.files['logo']
-                if f and f.filename:
-                    if not extension_permitida(f.filename):
-                        error = 'Solo se permiten imágenes (png, jpg, jpeg, gif, webp).'
-                    else:
-                        ext = f.filename.rsplit('.', 1)[-1].lower()
-                        logo_filename = f'{slug_e}.{ext}'
-                        ruta_logo = os.path.join(LOGO_FOLDER, logo_filename)
-                        f.save(ruta_logo)
-                        if not validar_imagen(ruta_logo):
-                            os.remove(ruta_logo)
-                            error = 'El archivo no es una imagen válida.'
-                        else:
-                            cm.execute('UPDATE colegios SET logo=? WHERE slug=?', (logo_filename, slug_e))
-                            cm.commit()
-            cm.close()
-            _cache_invalidate(slug_e)
-            _cache_invalidate(prefix='col_')
-            exito = f'Colegio "{nombre}" actualizado. Código: {codigo}'
-
-        elif accion == 'eliminar_colegio':
-            slug_e = request.form.get('slug')
-            cm = conectar_master()
-            cm.execute('DELETE FROM colegios WHERE slug=?', (slug_e,))
-            cm.commit(); cm.close()
-            db = db_path(slug_e)
-            if os.path.exists(db): os.rename(db, db + '.bak')
-            exito = 'Colegio eliminado.'
-            logger.info(f'Colegio eliminado: {slug_e}')
-
-        conn = conectar_master()
-        colegios = conn.execute('SELECT * FROM colegios ORDER BY creado DESC').fetchall()
-        conn.close()
-
-    return render_template('admin_panel.html', colegios=colegios, error=error, exito=exito)
-
-@app.route('/admin/logout')
-def admin_logout():
-    session.clear()
-    return redirect(url_for('admin'))
-
-# ── RECUPERAR CONTRASEÑA (PROFESORES) ─────────────────────────────────────────
-@app.route('/<slug>/recuperar', methods=['GET', 'POST'])
-def recuperar_password(slug):
-    require_colegio(slug)
-    colegio = get_colegio(slug)
-    error = exito = None
-    pregunta = None
-    usuario_val = ''
-    paso = 1
-    ip = request.remote_addr
-
-    if request.method == 'POST':
-        if not validar_csrf():
-            error = 'Error de seguridad. Intenta de nuevo.'
-            return render_template('recuperar.html', slug=slug, colegio=colegio, error=error, exito=exito, pregunta=pregunta, usuario_val=usuario_val, paso=paso)
-        bloqueado = ip_bloqueada(ip, prefijo=f'recup_{slug}')
-        if bloqueado:
-            error = f'Demasiados intentos. Espera {bloqueado}s.'
-            return render_template('recuperar.html', slug=slug, colegio=colegio, error=error, exito=exito, pregunta=pregunta, usuario_val=usuario_val, paso=paso)
-        accion      = request.form.get('accion', '')
-        usuario_val = request.form.get('usuario', '').strip()
-
-        if accion == 'buscar_usuario':
-            conn = conectar(slug)
-            prof = conn.execute(
-                'SELECT * FROM profesores WHERE usuario=? AND activo=1', (usuario_val,)
-            ).fetchone()
-            conn.close()
-            if not prof:
-                error = 'Usuario no encontrado.'
-                registrar_fallo(ip, prefijo=f'recup_{slug}')
-            elif not prof['pregunta_secreta']:
-                error = 'Este usuario no tiene pregunta secreta. Contacta al administrador.'
-                registrar_fallo(ip, prefijo=f'recup_{slug}')
-            else:
-                pregunta = prof['pregunta_secreta']
-                paso = 2
-
-        elif accion == 'cambiar_password':
-            respuesta = request.form.get('respuesta', '').strip().lower()
-            nueva     = request.form.get('nueva', '').strip()
-            confirmar = request.form.get('confirmar', '').strip()
-            conn = conectar(slug)
-            prof = conn.execute(
-                'SELECT * FROM profesores WHERE usuario=? AND activo=1', (usuario_val,)
-            ).fetchone()
-            if not prof:
-                error = 'Usuario no encontrado.'; conn.close()
-                registrar_fallo(ip, prefijo=f'recup_{slug}')
-            elif prof['respuesta_secreta'].lower() != respuesta:
-                error = 'Respuesta incorrecta.'
-                pregunta = prof['pregunta_secreta']; paso = 2; conn.close()
-                registrar_fallo(ip, prefijo=f'recup_{slug}')
-            elif len(nueva) < 6:
-                error = 'Mínimo 6 caracteres.'
-                pregunta = prof['pregunta_secreta']; paso = 2; conn.close()
-                registrar_fallo(ip, prefijo=f'recup_{slug}')
-            elif nueva != confirmar:
-                error = 'Las contraseñas no coinciden.'
-                pregunta = prof['pregunta_secreta']; paso = 2; conn.close()
-                registrar_fallo(ip, prefijo=f'recup_{slug}')
-            else:
-                conn.execute('UPDATE profesores SET password=? WHERE id=?',
-                             (hash_pw(nueva), prof['id']))
-                conn.commit(); conn.close()
-                exito = '✅ Contraseña actualizada. Ya puedes ingresar.'
-                limpiar_intentos(ip, prefijo=f'recup_{slug}')
-
-    return render_template('recuperar.html',
-                           slug=slug, colegio=colegio, error=error, exito=exito,
-                           pregunta=pregunta, usuario_val=usuario_val, paso=paso)
-
-# ── RECUPERAR CONTRASEÑA DIRECTORAS (AJAX) ────────────────────────────────────
-@app.route('/<slug>/directora/buscar_usuario_recuperar', methods=['POST'])
-def directora_buscar_usuario_recuperar(slug):
-    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
-    require_colegio(slug)
-    ip = request.remote_addr
-    bloqueado = ip_bloqueada(ip, prefijo=f'recup_directora_{slug}')
-    if bloqueado:
-        return jsonify({'ok': False, 'mensaje': f'Demasiados intentos. Espera {bloqueado}s.'})
-    usuario = request.form.get('usuario', '').strip()
-    conn = conectar(slug)
-    d = conn.execute(
-        'SELECT * FROM directoras WHERE usuario=? AND activo=1', (usuario,)
-    ).fetchone()
-    conn.close()
-    if not d:
-        registrar_fallo(ip, prefijo=f'recup_directora_{slug}')
-        return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
-    if not d['pregunta_secreta']:
-        registrar_fallo(ip, prefijo=f'recup_directora_{slug}')
-        return jsonify({'ok': False, 'mensaje': 'Este usuario no tiene pregunta secreta. Contacta al administrador.'})
-    return jsonify({'ok': True, 'pregunta': d['pregunta_secreta']})
-
-@app.route('/<slug>/directora/cambiar_password_recuperar', methods=['POST'])
-def directora_cambiar_password_recuperar(slug):
-    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
-    require_colegio(slug)
-    ip = request.remote_addr
-    bloqueado = ip_bloqueada(ip, prefijo=f'recup_directora_{slug}')
-    if bloqueado:
-        return jsonify({'ok': False, 'mensaje': f'Demasiados intentos. Espera {bloqueado}s.'})
-    usuario   = request.form.get('usuario', '').strip()
-    respuesta = request.form.get('respuesta', '').strip().lower()
-    nueva     = request.form.get('nueva', '').strip()
-    conn = conectar(slug)
-    d = conn.execute(
-        'SELECT * FROM directoras WHERE usuario=? AND activo=1', (usuario,)
-    ).fetchone()
-    if not d:
-        conn.close(); registrar_fallo(ip, prefijo=f'recup_directora_{slug}')
-        return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
-    if not d['respuesta_secreta'] or d['respuesta_secreta'].lower() != respuesta:
-        conn.close(); registrar_fallo(ip, prefijo=f'recup_directora_{slug}')
-        return jsonify({'ok': False, 'mensaje': 'Respuesta incorrecta.'})
-    if len(nueva) < 6:
-        conn.close(); registrar_fallo(ip, prefijo=f'recup_directora_{slug}')
-        return jsonify({'ok': False, 'mensaje': 'Mínimo 6 caracteres.'})
-    conn.execute('UPDATE directoras SET password=? WHERE id=?', (hash_pw(nueva), d['id']))
-    conn.commit(); conn.close()
-    limpiar_intentos(ip, prefijo=f'recup_directora_{slug}')
-    return jsonify({'ok': True, 'mensaje': 'Contraseña actualizada. Ya puedes ingresar.'})
-
-# ── LOGIN ─────────────────────────────────────────────────────────────────────
-@app.route('/<slug>/login', methods=['GET', 'POST'])
-def login(slug):
-    require_colegio(slug)
-    init_db(slug)
-    colegio = get_colegio(slug)
-    error = None
-    ip = request.remote_addr
-
-    if request.method == 'POST':
-        if not validar_csrf():
-            error = 'Error de seguridad.'
-            return render_template('login_v2.html', error=error, materias=MATERIAS,
-                                   jornadas=JORNADAS, preguntas=PREGUNTAS_SECRETAS,
-                                   slug=slug, colegio=colegio)
-        accion = request.form.get('accion')
-
-        if accion == 'profesor_login':
-            bloqueado = ip_bloqueada(ip, prefijo=slug)
-            if bloqueado:
-                error = f'Demasiados intentos. Espera {bloqueado}s.'
-                return render_template('login_v2.html', error=error, materias=MATERIAS,
-                                       jornadas=JORNADAS, preguntas=PREGUNTAS_SECRETAS,
-                                       slug=slug, colegio=colegio)
-            u = request.form.get('usuario', '').strip()
-            p = request.form.get('password', '').strip()
-            if not p:
-                error = 'La contraseña es obligatoria.'
-            else:
-                conn = conectar(slug)
-                prof = conn.execute('SELECT * FROM profesores WHERE usuario=? AND activo=1', (u,)).fetchone()
-                if prof and verificar_pw(p, prof['password']):
-                    if necesita_rehash(prof['password']):
-                        conn.execute('UPDATE profesores SET password=? WHERE id=?',
-                                     (hash_pw(p), prof['id']))
-                        conn.commit()
-                        logger.info(f'Hash migrado para profesor id={prof["id"]} en {slug}')
-                    conn.close()
-                    session.clear()
-                    session.permanent = True
-                    session[f'rol_{slug}']        = 'profesor'
-                    session[f'profesor_id_{slug}'] = prof['id']
-                    limpiar_intentos(ip, prefijo=slug)
-                    return redirect(url_for('seleccionar_jornada', slug=slug))
-                conn.close()
-                registrar_fallo(ip, prefijo=slug)
-                error = 'Usuario o contraseña incorrectos.'
-
-        elif accion == 'profesor_registro':
-            nombre       = request.form.get('nombre', '').strip()
-            usuario      = request.form.get('reg_usuario', '').strip()
-            pw           = request.form.get('reg_password', '').strip()
-            email_p      = request.form.get('email_prof', '').strip()
-            pregunta     = request.form.get('pregunta_secreta', '').strip()
-            respuesta    = request.form.get('respuesta_secreta', '').strip()
-            materias_sel = request.form.getlist('materias_sel')
-            jornadas_sel = request.form.getlist('jornadas_sel')
-            codigo       = request.form.get('codigo_registro', '').strip()
-            confirmar    = request.form.get('confirmar_password', '').strip()
-            # Validar código POR COLEGIO Y ROL
-            codigo_colegio = get_codigo_registro(slug, 'profesores')
-            if pw != confirmar:
-                error = 'Las contraseñas no coinciden.'
-            elif codigo_colegio and codigo != codigo_colegio:
-                error = 'Código de invitación incorrecto.'
-            elif not nombre or not usuario or not email_p:
-                error = 'Completa todos los campos obligatorios.'
-            elif len(pw) < 6:
-                error = 'Mínimo 6 caracteres.'
-            elif not pregunta or not respuesta:
-                error = 'Debes elegir una pregunta secreta y escribir tu respuesta.'
-            elif not materias_sel:
-                error = 'Agrega al menos una materia con su jornada.'
-            else:
-                conn = conectar(slug)
-                if conn.execute('SELECT 1 FROM profesores WHERE usuario=?', (usuario,)).fetchone():
-                    error = 'Ese usuario ya existe.'; conn.close()
-                else:
-                    cur = conn.execute(
-                        '''INSERT INTO profesores
-                           (nombre,usuario,password,email,pregunta_secreta,respuesta_secreta)
-                           VALUES (?,?,?,?,?,?)''',
-                        (nombre, usuario, hash_pw(pw), email_p, pregunta, respuesta.lower()))
-                    pid = cur.lastrowid
-                    for mat, jor in zip(materias_sel, jornadas_sel):
-                        if mat and jor:
-                            try:
-                                conn.execute(
-                                    'INSERT OR IGNORE INTO asignaciones_materia (profesor_id,materia,jornada) VALUES (?,?,?)',
-                                    (pid, mat, jor))
-                            except Exception as e:
-                                logger.warning(f'Error al asignar materia={mat} jornada={jor} a profesor={pid} en {slug}: {e}')
-                    conn.commit(); conn.close()
-                    error = '✅ Registro exitoso. Ya puedes ingresar.'
-
-        elif accion == 'estudiante':
-            ip = request.remote_addr or '0.0.0.0'
-            bloqueo = ip_bloqueada(ip, prefijo=f'est_{slug}')
-            if bloqueo:
-                error = f'Demasiados intentos. Espera {bloqueo} segundos.'
-            else:
-                nombre     = request.form.get('nombre_est', '').strip().lower()
-                jornada    = request.form.get('jornada_est', '').strip()
-                pin_ingresado = request.form.get('pin_est', '').strip()
-                conn = conectar(slug)
-                if jornada:
-                    alumno = conn.execute(
-                        'SELECT * FROM alumnos WHERE LOWER(nombre)=? AND jornada=? AND activo=1',
-                        (nombre, jornada)).fetchone()
-                else:
-                    alumno = conn.execute(
-                        'SELECT * FROM alumnos WHERE LOWER(nombre)=? AND activo=1', (nombre,)).fetchone()
-                conn.close()
-                if alumno:
-                    if alumno['pin'] and pin_ingresado != alumno['pin']:
-                        registrar_fallo(ip, prefijo=f'est_{slug}')
-                        error = 'PIN incorrecto.'
-                    else:
-                        limpiar_intentos(ip, prefijo=f'est_{slug}')
-                        session.clear()
-                        session.permanent = True
-                        session[f'rol_{slug}']       = 'estudiante'
-                        session[f'alumno_id_{slug}'] = alumno['id']
-                        return redirect(url_for('vista_estudiante', slug=slug))
-                else:
-                    registrar_fallo(ip, prefijo=f'est_{slug}')
-                    error = 'No se encontró ese estudiante.'
-
-        elif accion == 'directora_login':
-            ip = request.remote_addr or '0.0.0.0'
-            bloqueo = ip_bloqueada(ip, prefijo=f'dir_{slug}')
-            if bloqueo:
-                error = f'Demasiados intentos. Espera {bloqueo} segundos.'
-            else:
-                u = request.form.get('dir_usuario', '').strip()
-                p = request.form.get('dir_password', '').strip()
-                conn = conectar(slug)
-                d = conn.execute(
-                    'SELECT * FROM directoras WHERE usuario=? AND activo=1', (u,)).fetchone()
-                conn.close()
-                if d and verificar_pw(p, d['password']):
-                    limpiar_intentos(ip, prefijo=f'dir_{slug}')
-                    session.clear()
-                    session.permanent = True
-                    session[f'directora_id_{slug}'] = d['id']
-                    return redirect(url_for('directora_panel', slug=slug))
-                registrar_fallo(ip, prefijo=f'dir_{slug}')
-                error = 'Usuario o contraseña incorrectos.'
-
-        elif accion == 'rector_login':
-            bloqueado = ip_bloqueada(ip, prefijo=f'rec_{slug}')
-            if bloqueado:
-                error = f'Demasiados intentos. Espera {bloqueado}s.'
-                return render_template('login_v2.html', error=error, materias=MATERIAS,
-                                       jornadas=JORNADAS, preguntas=PREGUNTAS_SECRETAS,
-                                       slug=slug, colegio=colegio)
-            u = request.form.get('rec_usuario', '').strip()
-            p = request.form.get('rec_password', '').strip()
-            conn = conectar(slug)
-            rector = conn.execute(
-                'SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
-            conn.close()
-            if rector and verificar_pw(p, rector['password']):
-                limpiar_intentos(ip, prefijo=f'rec_{slug}')
-                session.clear()
-                session.permanent = True
-                session[f'rector_id_{slug}'] = rector['id']
-                return redirect(url_for('rector_panel', slug=slug))
-            registrar_fallo(ip, prefijo=f'rec_{slug}')
-            error = 'Usuario o contraseña incorrectos.'
-
-    return render_template('login_v2.html', error=error, materias=MATERIAS,
-                           jornadas=JORNADAS, preguntas=PREGUNTAS_SECRETAS,
-                           slug=slug, colegio=colegio)
+# ── Auth routes migrated to app/routes/auth.py ──────────────────────────────
 
 # ── SELECTOR DE JORNADA/MATERIA ───────────────────────────────────────────────
 @app.route('/<slug>/seleccionar', methods=['GET', 'POST'])
 def seleccionar_jornada(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     materias_jornadas = get_materias_profesor(slug, prof['id'])
 
@@ -2301,10 +1869,7 @@ def seleccionar_jornada(slug):
                            slug=slug, colegio=colegio, profesor=prof,
                            materias_jornadas=materias_jornadas)
 
-@app.route('/<slug>/logout')
-def logout(slug):
-    session.clear()
-    return redirect(url_for('login', slug=slug))
+# ── logout migrated to app/routes/auth.py ──────────────────────────────────
 
 # ── HOME ──────────────────────────────────────────────────────────────────────
 @app.route('/<slug>/')
@@ -2312,7 +1877,7 @@ def logout(slug):
 def home(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
 
     jornada, materia = get_sesion_jornada_materia(slug)
     if not jornada or not materia:
@@ -2509,7 +2074,7 @@ def home(slug):
 def nueva_actividad(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     if not validar_csrf(): return ('Error CSRF', 403)
     jornada, materia = get_sesion_jornada_materia(slug)
     nombre    = request.form.get('nombre', '').strip()
@@ -4226,25 +3791,7 @@ def gestion_alumnos_list(slug):
         conn.close()
 
 # ── FASE 21: Parent Portal ───────────────────────────────────────────────
-@app.route('/<slug>/portal/login', methods=['GET','POST'])
-def portal_padre_login(slug):
-    require_colegio(slug)
-    if request.method == 'GET':
-        return render_template('portal_padre.html', slug=slug, colegio=get_colegio(slug), step='login')
-    data = request.get_json(silent=True) or request.form
-    email = data.get('email','').strip().lower()
-    pin = data.get('pin','').strip()
-    if not email or not pin: return jsonify({'error':'Email y PIN requeridos'}), 400
-    conn = conectar(slug)
-    try:
-        padre = conn.execute('SELECT id, nombre, email FROM padres WHERE email=? AND pin=? AND activo=1', (email, pin)).fetchone()
-        if not padre: return jsonify({'error':'Credenciales inválidas'}), 401
-        hijos = conn.execute('SELECT a.id, a.nombre, a.curso, a.jornada FROM alumno_padre ap JOIN alumnos a ON a.id=ap.alumno_id WHERE ap.padre_id=?', (padre['id'],)).fetchall()
-        session[f'padre_id_{slug}'] = padre['id']
-        session[f'rol_{slug}'] = 'padre'
-        return jsonify({'status':'ok','padre':{'nombre':padre['nombre'],'email':padre['email']},'hijos':[dict(h) for h in hijos]})
-    finally:
-        conn.close()
+# ── portal/parent routes migrated to app/routes/auth.py ──────────────────
 
 @app.route('/<slug>/portal/dashboard')
 def portal_padre_dashboard(slug):
@@ -5145,7 +4692,7 @@ def _excel_armar_wb(slug, prof, materia, jornada, curso_sel, periodo, actividade
 def plantilla_notas(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     if not jornada or not materia:
         return redirect(url_for('seleccionar_jornada', slug=slug))
@@ -5177,7 +4724,7 @@ def plantilla_notas(slug):
 def exportar_notas(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     if not jornada or not materia:
         return redirect(url_for('seleccionar_jornada', slug=slug))
@@ -5209,7 +4756,7 @@ def exportar_notas(slug):
 def importar_notas(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     if not jornada or not materia:
         return redirect(url_for('seleccionar_jornada', slug=slug))
@@ -5505,7 +5052,7 @@ def importar_notas_confirmar(slug):
 def migrar_excel(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     if not jornada or not materia:
         return redirect(url_for('seleccionar_jornada', slug=slug))
@@ -6205,7 +5752,7 @@ def dashboard(slug):
     prof = get_profesor(slug)
     rector = get_rector(slug)
     if not prof and not rector:
-        return redirect(url_for('login', slug=slug))
+        return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     num_periodos = colegio['num_periodos'] if colegio and 'num_periodos' in colegio.keys() else 4
     conn = conectar(slug)
@@ -6259,7 +5806,7 @@ def dashboard_data(slug):
 def nuevo_trabajo(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     if not validar_csrf(): return ('Error CSRF', 403)
     jornada, materia = get_sesion_jornada_materia(slug)
     curso_sel = request.form.get('curso_sel', '')
@@ -6274,7 +5821,7 @@ def borrar_trabajo(slug, id_t):
     if not validar_csrf(): return redirect(url_for('home', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     conn = conectar(slug)
     c = conn.execute('SELECT curso FROM compromisos WHERE id=?', (id_t,)).fetchone()
@@ -6288,7 +5835,7 @@ def borrar_trabajo(slug, id_t):
 def registrar(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     if not validar_csrf(): return ('Error CSRF', 403)
     jornada, materia = get_sesion_jornada_materia(slug)
     nom       = request.form.get('nombre', '').strip()
@@ -6315,7 +5862,7 @@ def archivar_alumno(slug, id):
     if not validar_csrf(): return redirect(url_for('home', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     curso_sel = request.form.get('curso', '')
     conn = conectar(slug)
@@ -6333,7 +5880,7 @@ def reactivar_alumno(slug, id):
     if not validar_csrf(): return redirect(url_for('archivados', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     curso_sel = request.form.get('curso', '')
     conn = conectar(slug)
@@ -6351,7 +5898,7 @@ def eliminar_alumno(slug, id):
     if not validar_csrf(): return redirect(url_for('archivados', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     curso_sel = request.form.get('curso', '')
     conn = conectar(slug)
@@ -6373,7 +5920,7 @@ def eliminar_alumno(slug, id):
 def archivados(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     colegio    = get_colegio(slug)
     mis_cursos = get_cursos_profesor(slug, prof['id'], materia, jornada)
@@ -6630,7 +6177,7 @@ def _asistencia_alertas(conn, slug, curso, jornada):
 def asistencia(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     if not jornada or not materia:
         return redirect(url_for('seleccionar_jornada', slug=slug))
@@ -6922,40 +6469,7 @@ def borrar_observacion(slug, id_o):
     return jsonify({'ok': True})
 
 # ── PERFIL / CURSOS ───────────────────────────────────────────────────────────
-@app.route('/<slug>/cambiar_password', methods=['GET', 'POST'])
-def cambiar_password(slug):
-    require_colegio(slug)
-    prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
-    jornada, materia = get_sesion_jornada_materia(slug)
-    error = exito = None
-    if request.method == 'POST':
-        if not validar_csrf():
-            error = 'Error de seguridad.'
-        else:
-            actual    = request.form.get('actual', '').strip()
-            nueva     = request.form.get('nueva', '').strip()
-            confirmar = request.form.get('confirmar', '').strip()
-            if not verificar_pw(actual, prof['password']):
-                error = 'Contraseña actual incorrecta.'
-            elif len(nueva) < 6:
-                error = 'Mínimo 6 caracteres.'
-            elif nueva != confirmar:
-                error = 'Las contraseñas no coinciden.'
-            else:
-                conn = conectar(slug)
-                conn.execute('UPDATE profesores SET password=? WHERE id=?',
-                             (hash_pw(nueva), prof['id']))
-                conn.commit(); conn.close()
-                exito = '¡Contraseña cambiada!'
-    mis_cursos        = get_cursos_profesor(slug, prof['id'], materia, jornada)
-    materias_jornadas = get_materias_profesor(slug, prof['id'])
-    colegio           = get_colegio(slug)
-    return render_template('cambiar_password.html',
-                           profesor=prof, mis_cursos=mis_cursos,
-                           materias_jornadas=materias_jornadas,
-                           error=error, exito=exito, slug=slug, colegio=colegio,
-                           materia=materia, jornada=jornada)
+# ── cambiar_password migrated to app/routes/auth.py ──────────────────────
 
 @app.route('/<slug>/agregar_cursos', methods=['POST'])
 def agregar_cursos(slug):
@@ -6963,7 +6477,7 @@ def agregar_cursos(slug):
         return 'Error de seguridad', 400
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     cursos = request.form.getlist('cursos')
     extra  = request.form.get('cursos_extra', '').strip()
@@ -6982,7 +6496,7 @@ def quitar_curso(slug, curso):
     if not validar_csrf(): return redirect(url_for('cambiar_password', slug=slug))
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     conn = conectar(slug)
     conn.execute(
@@ -6996,7 +6510,7 @@ def quitar_curso(slug, curso):
 def transferir_curso(slug):
     require_colegio(slug)
     prof = get_profesor(slug)
-    if not prof: return redirect(url_for('login', slug=slug))
+    if not prof: return redirect(url_for('auth.login', slug=slug))
     jornada, materia = get_sesion_jornada_materia(slug)
     if not jornada or not materia:
         return redirect(url_for('seleccionar_jornada', slug=slug))
@@ -7079,7 +6593,7 @@ DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes']
 @app.route('/<slug>/horarios', methods=['GET', 'POST'])
 def horarios(slug):
     require_colegio(slug)
-    if not session.get(f'rol_{slug}'): return redirect(url_for('login', slug=slug))
+    if not session.get(f'rol_{slug}'): return redirect(url_for('auth.login', slug=slug))
     prof    = get_profesor(slug)
     colegio = get_colegio(slug)
     jornada, materia = get_sesion_jornada_materia(slug)
@@ -7133,7 +6647,7 @@ def horarios(slug):
 def vista_estudiante(slug):
     require_colegio(slug)
     if session.get(f'rol_{slug}') != 'estudiante':
-        return redirect(url_for('login', slug=slug))
+        return redirect(url_for('auth.login', slug=slug))
     aid     = session.get(f'alumno_id_{slug}')
     colegio = get_colegio(slug)
     conn    = conectar(slug)
@@ -7142,7 +6656,7 @@ def vista_estudiante(slug):
         conn.close()
         session.pop(f'rol_{slug}', None)
         session.pop(f'alumno_id_{slug}', None)
-        return redirect(url_for('login', slug=slug))
+        return redirect(url_for('auth.login', slug=slug))
     agenda = conn.execute(
         'SELECT * FROM compromisos WHERE curso=? AND jornada=? ORDER BY fecha, materia',
         (alumno['curso'], alumno['jornada'])).fetchall()
@@ -7237,131 +6751,14 @@ def get_rector(slug):
     setattr(g, cache_key, r)
     return r
 
-@app.route('/<slug>/rector/login', methods=['GET', 'POST'])
-def rector_login(slug):
-    require_colegio(slug)
-    init_db(slug)
-    colegio = get_colegio(slug)
-    error = exito = None
-    ip = request.remote_addr
-    if request.method == 'POST':
-        if not validar_csrf():
-            error = 'Error de seguridad.'
-            return render_template('rector_login.html', slug=slug, colegio=colegio, error=error, exito=exito)
-        bloqueado = ip_bloqueada(ip, prefijo=f'rector_{slug}')
-        if bloqueado:
-            error = f'Demasiados intentos. Espera {bloqueado}s.'
-            return render_template('rector_login.html', slug=slug, colegio=colegio, error=error, exito=exito)
-        u = request.form.get('usuario', '').strip()
-        p = request.form.get('password', '').strip()
-        conn = conectar(slug)
-        rector = conn.execute(
-            'SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
-        conn.close()
-        if rector and verificar_pw(p, rector['password']):
-            session.clear()
-            session.permanent = True
-            session[f'rector_id_{slug}'] = rector['id']
-            limpiar_intentos(ip, prefijo=f'rector_{slug}')
-            return redirect(url_for('rector_panel', slug=slug))
-        registrar_fallo(ip, prefijo=f'rector_{slug}')
-        error = 'Usuario o contraseña incorrectos.'
-    return render_template('rector_login.html', slug=slug, colegio=colegio,
-                           error=error, exito=exito)
-
-@app.route('/<slug>/rector/registrar', methods=['POST'])
-def rector_registrar(slug):
-    if not validar_csrf():
-        return 'Error de seguridad', 400
-    require_colegio(slug)
-    init_db(slug)
-    colegio  = get_colegio(slug)
-    error = exito = None
-    nombre   = request.form.get('nombre', '').strip()
-    usuario  = request.form.get('usuario', '').strip()
-    pw       = request.form.get('password', '').strip()
-    confirm  = request.form.get('confirmar_password', '').strip()
-    jornada  = request.form.get('jornada', '').strip()
-    email    = request.form.get('email', '').strip()
-    pregunta = request.form.get('pregunta_secreta', '').strip()
-    resp     = request.form.get('respuesta_secreta', '').strip().lower()
-    codigo   = request.form.get('codigo_registro_rec', '').strip()
-
-    codigo_colegio = get_codigo_registro(slug, 'rectores')
-    if codigo_colegio and codigo != codigo_colegio:
-        error = 'Código de invitación incorrecto.'
-    elif pw != confirm:
-        error = 'Las contraseñas no coinciden.'
-    elif not nombre or not usuario or not pw or not jornada:
-        error = 'Completa todos los campos obligatorios.'
-    elif len(pw) < 6:
-        error = 'Mínimo 6 caracteres.'
-    elif not pregunta or not resp:
-        error = 'Debes elegir una pregunta secreta y escribir tu respuesta.'
-    else:
-        conn = conectar(slug)
-        if conn.execute('SELECT 1 FROM rectores WHERE usuario=?', (usuario,)).fetchone():
-            error = 'Ese usuario ya existe. Elige otro nombre de usuario.'
-            conn.close()
-        else:
-            conn.execute(
-                '''INSERT INTO rectores
-                   (nombre, usuario, password, jornada, email, pregunta_secreta, respuesta_secreta)
-                   VALUES (?,?,?,?,?,?,?)''',
-                (nombre, usuario, hash_pw(pw), jornada, email, pregunta, resp))
-            conn.commit()
-            conn.close()
-            exito = 'Cuenta de Rector creada. Ya puedes ingresar.'
-    return render_template('rector_login.html', slug=slug, colegio=colegio,
-                           error=error, exito=exito)
-
-@app.route('/<slug>/rector/buscar_usuario_recuperar', methods=['POST'])
-def rector_buscar_usuario_recuperar(slug):
-    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
-    require_colegio(slug)
-    ip = request.remote_addr
-    bloqueado = ip_bloqueada(ip, prefijo=f'recup_rector_{slug}')
-    if bloqueado:
-        return jsonify({'ok': False, 'mensaje': f'Demasiados intentos. Espera {bloqueado}s.'})
-    u = request.form.get('usuario', '').strip()
-    conn = conectar(slug)
-    r = conn.execute('SELECT pregunta_secreta FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
-    conn.close()
-    if not r or not r['pregunta_secreta']:
-        registrar_fallo(ip, prefijo=f'recup_rector_{slug}')
-        return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
-    return jsonify({'ok': True, 'pregunta': r['pregunta_secreta']})
-
-@app.route('/<slug>/rector/cambiar_password_recuperar', methods=['POST'])
-def rector_cambiar_password_recuperar(slug):
-    if not validar_csrf(): return jsonify({'ok': False, 'mensaje': 'Error CSRF'})
-    require_colegio(slug)
-    ip = request.remote_addr
-    bloqueado = ip_bloqueada(ip, prefijo=f'recup_rector_{slug}')
-    if bloqueado:
-        return jsonify({'ok': False, 'mensaje': f'Demasiados intentos. Espera {bloqueado}s.'})
-    u = request.form.get('usuario', '').strip()
-    rta = request.form.get('respuesta', '').strip().lower()
-    nueva = request.form.get('nueva', '').strip()
-    conn = conectar(slug)
-    r = conn.execute('SELECT * FROM rectores WHERE usuario=? AND activo=1', (u,)).fetchone()
-    if not r:
-        conn.close(); registrar_fallo(ip, prefijo=f'recup_rector_{slug}'); return jsonify({'ok': False, 'mensaje': 'Usuario no encontrado.'})
-    if not r['respuesta_secreta'] or r['respuesta_secreta'].lower() != rta:
-        conn.close(); registrar_fallo(ip, prefijo=f'recup_rector_{slug}'); return jsonify({'ok': False, 'mensaje': 'Respuesta incorrecta.'})
-    if len(nueva) < 6:
-        conn.close(); registrar_fallo(ip, prefijo=f'recup_rector_{slug}'); return jsonify({'ok': False, 'mensaje': 'Mínimo 6 caracteres.'})
-    conn.execute('UPDATE rectores SET password=? WHERE id=?', (hash_pw(nueva), r['id']))
-    conn.commit(); conn.close()
-    limpiar_intentos(ip, prefijo=f'recup_rector_{slug}')
-    return jsonify({'ok': True, 'mensaje': 'Contraseña actualizada. Ya puedes ingresar.'})
+# ── Rector auth routes migrated to app/routes/auth.py ───────────────────
 
 @app.route('/<slug>/rector')
 @app.route('/<slug>/rector/panel')
 def rector_panel(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     conn = conectar(slug)
     total_est = conn.execute(
@@ -7424,17 +6821,14 @@ def rector_panel(slug):
                            ultimos_profesores=ultimos_profesores,
                            proximos_eventos=proximos_eventos)
 
-@app.route('/<slug>/rector/logout')
-def rector_logout(slug):
-    session.clear()
-    return redirect(url_for('login', slug=slug))
+# ── Rector logout migrated to app/routes/auth.py ────────────────────────
 
 # ── RECTOR: HORARIOS ───────────────────────────────────────────────────────────
 @app.route('/<slug>/rector/horarios')
 def rector_horarios(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     conn = conectar(slug)
     cursos = [r['curso'] for r in conn.execute(
@@ -7469,7 +6863,7 @@ def rector_horarios_datos(slug):
 def rector_profesores(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 50, type=int)
@@ -7492,7 +6886,7 @@ def rector_profesores(slug):
 def rector_estudiantes(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 50, type=int)
@@ -7516,7 +6910,7 @@ def rector_estudiantes(slug):
 def rector_cursos(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 12, type=int)
@@ -7543,7 +6937,7 @@ def rector_cursos(slug):
 def rector_reportes(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     conn = conectar(slug)
     total_est = conn.execute(
@@ -7567,7 +6961,7 @@ def rector_reportes(slug):
 def rector_asistencia(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     conn = conectar(slug)
     cursos = [r['curso'] for r in conn.execute(
@@ -7643,7 +7037,7 @@ def rector_asistencia_data(slug):
 def rector_configuracion(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     error = exito = None
     conn = conectar(slug)
@@ -7748,7 +7142,7 @@ def rector_periodo_accion(slug, periodo, accion):
 def rector_solicitudes(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     conn = conectar(slug)
     solicitudes = conn.execute(
         '''SELECT s.*, a.nombre as alumno_nombre, p.nombre as profesor_nombre,
@@ -7856,7 +7250,7 @@ def rector_solicitud_accion(slug, sid, accion):
 def rector_auditoria(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     conn = conectar(slug)
 
@@ -8027,7 +7421,7 @@ def comunicaciones_pendientes(slug, usuario_tipo, usuario_id, conn=None):
 def rector_comunicaciones(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     estado_filtro = request.args.get('estado', '')
     conn = conectar(slug)
@@ -8053,7 +7447,7 @@ def rector_comunicaciones(slug):
 def rector_comunicacion_nueva(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     error = exito = None
     conn = conectar(slug)
@@ -8105,7 +7499,7 @@ def rector_comunicacion_nueva(slug):
 def rector_comunicacion_editar(slug, cid):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     conn = conectar(slug)
     com = conn.execute(
@@ -8164,7 +7558,7 @@ def rector_comunicacion_editar(slug, cid):
 def rector_comunicacion_detalle(slug, cid):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     colegio = get_colegio(slug)
     conn = conectar(slug)
     com = conn.execute(
@@ -8186,7 +7580,7 @@ def rector_comunicacion_detalle(slug, cid):
 def rector_comunicacion_publicar(slug, cid):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     if not validar_csrf(): return 'Error de seguridad', 400
     conn = conectar(slug)
     conn.execute(
@@ -8205,7 +7599,7 @@ def rector_comunicacion_publicar(slug, cid):
 def rector_comunicacion_archivar(slug, cid):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     if not validar_csrf(): return 'Error de seguridad', 400
     conn = conectar(slug)
     conn.execute(
@@ -8219,7 +7613,7 @@ def rector_comunicacion_archivar(slug, cid):
 def rector_comunicacion_eliminar(slug, cid):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('login', slug=slug))
+    if not rector: return redirect(url_for('auth.login', slug=slug))
     if not validar_csrf(): return 'Error de seguridad', 400
     conn = conectar(slug)
     conn.execute(
@@ -8249,7 +7643,7 @@ def notificaciones(slug):
         aid = session.get(f'alumno_id_{slug}')
         if aid: usuario_tipo, usuario_id = 'estudiante', aid
     if not usuario_id:
-        return redirect(url_for('login', slug=slug))
+        return redirect(url_for('auth.login', slug=slug))
     conn = conectar(slug)
     notifs = conn.execute(
         'SELECT * FROM notificaciones WHERE usuario_tipo=? AND usuario_id=? ORDER BY fecha_creacion DESC LIMIT 100',
@@ -8357,7 +7751,7 @@ def comunicacion_leer(slug, cid):
 def rector_canales(slug):
     require_colegio(slug)
     rector = get_rector(slug)
-    if not rector: return redirect(url_for('rector_login', slug=slug))
+    if not rector: return redirect(url_for('auth.rector_login', slug=slug))
     conn = conectar(slug)
     canales = conn.execute('SELECT * FROM canales WHERE slug=? ORDER BY fecha_creacion DESC', (slug,)).fetchall()
     cursos = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
@@ -9137,89 +8531,14 @@ def rector_gestion_hacer_principal(slug, rid):
         'Rector Principal transferido', f'{r["nombre"]} te ha transferido el rol de Rector Principal.', 'warning')
     return redirect(url_for('rector_panel', slug=slug))
 
-@app.route('/<slug>/directora/login', methods=['GET', 'POST'])
-def directora_login(slug):
-    require_colegio(slug)
-    colegio = get_colegio(slug)
-    error = exito = None
-    ip = request.remote_addr
-    if request.method == 'POST':
-        if not validar_csrf():
-            error = 'Error de seguridad.'
-            return render_template('directora_login.html', slug=slug, colegio=colegio, error=error, exito=exito)
-        bloqueado = ip_bloqueada(ip, prefijo=f'directora_{slug}')
-        if bloqueado:
-            error = f'Demasiados intentos. Espera {bloqueado}s.'
-            return render_template('directora_login.html', slug=slug, colegio=colegio, error=error, exito=exito)
-        u = request.form.get('usuario', '').strip()
-        p = request.form.get('password', '').strip()
-        conn = conectar(slug)
-        d = conn.execute(
-            'SELECT * FROM directoras WHERE usuario=? AND activo=1', (u,)).fetchone()
-        conn.close()
-        if d and verificar_pw(p, d['password']):
-            session.clear()
-            session.permanent = True
-            session[f'directora_id_{slug}'] = d['id']
-            limpiar_intentos(ip, prefijo=f'directora_{slug}')
-            return redirect(url_for('directora_panel', slug=slug))
-        registrar_fallo(ip, prefijo=f'directora_{slug}')
-        error = 'Usuario o contraseña incorrectos.'
-    return render_template('directora_login.html', slug=slug, colegio=colegio,
-                           error=error, exito=exito)
-
-@app.route('/<slug>/directora/registrar_directo', methods=['POST'])
-def directora_registrar_directo(slug):
-    if not validar_csrf():
-        return 'Error de seguridad', 400
-    require_colegio(slug)
-    init_db(slug)
-    colegio   = get_colegio(slug)
-    error = exito = None
-    nombre    = request.form.get('nombre', '').strip()
-    usuario   = request.form.get('usuario', '').strip()
-    pw        = request.form.get('password', '').strip()
-    confirmar = request.form.get('confirmar_password', '').strip()
-    curso     = request.form.get('curso', '').strip()
-    jornada   = request.form.get('jornada', '').strip()
-    email     = request.form.get('email', '').strip()
-    pregunta  = request.form.get('pregunta_secreta', '').strip()
-    respuesta = request.form.get('respuesta_secreta', '').strip().lower()
-    codigo    = request.form.get('codigo_registro_dir', '').strip()
-
-    # Validar código POR COLEGIO Y ROL
-    codigo_colegio = get_codigo_registro(slug, 'directoras')
-    if codigo_colegio and codigo != codigo_colegio:
-        error = 'Código de invitación incorrecto.'
-    elif pw != confirmar:
-        error = 'Las contraseñas no coinciden.'
-    elif not nombre or not usuario or not pw or not curso or not jornada:
-        error = 'Completa todos los campos obligatorios.'
-    elif len(pw) < 6:
-        error = 'Mínimo 6 caracteres.'
-    elif not pregunta or not respuesta:
-        error = 'Debes elegir una pregunta secreta y escribir tu respuesta.'
-    else:
-        conn = conectar(slug)
-        if conn.execute('SELECT 1 FROM directoras WHERE usuario=?', (usuario,)).fetchone():
-            error = 'Ese usuario ya existe. Elige otro nombre de usuario.'; conn.close()
-        else:
-            conn.execute(
-                '''INSERT INTO directoras
-                   (nombre,usuario,password,curso,jornada,email,pregunta_secreta,respuesta_secreta)
-                   VALUES (?,?,?,?,?,?,?,?)''',
-                (nombre, usuario, hash_pw(pw), curso, jornada, email, pregunta, respuesta))
-            conn.commit(); conn.close()
-            exito = '✅ Cuenta creada. Ya puedes ingresar.'
-    return render_template('directora_login.html', slug=slug, colegio=colegio,
-                           error=error, exito=exito)
+# ── Directora auth routes migrated to app/routes/auth.py ────────────────
 
 @app.route('/<slug>/directora')
 @app.route('/<slug>/directora/panel')
 def directora_panel(slug):
     require_colegio(slug)
     directora = get_directora(slug)
-    if not directora: return redirect(url_for('directora_login', slug=slug))
+    if not directora: return redirect(url_for('auth.directora_login', slug=slug))
     colegio  = get_colegio(slug)
     curso    = directora['curso']
     jornada  = directora['jornada']
@@ -9320,7 +8639,7 @@ def directora_panel(slug):
 def directora_boletin_pdf(slug):
     require_colegio(slug)
     directora = get_directora(slug)
-    if not directora: return redirect(url_for('directora_login', slug=slug))
+    if not directora: return redirect(url_for('auth.directora_login', slug=slug))
     from flask import Response
     colegio  = get_colegio(slug)
     curso    = directora['curso']
@@ -9368,10 +8687,7 @@ def directora_boletin_pdf(slug):
                         headers={'Content-Disposition':
                                  f'attachment;filename=boletin_{curso}_{jornada}_P{periodo}.pdf'})
 
-@app.route('/<slug>/directora/logout')
-def directora_logout(slug):
-    session.clear()
-    return redirect(url_for('directora_login', slug=slug))
+# ── Directora logout migrated to app/routes/auth.py ────────────────────
 
 @app.route('/<slug>/directora/enviar_correos', methods=['POST'])
 def directora_enviar_correos(slug):
@@ -9565,7 +8881,7 @@ def hex_to_rgb(hex_color):
 @app.route('/admin/codigos/<slug>', methods=['GET', 'POST'])
 def admin_codigos(slug=None):
     if not session.get('admin_auth'):
-        return redirect(url_for('admin'))
+        return redirect(url_for('auth.admin'))
     cm = conectar_master()
     error = exito = None
 
@@ -9781,7 +9097,9 @@ def api_rector_observador(slug, aid):
 
 # ── INIT ────────────────────────────────────────────────────────────────────────
 init_master_db()
-threading.Timer(30, programar_backup).start()
+t = threading.Timer(30, programar_backup)
+t.daemon = True
+t.start()
 
 if __name__ == '__main__':
     _port = int(os.environ.get('PORT', 8000 if ENV == 'production' else 5000))
