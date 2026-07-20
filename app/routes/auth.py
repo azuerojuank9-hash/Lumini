@@ -384,7 +384,7 @@ def login(slug):
                     error = err
                 else:
                     fa.limpiar_intentos(ip, prefijo=f'est_{slug}')
-                    return redirect(url_for('vista_estudiante', slug=slug))
+                    return redirect(url_for('student.vista_estudiante', slug=slug))
 
         elif accion == 'directora_login':
             ip = request.remote_addr or '0.0.0.0'
@@ -403,7 +403,7 @@ def login(slug):
                     error = err
                 else:
                     fa.limpiar_intentos(ip, prefijo=f'dir_{slug}')
-                    return redirect(url_for('directora_panel', slug=slug))
+                    return redirect(url_for('directora.directora_panel', slug=slug))
 
         elif accion == 'rector_login':
             bloqueado = fa.ip_bloqueada(ip, prefijo=f'rec_{slug}')
@@ -423,7 +423,7 @@ def login(slug):
                 error = err
             else:
                 fa.limpiar_intentos(ip, prefijo=f'rec_{slug}')
-                return redirect(url_for('rector_panel', slug=slug))
+                return redirect(url_for('rector.rector_panel', slug=slug))
 
     return render_template('login_v2.html', error=error, materias=fa.MATERIAS,
                            jornadas=fa.JORNADAS, preguntas=fa.PREGUNTAS_SECRETAS,
@@ -522,7 +522,7 @@ def rector_login(slug):
             error = err
         else:
             fa.limpiar_intentos(ip, prefijo=f'rector_{slug}')
-            return redirect(url_for('rector_panel', slug=slug))
+            return redirect(url_for('rector.rector_panel', slug=slug))
     return render_template('rector_login.html', slug=slug, colegio=colegio,
                            error=error, exito=exito)
 
@@ -651,7 +651,7 @@ def directora_login(slug):
             error = err
         else:
             fa.limpiar_intentos(ip, prefijo=f'directora_{slug}')
-            return redirect(url_for('directora_panel', slug=slug))
+            return redirect(url_for('directora.directora_panel', slug=slug))
     return render_template('directora_login.html', slug=slug, colegio=colegio,
                            error=error, exito=exito)
 

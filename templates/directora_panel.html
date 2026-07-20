@@ -92,7 +92,7 @@
                 <a href="?periodo={{ periodo }}#table-consolidada" class="qaction"><i data-lucide="clipboard-list"></i> Notas</a>
                 <button onclick="enviarCorreosTodos()" class="qaction" style="border:none;background:var(--bg3);cursor:pointer;"><i data-lucide="send"></i> Enviar boletines</button>
                 <button onclick="abrirModalRegistro()" class="qaction" style="border:none;background:var(--bg3);cursor:pointer;"><i data-lucide="user-plus"></i> Crear directora</button>
-                <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="qaction"><i data-lucide="file-text"></i> PDF todos</a>
+                <a href="{{ url_for('directora.directora_boletin_pdf', slug=slug, periodo=periodo) }}" class="qaction"><i data-lucide="file-text"></i> PDF todos</a>
             </div>
         </div>
         <div class="dash-module">
