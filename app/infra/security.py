@@ -1,5 +1,12 @@
-import time, hashlib, bcrypt, secrets
-from flask import session, request
+import hashlib
+import logging
+import secrets
+import time
+
+import bcrypt
+from flask import request, session
+
+logger = logging.getLogger(__name__)
 
 login_intentos = {}
 
@@ -27,6 +34,7 @@ def validar_imagen(ruta):
         img.verify()
         return True
     except Exception:
+        logger.debug('validar_imagen: imagen inválida %s', ruta)
         return False
 
 

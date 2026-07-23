@@ -1,7 +1,15 @@
+import logging
 import os
 import uuid
+
+from werkzeug.utils import secure_filename
+
 from app.models.schema import conectar
-from app.repositories.file_repository import get_archivo as repo_get_archivo, eliminar_archivo as repo_eliminar_archivo, get_max_tamano_archivo
+from app.repositories.file_repository import eliminar_archivo as repo_eliminar_archivo
+
+logger = logging.getLogger(__name__)
+from app.repositories.file_repository import get_archivo as repo_get_archivo
+from app.repositories.file_repository import get_max_tamano_archivo
 
 EXTENSIONES_PERMITIDAS = {
     '.pdf': 'application/pdf',
@@ -37,7 +45,7 @@ def max_tamano_archivo(slug):
 
 
 def guardar_archivo_mensaje(slug, canal_id, f, usuario_tipo, usuario_id, app_root_path):
-    nombre_original = f.filename
+    nombre_original = secure_filename(f.filename or 'archivo')
     ext = os.path.splitext(nombre_original)[1].lower()
     if ext not in EXTENSIONES_PERMITIDAS:
         return None, 'Extensión no permitida'
@@ -49,12 +57,14 @@ def guardar_archivo_mensaje(slug, canal_id, f, usuario_tipo, usuario_id, app_roo
     es_img = ext in ('.jpg', '.jpeg', '.png', '.gif', '.webp')
     if es_img:
         try:
-            from PIL import Image
             import io
+
+            from PIL import Image
             img = Image.open(io.BytesIO(f.read()))
             img.verify()
             f.seek(0)
         except Exception:
+            logger.warning('guardar_archivo_mensaje: imagen corrupta o inválida')
             return None, 'Archivo de imagen inválido o corrupto'
     nombre_archivo = f'{uuid.uuid4().hex}{ext}'
     upload_dir = os.path.join(app_root_path, 'static', 'uploads', slug)
@@ -68,7 +78,7 @@ def guardar_archivo_mensaje(slug, canal_id, f, usuario_tipo, usuario_id, app_roo
             img = Image.open(ruta)
             ancho, alto = img.size
         except Exception:
-            pass
+            logger.warning("No se pudo leer dimensiones de imagen")
     conn = conectar(slug)
     try:
         fid = conn.execute(
@@ -87,4 +97,4 @@ def eliminar_archivo_fisico(ruta):
     try:
         os.remove(ruta)
     except Exception:
-        pass
+        logger.debug("Archivo no encontrado para eliminar: %s", ruta)

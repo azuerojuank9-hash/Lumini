@@ -1,6 +1,7 @@
 from io import BytesIO
-from datetime import date
-from flask import render_template, request, redirect, url_for, jsonify, Response
+
+from flask import Response, jsonify, redirect, render_template, request, url_for
+
 from app.routes import directora_bp
 
 
@@ -150,7 +151,7 @@ def directora_boletin_pdf(slug):
                         headers={'Content-Disposition':
                                  f'attachment;filename=boletin_{curso}_{jornada}_P{periodo}.pdf'})
     try:
-        from pypdf import PdfWriter, PdfReader
+        from pypdf import PdfReader, PdfWriter
         writer = PdfWriter()
         for pdf_bytes in all_pdfs:
             reader = PdfReader(BytesIO(pdf_bytes))

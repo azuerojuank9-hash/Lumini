@@ -97,13 +97,14 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;min-heigh
 {% block extra_scripts %}
 <script>
 var slug = '{{ slug }}';
+var csrfToken = '{{ csrf_token() }}';
 function ppLogin(){
   var email=document.getElementById('ppEmail').value.trim();
   var pin=document.getElementById('ppPin').value.trim();
   var err=document.getElementById('ppError');
   if(!email||!pin){err.textContent='Completa todos los campos';err.style.display='block';return;}
   err.style.display='none';
-  fetch('/'+slug+'/portal/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,pin:pin})})
+  fetch('/'+slug+'/portal/login',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrfToken},body:JSON.stringify({email:email,pin:pin})})
   .then(function(r){return r.json();}).then(function(d){
     if(d.error){err.textContent=d.error;err.style.display='block';return;}
     document.getElementById('ppLogin').style.display='none';

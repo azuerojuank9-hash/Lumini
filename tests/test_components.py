@@ -1,5 +1,6 @@
 import os
 import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
@@ -10,7 +11,7 @@ TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__fi
 @pytest.fixture
 def env():
     from jinja2 import Environment, FileSystemLoader
-    return Environment(loader=FileSystemLoader(TEMPLATE_DIR))
+    return Environment(loader=FileSystemLoader(TEMPLATE_DIR), autoescape=True)
 
 def tmpl(env, src):
     return env.from_string(src).render()

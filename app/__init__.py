@@ -1,6 +1,7 @@
 import os
-from flask import Flask
+
 from dotenv import load_dotenv
+from flask import Flask
 
 _basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 load_dotenv(os.path.join(_basedir, '.env'))

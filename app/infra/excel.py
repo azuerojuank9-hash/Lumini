@@ -4,7 +4,7 @@ from app.infra.grades import _promedio_ponderado
 
 def _excel_armar_wb(slug, prof, materia, jornada, curso_sel, periodo, actividades, alumnos):
     from openpyxl import Workbook
-    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
     wb = Workbook()
     ws = wb.active
     ws.title = 'Notas'

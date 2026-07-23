@@ -1,6 +1,9 @@
-import requests, re, sys, json, os, time
-from bs4 import BeautifulSoup
+import json
+import re
 from collections import defaultdict
+
+import requests
+from bs4 import BeautifulSoup
 
 BASE = "http://127.0.0.1:5050"
 s = requests.Session()
@@ -271,4 +274,4 @@ report = {
 }
 with open("C:\\Users\\PC\\OneDrive\\Documentos\\GitHub\\Lumini\\audit_report.json", "w") as f:
     json.dump(report, f, indent=2, default=str)
-print(f"\nReport saved!")
+print("\nReport saved!")

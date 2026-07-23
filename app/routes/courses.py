@@ -1,5 +1,6 @@
 import logging
-from flask import Blueprint, request, redirect, url_for, render_template
+
+from flask import Blueprint, redirect, render_template, request, url_for
 
 from app.utils.security import validar_csrf
 

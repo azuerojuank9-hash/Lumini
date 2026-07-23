@@ -14,11 +14,15 @@ window.showToast = function(message, type, duration) {
   var t = document.createElement('div');
   t.className = 'toast toast-' + type + ' toast-enter';
   var iconMap = { success: 'check-circle', error: 'alert-triangle', info: 'info', warning: 'alert-circle' };
-  t.innerHTML = '<span class="toast-icon"><i data-lucide="' + (iconMap[type] || 'info') + '" width="16" height="16"></i></span>'
-    + '<span class="toast-message">' + message + '</span>'
+  var iconName = iconMap[type] || 'info';
+  var escDiv = document.createElement('div');
+  escDiv.textContent = message;
+  var safeMsg = escDiv.innerHTML;
+  t.innerHTML = '<span class="toast-icon"><i data-lucide="' + iconName + '" width="16" height="16"></i></span>'
+    + '<span class="toast-message">' + safeMsg + '</span>'
     + '<button class="toast-close btn-icon-sm btn-ghost" onclick="this.closest(\'.toast\').remove()" aria-label="Cerrar"><i data-lucide="x" width="12" height="12"></i></button>';
   c.appendChild(t);
-  if (window.lucide) lucide.createIcons();
+  if (window.lucide) lucide.createIcons({ attrs: { 'aria-hidden': 'true' } }, t);
   setTimeout(function() {
     t.classList.remove('toast-enter');
     t.classList.add('toast-exit');

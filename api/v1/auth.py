@@ -1,10 +1,11 @@
-import jwt
-import secrets
 import hashlib
+import secrets
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from functools import wraps
-from flask import Blueprint, request, jsonify, current_app, g
+
+import jwt
+from flask import Blueprint, current_app, g, jsonify, request
 from werkzeug.security import check_password_hash
 
 bp = Blueprint('api_v1', __name__, url_prefix='/api/v1')

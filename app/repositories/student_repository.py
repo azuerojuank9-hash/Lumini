@@ -1,4 +1,3 @@
-from app.models.schema import conectar
 
 
 def create_student(conn, nombre, curso, jornada):

@@ -13,8 +13,10 @@ def agregar_cursos(conn, profesor_id, materia, jornada, cursos, extra):
 
 def transferir_curso(conn, from_pid, to_pid, materia, jornada, curso, periodos, jornada_curso):
     from app.repositories.course_repository import (
-        transfer_actividades, transfer_evaluaciones,
-        copy_asignacion_curso, delete_asignacion_curso
+        copy_asignacion_curso,
+        delete_asignacion_curso,
+        transfer_actividades,
+        transfer_evaluaciones,
     )
     for p in periodos:
         transfer_actividades(conn, from_pid, to_pid, materia, jornada, curso, p)

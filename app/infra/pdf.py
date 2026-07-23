@@ -1,15 +1,15 @@
 from io import BytesIO
-from app.infra.database import conectar
+
 from app.infra.grades import _promedio_ponderado
 
 
 def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
     try:
-        from reportlab.lib.pagesizes import A4
         from reportlab.lib import colors
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
         from reportlab.lib.units import cm
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
     except ImportError:
         raise ImportError(
             'reportlab no está instalado. '
@@ -29,10 +29,6 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
         pri_color = colors.HexColor(colegio['primary_color']) if colegio and colegio['primary_color'] else colors.HexColor('#6c63ff')
     except (KeyError, AttributeError, TypeError):
         pri_color = colors.HexColor('#6c63ff')
-    try:
-        sec_color = colors.HexColor(colegio['secondary_color']) if colegio and colegio['secondary_color'] else colors.HexColor('#3498db')
-    except (KeyError, AttributeError, TypeError):
-        sec_color = colors.HexColor('#3498db')
     styles = getSampleStyleSheet()
     titulo_style = ParagraphStyle('t', fontSize=16, fontName='Helvetica-Bold',
                                   textColor=pri_color, spaceAfter=4)

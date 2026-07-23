@@ -1,8 +1,10 @@
-import os, sys, sqlite3, json
+import os
+import sqlite3
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
-from flask_app import app
 import pytest
 
 TEST_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),

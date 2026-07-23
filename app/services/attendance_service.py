@@ -9,7 +9,10 @@ COLORES_ASISTENCIA = {'P': 'green', 'A': 'red', 'T': 'yellow', 'E': 'blue', 'X':
 
 
 def compute_asistencia_stats(conn, curso=None, jornada=None, aid=None):
-    from app.repositories.attendance_repository import get_students_by_curso, get_asistencia_stats, get_student_ids_by_curso
+    from app.repositories.attendance_repository import (
+        get_asistencia_stats,
+        get_student_ids_by_curso,
+    )
     where_curso = curso
     where_jornada = jornada
     if aid:
@@ -41,8 +44,10 @@ def compute_asistencia_stats(conn, curso=None, jornada=None, aid=None):
 
 def compute_asistencia_alertas(conn, slug, curso, jornada):
     from app.repositories.attendance_repository import (
-        get_students_by_curso, get_asistencia_abs_consec,
-        get_asistencia_tardanzas, get_asistencia_all_stats
+        get_asistencia_abs_consec,
+        get_asistencia_all_stats,
+        get_asistencia_tardanzas,
+        get_students_by_curso,
     )
     alertas = []
     alumnos = get_students_by_curso(conn, curso, jornada)
@@ -94,7 +99,7 @@ def compute_asistencia_alertas(conn, slug, curso, jornada):
 
 
 def build_asistencia_calendario(conn, curso, jornada):
-    from app.repositories.attendance_repository import get_student_ids_by_curso, get_asistencia_all_dates
+    from app.repositories.attendance_repository import get_asistencia_all_dates, get_student_ids_by_curso
     alumnos = get_student_ids_by_curso(conn, curso, jornada)
     aids = tuple(a['id'] for a in alumnos)
     calendario = defaultdict(lambda: defaultdict(int))

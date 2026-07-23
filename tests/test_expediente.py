@@ -1,9 +1,14 @@
-import os, sys, json, sqlite3
+import json
+import os
+import sqlite3
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
-from flask_app import app, init_db, hash_pw
 import pytest
+
+from flask_app import app, init_db
 
 TEST_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                        'colegios_db', 'testcolegio.db')
@@ -35,6 +40,7 @@ def rector_session(client):
         sess['rol'] = 'rector'
         sess['slug'] = 'testcolegio'
         sess['_csrf_token'] = 'pytest_csrf'
+        sess['rector_id_testcolegio'] = 99
 
 def test_expediente_page_loads(client, rector_session):
     resp = client.get('/testcolegio/rector/expediente')

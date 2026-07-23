@@ -1,7 +1,8 @@
 """Authentication routes — login, logout, password recovery for all roles."""
 
 import logging
-from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
+
+from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +34,8 @@ def admin():
             if bloqueado:
                 error = f'Demasiados intentos. Espera {bloqueado}s.'
                 return render_template('admin_login.html', error=error)
-            from app.services.auth_service import admin_login
-            rol, err = admin_login(
+            from app.services.auth_service import login_admin
+            rol, err = login_admin(
                 request.form.get('password', ''),
                 fa.ADMIN_PASSWORD,
                 ip,
@@ -47,11 +48,16 @@ def admin():
             return redirect(url_for('auth.admin'))
         return render_template('admin_login.html', error=error)
 
-    from app.repositories.user_repository import get_all_colegios, create_colegio, toggle_colegio_activo, \
-        update_colegio, delete_colegio, find_colegio_by_slug
-    from app.utils.security import extension_permitida, validar_imagen
-    from app.models.schema import init_db, conectar_master, db_path
     import os
+
+    from app.models.schema import conectar_master, db_path, init_db
+    from app.repositories.user_repository import (
+        create_colegio,
+        delete_colegio,
+        get_all_colegios,
+        toggle_colegio_activo,
+    )
+    from app.utils.security import extension_permitida, validar_imagen
 
     colegios = get_all_colegios()
 
@@ -95,6 +101,7 @@ def admin():
                     try:
                         create_colegio(slug, nombre, logo_filename, num_p, venc, codigo, pri_col, sec_col)
                     except Exception:
+                        logger.warning('register_colegio: slug duplicado %s', slug)
                         error = f'El slug "{slug}" ya existe.'
                     if not error:
                         init_db(slug)
@@ -320,7 +327,7 @@ def login(slug):
                     error = err
                 else:
                     fa.limpiar_intentos(ip, prefijo=slug)
-                    return redirect(url_for('seleccionar_jornada', slug=slug))
+                    return redirect(url_for('teacher.seleccionar_jornada', slug=slug))
 
         elif accion == 'profesor_registro':
             nombre = request.form.get('nombre', '').strip()
@@ -347,7 +354,7 @@ def login(slug):
             elif not materias_sel:
                 error = 'Agrega al menos una materia con su jornada.'
             else:
-                from app.repositories.user_repository import username_exists_profesor, create_profesor
+                from app.repositories.user_repository import create_profesor, username_exists_profesor
                 if username_exists_profesor(slug, usuario):
                     error = 'Ese usuario ya existe.'
                 else:
@@ -378,7 +385,7 @@ def login(slug):
                 from app.repositories.user_repository import find_alumno_by_nombre
                 alumno = find_alumno_by_nombre(slug, nombre, jornada)
                 from app.services.auth_service import login_estudiante
-                rol, err = login_estudiante(slug, nombre, jornada, pin_ingresado, alumno)
+                rol, err = login_estudiante(slug, nombre, pin_ingresado, alumno, fa.verificar_pw, fa.necesita_rehash, fa.hash_pw)
                 if err:
                     fa.registrar_fallo(ip, prefijo=f'est_{slug}')
                     error = err
@@ -457,8 +464,8 @@ def cambiar_password(slug):
             if err:
                 error = err
             else:
-                from app.utils.security import hash_pw
                 from app.repositories.user_repository import update_profesor_password
+                from app.utils.security import hash_pw
                 update_profesor_password(slug, prof['id'], hash_pw(nueva))
                 exito = 'Contrasena cambiada!'
     mis_cursos = fa.get_cursos_profesor(slug, prof['id'], materia, jornada)
@@ -480,16 +487,23 @@ def portal_padre_login(slug):
     fa.require_colegio(slug)
     if request.method == 'GET':
         return render_template('portal_padre.html', slug=slug, colegio=fa.get_colegio(slug), step='login')
+    ip = request.remote_addr or '0.0.0.0'
+    if fa.ip_bloqueada(ip, prefijo=f'parent_{slug}'):
+        return jsonify({'error': 'Demasiados intentos. Espera 5 minutos.'}), 429
+    if not fa.validar_csrf():
+        return jsonify({'error': 'CSRF inválido'}), 403
     data = request.get_json(silent=True) or request.form
     email = data.get('email', '').strip().lower()
     pin = data.get('pin', '').strip()
     if not email or not pin:
         return jsonify({'error': 'Email y PIN requeridos'}), 400
+    from app.repositories.user_repository import get_children_for_parent, get_parent_by_email_pin
     from app.services.auth_service import parent_portal_login
-    from app.repositories.user_repository import get_parent_by_email_pin, get_children_for_parent
     result, err = parent_portal_login(slug, email, pin, get_parent_by_email_pin, get_children_for_parent)
     if err:
+        fa.registrar_fallo(ip, prefijo=f'parent_{slug}')
         return jsonify({'error': err}), 401
+    fa.limpiar_intentos(ip, prefijo=f'parent_{slug}')
     return jsonify({'status': 'ok', **result})
 
 
@@ -557,7 +571,7 @@ def rector_registrar(slug):
     elif not pregunta or not resp:
         error = 'Debes elegir una pregunta secreta y escribir tu respuesta.'
     else:
-        from app.repositories.user_repository import username_exists_rector, create_rector
+        from app.repositories.user_repository import create_rector, username_exists_rector
         if username_exists_rector(slug, usuario):
             error = 'Ese usuario ya existe. Elige otro nombre de usuario.'
         else:
@@ -687,7 +701,7 @@ def directora_registrar_directo(slug):
     elif not pregunta or not respuesta:
         error = 'Debes elegir una pregunta secreta y escribir tu respuesta.'
     else:
-        from app.repositories.user_repository import username_exists_directora, create_directora
+        from app.repositories.user_repository import create_directora, username_exists_directora
         if username_exists_directora(slug, usuario):
             error = 'Ese usuario ya existe. Elige otro nombre de usuario.'
         else:

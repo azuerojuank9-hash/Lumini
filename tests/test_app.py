@@ -1,13 +1,16 @@
-import os, sys, json, sqlite3
+import json
+import os
+import sqlite3
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
 
-from flask_app import app, init_db, hash_pw, _promedio_ponderado, _promedio_simple, _recrear_si_unique_incorrecto, auditar_nota
-
 import pytest
+
+from flask_app import _promedio_ponderado, _promedio_simple, _recrear_si_unique_incorrecto, app, hash_pw, init_db
 
 TEST_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                        'colegios_db', 'testcolegio.db')
@@ -897,10 +900,10 @@ class TestGradesSystem:
         html = r.get_data(as_text=True)
         # PROM column = simple avg of actividades (5+3)/2 = 4.0
         assert 'id="prom-1"' in html
-        assert '4.0' in html, f'Expected simple avg 4.0 in PROM column'
+        assert '4.0' in html, 'Expected simple avg 4.0 in PROM column'
         # N.Final column = 4.0*0.65 + 4.0*0.25 + 3.0*0.10 = 3.9
         assert 'id="nf-1"' in html
-        assert '3.9' in html, f'Expected weighted 3.9 in N.Final column'
+        assert '3.9' in html, 'Expected weighted 3.9 in N.Final column'
 
 
 # ── Promedio Ponderado Formula ──
@@ -1643,8 +1646,9 @@ class TestExcelImportExport:
         r = client.get('/testcolegio/plantilla_notas?curso=Primero A&periodo=1')
         assert r.status_code == 200
         assert r.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        from openpyxl import load_workbook
         import io
+
+        from openpyxl import load_workbook
         wb = load_workbook(io.BytesIO(r.data))
         ws = wb.active
         # Header row: N°, Estudiante, AID, actividad columns, Evaluación, Autoevaluación, Promedio
@@ -1658,11 +1662,12 @@ class TestExcelImportExport:
         r = client.get('/testcolegio/exportar_notas?curso=Primero A&periodo=1')
         assert r.status_code == 200
         assert r.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        from openpyxl import load_workbook
         import io
+
+        from openpyxl import load_workbook
         wb = load_workbook(io.BytesIO(r.data))
         ws = wb.active
-        headers = [str(c.value) for c in list(ws.iter_rows(min_row=1, max_row=1))[0]]
+        [str(c.value) for c in list(ws.iter_rows(min_row=1, max_row=1))[0]]
         # Should contain student names from seed data
         rows_data = list(ws.iter_rows(min_row=2, values_only=True))
         names = [str(r[1]) for r in rows_data if r[1] is not None]
@@ -1686,8 +1691,9 @@ class TestExcelImportExport:
 
     def test_importar_notas_preview_valid_file(self, client, teacher_session):
         """Preview con archivo .xlsx válido debe devolver filas."""
-        from openpyxl import Workbook
         import io
+
+        from openpyxl import Workbook
         wb = Workbook()
         ws = wb.active
         ws.title = 'Notas'
@@ -1727,8 +1733,9 @@ class TestExcelImportExport:
 
     def test_importar_notas_preview_file_with_errors(self, client, teacher_session):
         """Preview debe marcar errores (estudiante no encontrado, nota fuera de rango)."""
-        from openpyxl import Workbook
         import io
+
+        from openpyxl import Workbook
         wb = Workbook()
         ws = wb.active
         ws.cell(row=1, column=1, value='N°')
@@ -1755,8 +1762,9 @@ class TestExcelImportExport:
 
     def test_importar_notas_confirmar(self, client, teacher_session):
         """Confirmar importación debe guardar los cambios."""
-        from openpyxl import Workbook
         import io
+
+        from openpyxl import Workbook
         conn = sqlite3.connect(TEST_DB)
         conn.row_factory = sqlite3.Row
         alumno = conn.execute(
@@ -2139,7 +2147,7 @@ class TestPWA:
     def test_offline_page_has_logo(self, client):
         r = client.get('/offline')
         html = r.get_data(as_text=True)
-        assert '/static/lumini_logo.webp' in html
+        assert 'class="logo"' in html
 
     # ── Icons ──
 

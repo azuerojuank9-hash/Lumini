@@ -1,8 +1,11 @@
-from flask import render_template, request, redirect, url_for, jsonify, session
+from flask import jsonify, redirect, render_template, url_for
+
 from app.routes import notifications_bp
 from app.services.notification_service import (
-    get_current_user, list_notificaciones, marcar_leida,
-    count_no_leidas, marcar_comunicacion,
+    get_current_user,
+    list_notificaciones,
+    marcar_comunicacion,
+    marcar_leida,
 )
 
 

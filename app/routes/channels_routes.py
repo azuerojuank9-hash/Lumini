@@ -1,6 +1,8 @@
-from flask import Blueprint, jsonify, request, session
 from datetime import datetime
-from app.services.channel_service import _enriquecer_mensajes_batch, nombre_usuario_canal, canales_usuario
+
+from flask import Blueprint, jsonify, request, session
+
+from app.services.channel_service import _enriquecer_mensajes_batch, canales_usuario, nombre_usuario_canal
 
 channels_bp = Blueprint('channels', __name__)
 

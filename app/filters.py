@@ -1,4 +1,7 @@
+import logging
 from datetime import date as _date
+
+logger = logging.getLogger(__name__)
 
 
 def register_template_filters(app):
@@ -8,6 +11,7 @@ def register_template_filters(app):
             fecha = _date.fromisoformat(str(fecha_str))
             return (fecha - _date.today()).days
         except Exception:
+            logger.debug('dias_restantes: fecha inválida %s', fecha_str)
             return None
 
     @app.template_filter('hex_to_rgb')

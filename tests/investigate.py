@@ -1,10 +1,13 @@
 """Final visual audit with isolated sessions."""
-import os, sys
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
-from flask_app import app, hash_pw, init_db
 import sqlite3
+
+from flask_app import app, hash_pw, init_db
 
 TEST_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                        'colegios_db', 'testcolegio.db')
@@ -43,18 +46,18 @@ def check(name, url, session_kv):
                 sess[k] = v
         resp = client.get(url, follow_redirects=True)
         html = resp.data.decode('utf-8', errors='replace')
-    
+
     has_sidebar = ('sidebar-nav' in html) or ('sidebar-item' in html) or ('class="sidebar"' in html) or ('sidebar-link' in html)
     has_vp = 'name="viewport"' in html
     is_login = 'Ingresa tu usuario' in html or 'login-wrap' in html
     bad_utf8 = '\ufffd' in html
-    
+
     issues = []
     if not has_vp: issues.append('NO-VIEWPORT')
     if is_login: issues.append('LOGIN-PAGE')
     if bad_utf8: issues.append('BAD-UTF8')
     if not has_sidebar and not is_login: issues.append('NO-SIDEBAR')
-    
+
     tag = ','.join(issues) if issues else 'OK'
     if tag == 'OK':
         all_results['ok'].append(name)
@@ -111,7 +114,7 @@ print(f"TOTAL PAGES CHECKED: {len(all_results['ok']) + len(all_results['issues']
 print(f"OK: {len(all_results['ok'])}")
 print(f"WITH ISSUES: {len(all_results['issues'])}")
 if all_results['issues']:
-    print(f"\nISSUES:")
+    print("\nISSUES:")
     for name, issues in all_results['issues']:
         print(f"  {name}: {', '.join(issues)}")
 print("=" * 75)

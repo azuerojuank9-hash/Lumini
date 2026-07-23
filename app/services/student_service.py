@@ -26,9 +26,12 @@ def delete_student_action(conn, aid):
 
 def build_archivados_context(conn, jornada, mis_cursos, curso_sel):
     from app.repositories.student_repository import (
-        get_archived_students, get_archived_profesores,
-        get_active_profesores, get_asignaciones_materia,
-        get_asignaciones_curso, get_other_active_profesores_by_mat_jor
+        get_active_profesores,
+        get_archived_profesores,
+        get_archived_students,
+        get_asignaciones_curso,
+        get_asignaciones_materia,
+        get_other_active_profesores_by_mat_jor,
     )
     alumnos_arch = []
     if curso_sel:
@@ -83,9 +86,8 @@ def build_archivados_context(conn, jornada, mis_cursos, curso_sel):
 
 def get_estudiante_context(conn, slug, aid):
     from app.repositories.student_repository import (
-        get_alumno, get_compromisos_curso, get_notas_estudiante,
-        get_evaluaciones_estudiante, get_asistencia_estudiante,
-        get_observaciones_estudiante, get_horario_curso,
+        get_alumno,
+        get_compromisos_curso,
     )
     alumno = get_alumno(conn, aid)
     if not alumno:
@@ -96,7 +98,8 @@ def get_estudiante_context(conn, slug, aid):
 
 def get_notas_context(conn, alumno, periodo, _promedio_ponderado):
     from app.repositories.student_repository import (
-        get_notas_estudiante, get_evaluaciones_estudiante,
+        get_evaluaciones_estudiante,
+        get_notas_estudiante,
     )
     notas_raw = get_notas_estudiante(conn, alumno['id'], alumno['curso'], alumno['jornada'], periodo)
     evals_raw = get_evaluaciones_estudiante(conn, alumno['id'], periodo)

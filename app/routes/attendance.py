@@ -1,13 +1,17 @@
 import logging
 from datetime import datetime, timedelta
 from io import BytesIO
-from flask import Blueprint, request, redirect, url_for, session, jsonify, render_template, Response
 
-from app.utils.security import validar_csrf
+from flask import Blueprint, Response, jsonify, redirect, render_template, request, url_for
+
 from app.services.attendance_service import (
-    ESTADOS_ASISTENCIA, COLORES_ASISTENCIA,
-    compute_asistencia_stats, compute_asistencia_alertas, build_asistencia_calendario
+    COLORES_ASISTENCIA,
+    ESTADOS_ASISTENCIA,
+    build_asistencia_calendario,
+    compute_asistencia_alertas,
+    compute_asistencia_stats,
 )
+from app.utils.security import validar_csrf
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +58,7 @@ def asistencia(slug):
                                materias_jornadas=f.get_materias_profesor(slug, prof['id']))
     conn = f.conectar(slug)
     try:
-        from app.repositories.attendance_repository import get_students_by_curso, get_asistencia_for_date
+        from app.repositories.attendance_repository import get_asistencia_for_date, get_students_by_curso
         alumnos = get_students_by_curso(conn, curso_sel, jornada)
         asis_rows = []
         if alumnos:
@@ -115,7 +119,7 @@ def marcar_asistencia(slug):
     if not cursos_prof:
         conn.close()
         return ('', 403)
-    from app.repositories.attendance_repository import verify_student_in_cursos, upsert_asistencia
+    from app.repositories.attendance_repository import upsert_asistencia, verify_student_in_cursos
     if not verify_student_in_cursos(conn, aid, cursos_prof, jornada):
         conn.close()
         return ('', 403)
@@ -132,13 +136,11 @@ def asistencia_data(slug):
     f = _fa()
     f.require_colegio(slug)
     prof = f.get_profesor(slug)
-    if not prof or not validar_csrf():
+    if not prof:
         return jsonify({'error': 'No autorizado'}), 403
     jornada, materia = f.get_sesion_jornada_materia(slug)
     if not jornada or not materia:
         return jsonify({'error': 'Sin jornada/materia'}), 400
-    MESES = {'01': 'Ene', '02': 'Feb', '03': 'Mar', '04': 'Abr', '05': 'May', '06': 'Jun',
-             '07': 'Jul', '08': 'Ago', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dic'}
     conn = f.conectar(slug)
     try:
         curso = request.args.get('curso', '')
@@ -172,7 +174,7 @@ def asistencia_reporte_excel(slug):
     conn = f.conectar(slug)
     try:
         from openpyxl import Workbook
-        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
         wb = Workbook()
         ws = wb.active
         ws.title = 'Asistencia'
@@ -184,7 +186,7 @@ def asistencia_reporte_excel(slug):
         if not curso:
             conn.close()
             return ('Curso requerido', 400)
-        from app.repositories.attendance_repository import get_students_by_curso, get_asistencia_full
+        from app.repositories.attendance_repository import get_asistencia_full, get_students_by_curso
         alumnos = get_students_by_curso(conn, curso, jornada)
         if not alumnos:
             conn.close()

@@ -12,17 +12,15 @@ Generates high-quality PDF certificates:
 Built on reportlab with institutional theming.
 """
 
-import os
-from io import BytesIO
 from datetime import datetime
-from typing import Optional
+from io import BytesIO
 
 
 def _init_styles():
-    from reportlab.lib.pagesizes import letter
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.units import cm, mm
     from reportlab.lib import colors
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import cm, mm
     styles = getSampleStyleSheet()
     title_style = ParagraphStyle(
         'CertTitle', parent=styles['Title'],
@@ -38,7 +36,7 @@ def _init_styles():
 
 def generar_constancia_estudio(alumno: dict, colegio: dict, firma_rector: str = '') -> BytesIO:
     """Generate 'Constancia de Estudio' PDF — proof of current enrollment."""
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
     letter, cm, mm, colors, title_style, normal_style = _init_styles()
 
     buf = BytesIO()
@@ -77,7 +75,7 @@ def generar_constancia_estudio(alumno: dict, colegio: dict, firma_rector: str = 
 def generar_certificado_estudio(alumno: dict, colegio: dict, materias: list,
                                  promedio_general: float, firma_rector: str = '') -> BytesIO:
     """Generate 'Certificado de Estudio' PDF — final academic certificate with grades."""
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
     letter, cm, mm, colors, title_style, normal_style = _init_styles()
 
     buf = BytesIO()
@@ -125,7 +123,7 @@ def generar_certificado_estudio(alumno: dict, colegio: dict, materias: list,
 
 def generar_paz_y_salvo(alumno: dict, colegio: dict, firma_rector: str = '') -> BytesIO:
     """Generate 'Paz y Salvo' PDF — clearance certificate."""
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
     letter, cm, mm, colors, title_style, normal_style = _init_styles()
 
     buf = BytesIO()
@@ -156,7 +154,7 @@ def generar_paz_y_salvo(alumno: dict, colegio: dict, firma_rector: str = '') -> 
 def generar_certificado_conducta(alumno: dict, colegio: dict, observaciones: list,
                                   firma_rector: str = '') -> BytesIO:
     """Generate 'Certificado de Conducta' PDF — behavior certificate."""
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
     letter, cm, mm, colors, title_style, normal_style = _init_styles()
 
     positivas = sum(1 for o in observaciones if 'positivo' in o.get('texto', '').lower())

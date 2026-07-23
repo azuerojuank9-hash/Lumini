@@ -1,5 +1,6 @@
 import logging
-from app.repositories.planning_repository import get_actividades_origin, get_next_orden, copiar_actividad
+
+from app.repositories.planning_repository import copiar_actividad, get_actividades_origin, get_next_orden
 
 logger = logging.getLogger(__name__)
 

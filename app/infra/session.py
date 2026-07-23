@@ -1,4 +1,5 @@
 from typing import Any
+
 from flask import session as _flask_session
 
 

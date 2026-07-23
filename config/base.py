@@ -39,7 +39,7 @@ class BaseSettings:
         '¿Cuál es el nombre de tu madre?',
         '¿Cuál es tu deporte favorito?',
     ])
-    SCHEMA_VERSION: int = 20
+    SCHEMA_VERSION: int = 21
 
     # ── Flask defaults ──
     SEND_FILE_MAX_AGE_DEFAULT: int = 86400 * 7

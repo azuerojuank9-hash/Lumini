@@ -36,7 +36,7 @@ def calcular_stats_estudiante(slug, aid, curso_sel, materia, jornada, periodo, p
 
 
 def calcular_nota_final_estudiante(slug, aid, curso_sel, materia, jornada, periodo, profesor_id):
-    from app.repositories.grade_repository import get_notas_for_student, get_evaluacion
+    from app.repositories.grade_repository import get_evaluacion, get_notas_for_student
     notas_raw = get_notas_for_student(slug, aid, materia, jornada, curso_sel, periodo, profesor_id)
     ev = get_evaluacion(slug, aid, profesor_id, materia, jornada, periodo)
     vals = [r['val'] for r in notas_raw] if notas_raw else []
@@ -46,9 +46,7 @@ def calcular_nota_final_estudiante(slug, aid, curso_sel, materia, jornada, perio
 
 
 def calcular_stats_curso(slug, curso_sel, materia, jornada, periodo, profesor_id):
-    from app.repositories.grade_repository import (
-        get_alumnos_by_curso, get_actividades_count, get_notas_count
-    )
+    from app.repositories.grade_repository import get_actividades_count, get_alumnos_by_curso, get_notas_count
     alumnos = get_alumnos_by_curso(slug, curso_sel, jornada)
     promedios = []
     for a in alumnos:
@@ -64,7 +62,7 @@ def calcular_stats_curso(slug, curso_sel, materia, jornada, periodo, profesor_id
 
 
 def get_notas_mapped(slug, aid_list, materia, jornada, curso, periodo, profesor_id):
-    from app.repositories.grade_repository import get_all_notas_for_curso, get_all_evaluaciones_for_curso
+    from app.repositories.grade_repository import get_all_evaluaciones_for_curso, get_all_notas_for_curso
     if not aid_list:
         return {}, {}
     notas_all = get_all_notas_for_curso(slug, aid_list, materia, jornada, curso, periodo, profesor_id)
@@ -74,36 +72,3 @@ def get_notas_mapped(slug, aid_list, materia, jornada, curso, periodo, profesor_
     evals_all = get_all_evaluaciones_for_curso(slug, aid_list, profesor_id, materia, jornada, periodo)
     evals_by_aid = {r['aid']: r for r in evals_all}
     return notas_by_aid, evals_by_aid
-
-
-def guardar_nota_transaction(conn, slug, aid, actividad_id, val, profesor_id, curso, materia, periodo,
-                             audit_log_fn, auditar_nota_fn, periodo_cerrado_fn):
-    from app.repositories.grade_repository import get_nota
-    if periodo_cerrado_fn(slug, periodo):
-        return {'status': 'error', 'codigo': 'PERIODO_CERRADO', 'mensaje': 'El per\u00edodo est\u00e1 cerrado.'}, 403
-    old = get_nota(slug, aid, actividad_id)
-    old_val = old['val'] if old else None
-    if conn is None:
-        from app.models.schema import conectar
-        conn = conectar(slug)
-        cerrar = True
-    else:
-        cerrar = False
-    try:
-        conn.execute(
-            '''INSERT INTO notas (aid,actividad_id,val) VALUES (?,?,?)
-               ON CONFLICT(aid,actividad_id) DO UPDATE SET val=excluded.val''',
-            (aid, actividad_id, val))
-        conn.commit()
-        audit_log_fn(slug, profesor_id, 'nota_editada', 'notas', registro_id=None,
-                     valor_anterior={'aid': aid, 'actividad_id': actividad_id, 'val': old_val},
-                     valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'val': val})
-        tipo_nota = 'creacion' if old_val is None else 'modificacion'
-        auditar_nota_fn(slug, profesor_id, 'profesor', tipo_nota, 'notas', aid,
-                        curso, materia, periodo,
-                        campo='nota', actividad_id=actividad_id,
-                        valor_anterior=old_val, valor_nuevo=val)
-        return {'status': 'ok'}, None
-    finally:
-        if cerrar:
-            conn.close()

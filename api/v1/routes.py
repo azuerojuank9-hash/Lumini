@@ -1,5 +1,6 @@
-from flask import jsonify, request, g
-from .auth import bp, token_required, role_required
+from flask import g, jsonify, request
+
+from .auth import bp, token_required
 
 
 @bp.route('/students', methods=['GET'])

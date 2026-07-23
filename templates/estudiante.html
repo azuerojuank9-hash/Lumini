@@ -746,7 +746,7 @@ function switchComTabEst(tab,btn){
 }
 function estVerComunicado(id){var el=document.getElementById('com-'+id);if(el)el.classList.add('open');}
 function estCerrarComunicado(){document.querySelectorAll('.com-detalle').forEach(function(c){c.classList.remove('open');});}
-function marcarLeido(id,btn){fetch('/estudiante/comunicado/'+id+'/leer',{method:'POST'}).then(function(){var badge=btn.querySelector('.badge');if(badge)badge.remove();btn.textContent='Le\u00eddo';}).catch(function(){});}
+function marcarLeido(id,btn){var csrf=document.getElementById('csrf-global');fetch('/{{ slug }}/comunicaciones/'+id+'/leer',{method:'POST',headers:{'X-CSRF-Token':csrf?csrf.value:''}}).then(function(){var badge=btn.querySelector('.badge');if(badge)badge.remove();btn.textContent='Le\u00eddo';}).catch(function(){});}
 function hideComToastEst(){var t=document.getElementById('comToastEst');if(t)t.classList.remove('show');}
 
 </script>

@@ -102,11 +102,10 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba
   </div>
 </div>
 {% endif %}
-</div>
 
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
 <input type="hidden" id="slug" value="{{ slug }}">
-<div id="toast">
+<div id="toast"></div>
 {% endblock %}
 {% block extra_scripts %}
 var _slug=document.getElementById('slug')?document.getElementById('slug').value:'';

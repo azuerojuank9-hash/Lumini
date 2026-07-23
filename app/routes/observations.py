@@ -1,5 +1,6 @@
 import logging
-from flask import Blueprint, request, session, jsonify
+
+from flask import Blueprint, jsonify, request
 
 from app.utils.security import validar_csrf
 

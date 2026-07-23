@@ -1,6 +1,7 @@
-from flask import session, g
-from app.infra.database import conectar, get_colegio
+from flask import g, session
+
 from app.exceptions import ForbiddenError, NotFoundError
+from app.infra.database import conectar, get_colegio
 
 
 def get_profesor(slug):
@@ -150,3 +151,20 @@ def get_jornadas_cache(slug):
     val = [r['jornada'] for r in rows]
     _cache_set(key, val, ttl=60)
     return val
+
+
+def require_rector_principal(slug):
+    from flask import abort, session
+
+    from app.infra.database import conectar
+    rector_id = session.get(f'rector_id_{slug}')
+    if not rector_id:
+        abort(403, 'Debe iniciar sesión como rector')
+    conn = conectar(slug)
+    rector = conn.execute('SELECT * FROM rectores WHERE id=? AND activo=1', (rector_id,)).fetchone()
+    conn.close()
+    if not rector:
+        abort(404, 'Rector no encontrado')
+    if not rector['es_principal']:
+        abort(403, 'Solo el rector principal puede realizar esta acción')
+    return dict(rector)

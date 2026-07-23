@@ -1,10 +1,15 @@
 """Visual quality audit: renders every page and checks HTML structure."""
-import os, sys, re, json
+import json
+import os
+import re
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
-from flask_app import app, init_db, hash_pw
 import sqlite3
+
+from flask_app import app, hash_pw, init_db
 
 TEST_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                        'colegios_db', 'testcolegio.db')
@@ -73,7 +78,6 @@ def has_sidebar_block(html):
 def has_no_hardcoded_colors(html):
     """Check for hardcoded colors that should use CSS vars."""
     # Skip known safe patterns (gradients using CSS vars, colors in data attrs, etc.)
-    hardcoded = r'#[0-9a-fA-F]{3,6}|rgba?\([^)]+\)' 
     # Check lines that are style= or css blocks
     lines = html.split('\n')
     suspicious = []
@@ -104,7 +108,7 @@ def no_mojibake(html):
 
 def balanced_tags(html):
     """Check for balanced div tags (basic)"""
-    opens = html.count('<div') 
+    opens = html.count('<div')
     closes = html.count('</div>')
     return opens == closes
 
@@ -134,7 +138,7 @@ def render_and_check(name, url, checks, method='GET', data=None):
                 ok, extra = result
                 if not ok:
                     page_issues.append(label)
-                    if extra: 
+                    if extra:
                         for e in extra[:3]:
                             page_issues.append(f"  {e}")
             elif not result:
@@ -254,4 +258,4 @@ report = {
 }
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'visual_audit_report.json'), 'w') as f:
     json.dump(report, f, indent=2, ensure_ascii=False)
-print(f"\nReport saved to tests/visual_audit_report.json")
+print("\nReport saved to tests/visual_audit_report.json")

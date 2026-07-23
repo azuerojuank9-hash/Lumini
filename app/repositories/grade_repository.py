@@ -53,6 +53,9 @@ def create_actividad(slug, profesor_id, materia, jornada, curso, nombre, orden, 
 
 
 def update_actividad_field(slug, act_id, field, value):
+    ALLOWED_FIELDS = {'nombre', 'descripcion', 'fecha', 'peso', 'periodo', 'tipo'}
+    if field not in ALLOWED_FIELDS:
+        return False
     conn = conectar(slug)
     try:
         conn.execute(f'UPDATE actividades SET {field}=? WHERE id=?', (value, act_id))
@@ -363,7 +366,6 @@ def get_notas_stats_actividad(slug, act_id):
         vals = [float(r['val']) for r in conn.execute(
             'SELECT val FROM notas WHERE actividad_id=? AND val IS NOT NULL', (act_id,)
         ).fetchall()]
-        conn.close()
         return vals
     finally:
         conn.close()

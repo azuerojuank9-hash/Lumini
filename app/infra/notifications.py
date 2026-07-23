@@ -1,5 +1,6 @@
 import json
 import logging
+
 from app.infra.database import conectar
 
 app_logger = logging.getLogger(__name__)

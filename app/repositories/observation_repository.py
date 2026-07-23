@@ -29,5 +29,5 @@ def delete_observation(conn, id_o):
 def student_belongs_to_cursos(conn, aid, cursos_prof, jornada):
     placeholders = ','.join('?' * len(cursos_prof))
     return conn.execute(
-        'SELECT id FROM alumnos WHERE id=? AND curso IN ({}) AND jornada=? AND activo=1'.format(placeholders),
+        f'SELECT id FROM alumnos WHERE id=? AND curso IN ({placeholders}) AND jornada=? AND activo=1',
         (aid, *cursos_prof, jornada)).fetchone() is not None

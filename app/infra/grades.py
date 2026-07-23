@@ -49,8 +49,8 @@ def calcular_nota_final_estudiante(conn, slug, aid, curso_sel, materia, jornada,
         (aid, materia, jornada, curso_sel, periodo, profesor_id)).fetchall()
     ev = conn.execute(
         '''SELECT evaluacion, autoevaluacion FROM evaluaciones
-           WHERE aid=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?''',
-        (aid, materia, jornada, periodo)).fetchone()
+           WHERE aid=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=? AND profesor_id=?''',
+        (aid, materia, jornada, periodo, profesor_id)).fetchone()
     vals = [r['val'] for r in notas_raw] if notas_raw else []
     eval_v   = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
     auto_v   = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None

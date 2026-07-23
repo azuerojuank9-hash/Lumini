@@ -1,9 +1,13 @@
-import os, sys, json
+import json
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
-from flask_app import app, init_db, hash_pw
 import pytest
+
+from flask_app import app, hash_pw, init_db
 
 TEST_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                        'colegios_db', 'testcolegio.db')

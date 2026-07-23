@@ -1,15 +1,34 @@
 from datetime import datetime
+
 from app.repositories.channel_repository import (
-    get_canales_para_rector, get_canales_para_usuario, get_canal, es_miembro,
-    get_mensajes_canal, get_mensajes_nuevos, insertar_mensaje,
-    actualizar_tiene_archivos, actualizar_actividad, marcar_mensajes_leidos,
-    get_mensaje, actualizar_mensaje, soft_delete_mensaje,
-    crear_reaccion, eliminar_reaccion, get_reaccion_existente,
-    get_mensaje_fijado, insertar_fijado, eliminar_fijado, get_mensajes_fijados,
-    get_archivos_biblioteca, get_enlaces_biblioteca, buscar_mensajes,
-    get_miembros_canal, get_total_mensajes, get_actividad_canal,
-    get_lecturas_por_miembro, get_actividad_estados, set_estado_actividad,
+    actualizar_actividad,
+    actualizar_mensaje,
+    buscar_mensajes,
+    crear_reaccion,
+    eliminar_fijado,
+    eliminar_reaccion,
+    es_miembro,
+    get_actividad_canal,
+    get_actividad_estados,
+    get_archivos_biblioteca,
+    get_canales_para_rector,
+    get_canales_para_usuario,
+    get_enlaces_biblioteca,
+    get_lecturas_por_miembro,
+    get_mensaje,
+    get_mensaje_fijado,
+    get_mensajes_canal,
+    get_mensajes_fijados,
+    get_mensajes_nuevos,
+    get_miembros_canal,
+    get_reaccion_existente,
+    get_total_mensajes,
     guardar_enlace,
+    insertar_fijado,
+    insertar_mensaje,
+    marcar_mensajes_leidos,
+    set_estado_actividad,
+    soft_delete_mensaje,
 )
 
 REACCIONES_VALIDAS = ('👍', '✅', '❓', '📌', '❤')
@@ -21,7 +40,7 @@ def list_canales(slug, tipo, uid, conn, fa):
     if tipo == 'rector':
         rector = fa.get_rector(slug)
         return [dict(r) for r in get_canales_para_rector(conn, rector['id'])]
-    return [dict(r) for r in get_canales_para_usuario(conn, tipo, uid, tipo, uid, tipo, uid)]
+    return [dict(r) for r in get_canales_para_usuario(conn, tipo, uid)]
 
 
 def verificar_acceso_canal(conn, cid, tipo, uid):

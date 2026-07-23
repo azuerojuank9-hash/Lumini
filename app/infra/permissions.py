@@ -1,8 +1,10 @@
 from functools import wraps
+
 from flask import redirect, url_for
+
+from app.exceptions import ForbiddenError, ValidationError
 from app.infra.database import conectar
 from app.infra.helpers import get_usuario_actual
-from app.exceptions import ForbiddenError, ValidationError
 
 
 def obtener_roles_usuario(slug, usuario_id):

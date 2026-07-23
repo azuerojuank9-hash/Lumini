@@ -83,5 +83,5 @@ def upsert_asistencia(conn, aid, fecha, estado, observacion, hora, usuario_tipo,
 def verify_student_in_cursos(conn, aid, cursos_prof, jornada):
     placeholders = ','.join('?' * len(cursos_prof))
     return conn.execute(
-        'SELECT id FROM alumnos WHERE id=? AND curso IN ({}) AND jornada=? AND activo=1'.format(placeholders),
+        f'SELECT id FROM alumnos WHERE id=? AND curso IN ({placeholders}) AND jornada=? AND activo=1',
         (aid, *cursos_prof, jornada)).fetchone() is not None

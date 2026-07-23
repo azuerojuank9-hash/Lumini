@@ -8,12 +8,10 @@ Stores signature metadata and hash-based verification.
 """
 
 import hashlib
-import json
 import hmac
 import logging
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any
-from dataclasses import dataclass, asdict
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +26,7 @@ SIGNATURE_TYPES = {
 
 @dataclass
 class DigitalSignature:
-    id: Optional[int]
+    id: int | None
     usuario_tipo: str
     usuario_id: int
     nombre: str
@@ -48,7 +46,7 @@ def _make_document_hash(documento_tipo: str, documento_id: int, contenido: str) 
     return hashlib.sha256(raw.encode('utf-8')).hexdigest()
 
 
-def _make_signature_hash(usuario_tipo: str, usuario_id: int, doc_hash: str, secret: str, timestamp: Optional[str] = None) -> str:
+def _make_signature_hash(usuario_tipo: str, usuario_id: int, doc_hash: str, secret: str, timestamp: str | None = None) -> str:
     """Create an HMAC-SHA256 signature for authenticity."""
     ts = timestamp or datetime.now(timezone.utc).isoformat()
     raw = f'{usuario_tipo}:{usuario_id}:{doc_hash}:{ts}'

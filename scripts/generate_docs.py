@@ -1,5 +1,5 @@
 """Generate architecture and route documentation from source code."""
-import os, ast, inspect, importlib, pkgutil
+import ast
 from pathlib import Path
 
 _BASEDIR = Path(__file__).resolve().parent.parent

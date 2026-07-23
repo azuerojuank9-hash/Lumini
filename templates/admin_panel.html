@@ -280,7 +280,7 @@
                                 <i data-lucide="users"></i> Profesores
                             </button>
                             <div class="menu-divider"></div>
-                            <form method="POST" class="menu-item-form" onsubmit="return confirm('¿Eliminar {{ c.nombre }}?\nEsta acción no se puede deshacer.')">
+                            <form method="POST" class="menu-item-form" onsubmit="return confirm('¿Eliminar {{ c.nombre|replace("'","\\'")|replace('"','\\"') }}? Esta acción no se puede deshacer.')">
                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="accion" value="eliminar_colegio">
                                 <input type="hidden" name="slug" value="{{ c.slug }}">

@@ -1,4 +1,7 @@
-import requests, re, sqlite3, os
+import os
+import sqlite3
+
+import requests
 from bs4 import BeautifulSoup
 
 BASE = r"C:\Users\PC\OneDrive\Documentos\GitHub\Lumini"

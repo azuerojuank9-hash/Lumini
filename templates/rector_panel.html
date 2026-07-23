@@ -73,6 +73,7 @@ html{scroll-behavior:smooth;}
 </div>
 
 <div class="dash-wrap">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 <div class="dash-greeting">
     <div>
         <h1>Bienvenido, {{ rector.nombre }}</h1>
@@ -487,7 +488,6 @@ html{scroll-behavior:smooth;}
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
 var slug = '{{ slug }}';
 // ── Fase 22: AI Assistant ──
 function abrirAIAssistant(){
@@ -899,6 +899,8 @@ function exportarReporteCSV(){
     link.click();
 }
 function showToast(msg){
+    if(window.showToast) window.showToast(msg);
+}
 function escHtml(s){
     if(!s) return '';
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -907,6 +909,5 @@ function escJsStr(s){
     if(!s) return '';
     return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
 }
-</script>
 {% endblock %}
 

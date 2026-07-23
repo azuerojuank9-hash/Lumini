@@ -1,5 +1,6 @@
-import json, hashlib
-from datetime import datetime, date
+import json
+from datetime import datetime
+
 from app.routes import rector_bp
 from app.services.channel_service import nombre_usuario_canal as _nombre_usuario_canal
 
@@ -225,8 +226,8 @@ def rector_asistencia_data(slug):
     try:
         curso = fa.request.args.get('curso', '')
         jornada = fa.request.args.get('jornada', '')
-        materia = fa.request.args.get('materia', '')
-        profesor_id = fa.request.args.get('profesor_id', type=int)
+        fa.request.args.get('materia', '')
+        fa.request.args.get('profesor_id', type=int)
         fecha = fa.request.args.get('fecha', datetime.today().strftime('%Y-%m-%d'))
         try:
             datetime.strptime(fecha, '%Y-%m-%d')
@@ -765,12 +766,12 @@ def rector_canales(slug):
 @rector_bp.route('/<slug>/rector/canales/crear', methods=['POST'])
 def rector_canales_crear(slug):
     fa = _fa()
-    if not fa.validar_csrf():
-        return fa.jsonify({'ok': False, 'error': 'Error CSRF'}), 403
     fa.require_colegio(slug)
     rector = fa.get_rector(slug)
     if not rector:
         return fa.jsonify({'ok': False, 'error': 'No autorizado'})
+    if not fa.validar_csrf():
+        return fa.jsonify({'ok': False, 'error': 'Error CSRF'}), 403
     tipo = fa.request.form.get('tipo')
     nombre = fa.request.form.get('nombre', '').strip()
     curso = fa.request.form.get('curso', '')
@@ -1018,21 +1019,25 @@ def rector_expediente(slug):
 @rector_bp.route('/<slug>/rector/observador')
 def rector_observador(slug):
     fa = _fa()
-    conn = fa.conectar(slug)
+    fa.require_colegio(slug)
+    rector = fa.get_rector(slug)
+    if not rector:
+        return fa.redirect(fa.url_for('auth.login', slug=slug))
     colegio = fa.get_colegio(slug)
-    rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
-    notif_count = fa.notificaciones_no_leidas(slug, 'rector', 0)
+    notif_count = fa.notificaciones_no_leidas(slug, 'rector', rector['id'])
     return fa.render_template('rector/observador.html', slug=slug, colegio=colegio, rector=rector, notif_count=notif_count)
 
 
 @rector_bp.route('/<slug>/rector/certificados')
 def rector_certificados(slug):
     fa = _fa()
-    conn = fa.conectar(slug)
+    fa.require_colegio(slug)
+    rector = fa.get_rector(slug)
+    if not rector:
+        return fa.redirect(fa.url_for('auth.login', slug=slug))
     colegio = fa.get_colegio(slug)
-    rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
-    notif_count = fa.notificaciones_no_leidas(slug, 'rector', 0)
-    cursos_raw = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
+    notif_count = fa.notificaciones_no_leidas(slug, 'rector', rector['id'])
+    cursos_raw = fa.conectar(slug).execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
     cursos = [r['curso'] for r in cursos_raw]
     return fa.render_template('rector/certificados.html', slug=slug, colegio=colegio, rector=rector, cursos=cursos, notif_count=notif_count)
 
@@ -1040,26 +1045,34 @@ def rector_certificados(slug):
 @rector_bp.route('/<slug>/rector/calendario')
 def rector_calendario(slug):
     fa = _fa()
-    conn = fa.conectar(slug)
+    fa.require_colegio(slug)
+    rector = fa.get_rector(slug)
+    if not rector:
+        return fa.redirect(fa.url_for('auth.login', slug=slug))
     colegio = fa.get_colegio(slug)
-    rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
-    notif_count = fa.notificaciones_no_leidas(slug, 'rector', 0)
+    notif_count = fa.notificaciones_no_leidas(slug, 'rector', rector['id'])
     return fa.render_template('rector/calendario.html', slug=slug, colegio=colegio, rector=rector, notif_count=notif_count)
 
 
 @rector_bp.route('/<slug>/rector/mensajes')
 def rector_mensajes(slug):
     fa = _fa()
-    conn = fa.conectar(slug)
+    fa.require_colegio(slug)
+    rector = fa.get_rector(slug)
+    if not rector:
+        return fa.redirect(fa.url_for('auth.login', slug=slug))
     colegio = fa.get_colegio(slug)
-    rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
-    notif_count = fa.notificaciones_no_leidas(slug, 'rector', 0)
+    notif_count = fa.notificaciones_no_leidas(slug, 'rector', rector['id'])
     return fa.render_template('rector/mensajes.html', slug=slug, colegio=colegio, rector=rector, notif_count=notif_count)
 
 
 @rector_bp.route('/<slug>/api/rector/estudiantes')
 def api_rector_estudiantes(slug):
     fa = _fa()
+    fa.require_colegio(slug)
+    rector = fa.get_rector(slug)
+    if not rector:
+        return fa.jsonify({'ok': False, 'error': 'No autorizado'}), 401
     conn = fa.conectar(slug)
     q = fa.request.args.get('q', '').strip()
     curso = fa.request.args.get('curso', '').strip()
@@ -1075,6 +1088,10 @@ def api_rector_estudiantes(slug):
 @rector_bp.route('/<slug>/api/rector/observador/<int:aid>', methods=['GET', 'POST'])
 def api_rector_observador(slug, aid):
     fa = _fa()
+    fa.require_colegio(slug)
+    rector = fa.get_rector(slug)
+    if not rector:
+        return fa.jsonify({'ok': False, 'error': 'No autorizado'}), 401
     conn = fa.conectar(slug)
     if fa.request.method == 'POST':
         if not fa.validar_csrf():

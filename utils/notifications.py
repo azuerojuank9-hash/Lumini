@@ -7,8 +7,7 @@ Current implementation is a scaffold: validates payloads and logs.
 
 import json
 import logging
-from dataclasses import dataclass, asdict
-from typing import Optional
+from dataclasses import asdict, dataclass
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +19,8 @@ class PushNotification:
     icon: str = "/static/icons/icon-192x192.png"
     badge: str = "/static/icons/icon-72x72.png"
     tag: str = ""
-    data: Optional[dict] = None
-    url: Optional[str] = None
+    data: dict | None = None
+    url: str | None = None
 
 
 def send_notification(subscription: dict, notification: PushNotification) -> bool:
@@ -55,7 +54,7 @@ def send_notification_to_user(
     user_id: int,
     title: str,
     body: str,
-    url: Optional[str] = None,
+    url: str | None = None,
 ) -> bool:
     """
     Send a notification to a specific user.
@@ -84,7 +83,7 @@ def broadcast_to_school(
     slug: str,
     title: str,
     body: str,
-    url: Optional[str] = None,
+    url: str | None = None,
 ) -> bool:
     """
     Send a notification to all users in a school with active subscriptions.

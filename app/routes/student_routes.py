@@ -1,8 +1,12 @@
-from flask import render_template, request, redirect, url_for, session
+from flask import redirect, render_template, request, session, url_for
+
 from app.routes import student_bp
 from app.services.student_service import (
-    get_estudiante_context, get_notas_context, get_asistencia_context,
-    get_observaciones_context, get_horario_context,
+    get_asistencia_context,
+    get_estudiante_context,
+    get_horario_context,
+    get_notas_context,
+    get_observaciones_context,
 )
 
 

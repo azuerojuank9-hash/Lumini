@@ -172,14 +172,14 @@
               <button class="actions-trigger" onclick="toggleActionsMenu(this)" aria-label="Más acciones" title="Más acciones"><i data-lucide="more-vertical"></i></button>
               <div class="actions-menu">
                 {% if not rec.es_principal %}
-                <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/eliminar" onsubmit="return confirm('¿Eliminar permanentemente a {{ rec.nombre }}?');">
+                <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/eliminar" onsubmit="return confirm('¿Eliminar permanentemente a {{ rec.nombre|replace("'","\\'")|replace('"','\\"') }}?');">
                   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                   <button class="menu-item danger"><i data-lucide="trash-2"></i> Eliminar rector</button>
                 </form>
                 {% endif %}
                 {% if rec.activo and not rec.es_principal %}
                 <div class="menu-divider"></div>
-                <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/hacer-principal" onsubmit="return confirm('¿Transferir el rol de Rector Principal a {{ rec.nombre }}? Tú perderás el acceso administrativo.');">
+                <form method="POST" action="/{{ slug }}/rector/gestion-rectores/{{ rec.id }}/hacer-principal" onsubmit="return confirm('¿Transferir el rol de Rector Principal a {{ rec.nombre|replace("'","\\'")|replace('"','\\"') }}? Tú perderás el acceso administrativo.');">
                   <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                   <button class="menu-item"><i data-lucide="crown"></i> Hacer principal</button>
                 </form>

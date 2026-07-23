@@ -1,4 +1,5 @@
 from flask import jsonify, session
+
 from app.routes import parent_bp
 from app.services.parent_service import ParentService
 

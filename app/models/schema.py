@@ -4,9 +4,9 @@ During Phase 1, this module re-exports from flask_app.py.
 Over time, functions will be migrated here directly.
 """
 
-import os, sys
-import sqlite3
 import logging
+import os
+import sqlite3
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 _basedir = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 DB_FOLDER = os.path.join(_basedir, 'colegios_db')
 MASTER_DB = os.path.join(_basedir, 'master.db')
-SCHEMA_VERSION = 20
+SCHEMA_VERSION = 21
 
 
 def db_path(slug):

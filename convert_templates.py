@@ -1,5 +1,6 @@
 """Convert standalone templates to extend base.html"""
-import re, os
+import os
+import re
 
 TEMPLATES_DIR = r"C:\Users\PC\OneDrive\Documentos\GitHub\Lumini\templates"
 SKIP_FILES = {"base.html", "components.html", "rector_panel.html"}
@@ -14,7 +15,7 @@ NO_SIDEBAR = {
 
 def get_end(filepath):
     """Read end of file to handle closing divs and scripts"""
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         content = f.read()
     # Find the last few closing divs before <script> tags
     # Pattern: we need to identify what's the .main closing div
@@ -24,7 +25,7 @@ def convert_template(filepath):
     basename = os.path.basename(filepath)
     print(f"Converting {basename}...")
 
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         content = f.read()
 
     original = content
@@ -41,7 +42,6 @@ def convert_template(filepath):
         # Remove the base variables (root and [data-theme]) that base.html provides
         css_lines = css.split("\n")
         filtered = []
-        in_var_block = False
         for line in css_lines:
             stripped = line.strip()
             if stripped.startswith(":root{--bg:") or stripped == ":root{--bg:#080B14;--bg2:#0F172A;--bg3:#1E293B;--bg4:#334155;--border:rgba(255,255,255,.06);{{ accent_css(colegio) }}--blue:#2563EB;--text:#F8FAFC;--muted:#94A3B8;--sub:#64748B;--green:#22C55E;--red:#EF4444;--rsm:6px;--rmd:10px;--rlg:14px;--tr:.2s cubic-bezier(.4,0,.2,1);--sidebar:210px;}":
@@ -124,7 +124,7 @@ def convert_template(filepath):
     # Extract sidebar nav (between <nav class="sidebar" and </nav>)
     if has_sidebar:
         sidebar_match = re.search(
-            r'(<nav class="sidebar"[^>]*>.*?</nav>)', 
+            r'(<nav class="sidebar"[^>]*>.*?</nav>)',
             content, re.DOTALL
         )
         if sidebar_match:
@@ -219,7 +219,7 @@ def convert_template(filepath):
             f.write(new_content)
         print(f"  Converted ({len(new_content)} chars, was {len(original)})")
     else:
-        print(f"  Skipped (no changes)")
+        print("  Skipped (no changes)")
 
 
 for fname in sorted(os.listdir(TEMPLATES_DIR)):

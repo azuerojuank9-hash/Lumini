@@ -59,6 +59,7 @@
 .alert-item .alert-icon{width:20px;height:20px;flex-shrink:0;margin-top:1px;}
 .obs-input{font-family:inherit;font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg3);color:var(--text);width:100%;max-width:180px;}
 .obs-input:focus{outline:none;border-color:var(--accent);}
+@media(max-width:768px){
   .sidebar{transform:translateX(-100%);position:fixed;z-index:100;}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;padding:16px;}
@@ -83,7 +84,7 @@
     <div class="breadcrumb">{{ materia }} · {{ jornada }} · {{ profesor.nombre }}</div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;">
-    <a href="#" onclick="exportarExcel();return false;" class="btn btn-secondary btn-sm"><i data-lucide="file-spreadsheet"></i> Excel</a>
+    <button type="button" onclick="exportarExcel()" class="btn btn-secondary btn-sm"><i data-lucide="file-spreadsheet"></i> Excel</button>
   </div>
 </div>
 
@@ -188,9 +189,7 @@
 <input type="hidden" id="slug" value="{{ slug }}">
 <input type="hidden" id="hoyHora" value="{{ hoy_hora }}">
 
-</div>
-
-<div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado
+<div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado</div>
 {% endblock %}
 {% block extra_scripts %}
 function exportarExcel(){

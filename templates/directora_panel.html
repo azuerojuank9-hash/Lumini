@@ -378,7 +378,7 @@
 
                         <a href="{{ url_for('directora_boletin_pdf', slug=slug, periodo=periodo, aid=fila.id) }}" title="Descargar PDF" class="btn btn-sm btn-soft"><i data-lucide="file-text"></i></a>
 
-                        <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre }}')" title="Enviar boletín" class="btn btn-sm btn-soft" style="color:var(--success);" aria-label="Enviar boletín"><i data-lucide="send" style="width:14px;height:14px;"></i></button>
+                        <button onclick="enviarCorreoUno({{ fila.id }}, '{{ fila.nombre|replace("'","\\'")|replace('"','\\"') }}')" title="Enviar boletín" class="btn btn-sm btn-soft" style="color:var(--success);" aria-label="Enviar boletín"><i data-lucide="send" style="width:14px;height:14px;"></i></button>
 
                     </td>
 

@@ -1,4 +1,6 @@
-import sqlite3, os, hashlib, bcrypt
+import os
+import sqlite3
+
 base = r"C:\Users\PC\OneDrive\Documentos\GitHub\Lumini"
 tdb = os.path.join(base, 'colegios_db', 'testcolegio.db')
 print(f'DB exists: {os.path.exists(tdb)}, size: {os.path.getsize(tdb) if os.path.exists(tdb) else 0}')

@@ -34,6 +34,5 @@ class ParentService:
 
     @staticmethod
     def get_comunicados(conn, padre_id):
-        ParentRepository.get_hijo_ids(conn, padre_id)
         rows = ParentRepository.get_comunicados_publicos(conn)
         return [dict(r) for r in rows]

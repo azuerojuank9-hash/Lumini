@@ -4,9 +4,7 @@ var OFFLINE_URL = '/offline';
 
 var urlsToCache = [
   '/static/manifest.json',
-  '/static/css/lumini.css',
   '/static/css/sidebar.css',
-  '/static/js/lumini.js',
   '/static/js/pwa.js',
   '/offline',
   '/static/icons/icon-192x192.png',

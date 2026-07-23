@@ -25,7 +25,7 @@ def edit_observation(conn, id_o, materia, texto):
 
 
 def delete_observation(conn, id_o, materia):
-    from app.repositories.observation_repository import get_observation_by_id, delete_observation
+    from app.repositories.observation_repository import delete_observation, get_observation_by_id
     obs = get_observation_by_id(conn, id_o)
     if obs and obs['materia'] == materia:
         delete_observation(conn, id_o)

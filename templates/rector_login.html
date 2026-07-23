@@ -255,7 +255,7 @@ function recCambiar(){
  if(nueva!==conf){e2.textContent='Las contraseñas no coinciden';return}
  var u=document.getElementById('rec-usuario').value;
  fetch(window.location.pathname.replace('/login','')+'/recuperar_cambiar',{
-  method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token() }}'},
+  method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':'{{ csrf_token() }}'},
   body:JSON.stringify({usuario:u,respuesta:respuesta,nueva_password:nueva})
  }).then(r=>r.json()).then(d=>{
   if(d.error){e2.textContent=d.error;return}

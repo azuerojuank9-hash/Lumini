@@ -39,7 +39,7 @@
 </style>
 {% endblock %}
 {% block sidebar %}
-{% include "rector_panel.html" %}
+{% include "components/sidebar_rector.html" %}
 {% endblock %}
 {% block content %}
 <div class="topbar">
@@ -112,11 +112,13 @@ function buscarEstudiante() {
       var html = '';
       data.data.forEach(function(e) {
         html += '<div onclick="seleccionarEstudiante(' + e.id + ',\'' + e.nombre.replace(/'/g, "\\'") + '\')" style="padding:8px 12px;cursor:pointer;border-radius:var(--radius-sm);background:var(--bg3);margin-bottom:4px;font-size:13px;">' +
-          '<strong>' + e.nombre + '</strong> <span style="color:var(--muted);">' + e.curso + '</span></div>';
+          '<strong>' + escH(e.nombre) + '</strong> <span style="color:var(--muted);">' + escH(e.curso) + '</span></div>';
       });
       container.innerHTML = html;
     });
 }
+
+function escH(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s));return d.innerHTML;}
 
 function seleccionarEstudiante(aid, nombre) {
   selectedAid = aid;
@@ -139,8 +141,8 @@ function cargarHistorial(aid) {
           html += '<div class="obs-entry" data-tipo="' + r.tipo + '">' +
             '<div class="bar"><span class="tag ' + tagClass + '">' + r.tipo_label + '</span>' +
             '<span class="badge-estado badge-' + r.estado + '">' + r.estado + '</span></div>' +
-            '<div class="texto">' + r.texto + '</div>' +
-            '<div class="meta">' + (r.docente || '—') + ' · ' + r.fecha + '</div>' +
+            '<div class="texto">' + escH(r.texto) + '</div>' +
+            '<div class="meta">' + escH(r.docente || '—') + ' · ' + escH(r.fecha) + '</div>' +
             '</div>';
         });
       }

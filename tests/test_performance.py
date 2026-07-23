@@ -1,8 +1,9 @@
 """Performance measurement tests for LUMINI Phase 11 optimization.
 Verifies indexes, caching, and batch functions work correctly."""
+
 import pytest
-from unittest.mock import patch
-from flask_app import app, conectar, init_db, _cache_invalidate
+
+from flask_app import _cache_invalidate, app, conectar, init_db
 
 
 @pytest.fixture
@@ -105,7 +106,6 @@ def test_dashboard_profesor_data_structure(client):
 
 def test_archivados_no_n_plus_1_structure(client):
     """Archivados should build correct teacher data structure."""
-    from flask_app import _enriquecer_mensajes_batch
     with app.app_context():
         conn = conectar('test-school')
         raw = conn.execute('SELECT * FROM profesores WHERE activo=1').fetchall()

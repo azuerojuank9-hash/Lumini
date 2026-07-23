@@ -2,7 +2,11 @@
 Usage: python seed_rector.py <slug> <nombre> <usuario> <password>
 If the database doesn't exist, it will be created with all required tables.
 """
-import sys, os, hashlib, secrets, sqlite3
+import hashlib
+import os
+import secrets
+import sqlite3
+import sys
 
 DB_FOLDER = os.path.join(os.path.dirname(__file__), 'colegios_db')
 

@@ -1,7 +1,12 @@
 import logging
+
 from app.repositories.template_repository import (
-    get_templates, create_template, get_template_by_id, delete_template,
-    get_max_orden, insert_actividad_desde_plantilla
+    create_template,
+    delete_template,
+    get_max_orden,
+    get_template_by_id,
+    get_templates,
+    insert_actividad_desde_plantilla,
 )
 
 logger = logging.getLogger(__name__)

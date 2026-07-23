@@ -6,9 +6,7 @@ All methods log predictions without calling external APIs yet.
 """
 
 import logging
-import json
-from typing import Optional, List, Dict, Any
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
@@ -21,8 +19,8 @@ class RiskPrediction:
     curso: str
     riesgo: str  # 'bajo' | 'medio' | 'alto'
     puntaje: float
-    factores: List[str]
-    recomendaciones: List[str]
+    factores: list[str]
+    recomendaciones: list[str]
     fecha: str
 
 
@@ -92,7 +90,7 @@ class AIService:
             fecha=datetime.now(timezone.utc).isoformat(),
         )
 
-    def batch_risk_analysis(self, curso: Optional[str] = None) -> List[RiskPrediction]:
+    def batch_risk_analysis(self, curso: str | None = None) -> list[RiskPrediction]:
         """Analyze risk for all students, optionally filtered by course."""
         query = 'SELECT id FROM alumnos WHERE activo=1'
         params = []
@@ -132,7 +130,7 @@ class AIService:
             return (f'El estudiante {nombre} del curso {curso} mantiene un desempeño '
                     f'académico regular (promedio: {prom_str}). Continuar con seguimiento.')
 
-    def recommend_courses(self, estudiante_id: int) -> List[AcademicRecommendation]:
+    def recommend_courses(self, estudiante_id: int) -> list[AcademicRecommendation]:
         """Recommend focus areas based on grade patterns."""
         rows = self.conn.execute('''
             SELECT ac.materia, AVG(n.val) as avg_val
@@ -153,7 +151,7 @@ class AIService:
                 ))
         return recs
 
-    def _calc_promedio(self, estudiante_id: int) -> Optional[float]:
+    def _calc_promedio(self, estudiante_id: int) -> float | None:
         from flask_app import _promedio_simple
         notas = self.conn.execute('''
             SELECT n.val FROM notas n

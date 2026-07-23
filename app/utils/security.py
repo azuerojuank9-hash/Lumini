@@ -1,9 +1,13 @@
 """Security utilities — password hashing, CSRF, file validation."""
 
 import hashlib
+import logging
 import secrets
+
+logger = logging.getLogger(__name__)
+
 import bcrypt
-from flask import session, request
+from flask import request, session
 
 
 def hash_pw(pw, _sal=None):
@@ -51,4 +55,5 @@ def validar_imagen(ruta):
         img.verify()
         return True
     except Exception:
+        logger.debug('validar_imagen: imagen inválida %s', ruta)
         return False

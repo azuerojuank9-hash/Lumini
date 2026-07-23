@@ -1,5 +1,6 @@
 from collections import Counter
-from app.infra.database import config_get, get_colegio
+
+from app.infra.database import config_get
 from app.infra.grades import _promedio_ponderado
 
 
@@ -117,17 +118,22 @@ def _dashboard_profesor_data(conn, slug, prof, curso=None, materia=None, jornada
     nota_min = min(finals) if finals else None
     dist = {'0-1': 0, '1-2': 0, '2-3': 0, '3-4': 0, '4-5': 0}
     all_vals = conn.execute(
-        f'''SELECT n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+        '''SELECT n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
             WHERE ac.profesor_id=? AND ac.materia=? AND ac.jornada=?
             AND (? IS NULL OR ac.curso=?) AND (? IS NULL OR ac.periodo=?)''',
         (prof['id'], m, j, curso, curso, periodo, periodo)).fetchall()
     for r in all_vals:
         v = r['val']
-        if v < 1: dist['0-1'] += 1
-        elif v < 2: dist['1-2'] += 1
-        elif v < 3: dist['2-3'] += 1
-        elif v < 4: dist['3-4'] += 1
-        else: dist['4-5'] += 1
+        if v < 1:
+            dist['0-1'] += 1
+        elif v < 2:
+            dist['1-2'] += 1
+        elif v < 3:
+            dist['2-3'] += 1
+        elif v < 4:
+            dist['3-4'] += 1
+        else:
+            dist['4-5'] += 1
     distribucion = [{'label': k, 'count': v} for k, v in dist.items()]
     _batch_aids = aids or []
     if _batch_aids:
@@ -153,11 +159,13 @@ def _dashboard_profesor_data(conn, slug, prof, curso=None, materia=None, jornada
     for c in cursos_q:
         cur_finals = []
         for a in all_alumnos:
-            if a['curso'] != c: continue
+            if a['curso'] != c:
+                continue
             v = notas_by_aid_c.get(a['id'], [])
             e = ev_by_aid_c.get(a['id'])
             ff = _promedio_ponderado(v, e, None)
-            if ff is not None: cur_finals.append(ff)
+            if ff is not None:
+                cur_finals.append(ff)
         prom_curso.append({'curso': c, 'promedio': round(sum(cur_finals) / len(cur_finals), 2) if cur_finals else None, 'count': len(cur_finals)})
     prom_materia = [{'materia': m, 'promedio': round(sum(finals) / len(finals), 2) if finals else None, 'count': len(finals)}]
     notas_by_aid_p = {}
@@ -173,7 +181,8 @@ def _dashboard_profesor_data(conn, slug, prof, curso=None, materia=None, jornada
             vals_p = notas_by_aid_p.get((a['id'], p), [])
             ev_p = ev_by_aid_p.get((a['id'], p))
             ff = _promedio_ponderado(vals_p, ev_p, None)
-            if ff is not None: finals_p.append(ff)
+            if ff is not None:
+                finals_p.append(ff)
         evol.append({'periodo': p, 'promedio': round(sum(finals_p) / len(finals_p), 2) if finals_p else None, 'count': len(finals_p)})
     acts = conn.execute(
         'SELECT id, nombre FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND (? IS NULL OR curso=?) AND (? IS NULL OR periodo=?) ORDER BY orden',
@@ -254,7 +263,6 @@ def _dashboard_rector_data(conn, slug, rector):
     ).fetchall()
     alumno_map = {a['id']: a for a in alumnos}
     profes = conn.execute('SELECT id, nombre FROM profesores WHERE activo=1').fetchall()
-    prof_map = {p['id']: p for p in profes}
     asignaciones = conn.execute(
         'SELECT profesor_id, materia, jornada FROM asignaciones_materia'
     ).fetchall()
@@ -329,11 +337,16 @@ def _dashboard_rector_data(conn, slug, rector):
     dist = {'0-1': 0, '1-2': 0, '2-3': 0, '3-4': 0, '4-5': 0}
     for row in conn.execute('SELECT val FROM notas').fetchall():
         v = row['val']
-        if v < 1: dist['0-1'] += 1
-        elif v < 2: dist['1-2'] += 1
-        elif v < 3: dist['2-3'] += 1
-        elif v < 4: dist['3-4'] += 1
-        else: dist['4-5'] += 1
+        if v < 1:
+            dist['0-1'] += 1
+        elif v < 2:
+            dist['1-2'] += 1
+        elif v < 3:
+            dist['2-3'] += 1
+        elif v < 4:
+            dist['3-4'] += 1
+        else:
+            dist['4-5'] += 1
     top_docentes = sorted(prof_avgs.items(), key=lambda x: x[1], reverse=True)[:10]
     bajo_list = []
     for aid, avg in sorted(student_overall.items(), key=lambda x: x[1]):

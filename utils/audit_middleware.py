@@ -12,9 +12,7 @@ Does NOT use Flask before_request hooks to avoid breaking existing behavior.
 
 import json
 import logging
-from datetime import datetime
-from typing import Optional, Dict, Any
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
@@ -37,10 +35,10 @@ class AuditEntry:
     accion: str
     categoria: str
     descripcion: str
-    tabla: Optional[str] = None
-    registro_id: Optional[int] = None
-    valor_anterior: Optional[Dict] = None
-    valor_nuevo: Optional[Dict] = None
+    tabla: str | None = None
+    registro_id: int | None = None
+    valor_anterior: dict | None = None
+    valor_nuevo: dict | None = None
     ip: str = ''
     user_agent: str = ''
     dispositivo: str = ''
@@ -78,10 +76,10 @@ def log_action(
     usuario_tipo: str,
     accion: str,
     descripcion: str,
-    tabla: Optional[str] = None,
-    registro_id: Optional[int] = None,
-    valor_anterior: Optional[Dict] = None,
-    valor_nuevo: Optional[Dict] = None,
+    tabla: str | None = None,
+    registro_id: int | None = None,
+    valor_anterior: dict | None = None,
+    valor_nuevo: dict | None = None,
     ip: str = '',
     user_agent: str = '',
     nivel: str = 'info',
@@ -126,11 +124,11 @@ def log_action(
 
 def query_audit_log(
     conn, slug: str,
-    usuario_id: Optional[int] = None,
-    categoria: Optional[str] = None,
-    accion: Optional[str] = None,
-    desde: Optional[str] = None,
-    hasta: Optional[str] = None,
+    usuario_id: int | None = None,
+    categoria: str | None = None,
+    accion: str | None = None,
+    desde: str | None = None,
+    hasta: str | None = None,
     page: int = 1,
     per_page: int = 50,
 ) -> dict:

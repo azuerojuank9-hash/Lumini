@@ -1,8 +1,10 @@
-import os, sys, sqlite3, json
+import os
+import sqlite3
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ['FLASK_ENV'] = 'development'
 os.environ['ENV'] = 'development'
-from flask_app import app
 import pytest
 
 TEST_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -80,7 +82,7 @@ def test_document_integrity_no_sig(conn):
     assert verify_document_integrity(conn, 'inexistente', 999, 'nada') is False
 
 def test_get_signatures_for_document(conn):
-    from services.signatures import sign_document, get_signatures_for_document
+    from services.signatures import get_signatures_for_document, sign_document
     conn.execute("DELETE FROM firmas_digitales WHERE documento_tipo='oficio' AND documento_id=400")
     conn.commit()
     sign_document(conn, 'testcolegio', 'rector', 1, 'Rector A',

@@ -1,7 +1,8 @@
 import csv
 import io
 import logging
-from app.repositories.migration_repository import insert_alumno, insert_actividad_migrada
+
+from app.repositories.migration_repository import insert_actividad_migrada, insert_alumno
 
 logger = logging.getLogger(__name__)
 

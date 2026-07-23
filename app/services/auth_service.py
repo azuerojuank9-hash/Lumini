@@ -1,8 +1,11 @@
 """Authentication service — login, logout, password recovery, brute-force."""
 
-import secrets
 import logging
-from app.infra.session import clear as session_clear, set_permanent, set as session_set
+import secrets
+
+from app.infra.session import clear as session_clear
+from app.infra.session import set as session_set
+from app.infra.session import set_permanent
 
 logger = logging.getLogger(__name__)
 
@@ -53,25 +56,42 @@ def login_admin(password, admin_password, ip, limpiar_intentos_fn, registrar_fal
     return False, f'Contraseña incorrecta. Intentos restantes: {restantes}'
 
 
-def admin_logout():
-    from flask import session
-    session.pop('admin_auth', None)
-
-
-def login_estudiante(slug, codigo, password, alumno, verificar_pw, necesita_rehash, hash_pw):
+def login_estudiante(slug, codigo, password, alumno, verificar_pw=None, necesita_rehash=None, hash_pw=None):
     if not alumno:
         return None, 'Código de estudiante no encontrado.'
     if not alumno['activo']:
         return None, 'El estudiante no está activo.'
-    if not verificar_pw(password, alumno['password']):
-        return None, 'Contraseña incorrecta.'
-    if necesita_rehash(alumno['password']):
-        from app.repositories.user_repository import update_alumno_password
-        update_alumno_password(slug, alumno['id'], hash_pw(password))
+    if alumno['pin'] and password != alumno['pin']:
+        return None, 'PIN incorrecto.'
     session_clear()
     set_permanent(True)
     session_set(f'alumno_id_{slug}', alumno['id'])
     return 'estudiante', None
+
+
+def parent_portal_login(slug, email, pin, get_parent_fn, get_children_fn):
+    parent = get_parent_fn(slug, email, pin)
+    if not parent:
+        return None, 'Credenciales incorrectas.'
+    session_clear()
+    set_permanent(True)
+    session_set(f'padre_id_{slug}', parent['id'])
+    children = get_children_fn(slug, parent['id'])
+    return {'padre': dict(parent), 'hijos': [dict(c) for c in children]}, None
+
+
+def validate_password_change(actual, nueva, confirmar, prof, verificar_pw):
+    if not actual or not nueva or not confirmar:
+        return 'Todos los campos son obligatorios.'
+    if not verificar_pw(actual, prof['password']):
+        return 'La contraseña actual es incorrecta.'
+    if len(nueva) < 6:
+        return 'La nueva contraseña debe tener al menos 6 caracteres.'
+    if nueva != confirmar:
+        return 'Las contraseñas nuevas no coinciden.'
+    if actual == nueva:
+        return 'La nueva contraseña debe ser diferente a la actual.'
+    return None
 
 
 def recuperar_password(slug, usuario, tipo, preguntas, respuestas, get_prof, get_dir, get_rec, hash_pw_fn):

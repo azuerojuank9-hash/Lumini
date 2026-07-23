@@ -5,17 +5,35 @@ This file only creates the Flask app, registers blueprints,
 and re-exports symbols for test compatibility.
 """
 
-import os, sys, json, threading
+import json
+import os
+import threading
+
 from dotenv import load_dotenv
 
 _basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(_basedir, '.env'))
 
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, send_file, abort, jsonify, g, Response, current_app
 from datetime import timedelta
 
-from config import settings
+from flask import (  # noqa: F401
+    Flask,
+    Response,
+    abort,
+    current_app,
+    g,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    send_from_directory,
+    session,
+    url_for,
+)
+
 from app.logging import get_logger
+from config import settings
 
 app = Flask(__name__)
 ENV = settings.ENV
@@ -55,37 +73,123 @@ def parse_json_filter(val):
     except Exception: return {}
 
 from app.infra.security import generar_csrf
+
 app.jinja_env.globals['csrf_token'] = generar_csrf
 
 # ── Re-export all infra symbols so imports like `from flask_app import conectar` still work ──
-from app.infra.config import (DB_FOLDER, MASTER_DB, LOGO_FOLDER, ADMIN_PASSWORD,
-    SENDGRID_API_KEY, EMAIL_ORIGEN, JORNADAS, MATERIAS, PREGUNTAS_SECRETAS, SCHEMA_VERSION)
-from app.infra.security import (login_intentos, generar_csrf, validar_csrf, extension_permitida,
-    validar_imagen, ip_bloqueada, registrar_fallo, _purgar_intentos_antiguos,
-    limpiar_intentos, hash_pw, verificar_pw, necesita_rehash)
-from app.infra.database import (_cache, _cache_lock, _CACHE_TTL, _cache_get, _cache_set,
-    _cache_invalidate, conectar_master, db_path, conectar, _recrear_si_unique_incorrecto,
-    _ejecutar_migraciones, _migrar_v6, _migrar_v7, _migrar_v8, _migrar_v9, _migrar_v10,
-    _migrar_v11, _migrar_v12, _migrar_v13, _migrar_v14, _migrar_v15, _migrar_v16,
-    _migrar_v17, _migrar_v18, _migrar_v19, _migrar_v20, MIGRACIONES, get_codigo_registro,
-    get_colegio, config_get, init_master_db, migrar_db, init_db)
-from app.infra.helpers import (get_profesor, get_directora, get_rector, get_usuario_actual,
-    require_colegio, get_sesion_jornada_materia, get_materias_profesor, get_cursos_profesor,
-    get_cursos_cache, get_materias_cache, get_jornadas_cache)
-from app.infra.permissions import (obtener_roles_usuario, PERMISOS_POR_CODIGO, NIVELES_ROL,
-    _permisos_para_rol, tiene_permiso, requiere_permiso)
-from app.infra.grades import (_promedio_simple, _promedio_ponderado, calcular_stats_estudiante,
-    calcular_nota_final_estudiante, calcular_stats_curso)
-from app.infra.audit import (periodo_cerrado, audit_log, auditar_nota)
-from app.infra.dashboard import (_estadisticas_desc, _dashboard_student_grades,
-    _dashboard_profesor_data, _dashboard_rector_data)
-from app.infra.attendance import (ESTADOS_ASISTENCIA, COLORES_ASISTENCIA, _asistencia_stats,
-    _asistencia_alertas)
-from app.infra.notifications import (crear_notificacion, notificaciones_no_leidas,
-    generar_destinatarios, comunicaciones_pendientes)
-from app.infra.pdf import generar_pdf_alumno
-from app.infra.mail import enviar_correo
-from app.infra.excel import _excel_armar_wb
+from app.infra.attendance import (  # noqa: F401
+    COLORES_ASISTENCIA,
+    ESTADOS_ASISTENCIA,
+    _asistencia_alertas,
+    _asistencia_stats,
+)
+from app.infra.audit import audit_log, auditar_nota, periodo_cerrado  # noqa: F401
+from app.infra.config import (  # noqa: F401
+    ADMIN_PASSWORD,
+    DB_FOLDER,
+    EMAIL_ORIGEN,
+    JORNADAS,
+    LOGO_FOLDER,
+    MASTER_DB,
+    MATERIAS,
+    PREGUNTAS_SECRETAS,
+    SCHEMA_VERSION,
+    SENDGRID_API_KEY,
+)
+from app.infra.dashboard import (  # noqa: F401
+    _dashboard_profesor_data,
+    _dashboard_rector_data,
+    _dashboard_student_grades,
+    _estadisticas_desc,
+)
+from app.infra.database import (  # noqa: F401
+    _CACHE_TTL,
+    MIGRACIONES,
+    _cache,
+    _cache_get,
+    _cache_invalidate,
+    _cache_lock,
+    _cache_set,
+    _ejecutar_migraciones,
+    _migrar_v6,
+    _migrar_v7,
+    _migrar_v8,
+    _migrar_v9,
+    _migrar_v10,
+    _migrar_v11,
+    _migrar_v12,
+    _migrar_v13,
+    _migrar_v14,
+    _migrar_v15,
+    _migrar_v16,
+    _migrar_v17,
+    _migrar_v18,
+    _migrar_v19,
+    _migrar_v20,
+    _recrear_si_unique_incorrecto,
+    conectar,
+    conectar_master,
+    config_get,
+    db_path,
+    get_codigo_registro,
+    get_colegio,
+    init_db,
+    init_master_db,
+    migrar_db,
+)
+from app.infra.excel import _excel_armar_wb  # noqa: F401
+from app.infra.grades import (  # noqa: F401
+    _promedio_ponderado,
+    _promedio_simple,
+    calcular_nota_final_estudiante,
+    calcular_stats_curso,
+    calcular_stats_estudiante,
+)
+from app.infra.helpers import (  # noqa: F401
+    get_cursos_cache,
+    get_cursos_profesor,
+    get_directora,
+    get_jornadas_cache,
+    get_materias_cache,
+    get_materias_profesor,
+    get_profesor,
+    get_rector,
+    get_sesion_jornada_materia,
+    get_usuario_actual,
+    require_colegio,
+    require_rector_principal,
+)
+from app.infra.mail import enviar_correo  # noqa: F401
+from app.infra.notifications import (  # noqa: F401
+    comunicaciones_pendientes,
+    crear_notificacion,
+    generar_destinatarios,
+    notificaciones_no_leidas,
+)
+from app.infra.pdf import generar_pdf_alumno  # noqa: F401
+from app.infra.permissions import (  # noqa: F401
+    NIVELES_ROL,
+    PERMISOS_POR_CODIGO,
+    _permisos_para_rol,
+    obtener_roles_usuario,
+    requiere_permiso,
+    tiene_permiso,
+)
+from app.infra.security import (  # noqa: F401
+    _purgar_intentos_antiguos,
+    extension_permitida,
+    generar_csrf,
+    hash_pw,
+    ip_bloqueada,
+    limpiar_intentos,
+    login_intentos,
+    necesita_rehash,
+    registrar_fallo,
+    validar_csrf,
+    validar_imagen,
+    verificar_pw,
+)
+
 
 # ── Context processors (need app reference, must stay here) ──
 @app.context_processor
@@ -117,9 +221,10 @@ if not settings.SENDGRID_API_KEY:
 app.config['MAX_CONTENT_LENGTH'] = settings.MAX_CONTENT_LENGTH
 
 # ── Errors, filters, backup ──
-from app.handlers import register_error_handlers
-from app.filters import register_template_filters
 from app.backup import programar_backup
+from app.filters import register_template_filters
+from app.handlers import register_error_handlers
+
 register_error_handlers(app)
 register_template_filters(app)
 
@@ -132,11 +237,22 @@ except ImportError as e:
     logger.warning(f"No se pudo registrar API v1: {e}")
 
 try:
-    from app.routes import (rector_bp, directora_bp, admin_bp, parent_bp, student_bp,
-        notifications_bp, teacher_bp, observations_bp, courses_bp, attendance_bp,
-        channels_bp, files_bp)
-    from app.routes.main_routes import main_bp
+    from app.routes import (
+        admin_bp,
+        attendance_bp,
+        channels_bp,
+        courses_bp,
+        directora_bp,
+        files_bp,
+        notifications_bp,
+        observations_bp,
+        parent_bp,
+        rector_bp,
+        student_bp,
+        teacher_bp,
+    )
     from app.routes.auth import auth_bp
+    from app.routes.main_routes import main_bp
     for bp in [rector_bp, directora_bp, admin_bp, parent_bp, student_bp, notifications_bp,
                teacher_bp, main_bp, auth_bp, observations_bp, courses_bp, attendance_bp,
                channels_bp, files_bp]:
@@ -146,8 +262,13 @@ except ImportError as e:
     logger.warning(f"No se pudieron registrar blueprints modulares: {e}")
 
 # ── Re-exports for test compatibility (symbols not in infra modules) ──
-from app.services.channel_service import (canales_usuario, agregar_miembro_canal,
-    asignar_miembros_auto, nombre_usuario_canal, _enriquecer_mensajes_batch)
+from app.services.channel_service import (  # noqa: F401
+    _enriquecer_mensajes_batch,
+    agregar_miembro_canal,
+    asignar_miembros_auto,
+    canales_usuario,
+    nombre_usuario_canal,
+)
 
 # ── Init ──
 init_master_db()

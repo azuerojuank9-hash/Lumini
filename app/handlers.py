@@ -1,7 +1,13 @@
 from flask import render_template
+
 from app.exceptions import (
-    ValidationError, ForbiddenError, UnauthorizedError, NotFoundError,
-    DatabaseError, BusinessError, PermissionError,
+    BusinessError,
+    DatabaseError,
+    ForbiddenError,
+    NotFoundError,
+    PermissionError,
+    UnauthorizedError,
+    ValidationError,
 )
 from app.logging import get_logger
 

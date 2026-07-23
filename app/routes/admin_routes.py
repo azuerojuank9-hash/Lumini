@@ -1,4 +1,5 @@
-from flask import jsonify, redirect, request, render_template, url_for
+from flask import jsonify, redirect, render_template, request
+
 from app.routes import admin_bp
 
 

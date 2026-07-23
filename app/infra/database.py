@@ -1,4 +1,10 @@
-import os, sqlite3, time, threading, json, re as _re, logging
+import logging
+import os
+import re as _re
+import sqlite3
+import threading
+import time
+
 from app.infra.config import DB_FOLDER, MASTER_DB, SCHEMA_VERSION
 
 logger = logging.getLogger(__name__)
@@ -478,6 +484,11 @@ def _migrar_v20(conn, slug=None):
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
 
+def _migrar_v21(conn, slug=None):
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_alumno_padre_padre ON alumno_padre(padre_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_alumno_padre_alumno ON alumno_padre(alumno_id)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_observador_registros_aid ON observador_registros(aid)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_eventos_curso ON eventos_calendario(curso)')
 
 MIGRACIONES = {
     6:  _migrar_v6,
@@ -495,6 +506,7 @@ MIGRACIONES = {
     18: _migrar_v18,
     19: _migrar_v19,
     20: _migrar_v20,
+    21: _migrar_v21,
 }
 
 
