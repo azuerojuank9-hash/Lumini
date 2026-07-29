@@ -269,9 +269,13 @@ def directora_cambiar_password_recuperar(slug):
     bloqueado = fa.ip_bloqueada(ip, prefijo=f'recup_directora_{slug}')
     if bloqueado:
         return jsonify({'ok': False, 'mensaje': f'Demasiados intentos. Espera {bloqueado}s.'})
-    usuario = request.form.get('usuario', '').strip()
-    respuesta = request.form.get('respuesta', '').strip().lower()
-    nueva = request.form.get('nueva', '').strip()
+    data = request.get_json(silent=True) or {}
+    usuario = data.get('usuario', '') or request.form.get('usuario', '')
+    usuario = usuario.strip()
+    respuesta = data.get('respuesta', '') or request.form.get('respuesta', '')
+    respuesta = respuesta.strip().lower()
+    nueva = data.get('nueva_password', '') or request.form.get('nueva', '')
+    nueva = nueva.strip()
     from app.repositories.user_repository import find_directora_by_username, update_directora_password
     d = find_directora_by_username(slug, usuario)
     if not d:
@@ -478,9 +482,6 @@ def cambiar_password(slug):
                            materia=materia, jornada=jornada)
 
 
-auth_bp_full = Blueprint('auth_full', __name__)
-
-
 @auth_bp.route('/<slug>/portal/login', methods=['GET', 'POST'])
 def portal_padre_login(slug):
     fa = _import_flask_app()
@@ -611,9 +612,13 @@ def rector_cambiar_password_recuperar(slug):
     bloqueado = fa.ip_bloqueada(ip, prefijo=f'recup_rector_{slug}')
     if bloqueado:
         return jsonify({'ok': False, 'mensaje': f'Demasiados intentos. Espera {bloqueado}s.'})
-    u = request.form.get('usuario', '').strip()
-    rta = request.form.get('respuesta', '').strip().lower()
-    nueva = request.form.get('nueva', '').strip()
+    data = request.get_json(silent=True) or {}
+    u = data.get('usuario', '') or request.form.get('usuario', '')
+    u = u.strip()
+    rta = data.get('respuesta', '') or request.form.get('respuesta', '')
+    rta = rta.strip().lower()
+    nueva = data.get('nueva_password', '') or request.form.get('nueva', '')
+    nueva = nueva.strip()
     from app.repositories.user_repository import find_rector_by_username, update_rector_password
     r = find_rector_by_username(slug, u)
     if not r:

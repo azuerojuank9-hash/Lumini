@@ -12,8 +12,8 @@ admin_bp = Blueprint('admin', __name__)
 parent_bp = Blueprint('parent', __name__)
 student_bp = Blueprint('student', __name__)
 notifications_bp = Blueprint('notifications', __name__)
-channels_bp = Blueprint('channels', __name__)
-files_bp = Blueprint('files', __name__)
+# channels_bp and files_bp are defined in their respective modules (channels_routes, files_routes)
+# and will be imported below after module loading.
 
 # API v1 blueprint is registered from api/v1/auth.py
 from flask import current_app
@@ -41,6 +41,8 @@ from app.routes.attendance import attendance_bp  # noqa: F401, E402
 from app.routes.courses import courses_bp  # noqa: F401, E402
 from app.routes.observations import observations_bp  # noqa: F401, E402
 from app.routes.teacher import teacher_bp  # noqa: F401, E402
+from app.routes.channels_routes import channels_bp  # noqa: F401, E402
+from app.routes.files_routes import files_bp  # noqa: F401, E402
 
 __all__ = [
     'rector_bp', 'directora_bp', 'admin_bp', 'parent_bp', 'student_bp', 'notifications_bp', 'teacher_bp',

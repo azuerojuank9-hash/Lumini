@@ -29,6 +29,7 @@
 {% endblock %}
 
 {% block content %}
+<input type="hidden" id="csrf-token-input" name="_csrf_token" value="{{ csrf_token() }}">
 <div class="top-bar">
   <h1><i data-lucide="bell" style="color:var(--accent);"></i> Notificaciones</h1>
   <a href="javascript:history.back()" class="back"><i data-lucide="arrow-left"></i> Volver</a>
@@ -66,7 +67,10 @@
 {% endblock %}
 {% block extra_scripts %}
 function marcarLeida(id){
-  fetch('/notificaciones/marcar/'+id,{method:'POST',headers:{'X-CSRF-Token':document.querySelector('[name=_csrf_token]').value}})
+  var slug='{{ slug }}';
+  var csrfEl=document.getElementById('csrf-token-input');
+  var token=csrfEl?csrfEl.value:'';
+  fetch('/'+slug+'/notificaciones/'+id+'/leer',{method:'POST',headers:{'X-CSRF-Token':token}})
   .then(function(){var el=document.getElementById('notif-'+id);if(el)el.style.opacity='0.4';})
   .catch(function(){});
 }

@@ -11,6 +11,8 @@ def get_student_ids_by_curso(conn, curso, jornada):
 
 
 def get_asistencia_for_date(conn, fecha, aids):
+    if not aids:
+        return []
     placeholders = ','.join('?' * len(aids))
     return conn.execute(
         f'SELECT aid, estado, observacion, hora FROM asistencia WHERE fecha=? AND aid IN ({placeholders})',
@@ -18,6 +20,8 @@ def get_asistencia_for_date(conn, fecha, aids):
 
 
 def get_asistencia_stats(conn, aids):
+    if not aids:
+        return []
     placeholders = ','.join('?' * len(aids))
     return conn.execute(
         f'SELECT estado, COUNT(*) as c FROM asistencia WHERE aid IN ({placeholders}) GROUP BY estado',
@@ -25,6 +29,8 @@ def get_asistencia_stats(conn, aids):
 
 
 def get_asistencia_abs_consec(conn, aids):
+    if not aids:
+        return []
     placeholders = ','.join('?' * len(aids))
     return conn.execute(
         f"SELECT aid, fecha FROM asistencia WHERE aid IN ({placeholders}) AND estado='A' AND fecha >= date('now','-30 days') ORDER BY aid, fecha",
@@ -32,6 +38,8 @@ def get_asistencia_abs_consec(conn, aids):
 
 
 def get_asistencia_tardanzas(conn, aids):
+    if not aids:
+        return []
     placeholders = ','.join('?' * len(aids))
     return conn.execute(
         f'SELECT aid, COUNT(*) as c FROM asistencia WHERE aid IN ({placeholders}) AND estado="T" GROUP BY aid',
@@ -39,6 +47,8 @@ def get_asistencia_tardanzas(conn, aids):
 
 
 def get_asistencia_all_stats(conn, aids):
+    if not aids:
+        return []
     placeholders = ','.join('?' * len(aids))
     return conn.execute(
         f'SELECT aid, estado, COUNT(*) as c FROM asistencia WHERE aid IN ({placeholders}) GROUP BY aid, estado',
@@ -46,6 +56,8 @@ def get_asistencia_all_stats(conn, aids):
 
 
 def get_asistencia_all_dates(conn, aids):
+    if not aids:
+        return []
     placeholders = ','.join('?' * len(aids))
     return conn.execute(
         f'SELECT fecha, estado FROM asistencia WHERE aid IN ({placeholders}) ORDER BY fecha',
@@ -53,35 +65,40 @@ def get_asistencia_all_dates(conn, aids):
 
 
 def get_asistencia_full(conn, aids):
+    if not aids:
+        return []
     placeholders = ','.join('?' * len(aids))
     return conn.execute(
         f'SELECT aid, fecha, estado, observacion FROM asistencia WHERE aid IN ({placeholders}) ORDER BY aid, fecha',
         aids).fetchall()
 
 
-def upsert_asistencia(conn, aid, fecha, estado, observacion, hora, usuario_tipo, usuario_id):
+def upsert_asistencia(conn, aid, fecha, estado, observacion='', hora='', usuario_tipo='profesor', usuario_id=0):
     if fecha:
-        conn.execute('''INSERT INTO asistencia (aid,fecha,estado,observacion,hora,usuario_tipo,usuario_id)
-                        VALUES (?,?,?,?,?,?,?)
-                        ON CONFLICT(aid,fecha) DO UPDATE SET estado=excluded.estado,
-                                                             observacion=excluded.observacion,
-                                                             hora=excluded.hora,
-                                                             usuario_tipo=excluded.usuario_tipo,
-                                                             usuario_id=excluded.usuario_id''',
-                     (aid, fecha, estado, observacion, hora, usuario_tipo, usuario_id))
+        conn.execute(
+            'INSERT INTO asistencia (aid, fecha, estado, observacion, hora, usuario_tipo, usuario_id) '
+            'VALUES (?, ?, ?, ?, ?, ?, ?) '
+            'ON CONFLICT(aid, fecha) DO UPDATE SET estado=excluded.estado, '
+            'observacion=excluded.observacion, hora=excluded.hora, '
+            'usuario_tipo=excluded.usuario_tipo, usuario_id=excluded.usuario_id',
+            (aid, fecha, estado, observacion or '', hora or '', usuario_tipo, usuario_id))
     else:
-        conn.execute('''INSERT INTO asistencia (aid,fecha,estado,observacion,hora,usuario_tipo,usuario_id)
-                        VALUES (?,date("now"),?,?,?,?,?)
-                        ON CONFLICT(aid,fecha) DO UPDATE SET estado=excluded.estado,
-                                                             observacion=excluded.observacion,
-                                                             hora=excluded.hora,
-                                                             usuario_tipo=excluded.usuario_tipo,
-                                                             usuario_id=excluded.usuario_id''',
-                     (aid, estado, observacion, hora, usuario_tipo, usuario_id))
+        from datetime import date
+        fecha = date.today().isoformat()
+        conn.execute(
+            'INSERT INTO asistencia (aid, fecha, estado, observacion, hora, usuario_tipo, usuario_id) '
+            'VALUES (?, ?, ?, ?, ?, ?, ?) '
+            'ON CONFLICT(aid, fecha) DO UPDATE SET estado=excluded.estado, '
+            'observacion=excluded.observacion, hora=excluded.hora, '
+            'usuario_tipo=excluded.usuario_tipo, usuario_id=excluded.usuario_id',
+            (aid, fecha, estado, observacion or '', hora or '', usuario_tipo, usuario_id))
 
 
 def verify_student_in_cursos(conn, aid, cursos_prof, jornada):
+    if not cursos_prof:
+        return False
     placeholders = ','.join('?' * len(cursos_prof))
-    return conn.execute(
-        f'SELECT id FROM alumnos WHERE id=? AND curso IN ({placeholders}) AND jornada=? AND activo=1',
-        (aid, *cursos_prof, jornada)).fetchone() is not None
+    row = conn.execute(
+        f'SELECT 1 FROM alumnos WHERE id=? AND curso IN ({placeholders}) AND jornada=? AND activo=1',
+        (aid,) + tuple(cursos_prof) + (jornada,)).fetchone()
+    return row is not None

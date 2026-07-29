@@ -12,7 +12,7 @@
 .text-muted { color: var(--muted); }
 .text-sub { color: var(--sub); }
 .text-white { color: #fff; }
-.text-black { color: #000; }
+.text-black { color: var(--text); }
 .text-blue { color: var(--blue); }
 .text-orange { color: var(--orange); }
 .text-purple { color: var(--purple); }

@@ -11,7 +11,7 @@
 .brand-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
 .nav-btn{padding:7px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;text-decoration:none;background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border);display:inline-flex;align-items:center;gap:5px;transition:background var(--tr);}
 .nav-btn:hover{background:rgba(var(--accent-rgb),.1);color:var(--accent);}
-.main{margin-top:72px;padding:24px;max-width:920px;margin-left:auto;margin-right:auto;}
+.main{margin-top:72px;padding:24px;max-width:1200px;margin-left:auto;margin-right:auto;}
 .est-header{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;box-shadow:0 4px 20px rgba(0,0,0,.2);}
 .est-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:white;flex-shrink:0;box-shadow:0 4px 12px rgba(var(--accent-rgb),.25);}
 .est-info{flex:1;}
@@ -34,7 +34,7 @@
 .prom-warn{background:rgba(var(--warning-rgb),.15);color:var(--warning);}
 .prom-bad{background:rgba(var(--danger-rgb),.15);color:var(--danger);}
 .notas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;margin-bottom:8px;}
-.nota-item{background:rgba(15,23,42,.6);border-radius:var(--radius-sm);padding:9px 11px;border:1px solid var(--border);}
+.nota-item{background:var(--bg3);border-radius:var(--radius-sm);padding:9px 11px;border:1px solid var(--border);}
 .nota-act{font-size:11px;color:var(--muted);margin-bottom:3px;}
 .nota-val{font-size:1.1rem;font-weight:700;}
 .eval-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
@@ -77,14 +77,14 @@ th{padding:8px;text-align:center;background:var(--bg2);border:1px solid var(--bo
 th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:1px;}
 th .ht{font-size:10px;color:var(--muted);}
 td{border:1px solid var(--border);vertical-align:middle;text-align:center;}
-td.dia-col{padding:8px 12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--accent);background:rgba(15,23,42,.6);white-space:nowrap;position:sticky;left:0;z-index:2;}
+td.dia-col{padding:8px 12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--accent);background:var(--bg3);white-space:nowrap;position:sticky;left:0;z-index:2;}
 td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px 6px;color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
 .celda{padding:8px 6px;min-height:58px;text-align:center;}
 .c-mat{font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px;}
 .c-prof{font-size:11px;color:var(--muted);}
 .c-empty{color:rgba(var(--accent-rgb),.15);font-size:20px;padding-top:8px;}
 .c-empty{text-align:center;padding:20px;color:var(--muted);font-size:13px;}
-.mobile-nav{display:none;position:fixed;top:70px;right:14px;z-index:2000;background:rgba(15,23,42,.98);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;min-width:200px;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .2s ease;}
+.mobile-nav{display:none;position:fixed;top:70px;right:14px;z-index:2000;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;min-width:200px;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .2s ease;}
 .mobile-nav.open{display:flex;flex-direction:column;gap:2px;}
 .mobile-nav a{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all var(--tr);}
 .mobile-nav a:hover{background:rgba(var(--accent-rgb),.1);color:var(--text);}
@@ -222,10 +222,6 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
           <span class="qa-icon" style="background:rgba(var(--orange-rgb),.12);color:var(--warning);"><i data-lucide="clipboard-list"></i></span>
           <span class="qa-label">Agenda</span>
         </a>
-        <a href="/{{ slug }}/directora/boletin_pdf?aid={{ alumno.id }}" class="qa-item">
-          <span class="qa-icon" style="background:rgba(var(--info-blue-rgb),.12);color:var(--info);"><i data-lucide="file-text"></i></span>
-          <span class="qa-label">PDF</span>
-        </a>
       </div>
     </div>
     <div class="module-card">
@@ -275,7 +271,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
         <span class="fs-10 px-8 py-2 radius-pill text-semibold" style="background:{{ pc.get(c.prioridad,'var(--blue)') }}15;color:{{ pc.get(c.prioridad,'var(--blue)') }};">{{ pc_name.get(c.prioridad,c.prioridad|capitalize) }}</span>
       </div>
       <div style="display:flex;gap:6px;margin-top:10px;margin-left:18px;">
-        <button onclick="estVerComunicado({{ c.id }})" class="btn btn-sm btn-ghost" style="background:rgba(var(--accent-rgb),.1);color:var(--accent);"><i data-lucide="eye"></i> Ver comunicado</button>
+        <button onclick="estAbrirModalComunicado({{ c.id }},'{{ c.titulo|replace("'","&#039;") }}','{{ (c.fecha_publicacion or c.fecha_creacion)[:10] }}','{{ (c.contenido or '')|replace("\\","\\\\")|replace("'","&#039;") }}','{{ pc_name.get(c.prioridad,'') }}','background:{{ pc.get(c.prioridad,'var(--blue)') }}15;color:{{ pc.get(c.prioridad,'var(--blue)') }};')" class="btn btn-sm btn-ghost" style="background:rgba(var(--accent-rgb),.1);color:var(--accent);"><i data-lucide="eye"></i> Ver comunicado</button>
         <button onclick="marcarLeido({{ c.id }}, this)" class="btn btn-sm btn-ghost"><i data-lucide="check"></i> Marcar como le&iacute;do</button>
       </div>
     </div>
@@ -345,11 +341,6 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
       </div>
     </div>
   </div>
-
-  <a href="/{{ slug }}/directora/boletin_pdf?aid={{ alumno.id }}"
-     class="btn btn-primary" style="margin-bottom:20px;">
-      <i data-lucide="download"></i> Descargar boletín PDF
-  </a>
 
   <div class="card" id="agenda">
 
@@ -746,6 +737,16 @@ function switchComTabEst(tab,btn){
 }
 function estVerComunicado(id){var el=document.getElementById('com-'+id);if(el)el.classList.add('open');}
 function estCerrarComunicado(){document.querySelectorAll('.com-detalle').forEach(function(c){c.classList.remove('open');});}
+function estAbrirModalComunicado(id,titulo,meta,contenido,badge,badgeClass){
+  document.getElementById('estComModalTitle').textContent=titulo;
+  document.getElementById('estComModalMeta').textContent=meta;
+  document.getElementById('estComModalContent').textContent=contenido;
+  var bEl=document.getElementById('estComModalBadge');
+  bEl.textContent=badge;bEl.className=badgeClass;
+  var btn=document.getElementById('estComModalLeerBtn');
+  btn.setAttribute('data-cid',id);
+  document.getElementById('estComModal').style.display='flex';
+}
 function marcarLeido(id,btn){var csrf=document.getElementById('csrf-global');fetch('/{{ slug }}/comunicaciones/'+id+'/leer',{method:'POST',headers:{'X-CSRF-Token':csrf?csrf.value:''}}).then(function(){var badge=btn.querySelector('.badge');if(badge)badge.remove();btn.textContent='Le\u00eddo';}).catch(function(){});}
 function hideComToastEst(){var t=document.getElementById('comToastEst');if(t)t.classList.remove('show');}
 

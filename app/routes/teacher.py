@@ -754,7 +754,7 @@ def guardar_nota(slug):
     if None in (aid, actividad_id, val): return ('', 400)
     conn = f.conectar(slug)
     act = conn.execute(
-        'SELECT a.id, a.profesor_id, a.curso, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
+        'SELECT a.id, a.profesor_id, a.curso, a.materia, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
         (actividad_id,)).fetchone()
     if not act:
         conn.close()
@@ -839,7 +839,7 @@ def historial_curso(slug):
                   COALESCE(ac.nombre, '') as actividad_nombre
            FROM auditoria_notas a
            LEFT JOIN actividades ac ON ac.id = a.actividad_id
-           WHERE a.curso = ? AND a.materia = ? AND a.periodo = ? AND a.profesor_id = ?
+           WHERE a.curso = ? AND a.materia = ? AND a.periodo = ? AND a.usuario_id = ?
            ORDER BY a.creado DESC
            LIMIT 500''',
         (curso, request.args.get('materia', ''), periodo, prof['id'])).fetchall()
@@ -1578,7 +1578,7 @@ def migrar_excel_analizar(slug):
         encabezados = [str(c).strip() if c is not None else '' for c in rows[0]]
         conn = f.conectar(slug)
         alumnos = conn.execute(
-            'SELECT id, CONCAT(apellidos,\' \',nombres) as nombre, documento FROM alumnos WHERE curso=? AND activo=1 ORDER BY apellidos,nombres',
+            'SELECT id, nombre FROM alumnos WHERE curso=? AND activo=1 ORDER BY nombre',
             (curso_sel,)).fetchall()
         actividades = conn.execute(
             '''SELECT id, nombre, orden FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND curso=?
@@ -1986,7 +1986,7 @@ def estudiante_tendencia(slug, aid):
                ORDER BY ac.periodo, ac.orden''',
             (aid, materia, jornada, prof['id'])).fetchall()
         puntos = [{'orden':r['orden'],'valor':float(r['val']),'nombre':r['act_nombre'],
-                    'periodo':r['periodo']} for r in rows if r['val'] is not None]
+                    'periodo':r['periodo'],'actividad_id':r['actividad_id']} for r in rows if r['val'] is not None]
         acum = []; running = []
         for p in puntos:
             acum.append(p['valor'])
@@ -2179,6 +2179,8 @@ def actividades_list(slug):
 def actividades_masiva(slug):
     f = _fa()
     f.require_colegio(slug)
+    if not f.validar_csrf():
+        return jsonify({'error': 'CSRF inválido'}), 403
     prof = f.get_profesor(slug)
     if not prof: return jsonify({'error':'No autorizado'}), 403
     data = request.get_json(silent=True) or {}
@@ -2630,6 +2632,7 @@ def dashboard(slug):
     colegio = f.get_colegio(slug)
     num_periodos = colegio['num_periodos'] if colegio and 'num_periodos' in colegio.keys() else 4
     conn = f.conectar(slug)
+    materias_list = []
     if prof:
         jornada, materia = f.get_sesion_jornada_materia(slug)
         mis_cursos = f.get_cursos_profesor(slug, prof['id'], materia or '', jornada or '')
@@ -2648,7 +2651,7 @@ def dashboard(slug):
     colegio_dash = f.get_colegio(slug)
     return render_template('dashboard.html', slug=slug, colegio=colegio_dash, instance=instance, nombre=nombre,
                            num_periodos=num_periodos, mis_cursos=mis_cursos,
-                           materias_list=materias_list if rector else [materia],
+                           materias_list=materias_list if rector else [materia] if materia else [],
                            jornada=jornada, materia=materia)
 
 
@@ -2970,6 +2973,8 @@ def comunicados_crear(slug):
     prof = f.get_profesor(slug)
     if not prof:
         return jsonify({'error': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'error': 'CSRF inválido'}), 403
     data = request.get_json(silent=True) or {}
     titulo = data.get('titulo', '')
     contenido = data.get('contenido', '')
@@ -2993,6 +2998,9 @@ def comunicados_crear(slug):
 def comunicados_leer(slug, cid):
     f = _fa()
     f.require_colegio(slug)
+    prof = f.get_profesor(slug)
+    if not prof:
+        return jsonify({'error': 'No autorizado'}), 403
     conn = f.conectar(slug)
     try:
         conn.execute("UPDATE comunicaciones SET estado='leido' WHERE id=?", (cid,))
@@ -3044,8 +3052,8 @@ def estudiante_expediente(slug, aid):
             (aid,)).fetchall()
         asistencias = conn.execute('SELECT fecha, estado FROM asistencia WHERE aid=? ORDER BY fecha DESC LIMIT 30', (aid,)).fetchall()
         observaciones = conn.execute('SELECT texto, fecha FROM observaciones WHERE aid=? ORDER BY fecha DESC LIMIT 20', (aid,)).fetchall()
-        sanciones = conn.execute("SELECT texto, fecha, tipo FROM observador_registros WHERE aid=? AND tipo IN ('llamado_atencion','sancion') ORDER BY fecha DESC LIMIT 10", (aid,)).fetchall()
-        reconocimientos = conn.execute("SELECT texto, fecha, tipo FROM observador_registros WHERE aid=? AND tipo='reconocimiento' ORDER BY fecha DESC LIMIT 10", (aid,)).fetchall()
+        sanciones = conn.execute("SELECT texto, fecha, tipo FROM observador_registros WHERE aid=? AND tipo IN ('llamado','compromiso') ORDER BY fecha DESC LIMIT 10", (aid,)).fetchall()
+        reconocimientos = conn.execute("SELECT texto, fecha, tipo FROM observador_registros WHERE aid=? AND tipo='positivo' ORDER BY fecha DESC LIMIT 10", (aid,)).fetchall()
         return jsonify({
             'alumno': {'id': al['id'], 'nombre': al['nombre'], 'curso': al['curso'], 'email_acudiente': al['email_acudiente']},
             'notas': [{'actividad': n['actividad'], 'tipo': n['tipo'], 'val': n['val'], 'fecha': n['fecha_limite']} for n in notas],
@@ -3091,6 +3099,8 @@ def school_config(slug):
     prof = f.get_profesor(slug)
     if not prof:
         return jsonify({'error': 'No autorizado'}), 403
+    if request.method == 'POST' and not f.validar_csrf():
+        return jsonify({'error': 'CSRF inválido'}), 403
     conn = f.conectar(slug)
     try:
         if request.method == 'GET':
@@ -3367,6 +3377,10 @@ def home_dashboard(slug):
 def ai_ask(slug):
     f = _fa()
     f.require_colegio(slug)
+    prof = f.get_profesor(slug)
+    rector = f.get_rector(slug)
+    if not prof and not rector:
+        return jsonify({'error': 'No autorizado'}), 403
     data = request.get_json(silent=True) or {}
     pregunta = data.get('pregunta', '').lower().strip()
     if not pregunta:
@@ -3454,5 +3468,91 @@ def ai_ask(slug):
     except Exception as e:
         logger.error('asistente_analisis: %s', e)
         return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+
+@teacher_bp.route('/<slug>/get_notas')
+def get_notas(slug):
+    f = _fa()
+    f.require_colegio(slug)
+    prof = f.get_profesor(slug)
+    if not prof:
+        return jsonify({'notas': []})
+    aid = request.args.get('aid', type=int)
+    if not aid:
+        return jsonify({'notas': []})
+    conn = f.conectar(slug)
+    try:
+        rows = conn.execute(
+            '''SELECT a.nombre as actividad, n.val as valor
+               FROM notas n
+               JOIN actividades a ON a.id = n.actividad_id
+               WHERE n.aid = ?
+               ORDER BY a.fecha_limite DESC, a.nombre''',
+            (aid,)).fetchall()
+        return jsonify({'notas': [dict(r) for r in rows]})
+    finally:
+        conn.close()
+
+
+@teacher_bp.route('/<slug>/get_asistencia')
+def get_asistencia(slug):
+    f = _fa()
+    f.require_colegio(slug)
+    prof = f.get_profesor(slug)
+    if not prof:
+        return jsonify({'asistencias': []})
+    aid = request.args.get('aid', type=int)
+    if not aid:
+        return jsonify({'asistencias': []})
+    conn = f.conectar(slug)
+    try:
+        rows = conn.execute(
+            '''SELECT fecha, CASE WHEN estado='P' THEN 1 ELSE 0 END as presente
+               FROM asistencia WHERE aid = ?
+               ORDER BY fecha DESC LIMIT 30''',
+            (aid,)).fetchall()
+        return jsonify({'asistencias': [dict(r) for r in rows]})
+    finally:
+        conn.close()
+
+
+@teacher_bp.route('/<slug>/get_observaciones')
+def get_observaciones(slug):
+    f = _fa()
+    f.require_colegio(slug)
+    prof = f.get_profesor(slug)
+    if not prof:
+        return jsonify({'observaciones': []})
+    aid = request.args.get('aid', type=int)
+    if not aid:
+        return jsonify({'observaciones': []})
+    conn = f.conectar(slug)
+    try:
+        rows = conn.execute(
+            'SELECT id, materia, texto, fecha FROM observaciones WHERE aid=? ORDER BY fecha DESC LIMIT 20',
+            (aid,)).fetchall()
+        return jsonify({'observaciones': [dict(r) for r in rows]})
+    finally:
+        conn.close()
+
+
+@teacher_bp.route('/<slug>/cursos')
+def get_cursos_json(slug):
+    f = _fa()
+    f.require_colegio(slug)
+    prof = f.get_profesor(slug)
+    if not prof:
+        return jsonify({'cursos': []})
+    jornada, materia = f.get_sesion_jornada_materia(slug)
+    if not jornada or not materia:
+        return jsonify({'cursos': []})
+    conn = f.conectar(slug)
+    try:
+        rows = conn.execute(
+            'SELECT DISTINCT curso FROM asignaciones_curso WHERE profesor_id=? AND materia=? AND jornada=? ORDER BY curso',
+            (prof['id'], materia, jornada)).fetchall()
+        return jsonify({'cursos': [{'nombre': r['curso']} for r in rows]})
     finally:
         conn.close()

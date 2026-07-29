@@ -20,7 +20,7 @@ class ParentRepository:
     @staticmethod
     def get_actividades_publicadas_count(conn, curso, jornada):
         return conn.execute(
-            'SELECT COUNT(*) as cnt FROM actividades WHERE curso=? AND jornada=? AND estado_act="publicado"',
+            'SELECT COUNT(*) as cnt FROM actividades WHERE curso=? AND jornada=? AND estado_act="publicada"',
             (curso, jornada)).fetchone()
 
     @staticmethod
@@ -49,5 +49,5 @@ class ParentRepository:
     @staticmethod
     def get_comunicados_publicos(conn, limite=20):
         return conn.execute(
-            'SELECT id, titulo, contenido, fecha_creacion FROM comunicaciones WHERE destinatario_tipo IN ("todos","padres") AND estado="publicado" ORDER BY fecha_creacion DESC LIMIT ?',
+            'SELECT id, titulo, contenido, fecha_creacion FROM comunicaciones WHERE destinatario_tipo IN ("todo_colegio","estudiantes") AND estado="publicado" ORDER BY fecha_creacion DESC LIMIT ?',
             (limite,)).fetchall()

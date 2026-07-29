@@ -4,7 +4,7 @@
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
-.main{margin-left:var(--sidebar);padding:20px 24px;width:calc(100% - var(--sidebar));min-height:100vh;max-width:620px;}
+.main{margin-left:var(--sidebar-w);padding:20px 24px;width:calc(100% - var(--sidebar-w));min-height:100vh;max-width:620px;}
 .page-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:4px;}
 .page-sub{font-size:12px;color:var(--muted);margin-bottom:24px;}
 
@@ -123,7 +123,7 @@
                         <label class="periodo-check checked" id="label-p{{ i }}">
                             <input type="checkbox" name="periodos" value="{{ i }}" checked
                                    onchange="toggleChecked(this,'label-p{{ i }}');actualizarResumen()">
-                            <span>{{ i }}Â° Periodo</span>
+                            <span>{{ i }}° Periodo</span>
                         </label>
                         {% endfor %}
                     </div>
@@ -146,4 +146,31 @@
         </div>
     </div>
     {% endif %}
+{% endblock %}
+{% block extra_scripts %}
+function toggleChecked(cb,labelId){
+  var label=document.getElementById(labelId);
+  if(label){if(cb.checked)label.classList.add('checked');else label.classList.remove('checked');}
+}
+function actualizarResumen(){
+  var curso=document.getElementById('selectCurso').value;
+  var prof=document.getElementById('selectProf').value;
+  var periodos=[];
+  document.querySelectorAll('input[name="periodos"]:checked').forEach(function(c){periodos.push(c.value);});
+  var el=document.getElementById('resumen');
+  var txt=document.getElementById('resumenTexto');
+  if(curso&&prof&&periodos.length){
+    el.style.display='block';
+    txt.innerHTML='Se transferir\u00e1n <strong>'+periodos.length+' periodo(s)</strong> del curso <strong>'+curso+'</strong> al nuevo profesor.';
+  }else{el.style.display='none';}
+}
+function confirmarTransferencia(){
+  var curso=document.getElementById('selectCurso').value;
+  var prof=document.getElementById('selectProf').value;
+  var periodos=document.querySelectorAll('input[name="periodos"]:checked').length;
+  if(!curso){if(window.showToast)window.showToast('Selecciona un curso','error');return false;}
+  if(!prof){if(window.showToast)window.showToast('Selecciona un profesor','error');return false;}
+  if(!periodos){if(window.showToast)window.showToast('Selecciona al menos un periodo','error');return false;}
+  return confirm('\u00bfEst\u00e1s seguro de transferir el curso '+curso+'? Esta acci\u00f3n no se puede deshacer.');
+}
 {% endblock %}

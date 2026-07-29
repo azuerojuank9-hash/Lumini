@@ -1,0 +1,807 @@
+2026-07-27 15:32:07,738 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-27 15:32:07,897 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-27 15:32:08,048 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-27 15:32:08,052 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: logo
+2026-07-27 15:32:08,052 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: vencimiento
+2026-07-27 15:32:08,052 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: num_periodos
+2026-07-27 15:32:08,052 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_registro
+2026-07-27 15:32:08,053 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: primary_color
+2026-07-27 15:32:08,053 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: secondary_color
+2026-07-27 15:32:08,053 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_profesores
+2026-07-27 15:32:08,053 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_directoras
+2026-07-27 15:32:08,053 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_rectores
+2026-07-27 15:32:08,053 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: schema_version
+2026-07-27 15:32:13,434 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.75 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:32:13,435 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.74
+2026-07-27 15:32:13,442 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-27 15:32:13,510 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=None autoevaluacion=None
+2026-07-27 15:32:13,510 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.04
+2026-07-27 15:32:13,514 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-27 15:32:13,573 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:32:13,573 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.04
+2026-07-27 15:32:14,811 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.05 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:32:14,811 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.98
+2026-07-27 15:32:14,815 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-27 15:32:14,876 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=2.3 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:32:14,876 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:32:14,880 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-27 15:32:14,935 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=2.8 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:32:14,935 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.82
+2026-07-27 15:32:14,938 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-27 15:32:14,989 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.3 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:32:14,989 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.15
+2026-07-27 15:32:14,993 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-27 15:32:15,042 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:32:15,042 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.6
+2026-07-27 15:32:15,046 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-27 15:32:15,107 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:32:15,107 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.6
+2026-07-27 15:32:15,113 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-27 15:32:15,199 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.5 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:32:15,199 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.93
+2026-07-27 15:32:15,202 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-27 15:32:15,265 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:32:15,266 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.27
+2026-07-27 15:32:15,269 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-27 15:32:15,332 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:32:15,333 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.58
+2026-07-27 15:32:15,384 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:32:15,384 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.9
+2026-07-27 15:32:15,388 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-27 15:32:15,442 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:32:15,442 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.9
+2026-07-27 15:32:15,446 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-27 15:32:15,504 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=None autoevaluacion=None
+2026-07-27 15:32:15,504 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.27
+2026-07-27 15:32:15,505 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=3.5 autoevaluacion=None
+2026-07-27 15:32:15,505 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.15
+2026-07-27 15:32:15,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=None autoevaluacion=5.0
+2026-07-27 15:32:15,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.77
+2026-07-27 15:32:15,508 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:32:15,508 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.0
+2026-07-27 15:32:15,509 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=5.0
+2026-07-27 15:32:15,510 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=0.5
+2026-07-27 15:32:15,511 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=3.5 autoevaluacion=5.0
+2026-07-27 15:32:15,512 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.65
+2026-07-27 15:32:15,513 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:32:15,513 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:32:15,514 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=None autoevaluacion=None
+2026-07-27 15:32:15,514 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.04
+2026-07-27 15:32:15,515 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=5.0 evaluacion=None autoevaluacion=None
+2026-07-27 15:32:15,515 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:32:15,516 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=3.0 autoevaluacion=None
+2026-07-27 15:32:15,516 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.79
+2026-07-27 15:32:15,518 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=None autoevaluacion=None
+2026-07-27 15:32:15,518 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.6
+2026-07-27 15:32:15,519 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=3.5 autoevaluacion=5.0
+2026-07-27 15:32:15,519 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.65
+2026-07-27 15:32:15,521 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=1.6 autoevaluacion=None
+2026-07-27 15:32:15,521 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=0.4
+2026-07-27 15:32:15,522 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=None autoevaluacion=None
+2026-07-27 15:32:15,522 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.04
+2026-07-27 15:32:15,523 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:32:15,523 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:32:15,523 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:32:15,523 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:32:15,535 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-27 15:32:15,540 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-27 15:32:15,616 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.5 autoevaluacion=3.5
+2026-07-27 15:32:15,616 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=4.08
+2026-07-27 15:32:15,690 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.8 autoevaluacion=3.8
+2026-07-27 15:32:15,690 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=4.18
+2026-07-27 15:32:15,755 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:32:15,755 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:32:15,758 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-27 15:32:15,825 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=2.5 evaluacion=4.8 autoevaluacion=3.8
+2026-07-27 15:32:15,826 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.21
+2026-07-27 15:32:15,829 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-27 15:32:15,874 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.8 autoevaluacion=3.8
+2026-07-27 15:32:15,874 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.85
+2026-07-27 15:32:15,878 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-27 15:32:15,962 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:32:15,962 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.58
+2026-07-27 15:32:16,029 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=None autoevaluacion=None
+2026-07-27 15:32:16,029 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.6
+2026-07-27 15:32:16,032 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-27 15:32:16,144 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:32:16,144 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:32:16,147 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-27 15:32:38,083 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-27
+2026-07-27 15:32:48,968 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:33:21,774 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:33:22,069 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:22,069 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:33:22,072 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-27 15:33:24,619 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:24,619 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:24,620 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:24,620 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:33:24,620 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:24,620 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:24,671 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:24,671 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:24,671 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:24,671 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:33:24,671 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:24,671 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,569 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-27 15:33:57,649 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,649 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,649 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,649 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,649 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:57,649 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:33:57,650 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,650 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,650 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,650 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,650 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,650 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,650 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,650 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,651 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,651 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,651 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,651 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,662 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,663 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,663 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:57,663 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:33:57,679 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,679 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,679 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,679 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,679 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,680 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,680 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:57,680 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:33:57,680 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,680 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,681 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,681 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,681 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,681 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,681 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,681 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,681 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,681 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,681 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,681 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,682 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,682 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,682 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,682 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,693 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,693 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,693 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:57,693 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:33:57,709 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,710 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,710 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,710 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,710 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:57,710 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:33:57,710 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,710 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,710 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,710 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,711 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,711 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,711 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,711 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,711 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,711 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,711 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,711 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,724 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,724 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,724 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,724 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,725 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:57,725 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:33:57,725 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,725 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,725 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,725 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,725 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,725 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,726 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,726 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,726 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,726 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,726 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,726 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,737 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,737 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,738 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,738 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,738 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:57,738 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:33:57,738 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,738 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,738 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,738 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,738 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,739 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,739 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,739 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,739 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,739 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,739 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,739 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,752 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,752 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,752 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,752 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,752 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:57,752 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:33:57,752 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,752 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,752 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,766 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,766 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,766 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,766 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,766 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:57,766 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:33:57,767 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:33:58,233 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:33:58,233 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:36:03,724 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-27 15:36:03,814 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-27 15:36:03,975 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-27 15:36:03,977 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: logo
+2026-07-27 15:36:03,977 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: vencimiento
+2026-07-27 15:36:03,977 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: num_periodos
+2026-07-27 15:36:03,977 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_registro
+2026-07-27 15:36:03,977 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: primary_color
+2026-07-27 15:36:03,977 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: secondary_color
+2026-07-27 15:36:03,977 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_profesores
+2026-07-27 15:36:03,977 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_directoras
+2026-07-27 15:36:03,978 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_rectores
+2026-07-27 15:36:03,978 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: schema_version
+2026-07-27 15:36:09,835 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.75 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:36:09,835 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.74
+2026-07-27 15:36:09,840 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-27 15:36:09,935 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=None autoevaluacion=None
+2026-07-27 15:36:09,935 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.04
+2026-07-27 15:36:09,941 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-27 15:36:10,050 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:36:10,050 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.04
+2026-07-27 15:36:11,671 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.05 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:36:11,672 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.98
+2026-07-27 15:36:11,676 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-27 15:36:11,755 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=2.3 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:36:11,755 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:36:11,759 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-27 15:36:11,835 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=2.8 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:36:11,835 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.82
+2026-07-27 15:36:11,839 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-27 15:36:11,900 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.3 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:36:11,901 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.15
+2026-07-27 15:36:11,904 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-27 15:36:11,963 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:36:11,963 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.6
+2026-07-27 15:36:11,968 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-27 15:36:12,029 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:36:12,029 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.6
+2026-07-27 15:36:12,033 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-27 15:36:12,096 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.5 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:36:12,096 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.93
+2026-07-27 15:36:12,100 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-27 15:36:12,158 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:36:12,158 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.27
+2026-07-27 15:36:12,161 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-27 15:36:12,276 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:36:12,276 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.58
+2026-07-27 15:36:12,335 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:36:12,336 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.9
+2026-07-27 15:36:12,339 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-27 15:36:12,390 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:36:12,390 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.9
+2026-07-27 15:36:12,393 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-27 15:36:12,454 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=None autoevaluacion=None
+2026-07-27 15:36:12,454 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.27
+2026-07-27 15:36:12,455 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=3.5 autoevaluacion=None
+2026-07-27 15:36:12,455 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.15
+2026-07-27 15:36:12,456 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=None autoevaluacion=5.0
+2026-07-27 15:36:12,456 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.77
+2026-07-27 15:36:12,457 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:36:12,458 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.0
+2026-07-27 15:36:12,459 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=5.0
+2026-07-27 15:36:12,459 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=0.5
+2026-07-27 15:36:12,461 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=3.5 autoevaluacion=5.0
+2026-07-27 15:36:12,461 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.65
+2026-07-27 15:36:12,462 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:36:12,462 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:36:12,464 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=None autoevaluacion=None
+2026-07-27 15:36:12,464 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.04
+2026-07-27 15:36:12,466 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=5.0 evaluacion=None autoevaluacion=None
+2026-07-27 15:36:12,466 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:36:12,468 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=3.0 autoevaluacion=None
+2026-07-27 15:36:12,468 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.79
+2026-07-27 15:36:12,470 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=None autoevaluacion=None
+2026-07-27 15:36:12,470 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.6
+2026-07-27 15:36:12,471 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=3.5 autoevaluacion=5.0
+2026-07-27 15:36:12,471 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.65
+2026-07-27 15:36:12,473 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=1.6 autoevaluacion=None
+2026-07-27 15:36:12,473 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=0.4
+2026-07-27 15:36:12,474 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=None autoevaluacion=None
+2026-07-27 15:36:12,474 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.04
+2026-07-27 15:36:12,475 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:36:12,475 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:36:12,475 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:36:12,476 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:36:12,488 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-27 15:36:12,492 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-27 15:36:12,570 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.5 autoevaluacion=3.5
+2026-07-27 15:36:12,570 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=4.08
+2026-07-27 15:36:12,634 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.8 autoevaluacion=3.8
+2026-07-27 15:36:12,634 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=4.18
+2026-07-27 15:36:12,703 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:36:12,703 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:36:12,708 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-27 15:36:12,781 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=2.5 evaluacion=4.8 autoevaluacion=3.8
+2026-07-27 15:36:12,781 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.21
+2026-07-27 15:36:12,784 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-27 15:36:12,840 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.8 autoevaluacion=3.8
+2026-07-27 15:36:12,840 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.85
+2026-07-27 15:36:12,844 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-27 15:36:12,951 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:36:12,951 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.58
+2026-07-27 15:36:13,027 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=None autoevaluacion=None
+2026-07-27 15:36:13,027 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.6
+2026-07-27 15:36:13,031 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-27 15:36:13,128 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:36:13,128 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:36:13,133 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-27 15:36:34,003 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-27
+2026-07-27 15:36:45,961 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:37:18,732 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:37:19,019 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:19,019 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:37:19,022 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-27 15:37:21,429 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:21,429 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:21,429 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:21,430 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:37:21,430 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:21,430 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:21,485 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:21,485 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:21,486 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:21,486 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:37:21,486 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:21,486 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,418 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-27 15:37:54,535 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,536 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,536 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,536 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,536 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:54,536 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:37:54,536 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,536 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,536 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,536 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,537 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,537 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,537 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,537 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,537 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,537 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,537 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,537 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,550 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,550 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,550 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:54,550 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:37:54,565 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,566 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,566 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,566 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,566 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,566 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,566 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:54,566 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:37:54,567 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,567 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,567 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,567 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,567 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,567 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,567 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,567 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,567 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,567 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,568 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,568 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,568 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,568 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,568 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,568 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,581 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,581 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,581 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:54,581 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:37:54,596 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,596 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,596 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,596 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,596 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:54,596 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,597 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,611 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:54,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:37:54,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,626 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,626 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,626 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,626 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,627 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:54,627 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:37:54,627 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,627 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,627 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,627 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,627 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,628 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,628 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,628 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,628 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,628 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,628 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,628 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,640 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,640 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,640 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,641 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,641 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:54,641 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:37:54,641 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,641 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,641 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,641 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,641 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,641 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,642 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,642 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,642 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,642 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,642 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,642 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,654 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,654 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,654 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,655 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,655 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:54,655 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:37:54,655 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:37:54,656 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:37:55,165 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:37:55,165 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:40:24,071 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-27 15:40:24,215 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-27 15:40:24,357 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-27 15:40:24,359 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: logo
+2026-07-27 15:40:24,359 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: vencimiento
+2026-07-27 15:40:24,359 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: num_periodos
+2026-07-27 15:40:24,359 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_registro
+2026-07-27 15:40:24,359 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: primary_color
+2026-07-27 15:40:24,360 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: secondary_color
+2026-07-27 15:40:24,360 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_profesores
+2026-07-27 15:40:24,360 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_directoras
+2026-07-27 15:40:24,360 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: codigo_rectores
+2026-07-27 15:40:24,360 [DEBUG  ] [-] app.infra.database: Columna ya existe en colegios: schema_version
+2026-07-27 15:40:30,328 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.75 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:40:30,328 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.74
+2026-07-27 15:40:30,332 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-27 15:40:30,411 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=None autoevaluacion=None
+2026-07-27 15:40:30,412 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.04
+2026-07-27 15:40:30,416 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-27 15:40:30,472 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:40:30,472 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.04
+2026-07-27 15:40:31,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.05 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:40:31,753 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.98
+2026-07-27 15:40:31,757 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-27 15:40:31,814 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=2.3 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:40:31,814 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:40:31,817 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-27 15:40:31,873 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=2.8 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:40:31,873 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.82
+2026-07-27 15:40:31,877 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-27 15:40:31,946 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.3 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:40:31,947 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.15
+2026-07-27 15:40:31,950 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-27 15:40:32,001 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:40:32,002 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.6
+2026-07-27 15:40:32,006 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-27 15:40:32,066 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:40:32,067 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.6
+2026-07-27 15:40:32,070 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-27 15:40:32,134 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.5 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:40:32,135 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.93
+2026-07-27 15:40:32,138 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-27 15:40:32,200 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:40:32,200 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.27
+2026-07-27 15:40:32,203 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-27 15:40:32,271 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:40:32,271 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.58
+2026-07-27 15:40:32,335 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:40:32,335 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.9
+2026-07-27 15:40:32,338 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-27 15:40:32,396 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:40:32,397 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.9
+2026-07-27 15:40:32,400 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-27 15:40:32,453 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=None autoevaluacion=None
+2026-07-27 15:40:32,453 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.27
+2026-07-27 15:40:32,455 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=3.5 autoevaluacion=None
+2026-07-27 15:40:32,455 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.15
+2026-07-27 15:40:32,456 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=None autoevaluacion=5.0
+2026-07-27 15:40:32,457 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.77
+2026-07-27 15:40:32,458 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:40:32,458 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.0
+2026-07-27 15:40:32,460 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=5.0
+2026-07-27 15:40:32,460 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=0.5
+2026-07-27 15:40:32,461 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=3.5 autoevaluacion=5.0
+2026-07-27 15:40:32,462 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.65
+2026-07-27 15:40:32,463 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:40:32,464 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:40:32,465 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=None autoevaluacion=None
+2026-07-27 15:40:32,465 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.04
+2026-07-27 15:40:32,467 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=5.0 evaluacion=None autoevaluacion=None
+2026-07-27 15:40:32,467 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:40:32,468 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=3.0 autoevaluacion=None
+2026-07-27 15:40:32,468 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.79
+2026-07-27 15:40:32,470 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=None autoevaluacion=None
+2026-07-27 15:40:32,470 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.6
+2026-07-27 15:40:32,471 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=3.5 autoevaluacion=5.0
+2026-07-27 15:40:32,472 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.65
+2026-07-27 15:40:32,473 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=1.6 autoevaluacion=None
+2026-07-27 15:40:32,473 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=0.4
+2026-07-27 15:40:32,474 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=1.6 evaluacion=None autoevaluacion=None
+2026-07-27 15:40:32,474 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=1.04
+2026-07-27 15:40:32,475 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:40:32,475 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:40:32,475 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:40:32,476 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:40:32,490 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-27 15:40:32,495 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-27 15:40:32,565 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.5 autoevaluacion=3.5
+2026-07-27 15:40:32,565 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=4.08
+2026-07-27 15:40:32,642 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=4.8 autoevaluacion=3.8
+2026-07-27 15:40:32,642 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=4.18
+2026-07-27 15:40:32,707 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:40:32,707 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:40:32,710 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-27 15:40:32,780 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=2.5 evaluacion=4.8 autoevaluacion=3.8
+2026-07-27 15:40:32,781 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.21
+2026-07-27 15:40:32,784 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-27 15:40:32,834 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.8 autoevaluacion=3.8
+2026-07-27 15:40:32,834 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.85
+2026-07-27 15:40:32,838 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-27 15:40:32,924 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.5 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:40:32,924 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.58
+2026-07-27 15:40:32,997 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=4.0 evaluacion=None autoevaluacion=None
+2026-07-27 15:40:32,997 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.6
+2026-07-27 15:40:33,000 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-27 15:40:33,082 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:40:33,082 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:40:33,086 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-27 15:40:54,370 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-27
+2026-07-27 15:41:05,766 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:41:38,513 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:41:38,791 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:41:38,791 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:41:38,795 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-27 15:41:40,444 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:41:40,444 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:41:40,444 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:41:40,444 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:41:40,445 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:41:40,445 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:41:40,490 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:41:40,490 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:41:40,490 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.0 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:41:40,490 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.25
+2026-07-27 15:41:40,490 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:41:40,490 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,417 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-27 15:42:13,505 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,505 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:42:13,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:42:13,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,506 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,507 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,507 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,507 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,507 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,507 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,507 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,520 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:42:13,520 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:42:13,520 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,520 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,533 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,533 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,533 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,533 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,533 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,533 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,534 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,535 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,535 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,535 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,535 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,535 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,535 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,547 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:42:13,548 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:42:13,548 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,548 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,562 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,562 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,563 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,563 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,563 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:42:13,563 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:42:13,563 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,563 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,563 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,563 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,564 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,564 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,564 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,564 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,564 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,564 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,564 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,564 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,575 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,575 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,576 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,577 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,577 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,577 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,577 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,577 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,588 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,589 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,589 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,589 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,589 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:42:13,589 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:42:13,589 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,589 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,589 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,589 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,589 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,590 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,590 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,590 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,590 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,590 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,590 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,590 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,600 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,600 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,600 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,600 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,600 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:42:13,600 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:42:13,600 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,601 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,612 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:42:13,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41
+2026-07-27 15:42:13,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:13,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=None evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=None
+2026-07-27 15:42:13,613 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.85 evaluacion=None autoevaluacion=None
+2026-07-27 15:42:13,614 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=2.5
+2026-07-27 15:42:13,614 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=None
+2026-07-27 15:42:13,614 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.11
+2026-07-27 15:42:14,043 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: act_prom=3.25 evaluacion=4.0 autoevaluacion=3.0
+2026-07-27 15:42:14,043 [DEBUG  ] [-] app.infra.grades: _promedio_ponderado: resultado=3.41

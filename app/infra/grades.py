@@ -61,18 +61,24 @@ def calcular_stats_curso(conn, slug, curso_sel, materia, jornada, periodo, profe
     alumnos = conn.execute(
         'SELECT id FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
         (curso_sel, jornada)).fetchall()
-    promedios = []
-    for a in alumnos:
-        p = calcular_stats_estudiante(conn, slug, a['id'], curso_sel, materia, jornada, periodo, profesor_id)
-        if p is not None:
-            promedios.append(p)
+    if not alumnos:
+        return {'promedio_curso': None, 'notas_pendientes': 0}
+    aids = [a['id'] for a in alumnos]
+    placeholders = ','.join('?' for _ in aids)
+    prom_rows = conn.execute(
+        f'''SELECT n.aid, ROUND(AVG(n.val),2) as promedio
+            FROM notas n JOIN actividades a ON a.id=n.actividad_id
+            WHERE n.aid IN ({placeholders}) AND a.materia=? AND a.jornada=? AND a.curso=?
+            AND COALESCE(a.periodo,1)=? AND a.profesor_id=?
+            GROUP BY n.aid''',
+        (*aids, materia, jornada, curso_sel, periodo, profesor_id)).fetchall()
+    promedios = [r['promedio'] for r in prom_rows if r['promedio'] is not None]
     prom_curso = round(sum(promedios) / len(promedios), 2) if promedios else None
     total_est = len(alumnos)
-    act_ids = conn.execute(
-        '''SELECT id FROM actividades WHERE materia=? AND jornada=? AND curso=?
+    act_count = conn.execute(
+        '''SELECT COUNT(*) as c FROM actividades WHERE materia=? AND jornada=? AND curso=?
            AND COALESCE(periodo,1)=? AND profesor_id=?''',
-        (materia, jornada, curso_sel, periodo, profesor_id)).fetchall()
-    act_count = len(act_ids)
+        (materia, jornada, curso_sel, periodo, profesor_id)).fetchone()['c']
     notas_count = conn.execute(
         '''SELECT COUNT(*) as c FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
            WHERE ac.materia=? AND ac.jornada=? AND ac.curso=? AND COALESCE(ac.periodo,1)=?

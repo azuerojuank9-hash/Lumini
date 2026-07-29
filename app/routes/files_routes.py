@@ -40,15 +40,21 @@ def api_archivo_descargar(slug, fid):
     if not tipo:
         return 'No autorizado', 401
     conn = fa.conectar(slug)
-    arch = get_archivo(conn, fid)
-    conn.close()
-    if not arch:
-        return 'No encontrado', 404
-    ruta = os.path.join(fa.app.root_path, 'static', 'uploads', slug, arch['nombre_archivo'])
-    if not os.path.exists(ruta):
-        return 'No encontrado', 404
-    return send_file(ruta, mimetype=arch['tipo_mime'], as_attachment=True,
-                     download_name=arch['nombre_original'])
+    try:
+        arch = get_archivo(conn, fid)
+        if not arch:
+            return 'No encontrado', 404
+        owner_tipo = arch.get('usuario_tipo')
+        owner_id = arch.get('usuario_id')
+        if owner_tipo != tipo or owner_id != uid:
+            return 'No autorizado', 403
+        ruta = os.path.join(fa.app.root_path, 'static', 'uploads', slug, arch['nombre_archivo'])
+        if not os.path.exists(ruta):
+            return 'No encontrado', 404
+        return send_file(ruta, mimetype=arch['tipo_mime'], as_attachment=True,
+                         download_name=arch['nombre_original'])
+    finally:
+        conn.close()
 
 
 @files_bp.route('/<slug>/api/archivos/<int:fid>/previsualizar')
@@ -59,18 +65,24 @@ def api_archivo_previsualizar(slug, fid):
     if not tipo:
         return 'No autorizado', 401
     conn = fa.conectar(slug)
-    arch = get_archivo(conn, fid)
-    conn.close()
-    if not arch:
-        return 'No encontrado', 404
-    ruta = os.path.join(fa.app.root_path, 'static', 'uploads', slug, arch['nombre_archivo'])
-    if not os.path.exists(ruta):
-        return 'No encontrado', 404
-    if arch['es_imagen']:
-        return send_file(ruta, mimetype=arch['tipo_mime'])
-    if arch['tipo_mime'] == 'application/pdf':
-        return send_file(ruta, mimetype='application/pdf')
-    return jsonify({'ok': False, 'error': 'Vista previa no disponible'})
+    try:
+        arch = get_archivo(conn, fid)
+        if not arch:
+            return 'No encontrado', 404
+        owner_tipo = arch.get('usuario_tipo')
+        owner_id = arch.get('usuario_id')
+        if owner_tipo != tipo or owner_id != uid:
+            return 'No autorizado', 403
+        ruta = os.path.join(fa.app.root_path, 'static', 'uploads', slug, arch['nombre_archivo'])
+        if not os.path.exists(ruta):
+            return 'No encontrado', 404
+        if arch['es_imagen']:
+            return send_file(ruta, mimetype=arch['tipo_mime'])
+        if arch['tipo_mime'] == 'application/pdf':
+            return send_file(ruta, mimetype='application/pdf')
+        return jsonify({'ok': False, 'error': 'Vista previa no disponible'})
+    finally:
+        conn.close()
 
 
 @files_bp.route('/<slug>/api/archivos/<int:fid>/eliminar', methods=['DELETE', 'POST'])
@@ -83,19 +95,19 @@ def api_archivo_eliminar(slug, fid):
     if not tipo:
         return jsonify({'ok': False, 'error': 'No autorizado'}), 401
     conn = fa.conectar(slug)
-    arch = get_archivo(conn, fid)
-    if not arch:
+    try:
+        arch = get_archivo(conn, fid)
+        if not arch:
+            return jsonify({'ok': False, 'error': 'No encontrado'}), 404
+        if arch['usuario_tipo'] != tipo or arch['usuario_id'] != uid:
+            if tipo != 'rector':
+                return jsonify({'ok': False, 'error': 'No puedes eliminar este archivo'}), 403
+        eliminar_archivo_db(conn, fid)
+        conn.commit()
+        fa.audit_log(slug, uid, 'delete', 'mensajes_archivos', fid,
+                     valor_anterior={'nombre_original': arch['nombre_original']})
+    finally:
         conn.close()
-        return jsonify({'ok': False, 'error': 'No encontrado'}), 404
-    if arch['usuario_tipo'] != tipo or arch['usuario_id'] != uid:
-        if tipo != 'rector':
-            conn.close()
-            return jsonify({'ok': False, 'error': 'No puedes eliminar este archivo'}), 403
-    eliminar_archivo_db(conn, fid)
-    conn.commit()
-    fa.audit_log(slug, uid, 'delete', 'mensajes_archivos', fid,
-                 valor_anterior={'nombre_original': arch['nombre_original']})
-    conn.close()
     ruta = os.path.join(fa.app.root_path, 'static', 'uploads', slug, arch['nombre_archivo'])
     eliminar_archivo_fisico(ruta)
     return jsonify({'ok': True})

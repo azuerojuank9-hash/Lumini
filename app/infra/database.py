@@ -297,7 +297,6 @@ def _migrar_v13(conn, slug=None):
     )''')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_auditoria_notas_aid ON auditoria_notas(aid)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_auditoria_notas_curso ON auditoria_notas(curso, materia, periodo)')
-    conn.execute('CREATE INDEX IF NOT EXISTS idx_auditoria_notas_curso_prof ON auditoria_notas(curso, materia, periodo, profesor_id)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_auditoria_notas_fecha ON auditoria_notas(creado)')
 
 
@@ -322,6 +321,7 @@ def _migrar_v14(conn, slug=None):
     conn.execute('CREATE INDEX IF NOT EXISTS idx_solicitudes_slug_estado ON solicitudes_modificacion(slug, estado)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_solicitudes_profesor ON solicitudes_modificacion(profesor_id, slug)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_solicitudes_aid ON solicitudes_modificacion(aid)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_solicitudes_fecha ON solicitudes_modificacion(fecha_solicitud)')
     conn.execute("UPDATE solicitudes_modificacion SET slug=? WHERE slug IS NULL OR slug=''", (slug or '',))
 
 
@@ -338,6 +338,9 @@ def _migrar_v15(conn, slug=None):
             conn.execute(f'ALTER TABLE asistencia ADD COLUMN {ddl}')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_asistencia_fecha_estado ON asistencia(fecha, estado)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_asistencia_aid_estado ON asistencia(aid, estado)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_asistencia_aid ON asistencia(aid)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_asistencia_aid_fecha ON asistencia(aid, fecha)')
+    conn.execute('CREATE INDEX IF NOT EXISTS idx_asistencia_fecha ON asistencia(fecha)')
 
 
 def _migrar_v16(conn, slug=None):
@@ -960,16 +963,13 @@ def init_db(slug):
         'CREATE INDEX IF NOT EXISTS idx_rectores_usuario ON rectores(usuario, activo)',
         'CREATE INDEX IF NOT EXISTS idx_comunicaciones_leidas_user ON comunicaciones_leidas(usuario_tipo, usuario_id, leido)',
         'CREATE INDEX IF NOT EXISTS idx_periodos_estado_periodo ON periodos_estado(periodo)',
-        'CREATE INDEX IF NOT EXISTS idx_config_institucion_slug ON config_institucion(slug)',
         'CREATE INDEX IF NOT EXISTS idx_alumnos_id_curso ON alumnos(id, curso)',
         'CREATE INDEX IF NOT EXISTS idx_comunicaciones_estado ON comunicaciones(rector_id, activo, estado)',
         'CREATE INDEX IF NOT EXISTS idx_ml_mensaje_tipo ON mensajes_leidos(mensaje_id, usuario_tipo, usuario_id)',
         'CREATE INDEX IF NOT EXISTS idx_obs_aid_materia ON observaciones(aid, materia)',
         'CREATE INDEX IF NOT EXISTS idx_comunicaciones_rector_fecha ON comunicaciones(rector_id, activo, fecha_creacion)',
-        'CREATE INDEX IF NOT EXISTS idx_audit_log_tabla ON audit_log(tabla)',
         'CREATE INDEX IF NOT EXISTS idx_asistencia_fecha ON asistencia(fecha)',
         'CREATE INDEX IF NOT EXISTS idx_actividades_prof_periodo ON actividades(profesor_id, materia, jornada, curso, periodo)',
-        'CREATE INDEX IF NOT EXISTS idx_solicitudes_fecha ON solicitudes_modificacion(fecha_solicitud)',
     ]
     for idx in indexes:
         try:

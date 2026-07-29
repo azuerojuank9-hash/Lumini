@@ -4,6 +4,7 @@ import logging
 import secrets
 
 from app.infra.session import clear as session_clear
+from app.infra.session import regenerate as session_regenerate
 from app.infra.session import set as session_set
 from app.infra.session import set_permanent
 
@@ -21,6 +22,7 @@ def login_profesor(slug, usuario, password, prof, verificar_pw, necesita_rehash,
     set_permanent(True)
     session_set(f'rol_{slug}', 'profesor')
     session_set(f'profesor_id_{slug}', prof['id'])
+    session_regenerate()
     return 'profesor', None
 
 
@@ -30,6 +32,7 @@ def login_rector(slug, usuario, password, rector, verificar_pw):
     session_clear()
     set_permanent(True)
     session_set(f'rector_id_{slug}', rector['id'])
+    session_regenerate()
     return 'rector', None
 
 
@@ -39,6 +42,7 @@ def login_directora(slug, usuario, password, directora, verificar_pw):
     session_clear()
     set_permanent(True)
     session_set(f'directora_id_{slug}', directora['id'])
+    session_regenerate()
     return 'directora', None
 
 
@@ -66,6 +70,7 @@ def login_estudiante(slug, codigo, password, alumno, verificar_pw=None, necesita
     session_clear()
     set_permanent(True)
     session_set(f'alumno_id_{slug}', alumno['id'])
+    session_regenerate()
     return 'estudiante', None
 
 
@@ -76,6 +81,7 @@ def parent_portal_login(slug, email, pin, get_parent_fn, get_children_fn):
     session_clear()
     set_permanent(True)
     session_set(f'padre_id_{slug}', parent['id'])
+    session_regenerate()
     children = get_children_fn(slug, parent['id'])
     return {'padre': dict(parent), 'hijos': [dict(c) for c in children]}, None
 

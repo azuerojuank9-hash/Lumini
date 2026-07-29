@@ -15,7 +15,10 @@ REFRESH_EXPIRY_DAYS = 30
 
 
 def _get_secret():
-    return current_app.config.get('SECRET_KEY', 'dev-secret-change-in-prod')
+    secret = current_app.config.get('SECRET_KEY')
+    if not secret:
+        raise RuntimeError('SECRET_KEY no configurado')
+    return secret
 
 
 def _get_jwk():
@@ -94,12 +97,18 @@ def role_required(*roles):
 
 @bp.route('/auth/login', methods=['POST'])
 def api_login():
+    from app.infra.security import ip_bloqueada, registrar_fallo, limpiar_intentos
     data = request.get_json(silent=True) or {}
     usuario = data.get('usuario', '')
     password = data.get('password', '')
     slug = data.get('slug', '')
     if not usuario or not password or not slug:
         return jsonify({'error': 'usuario, password y slug requeridos', 'code': 'MISSING_FIELDS'}), 400
+
+    ip = request.remote_addr or 'unknown'
+    bloqueo = ip_bloqueada(ip, prefijo='api')
+    if bloqueo:
+        return jsonify({'error': f'Demasiados intentos. Intenta en {bloqueo} segundos.', 'code': 'RATE_LIMITED'}), 429
 
     from flask_app import conectar, verificar_pw
     conn = conectar(slug)
@@ -123,7 +132,9 @@ def api_login():
                 if not row['activo']:
                     return jsonify({'error': 'Usuario inactivo', 'code': 'INACTIVE_USER'}), 403
                 if not verificar_pw(password, row['password']):
+                    registrar_fallo(ip, prefijo='api')
                     return jsonify({'error': 'Credenciales inválidas', 'code': 'INVALID_CREDENTIALS'}), 401
+                limpiar_intentos(ip, prefijo='api')
                 token = generate_token(row['id'], role, slug)
                 refresh = generate_refresh_token(row['id'], role, slug)
                 return jsonify({
@@ -134,6 +145,7 @@ def api_login():
                     'slug': slug,
                     'expires_in': TOKEN_EXPIRY_HOURS * 3600,
                 })
+        registrar_fallo(ip, prefijo='api')
         return jsonify({'error': 'Usuario no encontrado', 'code': 'USER_NOT_FOUND'}), 404
     finally:
         conn.close()

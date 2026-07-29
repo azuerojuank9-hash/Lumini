@@ -1,4 +1,4 @@
-from flask import jsonify, session
+from flask import jsonify, render_template, request, session
 
 from app.routes import parent_bp
 from app.services.parent_service import ParentService
@@ -12,17 +12,28 @@ def _fa():
     return flask_app
 
 
+def _is_json_request():
+    accept = request.headers.get('Accept', '')
+    return 'text/html' not in accept or request.args.get('json') is not None
+
+
 @parent_bp.route('/<slug>/portal/dashboard')
 def portal_padre_dashboard(slug):
     fa = _fa()
     fa.require_colegio(slug)
     pid = session.get(f'padre_id_{slug}')
     if not pid:
-        return jsonify({'error': 'No autorizado'}), 403
+        if _is_json_request():
+            return jsonify({'error': 'No autorizado'}), 403
+        return render_template('portal_padre.html', slug=slug, colegio=fa.get_colegio(slug), step='login')
     conn = fa.conectar(slug)
     try:
         resultado = ParentService.get_dashboard_data(conn, pid)
-        return jsonify({'hijos': resultado})
+        if _is_json_request():
+            return jsonify({'hijos': resultado})
+        return render_template('portal_padre.html', slug=slug, colegio=fa.get_colegio(slug),
+                               step='dashboard', hijos=resultado,
+                               padre=conn.execute('SELECT * FROM padres WHERE id=?', (pid,)).fetchone())
     finally:
         conn.close()
 

@@ -59,3 +59,37 @@
 </div>
 <div id="horarioContainer"></div>
 {% endblock %}
+{% block scripts %}
+<script>
+var SLUG='{{ slug }}';
+var dias=['Lunes','Martes','Miércoles','Jueves','Viernes'];
+var franjas=['1','2','3','4','5','6'];
+function cargarHorario(){
+    var curso=document.getElementById('cursoSelect').value;
+    var jornada=document.getElementById('jornadaSelect').value;
+    var c=document.getElementById('horarioContainer');
+    if(!curso){c.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);">Selecciona un curso para ver su horario.</div>';return;}
+    c.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);">Cargando horario...</div>';
+    fetch('/'+SLUG+'/rector/horarios/datos?curso='+encodeURIComponent(curso)+'&jornada='+encodeURIComponent(jornada))
+    .then(function(r){return r.json();}).then(function(d){
+        var h='<div class="horario-grid">';
+        h+='<div class="horario-cell header"></div>';
+        dias.forEach(function(di){h+='<div class="horario-cell header">'+di+'</div>';});
+        franjas.forEach(function(f){
+            h+='<div class="horario-cell franja">F'+f+'</div>';
+            dias.forEach(function(di){
+                var key=di+'_'+f;
+                var cell=d[key];
+                h+='<div class="horario-cell">';
+                if(cell&&cell.materia){h+='<div class="mat">'+escHtml(cell.materia)+'</div><div class="prof">'+escHtml(cell.profesor||'')+'</div>';}
+                else{h+='<div style="color:var(--muted);font-size:10px;">—</div>';}
+                h+='</div>';
+            });
+        });
+        h+='</div>';
+        c.innerHTML=h;
+    }).catch(function(){c.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger);">Error al cargar horario</div>';});
+}
+function escHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+{% endblock %}

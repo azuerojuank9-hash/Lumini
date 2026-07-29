@@ -11,10 +11,29 @@ function showToast(message, type, duration) {
   if (!c) { c = document.createElement('div'); c.id = 'toast-container'; c.className = 'toast-container'; document.body.appendChild(c); }
   var t = document.createElement('div');
   t.className = 'toast toast-' + type + ' toast-enter';
-  var iconMap = { success: 'check-circle', error: 'alert-triangle', info: 'info' };
-  t.innerHTML = '<span class="toast-icon"><i data-lucide="' + (iconMap[type] || 'info') + '" width="16" height="16"></i></span>'
-    + '<span class="toast-message">' + message + '</span>'
-    + '<button class="toast-close btn-icon-sm btn-ghost" onclick="this.closest(\'.toast\').remove()" aria-label="Cerrar"><i data-lucide="x" width="12" height="12"></i></button>';
+  var iconMap = { success: 'check-circle', error: 'alert-triangle', info: 'info', warning: 'alert-triangle' };
+  var iconSpan = document.createElement('span');
+  iconSpan.className = 'toast-icon';
+  var iconI = document.createElement('i');
+  iconI.setAttribute('data-lucide', iconMap[type] || 'info');
+  iconI.setAttribute('width', '16');
+  iconI.setAttribute('height', '16');
+  iconSpan.appendChild(iconI);
+  var msgSpan = document.createElement('span');
+  msgSpan.className = 'toast-message';
+  msgSpan.textContent = message;
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'toast-close btn-icon-sm btn-ghost';
+  closeBtn.setAttribute('aria-label', 'Cerrar');
+  closeBtn.onclick = function() { t.remove(); };
+  var closeI = document.createElement('i');
+  closeI.setAttribute('data-lucide', 'x');
+  closeI.setAttribute('width', '12');
+  closeI.setAttribute('height', '12');
+  closeBtn.appendChild(closeI);
+  t.appendChild(iconSpan);
+  t.appendChild(msgSpan);
+  t.appendChild(closeBtn);
   c.appendChild(t);
   if (window.lucide) lucide.createIcons();
   setTimeout(function() {

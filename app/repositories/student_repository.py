@@ -90,8 +90,8 @@ def reasignar_actividades(conn, from_pid, to_pid, curso, materia, jornada):
 
 def reasignar_evaluaciones(conn, from_pid, to_pid, curso, jornada):
     conn.execute(
-        'UPDATE evaluaciones SET profesor_id=? WHERE profesor_id=? AND materia=? AND jornada=? AND aid IN (SELECT id FROM alumnos WHERE curso=? AND jornada=?)',
-        (to_pid, from_pid, None, None, curso, jornada))
+        'UPDATE evaluaciones SET profesor_id=? WHERE profesor_id=? AND aid IN (SELECT id FROM alumnos WHERE curso=? AND jornada=?)',
+        (to_pid, from_pid, curso, jornada))
 
 
 def copy_asignacion_curso(conn, to_pid, materia, jornada, curso):

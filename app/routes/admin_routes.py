@@ -68,16 +68,39 @@ def admin_ver_profesores(slug):
         return jsonify({'error': 'Colegio no encontrado'}), 404
     fa.init_db(slug)
     conn = fa.conectar(slug)
-    profs = conn.execute(
-        'SELECT id, nombre, usuario, activo FROM profesores ORDER BY nombre').fetchall()
-    resultado = []
-    for p in profs:
-        mats = conn.execute(
-            'SELECT materia, jornada FROM asignaciones_materia WHERE profesor_id=? ORDER BY jornada, materia',
-            (p['id'],)).fetchall()
-        resultado.append({
-            'nombre': p['nombre'], 'usuario': p['usuario'], 'activo': p['activo'],
-            'materias': [{'materia': m['materia'], 'jornada': m['jornada']} for m in mats]
-        })
-    conn.close()
-    return jsonify({'profesores': resultado})
+    try:
+        profs = conn.execute(
+            'SELECT id, nombre, usuario, activo FROM profesores ORDER BY nombre').fetchall()
+        resultado = []
+        for p in profs:
+            mats = conn.execute(
+                'SELECT materia, jornada FROM asignaciones_materia WHERE profesor_id=? ORDER BY jornada, materia',
+                (p['id'],)).fetchall()
+            resultado.append({
+                'nombre': p['nombre'], 'usuario': p['usuario'], 'activo': p['activo'],
+                'materias': [{'materia': m['materia'], 'jornada': m['jornada']} for m in mats]
+            })
+        return jsonify({'profesores': resultado})
+    finally:
+        conn.close()
+
+
+@admin_bp.route('/admin/correos')
+def admin_correos():
+    fa = _fa()
+    if not fa.session.get('admin_auth'):
+        return redirect(fa.url_for('auth.admin'))
+    cm = fa.conectar_master()
+    colegios = cm.execute('SELECT * FROM colegios ORDER BY nombre').fetchall()
+    cm.close()
+    return render_template('admin_correos.html', colegios=colegios)
+
+
+@admin_bp.route('/admin/correos/<path:accion>', methods=['POST'])
+@admin_bp.route('/admin/recordatorio_pago', methods=['POST'])
+@admin_bp.route('/admin/enviar_correo', methods=['POST'])
+def admin_correos_placeholder(accion=None):
+    fa = _fa()
+    if not fa.session.get('admin_auth'):
+        return redirect(fa.url_for('auth.admin'))
+    return 'Esta funcionalidad esta en desarrollo.', 501

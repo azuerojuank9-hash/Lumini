@@ -239,9 +239,9 @@ function validarRegistro(){
 function recBuscar(){
  var u=document.getElementById('rec-usuario').value;var e1=document.getElementById('rec-err1');
  if(!u.trim()){e1.textContent='Ingresa tu usuario';e1.className='msg-box error';return}
- fetch(window.location.pathname.replace('/login','')+'/recuperar_pregunta?usuario='+encodeURIComponent(u))
+  fetch(window.location.pathname.replace('/login','')+'/buscar_usuario_recuperar',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRF-Token':'{{ csrf_token() }}'},body:'usuario='+encodeURIComponent(u)})
  .then(r=>r.json()).then(d=>{
-  if(d.error){e1.textContent=d.error;return}
+   if(d.mensaje&&!d.ok){e1.textContent=d.mensaje;return}
   document.getElementById('rec-pregunta-txt').innerHTML='<i data-lucide="key" width="14" height="14"></i> '+d.pregunta;
   document.getElementById('rec-paso1').style.display='none';
   document.getElementById('rec-paso2').style.display='block';
@@ -258,12 +258,12 @@ function recCambiar(){
  if(nueva.length<6){e2.textContent='La contraseña debe tener al menos 6 caracteres';return}
  if(nueva!==conf){e2.textContent='Las contraseñas no coinciden';return}
  var u=document.getElementById('rec-usuario').value;
- fetch(window.location.pathname.replace('/login','')+'/recuperar_cambiar',{
+  fetch(window.location.pathname.replace('/login','')+'/cambiar_password_recuperar',{
   method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':'{{ csrf_token() }}'},
   body:JSON.stringify({usuario:u,respuesta:respuesta,nueva_password:nueva})
  }).then(r=>r.json()).then(d=>{
-  if(d.error){e2.textContent=d.error;return}
-  o2.innerHTML=d.mensaje+' <a href="." class="forgot-link" style="display:inline">Ingresar ahora</a>';
+   if(d.mensaje&&!d.ok){e2.textContent=d.mensaje;return}
+   o2.innerHTML=d.mensaje+' <a href="." class="forgot-link" style="display:inline">Ingresar ahora</a>';
   document.getElementById('rec-err2').className='msg-box error';
   document.getElementById('rec-ok2').className='msg-box success';
  }).catch(function(){e2.textContent='Error de conexión'});

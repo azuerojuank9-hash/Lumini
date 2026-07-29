@@ -437,6 +437,9 @@ def api_canales_escribiendo(slug, cid):
 def api_canales_actividad(slug, cid):
     fa = _fa()
     fa.require_colegio(slug)
+    tipo, uid = fa.get_usuario_actual(slug)
+    if not tipo:
+        return jsonify({'ok': False, 'error': 'No autorizado'}), 401
     conn = fa.conectar(slug)
     rows = conn.execute(
         'SELECT ca.* FROM canal_actividad ca WHERE ca.canal_id=?', (cid,)).fetchall()

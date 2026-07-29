@@ -3,6 +3,7 @@
 {% block title %}Dashboard - {{ slug }}{% endblock %}
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_head %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>{% endblock %}
 {% block extra_styles %}
 .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
 .page-header h1{font-size:20px;font-weight:700;margin:0}
@@ -19,7 +20,7 @@
 .bg-orange{background:rgba(var(--orange-rgb),.2);color:var(--orange)}
 .bg-pink{background:rgba(var(--pink-rgb),.2);color:var(--pink)}
 .bg-teal{background:rgba(var(--teal-rgb),.2);color:var(--teal)}
-.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:12px;margin-bottom:20px}
 .chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px}
 .chart-card .chart-title{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text)}
 .chart-card .chart-wrap{position:relative;width:100%;max-height:340px}
@@ -55,6 +56,7 @@
 .dash-tab:hover{color:var(--text)}
 .tab-content{display:none}
 .tab-content.active{display:block}
+.empty-msg{text-align:center;color:var(--muted);font-size:13px;padding:24px 0}
 {% endblock %}
 
 {% block sidebar %}{% include "components/sidebar_teacher.html" %}{% endblock %}
@@ -62,8 +64,8 @@
 {% block content %}
 <div class="page-header">
     <div>
-      <h1>Dashboard {{ instance == 'rector' and 'Institucional' or 'Acad&eacute;mico' }}</h1>
-      <div class="subtitle">Indicadores y estad&iacute;sticas en tiempo real</div>
+      <h1>Dashboard {{ instance == 'rector' and 'Institucional' or 'Acad\u00e9mico' }}</h1>
+      <div class="subtitle">Indicadores y estadísticas en tiempo real</div>
     </div>
     <div class="export-bar">
       <button onclick="exportPDF()" class="btn btn-secondary btn-sm"><i data-lucide="file-text"></i> PDF</button>
@@ -87,10 +89,10 @@
   </div>
 
   <div class="dash-tabs" id="dashTabs">
-    <button class="dash-tab active" data-tab="charts">Gr&aacute;ficos</button>
+    <button class="dash-tab active" data-tab="charts">Gráficos</button>
     <button class="dash-tab" data-tab="alerts">Alertas</button>
     <button class="dash-tab" data-tab="rankings">Rankings</button>
-    <button class="dash-tab" data-tab="stats">Estad&iacute;sticas</button>
+    <button class="dash-tab" data-tab="stats">Estadísticas</button>
   </div>
 
   <div class="tab-content active" id="tabCharts">
@@ -125,7 +127,231 @@
   </div>
 {% endblock %}
 {% block extra_scripts %}
-function exportPDF(){ if(window.showToast)window.showToast('Generando PDF...','info'); }
-function exportExcel(){ if(window.showToast)window.showToast('Generando Excel...','info'); }
-function loadDashboard(){ /* loaded on page render */ }
+var SLUG='{{ slug }}';
+var INSTANCE='{{ instance }}';
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+
+function loadDashboard(){
+  var curso=document.getElementById('filterCurso').value;
+  var materia=document.getElementById('filterMateria')?document.getElementById('filterMateria').value:'';
+  var periodo=document.getElementById('filterPeriodo').value;
+  var params=new URLSearchParams();
+  if(curso)params.set('curso',curso);
+  if(materia)params.set('materia',materia);
+  if(periodo)params.set('periodo',periodo);
+  if(window.showToast)window.showToast('Cargando datos...','info');
+  fetch('/'+SLUG+'/dashboard_data?'+params.toString())
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+    .then(function(d){
+      renderCards(d.cards||{});
+      renderCharts(d.charts||{});
+      renderAlerts(d.alerts||{});
+      renderRankings(d.rankings||{});
+      renderStats(d.estadisticas||{});
+      if(window.showToast)window.showToast('Dashboard actualizado','success');
+    })
+    .catch(function(e){
+      console.error('Dashboard load error:',e);
+      if(window.showToast)window.showToast('Error al cargar datos','error');
+    });
+}
+
+function renderCards(c){
+  var g=document.getElementById('cardGrid');if(!g)return;
+  var cards=[];
+  if(INSTANCE==='rector'){
+    cards=[
+      {icon:'users',label:'Estudiantes',val:c.total_estudiantes,bg:'bg-purple'},
+      {icon:'briefcase',label:'Profesores',val:c.total_profesores,bg:'bg-blue'},
+      {icon:'book-open',label:'Cursos',val:c.total_cursos,bg:'bg-green'},
+      {icon:'layers',label:'Materias',val:c.total_materias,bg:'bg-orange'},
+      {icon:'clipboard',label:'Actividades',val:c.total_actividades,bg:'bg-yellow'},
+      {icon:'trending-up',label:'Promedio Inst.',val:c.promedio_institucional!=null?c.promedio_institucional.toFixed(1):'\u2014',bg:'bg-teal'},
+      {icon:'award',label:'Mejor Curso',val:c.mejor_curso||'\u2014',bg:'bg-green'},
+      {icon:'alert-triangle',label:'Curso en Riesgo',val:c.peor_curso||'\u2014',bg:'bg-red'},
+      {icon:'star',label:'Mejor Materia',val:c.mejor_materia||'\u2014',bg:'bg-yellow'},
+      {icon:'clock',label:'Solicitudes Pend.',val:c.solicitudes_pendientes,bg:'bg-orange'},
+      {icon:'calendar-check',label:'Per\u00edodos Abiertos',val:c.periodos_abiertos,bg:'bg-blue'},
+      {icon:'lock',label:'Per\u00edodos Cerrados',val:c.periodos_cerrados,bg:'bg-purple'}
+    ];
+  }else{
+    cards=[
+      {icon:'users',label:'Estudiantes',val:c.total_estudiantes,bg:'bg-purple'},
+      {icon:'clipboard',label:'Actividades',val:c.total_actividades,bg:'bg-blue'},
+      {icon:'check-circle',label:'Calificadas',val:c.actividades_calificadas,bg:'bg-green'},
+      {icon:'clock',label:'Pendientes',val:c.actividades_pendientes,bg:'bg-orange'},
+      {icon:'trending-up',label:'Promedio',val:c.promedio_curso!=null?c.promedio_curso.toFixed(1):'\u2014',bg:'bg-teal'},
+      {icon:'check',label:'Aprobados',val:c.aprobados,bg:'bg-green'},
+      {icon:'x-circle',label:'Reprobados',val:c.reprobados,bg:'bg-red'},
+      {icon:'arrow-up',label:'Nota M\u00e1x',val:c.nota_max!=null?c.nota_max.toFixed(1):'\u2014',bg:'bg-yellow'},
+      {icon:'arrow-down',label:'Nota M\u00edn',val:c.nota_min!=null?c.nota_min.toFixed(1):'\u2014',bg:'bg-orange'},
+      {icon:'bar-chart',label:'Prom. Materia',val:c.promedio_materia!=null?c.promedio_materia.toFixed(1):'\u2014',bg:'bg-pink'}
+    ];
+  }
+  var h='';
+  cards.forEach(function(c){
+    h+='<div class="card" style="padding:14px"><div style="display:flex;align-items:center;gap:10px">';
+    h+='<div class="icon '+c.bg+'" style="width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i data-lucide="'+c.icon+'"></i></div>';
+    h+='<div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">'+escHtml(c.label)+'</div>';
+    h+='<div style="font-size:18px;font-weight:700;margin-top:2px">'+escHtml(String(c.val))+'</div></div></div></div>';
+  });
+  g.innerHTML=h;
+  if(window.lucide)lucide.createIcons();
+}
+
+function renderCharts(ch){
+  var g=document.getElementById('chartGrid');if(!g)return;
+  g.innerHTML='';
+  var cards=[
+    {id:'dist',title:'Distribuci\u00f3n de Notas',data:ch.distribucion},
+    {id:'xcurso',title:'Promedio por Curso',data:ch.promedio_por_curso},
+    {id:'xmateria',title:'Promedio por Materia',data:ch.promedio_por_materia},
+    {id:'evol',title:'Evoluci\u00f3n por Per\u00edodo',data:ch.evolucion_periodos}
+  ];
+  cards.forEach(function(c){
+    g.innerHTML+='<div class="chart-card"><div class="chart-title">'+escHtml(c.title)+'</div><div class="chart-wrap"><canvas id="chart-'+c.id+'"></canvas></div></div>';
+  });
+  if(typeof Chart==='undefined')return;
+  var colors=['rgba(var(--accent-rgb),.7)','rgba(var(--blue-rgb),.7)','rgba(var(--success-rgb),.7)','rgba(var(--warning-rgb),.7)','rgba(var(--danger-rgb),.7)'];
+  var bgColors=['rgba(var(--accent-rgb),.2)','rgba(var(--blue-rgb),.2)','rgba(var(--success-rgb),.2)','rgba(var(--warning-rgb),.2)','rgba(var(--danger-rgb),.2)'];
+  if(ch.distribucion&&ch.distribucion.length){
+    var c1=document.getElementById('chart-dist');
+    if(c1){new Chart(c1,{type:'bar',data:{labels:ch.distribucion.map(function(d){return d.label}),datasets:[{label:'Cantidad',data:ch.distribucion.map(function(d){return d.count}),backgroundColor:colors,borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});}
+  }
+  if(ch.promedio_por_curso&&ch.promedio_por_curso.length){
+    var c2=document.getElementById('chart-xcurso');
+    if(c2){new Chart(c2,{type:'bar',data:{labels:ch.promedio_por_curso.map(function(d){return d.curso}),datasets:[{label:'Promedio',data:ch.promedio_por_curso.map(function(d){return d.promedio}),backgroundColor:'rgba(var(--accent-rgb),.6)',borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});}
+  }
+  if(ch.promedio_por_materia&&ch.promedio_por_materia.length){
+    var c3=document.getElementById('chart-xmateria');
+    if(c3){new Chart(c3,{type:'bar',data:{labels:ch.promedio_por_materia.map(function(d){return d.materia}),datasets:[{label:'Promedio',data:ch.promedio_por_materia.map(function(d){return d.promedio}),backgroundColor:'rgba(var(--success-rgb),.6)',borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});}
+  }
+  if(ch.evolucion_periodos&&ch.evolucion_periodos.length){
+    var c4=document.getElementById('chart-evol');
+    if(c4){new Chart(c4,{type:'line',data:{labels:ch.evolucion_periodos.map(function(d){return 'P'+d.periodo}),datasets:[{label:'Promedio',data:ch.evolucion_periodos.map(function(d){return d.promedio}),borderColor:'rgba(var(--accent-rgb),1)',backgroundColor:'rgba(var(--accent-rgb),.15)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'rgba(var(--accent-rgb),1)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});}
+  }
+}
+
+function renderAlerts(a){
+  var g=document.getElementById('alertsSection');if(!g)return;
+  var h='<div class="section-title"><i data-lucide="alert-triangle"></i> Alertas</div>';
+  var hasAlerts=false;
+  if(a.estudiantes_bajo&&a.estudiantes_bajo.length){
+    hasAlerts=true;
+    a.estudiantes_bajo.forEach(function(s){
+      h+='<div class="alert-item alert-red"><i data-lucide="user-x"></i><strong>'+escHtml(s.nombre)+'</strong> &mdash; Promedio: '+escHtml(String(s.promedio))+' ('+escHtml(s.curso)+')</div>';
+    });
+  }
+  if(a.cursos_bajo&&a.cursos_bajo.length){
+    hasAlerts=true;
+    a.cursos_bajo.forEach(function(c){
+      h+='<div class="alert-item alert-orange"><i data-lucide="alert-circle"></i><strong>'+escHtml(c.curso)+'</strong> &mdash; Promedio: '+escHtml(String(c.promedio))+'</div>';
+    });
+  }
+  if(a.actividades_bajo&&a.actividades_bajo.length){
+    hasAlerts=true;
+    a.actividades_bajo.forEach(function(a2){
+      h+='<div class="alert-item alert-yellow"><i data-lucide="alert-triangle"></i><strong>'+escHtml(a2.actividad)+'</strong> &mdash; Promedio: '+escHtml(String(a2.promedio))+'</div>';
+    });
+  }
+  if(a.destacados&&a.destacados.length){
+    hasAlerts=true;
+    a.destacados.forEach(function(s){
+      h+='<div class="alert-item alert-green"><i data-lucide="award"></i><strong>'+escHtml(s.nombre)+'</strong> &mdash; Promedio: '+escHtml(String(s.promedio))+' \u2b50</div>';
+    });
+  }
+  if(!hasAlerts)h+='<div class="empty-msg">Sin alertas en este per\u00edodo</div>';
+  g.innerHTML=h;
+  if(window.lucide)lucide.createIcons();
+}
+
+function renderRankings(r){
+  var g=document.getElementById('rankingsSection');if(!g)return;
+  var h='';
+  if(r.top_estudiantes&&r.top_estudiantes.length){
+    h+='<div class="chart-card"><div class="chart-title"><i data-lucide="trophy"></i> Top Estudiantes</div>';
+    h+='<table class="data-table"><thead><tr><th>#</th><th>Nombre</th><th>Promedio</th></tr></thead><tbody>';
+    r.top_estudiantes.forEach(function(s,i){
+      var cls=i<3?'rank-'+(i+1):'';
+      h+='<tr><td><span class="rank-badge '+cls+'">'+(i+1)+'</span></td><td>'+escHtml(s.nombre)+'</td><td><strong>'+escHtml(String(s.promedio))+'</strong></td></tr>';
+    });
+    h+='</tbody></table></div>';
+  }
+  if(r.top_cursos&&r.top_cursos.length){
+    h+='<div class="chart-card"><div class="chart-title"><i data-lucide="bar-chart-3"></i> Top Cursos</div>';
+    h+='<table class="data-table"><thead><tr><th>#</th><th>Curso</th><th>Promedio</th></tr></thead><tbody>';
+    r.top_cursos.forEach(function(c,i){
+      var cls=i<3?'rank-'+(i+1):'';
+      h+='<tr><td><span class="rank-badge '+cls+'">'+(i+1)+'</span></td><td>'+escHtml(c.curso)+'</td><td><strong>'+escHtml(String(c.promedio))+'</strong></td></tr>';
+    });
+    h+='</tbody></table></div>';
+  }
+  if(r.top_docentes&&r.top_docentes.length){
+    h+='<div class="chart-card"><div class="chart-title"><i data-lucide="briefcase"></i> Top Docentes</div>';
+    h+='<table class="data-table"><thead><tr><th>#</th><th>Nombre</th><th>Promedio</th></tr></thead><tbody>';
+    r.top_docentes.forEach(function(d,i){
+      var cls=i<3?'rank-'+(i+1):'';
+      h+='<tr><td><span class="rank-badge '+cls+'">'+(i+1)+'</span></td><td>'+escHtml(d.nombre)+'</td><td><strong>'+escHtml(String(d.promedio))+'</strong></td></tr>';
+    });
+    h+='</tbody></table></div>';
+  }
+  if(!h)h='<div class="empty-msg">Sin datos de ranking disponibles</div>';
+  g.innerHTML=h;
+  if(window.lucide)lucide.createIcons();
+}
+
+function renderStats(s){
+  var g=document.getElementById('statsSection');if(!g)return;
+  if(!s||s.media==null){g.innerHTML='<div class="empty-msg">Sin estad\u00edsticas disponibles</div>';return;}
+  var items=[
+    {label:'Media',val:s.media,icon:'hash'},
+    {label:'Mediana',val:s.mediana,icon:'hash'},
+    {label:'Moda',val:s.moda!=null?s.moda:'N/A',icon:'hash'},
+    {label:'Desviaci\u00f3n',val:s.desviacion,icon:'activity'},
+    {label:'M\u00e1ximo',val:s.maximo,icon:'arrow-up'},
+    {label:'M\u00ednimo',val:s.minimo,icon:'arrow-down'},
+    {label:'Q1',val:s.q1,icon:'hash'},
+    {label:'Q3',val:s.q3,icon:'hash'},
+    {label:'P10',val:s.p10,icon:'hash'},
+    {label:'P90',val:s.p90,icon:'hash'}
+  ];
+  var h='<div class="section-title"><i data-lucide="bar-chart"></i> Estad\u00edsticas Descriptivas</div><div class="stat-grid">';
+  items.forEach(function(it){
+    h+='<div class="stat-item"><div class="stat-label">'+escHtml(it.label)+'</div><div class="stat-value">'+escHtml(String(it.val))+'</div></div>';
+  });
+  h+='</div>';
+  g.innerHTML=h;
+  if(window.lucide)lucide.createIcons();
+}
+
+function exportPDF(){window.print();}
+function exportExcel(){
+  if(window.showToast)window.showToast('Preparando datos...','info');
+  fetch('/'+SLUG+'/dashboard_data?'+new URLSearchParams({curso:document.getElementById('filterCurso').value,materia:document.getElementById('filterMateria')?document.getElementById('filterMateria').value:'',periodo:document.getElementById('filterPeriodo').value}).toString())
+  .then(function(r){return r.json();})
+  .then(function(d){
+    var csv='Metrica,Valor\n';
+    var c=d.cards||{};
+    Object.keys(c).forEach(function(k){csv+=k+','+c[k]+'\n';});
+    var blob=new Blob([csv],{type:'text/csv'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dashboard_data.csv';a.click();
+    if(window.showToast)window.showToast('CSV descargado','success');
+  })
+  .catch(function(){if(window.showToast)window.showToast('Error al exportar','error');});
+}
+
+(function(){
+  document.querySelectorAll('.dash-tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      document.querySelectorAll('.dash-tab').forEach(function(t){t.classList.remove('active');});
+      document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});
+      tab.classList.add('active');
+      var id='tab'+tab.dataset.tab.charAt(0).toUpperCase()+tab.dataset.tab.slice(1);
+      var el=document.getElementById(id);
+      if(el)el.classList.add('active');
+    });
+  });
+  loadDashboard();
+})();
 {% endblock %}

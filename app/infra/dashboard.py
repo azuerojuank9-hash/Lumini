@@ -88,12 +88,13 @@ def _dashboard_profesor_data(conn, slug, prof, curso=None, materia=None, jornada
     cursos_q = [curso] if curso else [r['curso'] for r in conn.execute(
         'SELECT DISTINCT curso FROM asignaciones_curso WHERE profesor_id=? AND materia=? AND jornada=?',
         (prof['id'], m, j)).fetchall()]
-    scoped = lambda c: conn.execute(
-        'SELECT id, nombre, curso FROM alumnos WHERE curso=? AND jornada=? AND activo=1 ORDER BY nombre',
-        (c, j)).fetchall()
-    all_alumnos = []
-    for c in cursos_q:
-        all_alumnos.extend(scoped(c))
+    if cursos_q:
+        placeholders = ','.join('?' for _ in cursos_q)
+        all_alumnos = conn.execute(
+            f'SELECT id, nombre, curso FROM alumnos WHERE curso IN ({placeholders}) AND jornada=? AND activo=1 ORDER BY nombre',
+            (*cursos_q, j)).fetchall()
+    else:
+        all_alumnos = []
     aids = [a['id'] for a in all_alumnos]
     total_estudiantes = len(all_alumnos)
     total_actividades = conn.execute(
@@ -175,7 +176,8 @@ def _dashboard_profesor_data(conn, slug, prof, curso=None, materia=None, jornada
     for r in all_ev_periodos:
         ev_by_aid_p[(r['aid'], r['periodo'])] = r['evaluacion']
     evol = []
-    for p in range(1, 5):
+    max_periodo = max((r['periodo'] for r in all_ev_periodos), default=4)
+    for p in range(1, max_periodo + 1):
         finals_p = []
         for a in all_alumnos:
             vals_p = notas_by_aid_p.get((a['id'], p), [])

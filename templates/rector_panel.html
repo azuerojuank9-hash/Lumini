@@ -64,7 +64,7 @@ html{scroll-behavior:smooth;}
     <button class="btn btn-ghost btn-sm" onclick="abrirGestionAcademica()" title="Gestión Académica"><i data-lucide="school"></i></button>
     <button class="btn btn-ghost btn-sm" onclick="abrirMatriculas()" title="Matrículas"><i data-lucide="clipboard-check"></i></button>
     <button class="btn btn-ghost btn-sm" onclick="abrirTesoreria()" title="Tesorería"><i data-lucide="wallet"></i></button>
-    <button class="btn btn-ghost btn-sm" onclick="abrirReportBuilder()" title="Reportes"><i data-lucide="file-bar-chart"></i></button>
+    <button class="btn btn-ghost btn-sm" onclick="abrirReportes()" title="Reportes"><i data-lucide="file-bar-chart"></i></button>
     <a href="/{{ slug }}/notificaciones" class="btn btn-icon" style="position:relative;">
       <i data-lucide="bell"></i>
       {% if notif_count > 0 %}<span class="notif-badge">{{ notif_count }}</span>{% endif %}
@@ -898,16 +898,19 @@ function exportarReporteCSV(){
     link.download='reporte_'+document.getElementById('rptTabla').value+'.csv';
     link.click();
 }
-function showToast(msg){
-    if(window.showToast) window.showToast(msg);
-}
 function escHtml(s){
     if(!s) return '';
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 function escJsStr(s){
     if(!s) return '';
     return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+}
+function showToast(msg,type){
+    var t=document.getElementById('toast-inline');
+    if(!t){t=document.createElement('div');t.id='toast-inline';t.style.cssText='position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid rgba(var(--accent-rgb),.3);color:var(--text);padding:8px 14px;border-radius:8px;font-size:12px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4);max-width:320px;';document.body.appendChild(t);}
+    t.textContent=msg;t.className='toast-inline show'+(type?' toast-'+type:'');t.style.opacity='1';t.style.transform='translateY(0)';t.style.pointerEvents='auto';
+    clearTimeout(t._t);t._t=setTimeout(function(){t.style.opacity='0';t.style.transform='translateY(8px)';t.style.pointerEvents='none';},2500);
 }
 {% endblock %}
 

@@ -1074,7 +1074,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
     <button class="qf-btn" data-filter="pendientes" onclick="aplicarFiltro('pendientes')" aria-pressed="false">Pendientes</button>
 </div>
 <div class="validation-banner" id="validationBanner">
-    <div class="vb-head"><i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Revisi&oacute;n previa</div>
+    <div class="vb-head"><i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Revisión previa</div>
     <div id="validationItems"></div>
 </div>
 
@@ -1119,8 +1119,8 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
                 {% endfor %}
                 <th class="th-eval">Eval.<br><span class="th-pct">25%</span></th>
                 <th class="th-autoev">Autoev.<br><span class="th-pct">10%</span></th>
-                <th class="th-prom tip-wrap">Prom.<span class="tip"><div class="label">Promedio de actividades</div>Promedio simple de todas las actividades calificadas.<br>Las actividades vac&iacute;as no cuentan.<br><span style="color:var(--muted);font-size:11px;">Ej: (3.0 + 1.8) / 2 = 2.40</span></span></th>
-                <th class="th-nf">N.Final<span class="tip-wrap"><span class="info-icon">i</span><span class="tip"><div class="label">Nota Final del Per&iacute;odo</div>Promedio Actividades &times; 65%<br>+ Evaluaci&oacute;n &times; 25%<br>+ Autoevaluaci&oacute;n &times; 10%</span></span></th>
+                <th class="th-prom tip-wrap">Prom.<span class="tip"><div class="label">Promedio de actividades</div>Promedio simple de todas las actividades calificadas.<br>Las actividades vacías no cuentan.<br><span style="color:var(--muted);font-size:11px;">Ej: (3.0 + 1.8) / 2 = 2.40</span></span></th>
+                <th class="th-nf">N.Final<span class="tip-wrap"><span class="info-icon">i</span><span class="tip"><div class="label">Nota Final del Período</div>Promedio Actividades &times; 65%<br>+ Evaluación &times; 25%<br>+ Autoevaluación &times; 10%</span></span></th>
             </tr>
         </thead>
         <tbody>
@@ -1146,8 +1146,8 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
                 {% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},{{ act.id }},{{ nota.val if nota else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','{{ act.nombre|replace("'", "\\'") }}','actividad')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}
             </td>
             {% endfor %}
-            <td class="{% if periodo_cerrado %}td-locked{% endif %}"><div class="ni-wrap"><input class="ni eval-input{% if e.evaluacion is not none %} val-{{ e.evaluacion|int }}{% endif %}" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="&mdash;" data-aid="{{ e.id }}" data-campo="evaluacion" {% if periodo_cerrado %}disabled{% endif %} aria-label="Evaluaci&oacute;n {{ e.nombre }}" oninput="cambioEval(this)" onmouseenter="notaHistorial(this,{{ e.id }},null,'evaluacion')" onmouseleave="ocultarNotaHistorial()"><span class="save-indicator"></span></div>{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.evaluacion if e.evaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Evaluaci\u00f3n','evaluacion')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
-            <td class="{% if periodo_cerrado %}td-locked{% endif %}"><div class="ni-wrap"><input class="ni eval-input{% if e.autoevaluacion is not none %} val-{{ e.autoevaluacion|int }}{% endif %}" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="&mdash;" data-aid="{{ e.id }}" data-campo="autoevaluacion" {% if periodo_cerrado %}disabled{% endif %} aria-label="Autoevaluaci&oacute;n {{ e.nombre }}" oninput="cambioEval(this)" onmouseenter="notaHistorial(this,{{ e.id }},null,'autoevaluacion')" onmouseleave="ocultarNotaHistorial()"><span class="save-indicator"></span></div>{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.autoevaluacion if e.autoevaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Autoevaluaci\u00f3n','autoevaluacion')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
+            <td class="{% if periodo_cerrado %}td-locked{% endif %}"><div class="ni-wrap"><input class="ni eval-input{% if e.evaluacion is not none %} val-{{ e.evaluacion|int }}{% endif %}" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="&mdash;" data-aid="{{ e.id }}" data-campo="evaluacion" {% if periodo_cerrado %}disabled{% endif %} aria-label="Evaluación {{ e.nombre }}" oninput="cambioEval(this)" onmouseenter="notaHistorial(this,{{ e.id }},null,'evaluacion')" onmouseleave="ocultarNotaHistorial()"><span class="save-indicator"></span></div>{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.evaluacion if e.evaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Evaluaci\u00f3n','evaluacion')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
+            <td class="{% if periodo_cerrado %}td-locked{% endif %}"><div class="ni-wrap"><input class="ni eval-input{% if e.autoevaluacion is not none %} val-{{ e.autoevaluacion|int }}{% endif %}" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="&mdash;" data-aid="{{ e.id }}" data-campo="autoevaluacion" {% if periodo_cerrado %}disabled{% endif %} aria-label="Autoevaluación {{ e.nombre }}" oninput="cambioEval(this)" onmouseenter="notaHistorial(this,{{ e.id }},null,'autoevaluacion')" onmouseleave="ocultarNotaHistorial()"><span class="save-indicator"></span></div>{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.autoevaluacion if e.autoevaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Autoevaluaci\u00f3n','autoevaluacion')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
             <td class="pc prom-cell" id="prom-{{ e.id }}">
                 <span class="{% if e.promedio is not none and e.promedio>=3.5 %}ph{% elif e.promedio is not none and e.promedio>=3.0 %}pm{% elif e.promedio is not none %}pb{% endif %}">
                     {{ e.promedio if e.promedio is not none else '&mdash;' }}
@@ -1160,19 +1160,19 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
             </td>
         </tr>
         {% else %}
-            <tr><td colspan="99" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes todav&iacute;a.</td></tr>
+            <tr><td colspan="99" style="text-align:center;padding:28px;color:var(--muted)">No hay estudiantes todavía.</td></tr>
             {% endfor %}
             </tbody>
         </table>
     <div class="paginator" id="paginator">
-        <button class="pag-btn" id="pagPrev" onclick="paginaAnterior()" disabled aria-label="P&aacute;gina anterior"><i data-lucide="chevron-left" style="width:12px;height:12px;"></i></button>
-        <span class="pag-info" id="pagInfo">P&aacute;gina 1</span>
-        <select id="pagPerPage" onchange="cambiarPagina(1)" aria-label="Estudiantes por p&aacute;gina">
+        <button class="pag-btn" id="pagPrev" onclick="paginaAnterior()" disabled aria-label="Página anterior"><i data-lucide="chevron-left" style="width:12px;height:12px;"></i></button>
+        <span class="pag-info" id="pagInfo">Página 1</span>
+        <select id="pagPerPage" onchange="cambiarPagina(1)" aria-label="Estudiantes por página">
             <option value="25">25</option>
             <option value="50">50</option>
         </select>
-        <span style="font-size:10px;color:var(--muted);">por p&aacute;gina</span>
-        <button class="pag-btn" id="pagNext" onclick="paginaSiguiente()" aria-label="P&aacute;gina siguiente"><i data-lucide="chevron-right" style="width:12px;height:12px;"></i></button>
+        <span style="font-size:10px;color:var(--muted);">por página</span>
+        <button class="pag-btn" id="pagNext" onclick="paginaSiguiente()" aria-label="Página siguiente"><i data-lucide="chevron-right" style="width:12px;height:12px;"></i></button>
     </div>
 </div> <!-- /gradeScroll -->
 </div> <!-- /flex container (sidebar + table) -->
@@ -1190,7 +1190,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
                 <th style="width:32px">#</th>
                     <th>Estudiante</th>
                     <th style="width:80px">Estado</th>
-                    <th>Acci&oacute;n</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
@@ -1246,22 +1246,22 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
         <div id="obsTabHistorial" style="margin-bottom:16px;"></div>
         <div id="obsTabList" style="margin-bottom:14px;"></div>
         <div id="obsTabQuickComments" style="display:none;margin-bottom:12px;">
-            <label style="font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;margin-bottom:4px;display:block;">Comentarios r&aacute;pidos</label>
+            <label style="font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;margin-bottom:4px;display:block;">Comentarios rápidos</label>
             <div class="qc-grid" id="qcGrid">
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Excelente trabajo')">Excelente trabajo</button>
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Debe mejorar')">Debe mejorar</button>
-                <button class="qc-btn" onclick="insertarComentarioRapido(this,'No entregó')">No entreg&oacute;</button>
+                <button class="qc-btn" onclick="insertarComentarioRapido(this,'No entregó')">No entregó</button>
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Entrega incompleta')">Entrega incompleta</button>
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Buen desempeño')">Buen desempe&ntilde;o</button>
-                <button class="qc-btn" onclick="insertarComentarioRapido(this,'Participó activamente')">Particip&oacute; activamente</button>
-                <button class="qc-btn" onclick="insertarComentarioRapido(this,'Debe prestar más atención')">Debe prestar m&aacute;s atenci&oacute;n</button>
+                <button class="qc-btn" onclick="insertarComentarioRapido(this,'Participó activamente')">Participó activamente</button>
+                <button class="qc-btn" onclick="insertarComentarioRapido(this,'Debe prestar más atención')">Debe prestar más atención</button>
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Trabajo en equipo destacado')">Trabajo en equipo destacado</button>
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Progreso notable')">Progreso notable</button>
             </div>
         </div>
         <div id="obsTabForm" style="display:none;">
             <div class="oform" style="margin-top:8px;">
-                <input type="text" id="obsTabInput" placeholder="Escribir observaci&oacute;n..." oninput="autoSaveObsTabDebounced()" style="flex:1;">
+                <input type="text" id="obsTabInput" placeholder="Escribir observación..." oninput="autoSaveObsTabDebounced()" style="flex:1;">
                 <span class="save-indicator" id="obsTabIndicator"></span>
             </div>
         </div>
@@ -1301,7 +1301,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
                 {% endfor %}
                 {% if solicitudes_pendientes_mod %}
                 <div style="margin-top:8px;padding:8px 10px;border-radius:6px;background:rgba(var(--warning-rgb),.1);border:1px solid rgba(var(--warning-rgb),.2);font-size:11px;color:var(--warning);display:flex;align-items:center;gap:6px;">
-                  <i data-lucide="clock" style="width:14px;height:14px;"></i> {{ solicitudes_pendientes_mod }} solicitud(es) de modificaci&oacute;n pendiente(s)
+                  <i data-lucide="clock" style="width:14px;height:14px;"></i> {{ solicitudes_pendientes_mod }} solicitud(es) de modificación pendiente(s)
                 </div>
                 {% endif %}
         </div>
@@ -1381,14 +1381,15 @@ function getCsrf(){
     return document.getElementById('csrf-global').value;
 }
 
-function showToast(msg){
+function showToast(msg, type, duration){
     msg = msg || '<i data-lucide="check-circle"></i> Guardado';
     var t = document.getElementById('toast');
     if(!t) return;
     t.innerHTML = msg;
+    t.className='toast toast-'+(type||'success');
     t.classList.add('show');
     clearTimeout(t._t);
-    t._t = setTimeout(function(){ t.classList.remove('show'); }, 1800);
+    t._t = setTimeout(function(){ t.classList.remove('show'); }, duration || 1800);
 }
 function toggleActionsMenu(btn){
   var menu=btn.nextElementSibling;if(!menu)return;
@@ -1625,7 +1626,7 @@ function actualizarPromedio(aid){
     if(!cell) return;
     const prom = calcularPromPonderado(aid);
     if(prom === null){
-        cell.innerHTML = '<span style="color:var(--muted)">\u0097</span>';
+        cell.innerHTML = '<span style="color:var(--muted)">\u2014</span>';
         return;
     }
     const v = prom.toFixed(2);
@@ -1636,7 +1637,7 @@ function actualizarPromedioDesdeServidor(aid, serverProm){
     const cell = document.getElementById('prom-' + aid);
     if(!cell) return;
     if(serverProm === null || serverProm === undefined){
-        cell.innerHTML = '<span style="color:var(--muted)">\u0097</span>';
+        cell.innerHTML = '<span style="color:var(--muted)">\u2014</span>';
         return;
     }
     const v = parseFloat(serverProm).toFixed(2);
@@ -1648,7 +1649,7 @@ function actualizarNotaFinalDesdeServidor(aid, nf){
     const cell = document.getElementById('nf-' + aid);
     if(!cell) return;
     if(nf === null || nf === undefined){
-        cell.innerHTML = '<span style="color:var(--muted)">\u0097</span>';
+        cell.innerHTML = '<span style="color:var(--muted)">\u2014</span>';
         return;
     }
     const v = parseFloat(nf).toFixed(2);
@@ -2150,7 +2151,7 @@ function renderComunicaciones(){
             +'<span style="font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;background:'+pc+'15;color:'+pc+';">'+(c.prioridad.charAt(0).toUpperCase()+c.prioridad.slice(1))+'</span></div>'
             +'<div style="display:flex;gap:6px;margin-left:16px;margin-top:2px;">'
             +'<button onclick="verComunicado('+c.id+')" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(var(--blue-rgb),.1);color:var(--blue);font-family:\'Inter\',sans-serif;transition:all var(--tr);" onmouseover="this.style.background=\'rgba(var(--blue-rgb),.2)\'" onmouseout="this.style.background=\'rgba(var(--blue-rgb),.1)\'"><i data-lucide="eye"></i> Ver comunicado</button>'
-            +'<button onclick="marcarLeidoProf('+c.id+', this)" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:\'Inter\',sans-serif;transition:all var(--tr);" onmouseover="this.style.background=\'rgba(var(--accent-rgb),.2)\'" onmouseout="this.style.background=\'rgba(var(--accent-rgb),.1)\'"><i data-lucide="check"></i> Marcar como le&iacute;do</button>'
+            +'<button onclick="marcarLeidoProf('+c.id+', this)" style="padding:4px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:\'Inter\',sans-serif;transition:all var(--tr);" onmouseover="this.style.background=\'rgba(var(--accent-rgb),.2)\'" onmouseout="this.style.background=\'rgba(var(--accent-rgb),.1)\'"><i data-lucide="check"></i> Marcar como leído</button>'
             +'</div></div>';
     }
     container.innerHTML=html;
@@ -2194,7 +2195,7 @@ setInterval(checkNuevosComunicados,30000);
 // -- Canales (Fase 5  Comunicación v2) ----------------------------
 function escHtml(s){
     if(!s)return'';
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 
 var REACCIONES_DISPONIBLES = ['??','?','?','??','?'];
@@ -2330,7 +2331,7 @@ function crearSistemaCanales(opts){
         var container = el('canalMensajes');
         if(!container) return;
         if(!msgs || msgs.length === 0){
-            container.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">No hay mensajes. S&eacute; el primero en escribir.</div>';
+            container.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">No hay mensajes. Sé el primero en escribir.</div>';
             return;
         }
         var html = '<div class="canal-msg-list">';
@@ -2818,7 +2819,7 @@ function cerrarComunicado(){
 </div>
 <div id="comModalContent" style="padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;white-space:pre-wrap;color:var(--text);margin-bottom:14px;"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-<button onclick="var b=document.getElementById('comModalLeerBtn');marcarLeidoProf(parseInt(b.getAttribute('data-cid')),b);cerrarComunicado();" id="comModalLeerBtn" style="padding:8px 14px;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px;"><i data-lucide="check"></i> Marcar como le&iacute;do</button>
+<button onclick="var b=document.getElementById('comModalLeerBtn');marcarLeidoProf(parseInt(b.getAttribute('data-cid')),b);cerrarComunicado();" id="comModalLeerBtn" style="padding:8px 14px;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px;"><i data-lucide="check"></i> Marcar como leído</button>
 <button onclick="cerrarComunicado()" style="padding:8px 14px;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--muted);font-family:'Inter',sans-serif;">Cerrar</button>
 </div>
 </div>
@@ -2829,7 +2830,7 @@ function cerrarComunicado(){
   <div class="com-toast-body">
     <div class="com-toast-title" id="comToastTitle">Nuevo comunicado</div>
     <div class="com-toast-msg" id="comToastMsg"></div>
-    <div class="com-toast-time">Reci&eacute;n publicado</div>
+    <div class="com-toast-time">Recién publicado</div>
   </div>
 </div>
 </div>
@@ -2902,32 +2903,32 @@ function cerrarComunicado(){
     <div class="drawer-tabs">
         <button class="drawer-tab active" data-tab="detalle" onclick="switchDrawerTab('detalle')"><i data-lucide="info"></i> Detalle</button>
         <button class="drawer-tab" data-tab="historial" onclick="switchDrawerTab('historial')"><i data-lucide="clock"></i> Historial</button>
-        <button class="drawer-tab" data-tab="estadisticas" onclick="switchDrawerTab('estadisticas')"><i data-lucide="bar-chart-3"></i> Estad&iacute;sticas</button>
+        <button class="drawer-tab" data-tab="estadisticas" onclick="switchDrawerTab('estadisticas')"><i data-lucide="bar-chart-3"></i> Estadísticas</button>
     </div>
     <div class="drawer-body" id="drawerBody">
         <div id="drawerTabDetalle">
             <div class="drawer-section">
-                <h4>Informaci&oacute;n general</h4>
+                <h4>Información general</h4>
                 <div class="drawer-field"><span class="df-label">Nombre</span><span class="df-value" id="df-nombre" contenteditable="true" data-field="nombre"></span></div>
                 <div class="drawer-field"><span class="df-label">Tipo</span><select class="df-value" id="df-tipo" data-field="tipo"><option value="taller">Taller</option><option value="quiz">Quiz</option><option value="examen">Examen</option><option value="proyecto">Proyecto</option><option value="exposicion">Exposición</option><option value="laboratorio">Laboratorio</option><option value="recuperacion">Recuperación</option><option value="autoevaluacion">Autoevaluación</option><option value="coevaluacion">Coevaluación</option><option value="participacion">Participación</option><option value="tarea">Tarea</option><option value="otro">Otro</option></select></div>
                 <div class="drawer-field"><span class="df-label">Curso</span><span class="df-value" id="df-curso"></span></div>
                 <div class="drawer-field"><span class="df-label">Materia</span><span class="df-value" id="df-materia"></span></div>
-                <div class="drawer-field"><span class="df-label">Per&iacute;odo</span><span class="df-value" id="df-periodo"></span></div>
+                <div class="drawer-field"><span class="df-label">Período</span><span class="df-value" id="df-periodo"></span></div>
             </div>
             <div class="drawer-section">
-                <h4>Par&aacute;metros</h4>
+                <h4>Parámetros</h4>
                 <div class="drawer-field"><span class="df-label">Peso (%)</span><input class="df-value" id="df-peso" data-field="peso" type="number" min="0" max="100" step="0.1" style="width:80px;font-size:13px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg2);color:var(--text);"></div>
                 <div class="drawer-field"><span class="df-label">Competencia</span><span class="df-value" id="df-competencia" contenteditable="true" data-field="competencia"></span></div>
                 <div class="drawer-field"><span class="df-label">Estado</span><select class="df-value" id="df-estado_act" data-field="estado_act"><option value="borrador">Borrador</option><option value="publicada">Publicada</option><option value="cerrada">Cerrada</option><option value="archivada">Archivada</option></select></div>
-                <div class="drawer-field"><span class="df-label">F. l&iacute;mite</span><input class="df-value" id="df-fecha_limite" data-field="fecha_limite" type="date" style="font-size:13px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg2);color:var(--text);"></div>
+                <div class="drawer-field"><span class="df-label">F. límite</span><input class="df-value" id="df-fecha_limite" data-field="fecha_limite" type="date" style="font-size:13px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg2);color:var(--text);"></div>
                 <div class="drawer-field"><span class="df-label">Hora</span><input class="df-value" id="df-hora_limite" data-field="hora_limite" type="time" style="font-size:13px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg2);color:var(--text);"></div>
             </div>
             <div class="drawer-section">
-                <h4>Descripci&oacute;n</h4>
+                <h4>Descripción</h4>
                 <div class="drawer-field"><span class="df-value" id="df-descripcion" contenteditable="true" data-field="descripcion" style="white-space:pre-wrap;min-height:40px;"></span></div>
             </div>
             <div class="drawer-section">
-                <h4>Configuraci&oacute;n</h4>
+                <h4>Configuración</h4>
                 <div class="drawer-field"><span class="df-label">Entrega digital</span><span class="df-value" id="df-entrega_digital"></span></div>
                 <div class="drawer-field"><span class="df-label">Adjuntos</span><span class="df-value" id="df-adjuntos" style="font-size:11px;color:var(--muted);">Ninguno</span></div>
             </div>
@@ -2967,7 +2968,7 @@ function cerrarComunicado(){
                 <button class="bp-btn" onclick="batchCurva(10)">Curva +10%</button>
                 <button class="bp-btn" onclick="batchCurva(20)">Curva +20%</button>
                 <button class="bp-btn success" onclick="batchRedondear()">Redondear</button>
-                <button class="bp-btn" onclick="batchNotaMax(4.0)">M&aacute;x 4.0</button>
+                <button class="bp-btn" onclick="batchNotaMax(4.0)">Máx 4.0</button>
             </div>
         </div>
         <div class="bp-section">
@@ -3028,7 +3029,7 @@ function cerrarComunicado(){
 <div class="overlay" id="tl2Modal" onclick="if(event.target===this)cerrarTimeline()">
 <div class="modal tl2-modal">
     <div class="analytics-head">
-        <h2><i data-lucide="history" style="width:20px;height:20px;vertical-align:middle;margin-right:8px;"></i> L&iacute;nea de tiempo del per&iacute;odo</h2>
+        <h2><i data-lucide="history" style="width:20px;height:20px;vertical-align:middle;margin-right:8px;"></i> Línea de tiempo del período</h2>
         <button class="close-btn" onclick="cerrarTimeline()"><i data-lucide="x"></i></button>
     </div>
     <div class="tl2-body" id="tl2Body">
@@ -3040,7 +3041,7 @@ function cerrarComunicado(){
 <!-- ── Fase 7: Activity stats popover ── -->
 <div class="act-stat-popover" id="actStatPopover">
     <div class="asp-head">
-        <h4 id="aspTitle">Estad&iacute;sticas</h4>
+        <h4 id="aspTitle">Estadísticas</h4>
         <button class="asp-close" onclick="cerrarActStatPopover()"><i data-lucide="x" style="width:14px;height:14px;"></i></button>
     </div>
     <div class="asp-grid" id="aspGrid"></div>
@@ -3048,7 +3049,7 @@ function cerrarComunicado(){
 </div>
 
 <!-- ── Fase 7: Print button (floating) ── -->
-<button class="btn btn-ghost btn-sm" onclick="modoImpresion()" title="Vista de impresi&oacute;n" style="position:fixed;bottom:16px;right:16px;z-index:999;background:var(--bg2);border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.08);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;"><i data-lucide="printer" style="width:18px;height:18px;"></i></button>
+<button class="btn btn-ghost btn-sm" onclick="modoImpresion()" title="Vista de impresión" style="position:fixed;bottom:16px;right:16px;z-index:999;background:var(--bg2);border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.08);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;"><i data-lucide="printer" style="width:18px;height:18px;"></i></button>
 
 <!-- ── Fase 8: Communications Modal ── -->
 <div class="overlay" id="commModal" onclick="if(event.target===this)cerrarComms()">
@@ -3062,7 +3063,7 @@ function cerrarComunicado(){
         <button class="btn btn-ghost btn-sm" onclick="cargarComunicados()"><i data-lucide="refresh-cw"></i> Recargar</button>
     </div>
     <div id="commForm" style="display:none;" class="comm-form">
-        <input type="text" id="commTitulo" placeholder="T&iacute;tulo del comunicado">
+        <input type="text" id="commTitulo" placeholder="Título del comunicado">
         <textarea id="commContenido" placeholder="Contenido del comunicado..."></textarea>
         <select id="commDestinatarios">
             <option value="todos">Todos</option>
@@ -3113,11 +3114,11 @@ function cerrarComunicado(){
 <div class="overlay" id="configModal" onclick="if(event.target===this)cerrarConfig()">
 <div class="modal" style="max-width:500px;padding:0;">
     <div class="analytics-head">
-        <h2><i data-lucide="settings" style="width:18px;height:18px;"></i> Configuraci&oacute;n del colegio</h2>
+        <h2><i data-lucide="settings" style="width:18px;height:18px;"></i> Configuración del colegio</h2>
         <button class="close-btn" onclick="cerrarConfig()"><i data-lucide="x"></i></button>
     </div>
     <div style="padding:16px 20px;display:grid;gap:10px;">
-        <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Nombre instituci&oacute;n</label>
+        <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Nombre institución</label>
             <input id="cfgNombre" class="form-input" style="width:100%;" placeholder="Nombre del colegio"></div>
         <div><label style="font-size:10px;font-weight:600;color:var(--muted);display:block;margin-bottom:3px;">Lema</label>
             <input id="cfgLema" class="form-input" style="width:100%;" placeholder="Lema o frase institucional"></div>
@@ -3137,11 +3138,11 @@ function cerrarComunicado(){
 <div class="overlay" id="analyticsModal" onclick="if(event.target===this)cerrarAnalitica()">
 <div class="modal analytics-modal">
     <div class="analytics-head">
-        <h2><i data-lucide="bar-chart-3" style="width:20px;height:20px;vertical-align:middle;margin-right:8px;"></i> Anal&iacute;tica del curso</h2>
+        <h2><i data-lucide="bar-chart-3" style="width:20px;height:20px;vertical-align:middle;margin-right:8px;"></i> Analítica del curso</h2>
         <button class="close-btn" onclick="cerrarAnalitica()"><i data-lucide="x"></i></button>
     </div>
     <div class="analytics-tabs" id="analyticsTabs">
-        <button class="analytics-tab active" data-tab="distribucion" onclick="switchAnalyticsTab('distribucion')">Distribuci&oacute;n</button>
+        <button class="analytics-tab active" data-tab="distribucion" onclick="switchAnalyticsTab('distribucion')">Distribución</button>
         <button class="analytics-tab" data-tab="actividades" onclick="switchAnalyticsTab('actividades')">Actividades</button>
         <button class="analytics-tab" data-tab="ranking" onclick="switchAnalyticsTab('ranking')">Ranking</button>
     </div>
@@ -3149,7 +3150,7 @@ function cerrarComunicado(){
         <div class="analytics-panel" id="analyticsDistribucion">
             <div class="analytics-grid">
                 <div class="achart-wrap">
-                    <h4>Distribuci&oacute;n de notas</h4>
+                    <h4>Distribución de notas</h4>
                     <div class="achart-canvas"><canvas id="chartDistribucion"></canvas></div>
                 </div>
                 <div class="achart-wrap">
@@ -3190,12 +3191,12 @@ function cerrarComunicado(){
             <button class="profile-tab" data-ptab="notas" onclick="switchProfileTab('notas')">Notas</button>
             <button class="profile-tab" data-ptab="asistencia" onclick="switchProfileTab('asistencia')">Asistencia</button>
             <button class="profile-tab" data-ptab="observaciones" onclick="switchProfileTab('observaciones')">Observaciones</button>
-            <button class="profile-tab" data-ptab="estadisticas" onclick="switchProfileTab('estadisticas')">Estad&iacute;sticas</button>
+            <button class="profile-tab" data-ptab="estadisticas" onclick="switchProfileTab('estadisticas')">Estadísticas</button>
         </div>
         <div id="profileResumen">
             <div class="sd-stats" id="sdStats">
                 <div class="sd-stat"><div class="sd-stat-val" id="sdProm">—</div><div class="sd-stat-label">Promedio</div></div>
-                <div class="sd-stat"><div class="sd-stat-val" id="sdEval">—</div><div class="sd-stat-label">Evaluaci&oacute;n</div></div>
+                <div class="sd-stat"><div class="sd-stat-val" id="sdEval">—</div><div class="sd-stat-label">Evaluación</div></div>
                 <div class="sd-stat"><div class="sd-stat-val" id="sdNf">—</div><div class="sd-stat-label">N. Final</div></div>
             </div>
             <div class="sd-stat" style="text-align:center;padding:8px 16px;border-bottom:1px solid var(--border);">
@@ -3261,7 +3262,7 @@ function cerrarComunicado(){
             <div id="migPreview"></div>
             <div id="migMapping" style="margin:8px 0;"></div>
             <div style="display:flex;gap:8px;margin-top:12px;">
-                <button class="btn btn-ghost" onclick="prevMigStep()">Atr&aacute;s</button>
+                <button class="btn btn-ghost" onclick="prevMigStep()">Atrás</button>
                 <button class="btn btn-primary" onclick="ejecutarMigrar()"><i data-lucide="check" style="width:14px;height:14px;"></i> Confirmar e importar</button>
             </div>
         </div>
@@ -3269,7 +3270,7 @@ function cerrarComunicado(){
             <div class="import-summary">
                 <div class="big-num" id="migResultCount">0</div>
                 <div class="big-label">registros importados</div>
-                <div style="margin-top:16px;color:var(--muted);font-size:12px;" id="migResultMsg">Importaci&oacute;n completada</div>
+                <div style="margin-top:16px;color:var(--muted);font-size:12px;" id="migResultMsg">Importación completada</div>
                 <button class="btn btn-primary" style="margin-top:16px;" onclick="cerrarMigrar()">Listo</button>
             </div>
         </div>
@@ -3309,17 +3310,17 @@ function cerrarComunicado(){
 <div class="overlay" id="analiticaModal" onclick="if(event.target===this)cerrarAnalitica()">
 <div class="modal" style="max-width:900px;">
     <div class="modal-header">
-        <h2><i data-lucide="bar-chart-3" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Centro de Anal&iacute;tica</h2>
+        <h2><i data-lucide="bar-chart-3" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Centro de Analítica</h2>
         <button class="close-btn" onclick="cerrarAnalitica()"><i data-lucide="x"></i></button>
     </div>
     <div class="modal-body">
         <div class="analytics-tabs">
-            <button class="active" onclick="switchAnaliticaTab('periodos',this)">Por per&iacute;odos</button>
+            <button class="active" onclick="switchAnaliticaTab('periodos',this)">Por períodos</button>
             <button onclick="switchAnaliticaTab('docentes',this)">Comparar docentes</button>
         </div>
         <div class="analytics-grid">
             <div class="analytics-chart">
-                <h4><i data-lucide="trending-up" style="width:14px;height:14px;"></i> <span id="analyticsChartTitle">Promedio por per&iacute;odo</span></h4>
+                <h4><i data-lucide="trending-up" style="width:14px;height:14px;"></i> <span id="analyticsChartTitle">Promedio por período</span></h4>
                 <canvas id="analyticsCanvas"></canvas>
             </div>
             <div class="analytics-chart">
@@ -3360,7 +3361,7 @@ function cerrarComunicado(){
 <div class="overlay" id="cpModal" onclick="if(event.target===this)cerrarCP()">
 <div class="modal" style="max-width:550px;">
     <div class="modal-header">
-        <h2><i data-lucide="copy" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Copiar planificaci&oacute;n</h2>
+        <h2><i data-lucide="copy" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Copiar planificación</h2>
         <button class="close-btn" onclick="cerrarCP()"><i data-lucide="x"></i></button>
     </div>
     <div class="modal-body">
@@ -3710,7 +3711,7 @@ function abrirMenuActividad(event,id){
     var menu=document.getElementById('actContextMenu');
     if(!menu){
         menu=document.createElement('div');menu.id='actContextMenu';menu.className='act-context-menu';
-        menu.innerHTML='<button class="acm-item" data-action="editar"><i data-lucide="edit-3" style="width:14px;height:14px;"></i> Editar</button><button class="acm-item" data-action="duplicar"><i data-lucide="copy" style="width:14px;height:14px;"></i> Duplicar</button><div class="acm-divider"></div><button class="acm-item" data-action="publicar"><i data-lucide="send" style="width:14px;height:14px;"></i> Publicar</button><button class="acm-item" data-action="cerrar"><i data-lucide="lock" style="width:14px;height:14px;"></i> Cerrar</button><button class="acm-item" data-action="archivar"><i data-lucide="archive" style="width:14px;height:14px;"></i> Archivar</button><div class="acm-divider"></div><button class="acm-item" data-action="historial"><i data-lucide="clock" style="width:14px;height:14px;"></i> Ver historial</button><button class="acm-item" data-action="estadisticas"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i> Ver estad&iacute;sticas</button><div class="acm-divider"></div><button class="acm-item acm-danger" data-action="eliminar"><i data-lucide="trash-2" style="width:14px;height:14px;"></i> Eliminar</button>';
+        menu.innerHTML='<button class="acm-item" data-action="editar"><i data-lucide="edit-3" style="width:14px;height:14px;"></i> Editar</button><button class="acm-item" data-action="duplicar"><i data-lucide="copy" style="width:14px;height:14px;"></i> Duplicar</button><div class="acm-divider"></div><button class="acm-item" data-action="publicar"><i data-lucide="send" style="width:14px;height:14px;"></i> Publicar</button><button class="acm-item" data-action="cerrar"><i data-lucide="lock" style="width:14px;height:14px;"></i> Cerrar</button><button class="acm-item" data-action="archivar"><i data-lucide="archive" style="width:14px;height:14px;"></i> Archivar</button><div class="acm-divider"></div><button class="acm-item" data-action="historial"><i data-lucide="clock" style="width:14px;height:14px;"></i> Ver historial</button><button class="acm-item" data-action="estadisticas"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i> Ver estadísticas</button><div class="acm-divider"></div><button class="acm-item acm-danger" data-action="eliminar"><i data-lucide="trash-2" style="width:14px;height:14px;"></i> Eliminar</button>';
         menu.addEventListener('click',function(e){var btn=e.target.closest('.acm-item');if(btn) ejecutarAccionMenu(btn.getAttribute('data-action'),id);});
         document.body.appendChild(menu);
     }
@@ -4148,8 +4149,8 @@ function verificarTendencia(aid,nuevoVal){
 function guardarSugerencia(btn){
     var box=btn.closest('.sugerencia-box');var aid=box.dataset.aid;
     var texto=box.querySelector('.sug-text').textContent;
-    fetch('/{{ slug }}/guardar_obs', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value}, body:'aid='+encodeURIComponent(aid)+'&texto='+encodeURIComponent(texto)})
-    .then(function(r){return r.text();}).then(function(){var r=box.closest('.sug-row');if(r)r.remove();showToast('<i data-lucide="check-circle"></i> Observaci&oacute;n guardada');})
+    fetch('/{{ slug }}/agregar_observacion', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value}, body:'aid='+encodeURIComponent(aid)+'&texto='+encodeURIComponent(texto)})
+    .then(function(r){return r.text();}).then(function(){var r=box.closest('.sug-row');if(r)r.remove();showToast('<i data-lucide="check-circle"></i> Observación guardada');})
     .catch(function(){});
 }
 // Override cambioNota to add smart observation trigger
@@ -4254,7 +4255,7 @@ abrirStudentDrawer=function(aid,nombre){
         // Prediction
         var predEl=document.getElementById('sdPrediccion');
         if(predEl && d.prediccion!==null){
-            predEl.innerHTML='<div class="sd-prediction">Pron&oacute;stico: <span class="pred-val">'+d.prediccion+'</span> <span class="pred-conf">('+d.confianza+'% confianza)</span></div>';
+            predEl.innerHTML='<div class="sd-prediction">Pronóstico: <span class="pred-val">'+d.prediccion+'</span> <span class="pred-conf">('+d.confianza+'% confianza)</span></div>';
         }else if(predEl){predEl.innerHTML='';}
         // Trend chart
         var pts=d.puntos||[];
@@ -4407,7 +4408,7 @@ function toggleModoConcentracion(){
     var btn=document.querySelector('.focus-mode-btn');
     if(btn) btn.classList.toggle('active');
     if(body.classList.contains('focus-active')){
-        showToast('<i data-lucide="eye-off"></i> Modo concentraci&oacute;n activado. Presiona ESC para salir.');
+        showToast('<i data-lucide="eye-off"></i> Modo concentración activado. Presiona ESC para salir.');
     }else{
         showToast('<i data-lucide="eye"></i> Modo normal');
     }
@@ -4482,7 +4483,7 @@ function batchApplyToAll(fn){
 }
 function batchSetFixed(){
     var val=parseFloat(document.getElementById('batchFixedVal').value);
-    if(isNaN(val)||val<0||val>5){showToast('<i data-lucide="alert-circle"></i> Nota inv&aacute;lida (0-5)');return;}
+    if(isNaN(val)||val<0||val>5){showToast('<i data-lucide="alert-circle"></i> Nota inválida (0-5)');return;}
     batchApplyToAll(function(inp){inp.value=val;inp.dispatchEvent(new Event('input',{bubbles:true}));});
 }
 function batchSumar(delta){
@@ -4537,7 +4538,7 @@ function batchEliminarMayor(){
 var _existingFase5Kb=document.addEventListener('keydown',function(e){
     if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key==='n'){e.preventDefault();abrirModalActividad();}
     if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='F'){e.preventDefault();document.getElementById('searchInput').focus();document.getElementById('searchInput').select();}
-    if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='E'){e.preventDefault();showToast('Exportaci&oacute;n en desarrollo');}
+    if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='E'){e.preventDefault();showToast('Exportación en desarrollo');}
     if(e.key==='F2'){e.preventDefault();if(focusedCell){focusedCell.focus();focusedCell.select();}}
     if(e.key==='Delete'||e.key==='Backspace'){var t=e.target;
         if(t&&(t.classList.contains('nota-input')||t.classList.contains('eval-input'))&&!t.disabled&&document.activeElement===t&&t.value!==''&&t.selectionStart===0&&t.selectionEnd===t.value.length){
@@ -4564,15 +4565,15 @@ function actualizarConexion(){
     var tbDot=document.getElementById('connStatusDot');
     var tbText=document.getElementById('connStatusText');
     if(navigator.onLine){
-        var txt='En l&iacute;nea';
+        var txt='En línea';
         var cls='conn-status online';
         if(_wasOffline){
             txt='Reconectado';
             cls='conn-status reconnecting';
             setTimeout(function(){
-                if(ct) ct.textContent='En l&iacute;nea';
+                if(ct) ct.textContent='En línea';
                 if(cs) cs.className='conn-status online';
-                if(tbText) tbText.textContent='En l&iacute;nea';
+                if(tbText) tbText.textContent='En línea';
                 if(tbDot) tbDot.className='tb-dot online';
             },2000);
             _wasOffline=false;
@@ -4584,9 +4585,9 @@ function actualizarConexion(){
         if(tbDot) tbDot.className='tb-dot online';
     }else{
         _wasOffline=true;
-        if(ct) ct.textContent='Sin conexi&oacute;n';
+        if(ct) ct.textContent='Sin conexión';
         if(cs) cs.className='conn-status offline';
-        if(tbText) tbText.textContent='Sin conexi&oacute;n';
+        if(tbText) tbText.textContent='Sin conexión';
         if(tbDot) tbDot.className='tb-dot';
     }
 }
@@ -4597,7 +4598,7 @@ setInterval(actualizarConexion,5000);
 var _origMarcarDirty=marcarDirty;
 marcarDirty=function(n){
     _origMarcarDirty(n);
-    document.getElementById('saveBarText').textContent=!navigator.onLine?'Cambios pendientes (sin conexi&oacute;n)':n+' cambios pendientes';
+    document.getElementById('saveBarText').textContent=!navigator.onLine?'Cambios pendientes (sin conexión)':n+' cambios pendientes';
 };
 var _origMarcarSaving=marcarSaving;
 marcarSaving=function(n){
@@ -4620,9 +4621,9 @@ function cargarAlertas(){
     fetch('/{{ slug }}/alertas').then(function(r){return r.json();}).then(function(d){
         if(d.total===0){body.innerHTML='<div class="alerts-empty"><i data-lucide="check-circle" style="width:32px;height:32px;color:var(--success);margin-bottom:8px;display:block;margin:0 auto 8px;"></i> Sin alertas activas</div>';return;}
         var h='';var icon='',cls='';
-        if(d.riesgo&&d.riesgo.length){icon='<i data-lucide="alert-triangle" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;"></i>';cls='danger';h+='<div class="alerts-group"><h4>'+icon+'Rendimiento cr&iacute;tico <span class="ag-count">'+d.riesgo.length+'</span></h4>';d.riesgo.forEach(function(r2){h+='<div class="alert-card" onclick="abrirEstudiante('+r2.aid+')"><div class="ac-icon danger"><i data-lucide="alert-triangle" style="width:16px;height:16px;"></i></div><div class="ac-body"><div class="ac-title">'+r2.nombre+'</div><div class="ac-detail">Promedio: '+r2.promedio+'</div></div><button class="ac-action" onclick="event.stopPropagation();abrirEstudiante('+r2.aid+')">Ver</button></div>';});h+='</div>';}
+        if(d.riesgo&&d.riesgo.length){icon='<i data-lucide="alert-triangle" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;"></i>';cls='danger';h+='<div class="alerts-group"><h4>'+icon+'Rendimiento crítico <span class="ag-count">'+d.riesgo.length+'</span></h4>';d.riesgo.forEach(function(r2){h+='<div class="alert-card" onclick="abrirEstudiante('+r2.aid+')"><div class="ac-icon danger"><i data-lucide="alert-triangle" style="width:16px;height:16px;"></i></div><div class="ac-body"><div class="ac-title">'+r2.nombre+'</div><div class="ac-detail">Promedio: '+r2.promedio+'</div></div><button class="ac-action" onclick="event.stopPropagation();abrirEstudiante('+r2.aid+')">Ver</button></div>';});h+='</div>';}
         if(d.sin_notas&&d.sin_notas.length){h+='<div class="alerts-group"><h4><i data-lucide="file-minus" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;"></i> Sin notas <span class="ag-count">'+d.sin_notas.length+'</span></h4>';d.sin_notas.forEach(function(sn){h+='<div class="alert-card"><div class="ac-icon warning"><i data-lucide="file-minus" style="width:16px;height:16px;"></i></div><div class="ac-body"><div class="ac-title">'+sn.nombre+'</div><div class="ac-detail">Sin notas registradas</div></div></div>';});h+='</div>';}
-        if(d.vencimiento&&d.vencimiento.length){h+='<div class="alerts-group"><h4><i data-lucide="calendar-clock" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;"></i> Pr&oacute;ximos vencimientos <span class="ag-count">'+d.vencimiento.length+'</span></h4>';d.vencimiento.forEach(function(v){h+='<div class="alert-card"><div class="ac-icon info"><i data-lucide="calendar-clock" style="width:16px;height:16px;"></i></div><div class="ac-body"><div class="ac-title">'+v.actividad+'</div><div class="ac-detail">Vence: '+v.fecha+' ('+v.dias_restantes+' d&iacute;as)</div></div></div>';});h+='</div>';}
+        if(d.vencimiento&&d.vencimiento.length){h+='<div class="alerts-group"><h4><i data-lucide="calendar-clock" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;"></i> Próximos vencimientos <span class="ag-count">'+d.vencimiento.length+'</span></h4>';d.vencimiento.forEach(function(v){h+='<div class="alert-card"><div class="ac-icon info"><i data-lucide="calendar-clock" style="width:16px;height:16px;"></i></div><div class="ac-body"><div class="ac-title">'+v.actividad+'</div><div class="ac-detail">Vence: '+v.fecha+' ('+v.dias_restantes+' días)</div></div></div>';});h+='</div>';}
         if(d.asistencia&&d.asistencia.length){h+='<div class="alerts-group"><h4><i data-lucide="calendar-x" style="width:14px;height:14px;margin-right:4px;vertical-align:middle;"></i> Inasistencias frecuentes <span class="ag-count">'+d.asistencia.length+'</span></h4>';d.asistencia.forEach(function(a){h+='<div class="alert-card" onclick="abrirEstudiante('+a.aid+')"><div class="ac-icon danger"><i data-lucide="calendar-x" style="width:16px;height:16px;"></i></div><div class="ac-body"><div class="ac-title">'+a.nombre+'</div><div class="ac-detail">'+a.faltas+' faltas registradas</div></div></div>';});h+='</div>';}
         body.innerHTML=h;
         if(typeof lucide!=='undefined') lucide.createIcons();
@@ -4672,11 +4673,11 @@ function abrirEstudiante(aid){
         document.getElementById('sdEval').textContent=dd.total_evaluado;
         document.getElementById('sdNf').textContent=dd.nota_final;
         if(dd.comparacion_curso!==undefined) document.getElementById('sdComparacion').innerHTML='<span style="font-size:11px;color:var(--muted);">vs curso: <strong style="color:'+(dd.comparacion_curso>=0?'var(--success)':'var(--danger)')+';">'+(dd.comparacion_curso>=0?'+':'')+dd.comparacion_curso+'%</strong></span>';
-        if(dd.prediccion!==undefined) document.getElementById('sdPrediccion').innerHTML='<span style="font-size:11px;color:var(--muted);">Pron&oacute;stico: <strong>'+(typeof dd.prediccion==='number'?dd.prediccion.toFixed(1):dd.prediccion)+'</strong> <span style="font-size:10px;">('+dd.confianza+'% confianza)</span></span>';
+        if(dd.prediccion!==undefined) document.getElementById('sdPrediccion').innerHTML='<span style="font-size:11px;color:var(--muted);">Pronóstico: <strong>'+(typeof dd.prediccion==='number'?dd.prediccion.toFixed(1):dd.prediccion)+'</strong> <span style="font-size:10px;">('+dd.confianza+'% confianza)</span></span>';
         if(dd.puntos&&dd.puntos.length>1){
             var ctx=document.getElementById('sdTendenciaChart');if(ctx){
                 if(window._sdChart) window._sdChart.destroy();
-                window._sdChart=new Chart(ctx,{type:'scatter',data:{datasets:[{label:'Notas',data:dd.puntos.map(function(p,i){return{x:i,y:p};}),backgroundColor:'rgba(var(--accent-rgb),.7)',pointRadius:4,pointHoverRadius:6,showLine:!1},{label:'Promedio m&oacute;vil',data:dd.media_movil?dd.media_movil.map(function(m,i){return{x:i,y:m};}):[],borderColor:'var(--accent)',backgroundColor:'transparent',type:'line',fill:!1,tension:.3,pointRadius:2,pointHoverRadius:4,showLine:!0}],},options:{animation:!1,responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1,position:'top',labels:{boxWidth:8,boxHeight:8,font:{size:10},padding:8}}},scales:{x:{display:!0,grid:{display:!1},ticks:{display:!1}},y:{beginAtZero:!0,max:5,grid:{color:'rgba(128,128,128,.1)'},ticks:{font:{size:10}}}}}});}
+                window._sdChart=new Chart(ctx,{type:'scatter',data:{datasets:[{label:'Notas',data:dd.puntos.map(function(p,i){return{x:i,y:p};}),backgroundColor:'rgba(var(--accent-rgb),.7)',pointRadius:4,pointHoverRadius:6,showLine:!1},{label:'Promedio móvil',data:dd.media_movil?dd.media_movil.map(function(m,i){return{x:i,y:m};}):[],borderColor:'var(--accent)',backgroundColor:'transparent',type:'line',fill:!1,tension:.3,pointRadius:2,pointHoverRadius:4,showLine:!0}],},options:{animation:!1,responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1,position:'top',labels:{boxWidth:8,boxHeight:8,font:{size:10},padding:8}}},scales:{x:{display:!0,grid:{display:!1},ticks:{display:!1}},y:{beginAtZero:!0,max:5,grid:{color:'rgba(128,128,128,.1)'},ticks:{font:{size:10}}}}}});}
         }
     }).catch(function(){});
     // Load notes
@@ -4711,17 +4712,17 @@ function cargarEstadisticasPerfil(){
         h+='<div class="pp-item"><span class="pp-label">Puntaje total</span><span class="pp-value">'+(dd.puntos?dd.puntos.reduce(function(a,b){return a+b;},0).toFixed(1):'—')+'</span></div>';
         h+='<div class="pp-item"><span class="pp-label">Total evaluado</span><span class="pp-value">'+dd.total_evaluado+'</span></div>';
         h+='<div class="pp-item"><span class="pp-label">Nota final</span><span class="pp-value">'+dd.nota_final+'</span></div>';
-        if(dd.confianza) h+='<div class="pp-item"><span class="pp-label">Confianza predicci&oacute;n</span><span class="pp-value">'+dd.confianza+'%</span></div>';
+        if(dd.confianza) h+='<div class="pp-item"><span class="pp-label">Confianza predicción</span><span class="pp-value">'+dd.confianza+'%</span></div>';
         if(dd.comparacion_curso!==undefined) h+='<div class="pp-item"><span class="pp-label">vs promedio curso</span><span class="pp-value" style="color:'+(dd.comparacion_curso>=0?'var(--success)':'var(--danger)')+';">'+(dd.comparacion_curso>=0?'+':'')+dd.comparacion_curso+'%</span></div>';
         h+='</div>';
         document.getElementById('sdEstadisticas').innerHTML=h;
-    }).catch(function(){document.getElementById('sdEstadisticas').innerHTML='<span style="color:var(--muted);">Error al cargar estad&iacute;sticas</span>';});
+    }).catch(function(){document.getElementById('sdEstadisticas').innerHTML='<span style="color:var(--muted);">Error al cargar estadísticas</span>';});
 }
 // ── Fase 7: Productivity bar ──
 function actualizarProdBar(){
     var dot=document.getElementById('prodDot'),est=document.getElementById('prodEstado');
     dot.className='pbi-dot '+(navigator.onLine?'connected':'disconnected');
-    est.textContent=navigator.onLine?'Conectado':'Sin conexi&oacute;n';
+    est.textContent=navigator.onLine?'Conectado':'Sin conexión';
     document.getElementById('prodProm').textContent=document.getElementById('diProm').textContent;
     var riesgo=document.getElementById('prodRiesgo');
     var diRiesgo=document.getElementById('diRiesgoAlto');
@@ -4831,22 +4832,22 @@ function ejecutarAccionMasiva(accion){
     if(accion==='cambiar_tipo'){var t=prompt('Nuevo tipo (tarea/examen/taller/proyecto/quiz/oral):','tarea');if(!t)return;extra.tipo=t;}
     if(accion==='cambiar_fecha'){var f=prompt('Nueva fecha (YYYY-MM-DD):','');if(!f)return;extra.fecha=f;}
     fetch('/{{ slug }}/actividades/masiva',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value},body:JSON.stringify({accion:accion,ids:_selectedActIds})}).then(function(r){return r.json();}).then(function(d){
-        if(d.status==='ok'){showToast('<i data-lucide="check"></i> Acci&oacute;n completada');_selectedActIds=[];document.getElementById('massDeleteBtn').style.display='none';setTimeout(function(){location.reload();},800);}
-        else showToast('<i data-lucide="alert-circle"></i> Error al ejecutar acci&oacute;n');
-    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexi&oacute;n');});
+        if(d.status==='ok'){showToast('<i data-lucide="check"></i> Acción completada');_selectedActIds=[];document.getElementById('massDeleteBtn').style.display='none';setTimeout(function(){location.reload();},800);}
+        else showToast('<i data-lucide="alert-circle"></i> Error al ejecutar acción');
+    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexión');});
 }
 // ── Fase 7: Activity stats popover ──
 var _lastActStats=null;
 function abrirActStatPopover(refEl,actId){
     var pop=document.getElementById('actStatPopover');
-    fetch('/{{ slug }}/actividades/estadisticas/'+actId).then(function(r){return r.json();}).then(function(d){
+    fetch('/{{ slug }}/actividades/'+actId+'/estadisticas').then(function(r){return r.json();}).then(function(d){
         if(d.status!=='ok')return;
         var s=d.estadisticas;
-        document.getElementById('aspTitle').textContent=d.act_nombre||'Estad&iacute;sticas';
+        document.getElementById('aspTitle').textContent=d.act_nombre||'Estadísticas';
         var grid=document.getElementById('aspGrid');
         grid.innerHTML='<div class="asp-item"><div class="asp-val '+(s.promedio<2.8?'bad':s.promedio<3.5?'warn':'good')+'">'+(s.promedio||'—')+'</div><div class="asp-label">Promedio</div></div>'+
-            '<div class="asp-item"><div class="asp-val">'+(s.max||'—')+'</div><div class="asp-label">M&aacute;x</div></div>'+
-            '<div class="asp-item"><div class="asp-val">'+(s.min||'—')+'</div><div class="asp-label">M&iacute;n</div></div>'+
+            '<div class="asp-item"><div class="asp-val">'+(s.max||'—')+'</div><div class="asp-label">Máx</div></div>'+
+            '<div class="asp-item"><div class="asp-val">'+(s.min||'—')+'</div><div class="asp-label">Mín</div></div>'+
             '<div class="asp-item"><div class="asp-val">'+(s.aprobados||0)+'</div><div class="asp-label">Aprobados</div></div>'+
             '<div class="asp-item"><div class="asp-val bad">'+(s.reprobados||0)+'</div><div class="asp-label">Reprobados</div></div>';
         if(s.total_notas) grid.innerHTML+='<div class="asp-item"><div class="asp-val">'+s.total_notas+'</div><div class="asp-label">Total notas</div></div>';
@@ -4911,7 +4912,7 @@ function cargarSugerencias(){
     var panel=document.getElementById('sugPanel');panel.style.display='';
     var body=document.getElementById('sugBody');body.innerHTML='<div style="text-align:center;padding:12px;font-size:11px;color:var(--muted);">Generando sugerencias...</div>';
     fetch('/{{ slug }}/sugerencias?curso='+encodeURIComponent(document.querySelector('input[name="curso_sel"]')?.value||'')).then(function(r){return r.json();}).then(function(d){
-        if(!d.sugerencias||!d.sugerencias.length){body.innerHTML='<div style="text-align:center;padding:12px;font-size:11px;color:var(--muted);">Sin sugerencias autom&aacute;ticas</div>';return;}
+        if(!d.sugerencias||!d.sugerencias.length){body.innerHTML='<div style="text-align:center;padding:12px;font-size:11px;color:var(--muted);">Sin sugerencias automáticas</div>';return;}
         var h='';
         d.sugerencias.forEach(function(s){
             var icono='';var iconCls='';
@@ -4979,7 +4980,7 @@ function cargarTimeline(){
 function modoImpresion(){
     document.body.classList.toggle('print-mode');
     if(document.body.classList.contains('print-mode')){
-        showToast('<i data-lucide="printer"></i> Vista de impresi&oacute;n. Presiona Ctrl+P o ESC para salir.');
+        showToast('<i data-lucide="printer"></i> Vista de impresión. Presiona Ctrl+P o ESC para salir.');
     }
 }
 document.addEventListener('keydown',function(e){
@@ -5040,13 +5041,13 @@ function cancelarCommForm(){
 function enviarComunicado(){
     var titulo=document.getElementById('commTitulo').value;
     var contenido=document.getElementById('commContenido').value;
-    if(!titulo){showToast('<i data-lucide="alert-circle"></i> T&iacute;tulo requerido');return;}
+    if(!titulo){showToast('<i data-lucide="alert-circle"></i> Título requerido');return;}
     fetch('/{{ slug }}/comunicados/crear',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value},
         body:JSON.stringify({titulo:titulo,contenido:contenido,destinatario_tipo:document.getElementById('commDestinatarios').value,programada:document.getElementById('commProgramada').value||null})})
     .then(function(r){return r.json();}).then(function(d){
         if(d.status==='ok'){showToast('<i data-lucide="check"></i> Comunicado enviado');cancelarCommForm();cargarComunicados();document.getElementById('commTitulo').value='';document.getElementById('commContenido').value='';}
         else showToast('<i data-lucide="alert-circle"></i> Error al enviar');
-    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexi&oacute;n');});
+    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexión');});
 }
 // ── Fase 10: Calendar ──
 var _calDate=new Date();var _calEvents=[];
@@ -5103,7 +5104,7 @@ function cargarCC(){
         // Alerts
         if(d.alertas.total>0){
             h+='<div class="cc-section"><h3><i data-lucide="bell" style="width:14px;height:14px;"></i> Alertas</h3><div class="cc-alerts">';
-            if(d.alertas.riesgo>0) h+='<div class="cc-alert danger"><div class="cca-icon"><i data-lucide="alert-triangle" style="width:14px;height:14px;"></i></div> <span>'+d.alertas.riesgo+' estudiante(s) con riesgo acad&eacute;mico</span></div>';
+            if(d.alertas.riesgo>0) h+='<div class="cc-alert danger"><div class="cca-icon"><i data-lucide="alert-triangle" style="width:14px;height:14px;"></i></div> <span>'+d.alertas.riesgo+' estudiante(s) con riesgo académico</span></div>';
             if(d.alertas.sin_notas>0) h+='<div class="cc-alert warning"><div class="cca-icon"><i data-lucide="file-minus" style="width:14px;height:14px;"></i></div> <span>'+d.alertas.sin_notas+' estudiante(s) sin notas registradas</span></div>';
             h+='</div></div>';
         }
@@ -5165,7 +5166,7 @@ window.abrirEstudiante=function(aid){
         h+='</div>';
         // Documentos placeholder
         h+='<div class="er-section" id="erDocumentos" style="display:none;"><h5>Documentos</h5>';
-        h+='<div style="color:var(--muted);padding:8px 0;">Los certificados y boletines estar&aacute;n disponibles en la plataforma de padres.</div>';
+        h+='<div style="color:var(--muted);padding:8px 0;">Los certificados y boletines estarán disponibles en la plataforma de padres.</div>';
         h+='</div>';
         panelDiv.innerHTML=h;
         if(lastPanel) lastPanel.after(panelDiv);
@@ -5198,14 +5199,14 @@ var _paginaActual=1;
 var _paginaTotal=1;
 function cambiarPagina(p){
     _paginaActual=p;
-    document.getElementById('pagInfo').textContent='P&aacute;gina '+_paginaActual+' de '+_paginaTotal;
+    document.getElementById('pagInfo').textContent='Página '+_paginaActual+' de '+_paginaTotal;
     document.getElementById('pagPrev').disabled=_paginaActual<=1;
     document.getElementById('pagNext').disabled=_paginaActual>=_paginaTotal;
     // Fetch paginated data
     var perPage=document.getElementById('pagPerPage').value;
     fetch('/{{ slug }}/notas/pagina?page='+_paginaActual+'&per_page='+perPage+'&curso='+encodeURIComponent(document.querySelector('input[name="curso_sel"]')?.value||'')).then(function(r){return r.json();}).then(function(d){
         _paginaTotal=d.total_pages;
-        document.getElementById('pagInfo').textContent='P&aacute;gina '+_paginaActual+' de '+_paginaTotal+' ('+d.total+' estudiantes)';
+        document.getElementById('pagInfo').textContent='Página '+_paginaActual+' de '+_paginaTotal+' ('+d.total+' estudiantes)';
         document.getElementById('pagPrev').disabled=_paginaActual<=1;
         document.getElementById('pagNext').disabled=_paginaActual>=_paginaTotal;
         // Hide old rows and only show matching ones
@@ -5228,7 +5229,7 @@ setTimeout(function(){
     if(tbody){
         var totalRows=tbody.querySelectorAll('tr[data-aid]').length;
         _paginaTotal=Math.ceil(totalRows/25);
-        document.getElementById('pagInfo').textContent='P&aacute;gina 1 de '+_paginaTotal+' ('+totalRows+' estudiantes)';
+        document.getElementById('pagInfo').textContent='Página 1 de '+_paginaTotal+' ('+totalRows+' estudiantes)';
     }
 },1000);
 // ── Fase 13: High contrast ──
@@ -5264,9 +5265,9 @@ function guardarConfig(){
     var data={nombre:document.getElementById('cfgNombre').value,lema:document.getElementById('cfgLema').value,primary_color:document.getElementById('cfgPrimary').value,secondary_color:document.getElementById('cfgSecondary').value};
     fetch('/{{ slug }}/config',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value},body:JSON.stringify(data)})
     .then(function(r){return r.json();}).then(function(d){
-        if(d.status==='ok'){showToast('<i data-lucide="check"></i> Configuraci&oacute;n guardada');cerrarConfig();}
+        if(d.status==='ok'){showToast('<i data-lucide="check"></i> Configuración guardada');cerrarConfig();}
         else showToast('<i data-lucide="alert-circle"></i> Error al guardar');
-    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexi&oacute;n');});
+    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexión');});
 }
 // ── Fase 13: Extend actualizarTodo to refresh smart hub ──
 var _origActualizarTodo3=window.actualizarTodo;
@@ -5277,7 +5278,7 @@ window.actualizarTodo=function(){
         var totalRows=document.querySelectorAll('#gradeTable tbody tr[data-aid]').length;
         var perPage=parseInt(document.getElementById('pagPerPage')?.value||25);
         _paginaTotal=Math.ceil(totalRows/perPage)||1;
-        document.getElementById('pagInfo').textContent='P&aacute;gina '+_paginaActual+' de '+_paginaTotal+' ('+totalRows+' estudiantes)';
+        document.getElementById('pagInfo').textContent='Página '+_paginaActual+' de '+_paginaTotal+' ('+totalRows+' estudiantes)';
     },300);
 };
 // Run on load
@@ -5320,7 +5321,7 @@ function aiAsk(pregunta){
         }
         loadDiv.innerHTML=html;
         chat.scrollTop=chat.scrollHeight;
-    }).catch(function(){loadDiv.textContent='Error de conexi&oacute;n';chat.scrollTop=chat.scrollHeight;});
+    }).catch(function(){loadDiv.textContent='Error de conexión';chat.scrollTop=chat.scrollHeight;});
 }
 // ── Fase 15: Plantillas ──
 function abrirPlantillas(){
@@ -5349,7 +5350,7 @@ function crearPlantilla(){
     .then(function(r){return r.json();}).then(function(d){
         if(d.status==='ok'){showToast('<i data-lucide="check"></i> Plantilla creada');document.getElementById('tmplNombre').value='';cargarPlantillas();}
         else showToast('<i data-lucide="alert-circle"></i> '+d.error);
-    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexi&oacute;n');});
+    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexión');});
 }
 function aplicarPlantilla(id,nombre){
     if(!confirm('Usar la plantilla "'+nombre+'" en el curso actual?')) return;
@@ -5357,7 +5358,7 @@ function aplicarPlantilla(id,nombre){
     .then(function(r){return r.json();}).then(function(d){
         if(d.status==='ok'){showToast('<i data-lucide="check"></i> Actividad creada desde plantilla');cargarActividades();if(typeof actualizarTodo==='function')actualizarTodo();}
         else showToast('<i data-lucide="alert-circle"></i> '+d.error);
-    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexi&oacute;n');});
+    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexión');});
 }
 function eliminarPlantilla(id){
     if(!confirm('Eliminar esta plantilla?')) return;
@@ -5365,7 +5366,7 @@ function eliminarPlantilla(id){
     .then(function(r){return r.json();}).then(function(d){
         if(d.status==='ok'){showToast('<i data-lucide="check"></i> Plantilla eliminada');cargarPlantillas();}
         else showToast('<i data-lucide="alert-circle"></i> '+d.error);
-    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexi&oacute;n');});
+    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexión');});
 }
 // ── Fase 15: Copy planning ──
 var cursoActual='{{ curso }}';
@@ -5396,7 +5397,7 @@ function ejecutarCP(){
     .then(function(r){return r.json();}).then(function(d){
         if(d.status==='ok'){showToast('<i data-lucide="check"></i> '+d.copiadas+' actividades copiadas');cerrarCP();if(typeof actualizarTodo==='function')actualizarTodo();}
         else showToast('<i data-lucide="alert-circle"></i> '+d.error);
-    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexi&oacute;n');});
+    }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexión');});
 }
 // ── Fase 15: Migration ──
 function abrirMigrar(){
@@ -5483,7 +5484,7 @@ function ejecutarMigrar(){
         document.getElementById('migProgressFill').style.width='100%';
         if(d.error){showToast('<i data-lucide="alert-circle"></i> '+d.error);return;}
         document.getElementById('migResultCount').textContent=d.importados;
-        document.getElementById('migResultMsg').textContent='Importaci&oacute;n completada correctamente';
+        document.getElementById('migResultMsg').textContent='Importación completada correctamente';
         document.getElementById('migStep2').classList.remove('active');
         document.getElementById('migStep3').classList.add('active');
         if(typeof actualizarTodo==='function') setTimeout(actualizarTodo,300);
@@ -5499,7 +5500,7 @@ function cerrarAnalitica(){document.getElementById('analiticaModal').style.displ
 function switchAnaliticaTab(tipo,btn){
     document.querySelectorAll('.analytics-tabs button').forEach(function(b){b.classList.remove('active');});
     if(btn) btn.classList.add('active');
-    document.getElementById('analyticsChartTitle').textContent=tipo==='periodos'?'Promedio por per&iacute;odo':'Comparativa por docente';
+    document.getElementById('analyticsChartTitle').textContent=tipo==='periodos'?'Promedio por período':'Comparativa por docente';
     document.getElementById('analyticsDetails').innerHTML='Cargando...';
     fetch('/{{ slug }}/analitica/comparar?tipo='+tipo).then(function(r){return r.json();}).then(function(d){
         if(d.error){document.getElementById('analyticsDetails').innerHTML='<span style="color:var(--danger);">'+d.error+'</span>';return;}
@@ -5507,7 +5508,7 @@ function switchAnaliticaTab(tipo,btn){
         var det='<div style="display:flex;flex-direction:column;gap:6px;">';
         (d.datos||[]).forEach(function(item){
             if(tipo==='periodos'){
-                det+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span>Per&iacute;odo '+item.periodo+'</span><span style="font-weight:700;">'+item.promedio+' <span style="font-size:10px;color:var(--muted);">('+item.actividades+' act.)</span></span></div>';
+                det+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span>Período '+item.periodo+'</span><span style="font-weight:700;">'+item.promedio+' <span style="font-size:10px;color:var(--muted);">('+item.actividades+' act.)</span></span></div>';
             }else{
                 det+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span>'+escHtml(item.nombre)+'</span><span style="font-weight:700;">'+item.promedio+' <span style="font-size:10px;color:var(--muted);">('+item.notas+' notas)</span></span></div>';
             }

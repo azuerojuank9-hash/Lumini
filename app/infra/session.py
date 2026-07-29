@@ -7,6 +7,13 @@ def clear() -> None:
     _flask_session.clear()
 
 
+def regenerate() -> None:
+    data = dict(_flask_session)
+    _flask_session.clear()
+    for k, v in data.items():
+        _flask_session[k] = v
+
+
 def set_permanent(flag: bool = True) -> None:
     _flask_session.permanent = flag
 

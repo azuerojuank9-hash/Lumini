@@ -91,8 +91,11 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
 
     prom_general = round(sum(todos_finales) / len(todos_finales), 2) if todos_finales else None
     story.append(Spacer(1, 0.5*cm))
-    estado = 'Pendiente' if prom_general is None else ('Aprobado' if prom_general >= 3.0 else 'Reprobado')
-    bg_color = pri_color if prom_general is not None and prom_general >= 3.0 else colors.HexColor('#e74c3c') if prom_general is not None else colors.HexColor('#64748B')
+    from app.infra.database import config_get
+    cfg = config_get(slug)
+    nota_min_aprobar = float(cfg.get('nota_minima_aprobar', 3.0))
+    estado = 'Pendiente' if prom_general is None else ('Aprobado' if prom_general >= nota_min_aprobar else 'Reprobado')
+    bg_color = pri_color if prom_general is not None and prom_general >= nota_min_aprobar else colors.HexColor('#e74c3c') if prom_general is not None else colors.HexColor('#64748B')
     resumen = Table(
         [['PROMEDIO GENERAL', str(prom_general) if prom_general is not None else '—', 'ESTADO', estado]],
         colWidths=[5*cm, 3*cm, 3*cm, 3*cm]

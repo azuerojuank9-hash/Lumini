@@ -11,7 +11,7 @@
 .btn-danger:hover{background:var(--red-dark);box-shadow:0 4px 16px rgba(var(--danger-rgb),.25)}
 .btn-success{background:var(--success);color:var(--text-on-accent)}
 .btn-success:hover{background:var(--green-dark);box-shadow:0 4px 16px rgba(var(--success-rgb),.25)}
-.btn-warning{background:var(--warning);color:#000}
+.btn-warning{background:var(--warning);color:var(--text)}
 .btn-warning:hover{background:var(--yellow-dark)}
 .btn-ghost{background:transparent;color:var(--muted)}
 .btn-ghost:hover{background:rgba(var(--accent-rgb),.08);color:var(--text)}

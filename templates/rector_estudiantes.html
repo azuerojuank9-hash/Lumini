@@ -80,3 +80,18 @@
   </div>
 </div>
 {% endblock %}
+{% block scripts %}
+<script>
+function filtrar(){
+    var q=document.getElementById('buscarInput').value.toLowerCase().trim();
+    var rows=document.querySelectorAll('#estTable tbody tr');
+    var vis=0;
+    rows.forEach(function(r){
+        var text=r.textContent.toLowerCase();
+        var show=!q||text.includes(q);
+        r.style.display=show?'':'none';
+        if(show)vis++;
+    });
+}
+</script>
+{% endblock %}

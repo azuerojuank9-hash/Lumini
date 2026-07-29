@@ -248,12 +248,21 @@ def directora_guardar_email(slug):
     if not fa.validar_csrf():
         return ('Error CSRF', 403)
     aid = request.form.get('aid', type=int)
+    if not aid:
+        return jsonify({'ok': False, 'error': 'ID de alumno requerido'}), 400
     email = request.form.get('email', '').strip()
     conn = fa.conectar(slug)
-    conn.execute('UPDATE alumnos SET email_acudiente=? WHERE id=?', (email, aid))
-    conn.commit()
-    conn.close()
-    return jsonify({'ok': True})
+    try:
+        alumno = conn.execute('SELECT id, curso, jornada FROM alumnos WHERE id=?', (aid,)).fetchone()
+        if not alumno:
+            return jsonify({'ok': False, 'error': 'Alumno no encontrado'}), 404
+        if alumno['curso'] != directora['curso'] or alumno['jornada'] != directora['jornada']:
+            return jsonify({'ok': False, 'error': 'No autorizado para este alumno'}), 403
+        conn.execute('UPDATE alumnos SET email_acudiente=? WHERE id=?', (email, aid))
+        conn.commit()
+        return jsonify({'ok': True})
+    finally:
+        conn.close()
 
 
 @directora_bp.route('/<slug>/directora/crear_desde_panel', methods=['POST'])

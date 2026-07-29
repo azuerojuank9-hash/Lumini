@@ -18,7 +18,7 @@ EXTENSIONES_PERMITIDAS = {
     '.xls': 'application/vnd.ms-excel',
     '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     '.ppt': 'application/vnd.ms-powerpoint',
-    '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentationml',
+    '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
     '.png': 'image/png', '.gif': 'image/gif', '.webp': 'image/webp',
     '.svg': 'image/svg+xml',

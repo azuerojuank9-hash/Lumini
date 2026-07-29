@@ -75,3 +75,20 @@
   <div class="empty-desc">Intenta con otro término de búsqueda.</div>
 </div>
 {% endblock %}
+{% block scripts %}
+<script>
+function filtrarCursos(){
+    var q=document.getElementById('buscarCurso').value.toLowerCase().trim();
+    var cards=document.querySelectorAll('.curso-card');
+    var sinResultados=document.getElementById('sinResultadosCurso');
+    var vis=0;
+    cards.forEach(function(c){
+        var text=c.textContent.toLowerCase();
+        var show=!q||text.includes(q);
+        c.style.display=show?'':'none';
+        if(show)vis++;
+    });
+    if(sinResultados){sinResultados.style.display=vis===0&&q?'block':'none';}
+}
+</script>
+{% endblock %}

@@ -36,14 +36,14 @@
 .venc-danger{color:var(--danger);font-weight:700;}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:16px;}
 .overlay.open{display:flex;}
-.modal{background:rgba(15,23,42,.96);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .modal-title{font-size:15px;font-weight:600;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
 .close-btn{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;}
 .close-btn:hover{color:var(--text);}
 .scroll-top{display:none;position:fixed;bottom:80px;right:16px;z-index:2000;width:40px;height:40px;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--border);border-radius:50%;color:var(--text);font-size:18px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);}
 .scroll-top.show{display:flex;}
-.toast-inline{position:fixed;bottom:20px;right:20px;background:rgba(15,23,42,.95);border:1px solid rgba(var(--accent-rgb),.3);color:var(--text);padding:8px 14px;border-radius:8px;font-size:12px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4);}
+.toast-inline{position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid rgba(var(--accent-rgb),.3);color:var(--text);padding:8px 14px;border-radius:8px;font-size:12px;z-index:3000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4);}
 .toast-inline.show{opacity:1;transform:translateY(0);}
 .grid-2{gap:12px;}
 .grid-3{gap:12px;}
@@ -388,7 +388,7 @@
 <div class="toast-inline" id="toast-inline"></div>
 {% endblock %}
 {% block extra_scripts %}
-function showToast(msg,type){var t=document.getElementById('toast-inline');if(!t)return;t.innerHTML=msg;t.className='toast-inline show'+(type?' toast-'+type:'');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2500);}
+function showToast(msg,type){var t=document.getElementById('toast-inline');if(!t)return;t.textContent=msg;t.className='toast-inline show'+(type?' toast-'+type:'');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2500);}
 function toggleActionsMenu(btn){
   var menu=btn.nextElementSibling;if(!menu)return;
   var open=menu.classList.toggle('open');
@@ -428,7 +428,27 @@ function cerrarEditar(){document.getElementById('modalEditar').classList.remove(
 function verProfesores(slug,nombre){
   document.getElementById('prof-colegio-nombre').textContent=nombre;
   document.getElementById('modalProfesores').classList.add('open');
-  fetch('/admin/colegio/'+slug+'/profesores').then(function(r){return r.text();}).then(function(h){document.getElementById('prof-contenido').innerHTML=h;}).catch(function(){document.getElementById('prof-contenido').innerHTML='<p class="text-muted text-sm">Error al cargar.</p>';});
+  document.getElementById('prof-contenido').innerHTML='<p style="color:var(--muted);padding:16px;">Cargando...</p>';
+  fetch('/admin/profesores/'+slug).then(function(r){return r.json();}).then(function(d){
+    var h='';
+    if(!d.profesores||!d.profesores.length){h='<p style="color:var(--muted);padding:16px;">No hay profesores registrados.</p>';document.getElementById('prof-contenido').innerHTML=h;return;}
+    h+='<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:var(--bg3);">';
+    h+='<th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">Nombre</th>';
+    h+='<th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">Usuario</th>';
+    h+='<th style="padding:8px;text-align:center;border-bottom:2px solid var(--border);">Estado</th>';
+    h+='<th style="padding:8px;text-align:left;border-bottom:2px solid var(--border);">Materias</th></tr></thead><tbody>';
+    d.profesores.forEach(function(p){
+      h+='<tr><td style="padding:8px;border-bottom:1px solid var(--border);">'+p.nombre+'</td>';
+      h+='<td style="padding:8px;border-bottom:1px solid var(--border);color:var(--muted);">'+p.usuario+'</td>';
+      h+='<td style="padding:8px;border-bottom:1px solid var(--border);text-align:center;"><span style="color:'+(p.activo?'var(--success)':'var(--danger)')+';font-weight:600;">'+(p.activo?'Activo':'Inactivo')+'</span></td>';
+      h+='<td style="padding:8px;border-bottom:1px solid var(--border);font-size:11px;color:var(--sub);">';
+      if(p.materias&&p.materias.length){p.materias.forEach(function(m){h+=m.materia+' ('+m.jornada+') ';});}
+      else{h+='Sin materias';}
+      h+='</td></tr>';
+    });
+    h+='</tbody></table>';
+    document.getElementById('prof-contenido').innerHTML=h;
+  }).catch(function(){document.getElementById('prof-contenido').innerHTML='<p style="color:var(--danger);padding:16px;">Error al cargar.</p>';});
 }
 function cerrarProfesores(){document.getElementById('modalProfesores').classList.remove('open');}
 {% endblock %}

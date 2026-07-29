@@ -117,5 +117,7 @@ function fetchAndCache(req) {
       });
     }
     return resp;
+  }).catch(function() {
+    return caches.match(req);
   });
 }

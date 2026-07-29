@@ -4,7 +4,7 @@
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
-.main{margin-left:var(--sidebar);padding:20px 24px;width:calc(100% - var(--sidebar));min-height:100vh;}
+.main{margin-left:var(--sidebar-w);padding:16px 20px;width:calc(100% - var(--sidebar-w));min-height:100vh;}
 h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;}
 .subtitle{color:var(--muted);font-size:13px;margin-bottom:20px;}
 .curso-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
@@ -17,7 +17,7 @@ th{padding:7px 5px;text-align:center;background:var(--bg2);border:1px solid var(
 th .hl{font-size:13px;color:var(--text);font-weight:700;letter-spacing:0;text-transform:none;display:block;margin-bottom:2px;}
 th .ht{font-size:10px;color:var(--muted);}
 td{border:1px solid var(--border);vertical-align:middle;}
-td.dia-col{padding:10px 14px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--accent);background:rgba(15,23,42,.6);white-space:nowrap;min-width:55px;position:sticky;left:0;z-index:2;}
+td.dia-col{padding:10px 14px;text-align:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--accent);background:var(--bg3);white-space:nowrap;min-width:55px;position:sticky;left:0;z-index:2;}
 td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:12px 8px;color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
 td.edit-col{cursor:pointer;transition:background var(--tr);}
 td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
@@ -28,7 +28,7 @@ td.edit-col:hover{background:rgba(var(--accent-rgb),.08);}
 .c-empty{color:rgba(var(--accent-rgb),.2);font-size:24px;padding-top:10px;}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
-.modal{background:rgba(15,23,42,.95);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:100%;max-width:420px;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:100%;max-width:420px;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 .modal h3{font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:4px;}
 .modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
@@ -133,37 +133,82 @@ body .btn:active{transform:scale(.97);}
   </div>
 </div>
 
-<!-- Modal -->
-<div class="modal-overlay" id="modalCelda">
+<!-- Modal Horario -->
+<div class="modal-overlay" id="modalHorario">
   <div class="modal">
     <h3 id="mTitulo">Editar</h3>
     <p class="modal-sub" id="mSub"></p>
-    <div class="field">
-      <label>Número / Código</label>
-      <input class="inp" type="text" id="iNum" placeholder="ej: 31">
-    </div>
-    <div class="field">
-      <label>Materia</label>
-      <input class="inp" type="text" id="iMat" placeholder="ej: Matemáticas">
-    </div>
-    <div class="field">
-      <label>Profesor</label>
-      <input class="inp" type="text" id="iProf" placeholder="ej: Alberth">
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-clear" onclick="limpiar()" title="Borrar"><i data-lucide="trash-2"></i></button>
-      <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardar()">Guardar</button>
-    </div>
+    <form id="form-horario" method="post" action="/{{ slug }}/horarios">
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="dia" id="hDia" value="">
+      <input type="hidden" name="franja" id="hFranja" value="">
+      <input type="hidden" name="curso" value="{{ curso_sel or '' }}">
+      <div class="field">
+        <label>Número / Código</label>
+        <input class="inp" type="text" name="num" id="iNum" placeholder="ej: 31">
+      </div>
+      <div class="field">
+        <label>Materia</label>
+        <input class="inp" type="text" name="materia" id="iMat" placeholder="ej: Matemáticas">
+      </div>
+      <div class="field">
+        <label>Profesor</label>
+        <input class="inp" type="text" name="profesor" id="iProf" placeholder="ej: Alberth">
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-clear" onclick="limpiar()" title="Borrar"><i data-lucide="trash-2"></i></button>
+        <button type="button" class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="guardar()">Guardar</button>
+      </div>
+    </form>
   </div>
 </div>
 
-<input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
-<div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado
+<div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado</div>
 {% endblock %}
 {% block extra_scripts %}
-function abrirDesde(el){ openModal('modalHorario'); }
-function limpiar(){ var f=document.getElementById('form-horario');if(f)f.reset(); }
-function cerrar(){ closeModal('modalHorario'); }
-function guardar(){ document.getElementById('form-horario').submit(); }
+var SLUG='{{ slug }}';
+
+function abrirDesde(el){
+  var dia=el.getAttribute('data-dia');
+  var franja=el.getAttribute('data-franja');
+  var num=el.getAttribute('data-num');
+  var mat=el.getAttribute('data-mat');
+  var prof=el.getAttribute('data-prof');
+  document.getElementById('hDia').value=dia;
+  document.getElementById('hFranja').value=franja;
+  document.getElementById('iNum').value=num||'';
+  document.getElementById('iMat').value=mat||'';
+  document.getElementById('iProf').value=prof||'';
+  var title=mat?'Editar celda':'Nueva asignación';
+  document.getElementById('mTitulo').textContent=title;
+  document.getElementById('mSub').textContent=dia+' — Franja '+franja;
+  openModal('modalHorario');
+}
+
+function limpiar(){
+  document.getElementById('iNum').value='';
+  document.getElementById('iMat').value='';
+  document.getElementById('iProf').value='';
+}
+
+function cerrar(){
+  closeModal('modalHorario');
+}
+
+function guardar(){
+  var form=document.getElementById('form-horario');
+  var fd=new FormData(form);
+  var dia=fd.get('dia');
+  var franja=fd.get('franja');
+  if(!dia||!franja){if(window.showToast)window.showToast('Error: datos incompletos','error');return;}
+  fetch('/'+SLUG+'/horarios',{method:'POST',body:fd})
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r;})
+    .then(function(){
+      if(window.showToast)window.showToast('Guardado correctamente','success');
+      closeModal('modalHorario');
+      setTimeout(function(){location.reload();},400);
+    })
+    .catch(function(e){if(window.showToast)window.showToast('Error al guardar','error');});
+}
 {% endblock %}

@@ -1,0 +1,18 @@
+2026-07-27 15:32:07,738 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-27 15:32:15,535 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-27 15:32:15,540 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-27 15:32:48,968 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:33:21,774 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:33:57,569 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-27 15:36:03,724 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-27 15:36:12,488 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-27 15:36:12,492 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-27 15:36:45,961 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:37:18,732 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:37:54,418 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-27 15:40:24,071 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-27 15:40:32,490 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-27 15:40:32,495 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-27 15:41:05,766 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:41:38,513 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:42:13,417 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked

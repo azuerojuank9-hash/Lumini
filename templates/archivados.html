@@ -4,7 +4,7 @@
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
-.main{margin-left:var(--sidebar);padding:20px 24px;width:calc(100% - var(--sidebar));min-height:100vh;max-width:960px;}
+.main{margin-left:var(--sidebar-w);padding:20px 24px;width:calc(100% - var(--sidebar-w));min-height:100vh;max-width:1400px;}
 
 h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;}
 
@@ -58,7 +58,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 
-.modal{background:rgba(15,23,42,.96);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 16px 48px rgba(0,0,0,.5);animation:slideUp .25s ease;}
 
 @keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 
@@ -368,7 +368,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
 </div>
 
-<div class="overlay" id="modalArchivar" onclick="if(event.target===this)cerrarModal()">
+    <div class="overlay" id="modalArchivar" onclick="if(event.target===this)cerrarModal('modalArchivar')">
 
   <div class="modal">
 
@@ -402,13 +402,13 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 
       <div class="alert-warn-box">
 
-        <i data-lucide="alert-triangle"></i>ï¸ Al archivar, el profesor no podrá iniciar sesión. Sus datos e historial quedan guardados.
+        <i data-lucide="alert-triangle"></i> Al archivar, el profesor no podrá iniciar sesión. Sus datos e historial quedan guardados.
 
       </div>
 
       <button class="btn-modal-pri" onclick="confirmarArchivar()"><i data-lucide="archive"></i> Archivar profesor</button>
 
-      <button class="btn-modal-ghost" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-modal-ghost" onclick="cerrarModal('modalArchivar')">Cancelar</button>
 
     </div>
 
@@ -422,9 +422,40 @@ tr:hover td{background:rgba(var(--accent-rgb),.04);}
 {% endblock %}
 
 {% block extra_scripts %}
+var _archivarData={id:null,nombre:'',cursos:[],profesores:[]};
 function cerrarModal(id){closeModal(id);}
-function abrirModalArchivar(id){openModal('modalArchivar');}
-function eliminarProfesor(id){if(confirm('\u00bfEliminar profesor?'))window.location.href='?eliminar='+id;}
+function abrirModalArchivar(id,nombre,cursos,profesores){
+  _archivarData={id:id,nombre:nombre,cursos:cursos||[],profesores:profesores||[]};
+  document.getElementById('modal-prof-nombre').textContent='Archivar: '+nombre;
+  var cList=document.getElementById('lista-cursos-modal');
+  cList.innerHTML='';
+  if(cursos&&cursos.length){
+    cursos.forEach(function(c){var d=document.createElement('div');d.className='curso-tag';d.textContent=typeof c==='object'?c.curso:c;cList.appendChild(d);});
+    var bReasig=document.getElementById('bloque-reasignar');bReasig.style.display='block';
+    var sel=document.getElementById('select-prof-destino');
+    sel.innerHTML='<option value="">— Solo archivar (sin reasignar) —</option>';
+    if(profesores&&profesores.length){profesores.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.nombre;sel.appendChild(o);});}
+  }else{
+    document.getElementById('bloque-reasignar').style.display='none';
+  }
+  openModal('modalArchivar');
+}
+function eliminarProfesor(id,nombre){if(confirm('\u00bfEliminar a '+nombre+'?'))window.location.href='?eliminar='+id;}
 function reactivarProfesor(id){if(confirm('\u00bfReactivar profesor?'))window.location.href='?reactivar='+id;}
-function confirmarArchivar(){showToast('Archivado');}
+function confirmarArchivar(){
+  var slug='{{ slug }}';
+  var csrfEl=document.getElementById('csrf-global');
+  var token=csrfEl?csrfEl.value:'';
+  var sel=document.getElementById('select-prof-destino');
+  var profDest=sel?sel.value:'';
+  if(profDest){
+    var fd=new FormData();fd.append('_csrf_token',token);fd.append('profesor_id',_archivarData.id);fd.append('prof_destino_id',profDest);
+    _archivarData.cursos.forEach(function(c){fd.append('cursos_reasignar',typeof c==='object'?c.curso:c);});
+    fetch('/'+slug+'/archivar_profesor_con_reasignacion',{method:'POST',body:fd,headers:{'X-CSRF-Token':token}})
+    .then(function(r){return r.json();}).then(function(d){if(d.ok){window.location.reload();}else{alert(d.mensaje||'Error');}});
+  }else{
+    fetch('/'+slug+'/archivar_profesor/'+_archivarData.id,{method:'POST',headers:{'X-CSRF-Token':token}})
+    .then(function(r){return r.json();}).then(function(d){if(d.ok){window.location.reload();}else{alert(d.mensaje||'Error');}});
+  }
+}
 {% endblock %}

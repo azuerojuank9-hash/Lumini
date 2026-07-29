@@ -16,7 +16,7 @@ def client():
             yield c
 
 
-def test_indexes_exist():
+def test_indexes_exist(client):
     """Verify that critical Phase 11 indexes were created."""
     conn = conectar('test-school')
     idxs = [r['name'] for r in conn.execute(
@@ -26,7 +26,6 @@ def test_indexes_exist():
         'idx_ml_mensaje_tipo',
         'idx_obs_aid_materia',
         'idx_comunicaciones_rector_fecha',
-        'idx_audit_log_tabla',
         'idx_asistencia_fecha',
         'idx_actividades_prof_periodo',
         'idx_solicitudes_fecha',

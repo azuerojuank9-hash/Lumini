@@ -1,12 +1,13 @@
 /* LUMINI Design System — Layout */
-.main{flex:1;margin-left:var(--sidebar-w);max-width:calc(100% - var(--sidebar-w));padding:28px 36px;min-height:100vh;transition:margin var(--tr),max-width var(--tr),padding var(--tr)}
+.main{flex:1;margin-left:var(--sidebar-w);max-width:calc(100% - var(--sidebar-w));padding:20px 24px;min-height:100vh;transition:margin var(--tr),max-width var(--tr),padding var(--tr)}
 .main-full{margin-left:0;max-width:100%}
-.container{max-width:1200px;margin:0 auto;width:100%}
-.container-narrow{max-width:800px}
-.container-wide{max-width:1400px}
+.container{max-width:1400px;margin:0 auto;width:100%;padding:0 var(--spacing-sm)}
+.container-narrow{max-width:960px}
+.container-wide{max-width:1600px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing-lg)}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--spacing-lg)}
-.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:var(--spacing-md)}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--spacing-md)}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--spacing-md)}
 .flex{display:flex}
 .flex-wrap{flex-wrap:wrap}
 .flex-center{align-items:center;justify-content:center}
@@ -24,19 +25,26 @@
 .topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 /* -- Section tabs ------------------------------------------------------ */
 .curso-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+/* -- Full-width content ------------------------------------------------ */
+.main>.card,.main>.table-wrap,.main>table{width:100%;max-width:100%}
 /* --------------------------------------------------------------------- */
 .hamburger{display:none;position:fixed;top:12px;right:12px;z-index:2001;width:38px;height:38px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:18px;cursor:pointer;align-items:center;justify-content:center;transition:all var(--tr);box-shadow:var(--shadow-sm)}
 .hamburger:hover{background:var(--bg3);border-color:var(--accent)}
 .sidebar-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6)}
 /* -- Responsive -------------------------------------------------------- */
+@media(min-width:1600px){
+.container{max-width:1600px}
+}
 @media(max-width:1440px){
-.main{padding:24px 28px}
+.main{padding:18px 22px}
+.container{max-width:1300px}
 }
 @media(max-width:1280px){
-.main{padding:20px 24px}
+.main{padding:16px 20px}
+.container{max-width:1200px}
 }
 @media(max-width:1024px){
-.main{padding:18px 20px}
+.main{padding:14px 18px}
 .grid-4{grid-template-columns:1fr 1fr}
 .grid-3{grid-template-columns:1fr 1fr}
 .topbar-left h1{font-size:20px}
@@ -49,6 +57,7 @@
 .sidebar-overlay.open{display:block}
 .topbar{flex-direction:column;align-items:flex-start}
 .topbar-right{width:100%}
+.container{max-width:100%;padding:0}
 }
 @media(max-width:480px){
 .main{padding:12px!important}

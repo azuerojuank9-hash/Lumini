@@ -1,0 +1,81 @@
+2026-07-27 15:32:07,738 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-27 15:32:07,897 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-27 15:32:08,048 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-27 15:32:13,442 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-27 15:32:13,514 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-27 15:32:14,815 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-27 15:32:14,880 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-27 15:32:14,938 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-27 15:32:14,993 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-27 15:32:15,046 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-27 15:32:15,113 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-27 15:32:15,202 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-27 15:32:15,269 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-27 15:32:15,388 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-27 15:32:15,446 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-27 15:32:15,535 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-27 15:32:15,540 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-27 15:32:15,758 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-27 15:32:15,829 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-27 15:32:15,878 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-27 15:32:16,032 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-27 15:32:16,147 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-27 15:32:38,083 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-27
+2026-07-27 15:32:48,968 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:33:21,774 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:33:22,072 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-27 15:33:57,569 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-27 15:36:03,724 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-27 15:36:03,814 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-27 15:36:03,975 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-27 15:36:09,840 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-27 15:36:09,941 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-27 15:36:11,676 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-27 15:36:11,759 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-27 15:36:11,839 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-27 15:36:11,904 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-27 15:36:11,968 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-27 15:36:12,033 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-27 15:36:12,100 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-27 15:36:12,161 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-27 15:36:12,339 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-27 15:36:12,393 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-27 15:36:12,488 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-27 15:36:12,492 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-27 15:36:12,708 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-27 15:36:12,784 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-27 15:36:12,844 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-27 15:36:13,031 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-27 15:36:13,133 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-27 15:36:34,003 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-27
+2026-07-27 15:36:45,961 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:37:18,732 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:37:19,022 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-27 15:37:54,418 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-27 15:40:24,071 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-27 15:40:24,215 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-27 15:40:24,357 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-27 15:40:30,332 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-27 15:40:30,416 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-27 15:40:31,757 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-27 15:40:31,817 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-27 15:40:31,877 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-27 15:40:31,950 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-27 15:40:32,006 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-27 15:40:32,070 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-27 15:40:32,138 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-27 15:40:32,203 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-27 15:40:32,338 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-27 15:40:32,400 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-27 15:40:32,490 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-27 15:40:32,495 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-27 15:40:32,710 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-27 15:40:32,784 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-27 15:40:32,838 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-27 15:40:33,000 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-27 15:40:33,086 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-27 15:40:54,370 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-27
+2026-07-27 15:41:05,766 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:41:38,513 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-27 15:41:38,795 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-27 15:42:13,417 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked

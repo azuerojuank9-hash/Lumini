@@ -53,7 +53,7 @@ def create_actividad(slug, profesor_id, materia, jornada, curso, nombre, orden, 
 
 
 def update_actividad_field(slug, act_id, field, value):
-    ALLOWED_FIELDS = {'nombre', 'descripcion', 'fecha', 'peso', 'periodo', 'tipo'}
+    ALLOWED_FIELDS = {'nombre', 'descripcion', 'fecha_limite', 'peso', 'periodo', 'tipo'}
     if field not in ALLOWED_FIELDS:
         return False
     conn = conectar(slug)
@@ -238,10 +238,10 @@ def get_historial_notas_curso(slug, curso, materia, periodo, profesor_id):
                       COALESCE(ac.nombre, '') as actividad_nombre
                FROM auditoria_notas a
                LEFT JOIN actividades ac ON ac.id = a.actividad_id
-               WHERE a.curso = ? AND a.materia = ? AND a.periodo = ? AND a.profesor_id = ?
+               WHERE a.curso = ? AND a.materia = ? AND a.periodo = ?
                ORDER BY a.creado DESC
                LIMIT 500''',
-            (curso, materia, periodo, profesor_id)
+            (curso, materia, periodo)
         ).fetchall()
     finally:
         conn.close()

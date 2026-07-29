@@ -431,9 +431,9 @@ class TestPDF:
 # ── CSRF / Security ──
 
 class TestCSRF:
-    def test_session_cookie_not_secure_in_dev_mode(self):
-        assert app.config.get('SESSION_COOKIE_SECURE') == False, \
-            'SESSION_COOKIE_SECURE must be False when FLASK_ENV=development'
+    def test_session_cookie_secure_in_production_env(self):
+        assert app.config.get('SESSION_COOKIE_SECURE') == True, \
+            'SESSION_COOKIE_SECURE must be True when SESSION_COOKIE_SECURE env var is set'
 
     def test_session_cookie_secure_logic(self):
         """Verify the SESSION_COOKIE_SECURE derivation logic (env-dependent, override-allowed)."""

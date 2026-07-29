@@ -242,7 +242,7 @@ def rector_asistencia_data(slug):
         alumnos = conn.execute(f'SELECT a.id, a.nombre, a.num_curso, a.curso, a.jornada FROM alumnos a WHERE {where} ORDER BY a.curso, a.nombre', params).fetchall()
         if not alumnos:
             conn.close()
-            return fa.jsonify({'estudiantes': [], 'stats': fa._asistencia_stats(slug, conn, curso, jornada)})
+            return fa.jsonify({'estudiantes': [], 'stats': fa._asistencia_stats(conn, curso, jornada)})
         aids = [a['id'] for a in alumnos]
         placeholders = ','.join('?' * len(aids))
         asis_rows = conn.execute(f'SELECT aid, estado, observacion, hora FROM asistencia WHERE fecha=? AND aid IN ({placeholders})',
@@ -991,29 +991,35 @@ def rector_gestion_hacer_principal(slug, rid):
 @rector_bp.route('/<slug>/rector/expediente')
 def rector_expediente(slug):
     fa = _fa()
+    fa.require_colegio(slug)
+    rector = fa.get_rector(slug)
+    if not rector:
+        return fa.redirect(fa.url_for('auth.login', slug=slug))
     conn = fa.conectar(slug)
-    colegio = fa.get_colegio(slug)
-    rector = conn.execute('SELECT * FROM rectores WHERE activo=1 ORDER BY es_principal DESC LIMIT 1').fetchone()
-    aid = fa.request.args.get('aid', type=int) or fa.request.args.get('alumno_id', type=int)
-    alumno = None
-    notas_por_materia = {}
-    asistencia = []
-    observaciones = []
-    cursos_raw = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
-    cursos = [r['curso'] for r in cursos_raw]
-    notif_count = fa.notificaciones_no_leidas(slug, 'rector', 0)
-    if aid:
-        alumno = conn.execute('SELECT * FROM alumnos WHERE id=?', (aid,)).fetchone()
-        if alumno:
-            notas_raw = conn.execute('''SELECT a.materia, ROUND(AVG(n.val), 1) AS promedio, COUNT(n.id) AS evaluaciones
-                                        FROM notas n JOIN actividades a ON a.id = n.actividad_id
-                                        WHERE n.aid=? GROUP BY a.materia ORDER BY promedio DESC''', (aid,)).fetchall()
-            notas_por_materia = {r['materia']: {'promedio': r['promedio'], 'evaluaciones': r['evaluaciones']} for r in notas_raw}
-            asistencia = conn.execute('SELECT fecha, estado, observacion FROM asistencia WHERE aid=? ORDER BY fecha DESC LIMIT 20', (aid,)).fetchall()
-            observaciones = conn.execute('SELECT o.* FROM observador_registros o WHERE o.aid=? ORDER BY o.fecha DESC LIMIT 50', (aid,)).fetchall()
-    return fa.render_template('rector/expediente.html', slug=slug, colegio=colegio, rector=rector,
-                           alumno=alumno, notas_por_materia=notas_por_materia, asistencia=asistencia,
-                           observaciones=observaciones, cursos=cursos, notif_count=notif_count)
+    try:
+        colegio = fa.get_colegio(slug)
+        aid = fa.request.args.get('aid', type=int) or fa.request.args.get('alumno_id', type=int)
+        alumno = None
+        notas_por_materia = {}
+        asistencia = []
+        observaciones = []
+        cursos_raw = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
+        cursos = [r['curso'] for r in cursos_raw]
+        notif_count = fa.notificaciones_no_leidas(slug, 'rector', rector['id'])
+        if aid:
+            alumno = conn.execute('SELECT * FROM alumnos WHERE id=?', (aid,)).fetchone()
+            if alumno:
+                notas_raw = conn.execute('''SELECT a.materia, ROUND(AVG(n.val), 1) AS promedio, COUNT(n.id) AS evaluaciones
+                                            FROM notas n JOIN actividades a ON a.id = n.actividad_id
+                                            WHERE n.aid=? GROUP BY a.materia ORDER BY promedio DESC''', (aid,)).fetchall()
+                notas_por_materia = {r['materia']: {'promedio': r['promedio'], 'evaluaciones': r['evaluaciones']} for r in notas_raw}
+                asistencia = conn.execute('SELECT fecha, estado, observacion FROM asistencia WHERE aid=? ORDER BY fecha DESC LIMIT 20', (aid,)).fetchall()
+                observaciones = conn.execute('SELECT o.* FROM observador_registros o WHERE o.aid=? ORDER BY o.fecha DESC LIMIT 50', (aid,)).fetchall()
+        return fa.render_template('rector/expediente.html', slug=slug, colegio=colegio, rector=rector,
+                               alumno=alumno, notas_por_materia=notas_por_materia, asistencia=asistencia,
+                               observaciones=observaciones, cursos=cursos, notif_count=notif_count)
+    finally:
+        conn.close()
 
 
 @rector_bp.route('/<slug>/rector/observador')
@@ -1037,7 +1043,11 @@ def rector_certificados(slug):
         return fa.redirect(fa.url_for('auth.login', slug=slug))
     colegio = fa.get_colegio(slug)
     notif_count = fa.notificaciones_no_leidas(slug, 'rector', rector['id'])
-    cursos_raw = fa.conectar(slug).execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
+    conn = fa.conectar(slug)
+    try:
+        cursos_raw = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
+    finally:
+        conn.close()
     cursos = [r['curso'] for r in cursos_raw]
     return fa.render_template('rector/certificados.html', slug=slug, colegio=colegio, rector=rector, cursos=cursos, notif_count=notif_count)
 
@@ -1074,15 +1084,18 @@ def api_rector_estudiantes(slug):
     if not rector:
         return fa.jsonify({'ok': False, 'error': 'No autorizado'}), 401
     conn = fa.conectar(slug)
-    q = fa.request.args.get('q', '').strip()
-    curso = fa.request.args.get('curso', '').strip()
-    if curso:
-        rows = conn.execute('SELECT a.id, a.nombre, a.curso FROM alumnos a WHERE a.curso=? AND a.activo=1 ORDER BY a.nombre', (curso,)).fetchall()
-        return fa.jsonify({'estudiantes': [dict(r) for r in rows]})
-    if len(q) < 2:
-        return fa.jsonify({'ok': False, 'data': []})
-    rows = conn.execute('''SELECT a.id, a.nombre, a.curso FROM alumnos a WHERE a.nombre LIKE ? ORDER BY a.nombre LIMIT 15''', (f'%{q}%',)).fetchall()
-    return fa.jsonify({'ok': True, 'data': [dict(r) for r in rows]})
+    try:
+        q = fa.request.args.get('q', '').strip()
+        curso = fa.request.args.get('curso', '').strip()
+        if curso:
+            rows = conn.execute('SELECT a.id, a.nombre, a.curso FROM alumnos a WHERE a.curso=? AND a.activo=1 ORDER BY a.nombre', (curso,)).fetchall()
+            return fa.jsonify({'estudiantes': [dict(r) for r in rows]})
+        if len(q) < 2:
+            return fa.jsonify({'ok': False, 'data': []})
+        rows = conn.execute('''SELECT a.id, a.nombre, a.curso FROM alumnos a WHERE a.nombre LIKE ? ORDER BY a.nombre LIMIT 15''', (f'%{q}%',)).fetchall()
+        return fa.jsonify({'ok': True, 'data': [dict(r) for r in rows]})
+    finally:
+        conn.close()
 
 
 @rector_bp.route('/<slug>/api/rector/observador/<int:aid>', methods=['GET', 'POST'])
@@ -1093,26 +1106,283 @@ def api_rector_observador(slug, aid):
     if not rector:
         return fa.jsonify({'ok': False, 'error': 'No autorizado'}), 401
     conn = fa.conectar(slug)
-    if fa.request.method == 'POST':
-        if not fa.validar_csrf():
-            return fa.jsonify({'ok': False, 'error': 'CSRF inválido'}), 400
-        data = fa.request.get_json(silent=True) or {}
-        tipo = data.get('tipo', 'llamado')
-        texto = data.get('texto', '').strip()
-        if not texto:
-            return fa.jsonify({'ok': False, 'error': 'Texto requerido'}), 400
-        conn.execute('''INSERT INTO observador_registros (slug, aid, tipo, texto, docente, estado)
-                        VALUES (?,?,?,?,?,?)''',
-                     (slug, aid, tipo, texto, fa.session.get('nombre', ''), 'pendiente'))
+    try:
+        if fa.request.method == 'POST':
+            if not fa.validar_csrf():
+                return fa.jsonify({'ok': False, 'error': 'CSRF inválido'}), 400
+            data = fa.request.get_json(silent=True) or {}
+            tipo = data.get('tipo', 'llamado')
+            texto = data.get('texto', '').strip()
+            if not texto:
+                return fa.jsonify({'ok': False, 'error': 'Texto requerido'}), 400
+            conn.execute('''INSERT INTO observador_registros (slug, aid, tipo, texto, docente, estado)
+                            VALUES (?,?,?,?,?,?)''',
+                         (slug, aid, tipo, texto, fa.session.get('nombre', ''), 'pendiente'))
+            conn.commit()
+            return fa.jsonify({'ok': True})
+        rows = conn.execute('''SELECT o.*, CASE o.tipo
+                                WHEN 'positivo' THEN 'Positivo'
+                                WHEN 'llamado' THEN 'Llamado de atención'
+                                WHEN 'compromiso' THEN 'Compromiso'
+                                WHEN 'seguimiento' THEN 'Seguimiento'
+                            END AS tipo_label
+                            FROM observador_registros o
+                            WHERE o.aid=? AND o.slug=?
+                            ORDER BY o.fecha DESC LIMIT 50''', (aid, slug)).fetchall()
+        return fa.jsonify({'ok': True, 'data': [dict(r) for r in rows]})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/gestion-academica/alumnos')
+def rector_gestion_alumnos(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify([]), 403
+    conn = fa.conectar(slug)
+    try:
+        q = fa.request.args.get('q', '').strip()
+        if q:
+            alumnos = conn.execute(
+                "SELECT id, nombre, curso, jornada FROM alumnos WHERE activo=1 AND nombre LIKE ? ORDER BY nombre",
+                (f'%{q}%',)).fetchall()
+        else:
+            alumnos = conn.execute(
+                'SELECT id, nombre, curso, jornada FROM alumnos WHERE activo=1 ORDER BY curso, nombre').fetchall()
+        return fa.jsonify({'alumnos': [dict(a) for a in alumnos]})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/gestion-academica/promover', methods=['POST'])
+def rector_gestion_promover(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'ok': False, 'error': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'ok': False, 'error': 'CSRF'}), 400
+    data = fa.request.get_json(silent=True) or {}
+    origen = data.get('curso_origen', '')
+    destino = data.get('curso_destino', '')
+    if not origen or not destino:
+        return fa.jsonify({'status': 'error', 'error': 'Datos incompletos'}), 400
+    conn = fa.conectar(slug)
+    try:
+        aids = [r['id'] for r in conn.execute('SELECT id FROM alumnos WHERE curso=? AND activo=1', (origen,)).fetchall()]
+        if not aids:
+            return fa.jsonify({'status': 'error', 'error': 'No hay alumnos en ' + origen})
+        placeholders = ','.join('?' * len(aids))
+        conn.execute(f'UPDATE alumnos SET curso=? WHERE id IN ({placeholders})', [destino] + aids)
         conn.commit()
-        return fa.jsonify({'ok': True})
-    rows = conn.execute('''SELECT o.*, CASE o.tipo
-                            WHEN 'positivo' THEN 'Positivo'
-                            WHEN 'llamado' THEN 'Llamado de atención'
-                            WHEN 'compromiso' THEN 'Compromiso'
-                            WHEN 'seguimiento' THEN 'Seguimiento'
-                        END AS tipo_label
-                        FROM observador_registros o
-                        WHERE o.aid=? AND o.slug=?
-                        ORDER BY o.fecha DESC LIMIT 50''', (aid, slug)).fetchall()
-    return fa.jsonify({'ok': True, 'data': [dict(r) for r in rows]})
+        return fa.jsonify({'status': 'ok', 'promovidos': len(aids)})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/gestion-academica/trasladar', methods=['POST'])
+def rector_gestion_trasladar(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'ok': False, 'error': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'ok': False, 'error': 'CSRF'}), 400
+    data = fa.request.get_json(silent=True) or {}
+    aid = data.get('alumno_id')
+    destino = data.get('curso_nuevo', data.get('curso_destino', ''))
+    if not aid or not destino:
+        return fa.jsonify({'status': 'error', 'error': 'Datos incompletos'}), 400
+    conn = fa.conectar(slug)
+    try:
+        nombre = conn.execute('SELECT nombre FROM alumnos WHERE id=?', (aid,)).fetchone()
+        nombre = nombre['nombre'] if nombre else ''
+        conn.execute('UPDATE alumnos SET curso=? WHERE id=?', (destino, aid))
+        conn.commit()
+        return fa.jsonify({'status': 'ok', 'nombre': nombre})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/gestion-academica/historial/<int:aid>')
+def rector_gestion_historial(slug, aid):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify([]), 403
+    conn = fa.conectar(slug)
+    try:
+        alumno = conn.execute('SELECT id, nombre, curso FROM alumnos WHERE id=?', (aid,)).fetchone()
+        notas = conn.execute(
+            "SELECT ac.materia, ac.periodo, n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id WHERE n.aid=? ORDER BY ac.materia, ac.periodo",
+            (aid,)).fetchall()
+        historial = [{'curso': n['materia'], 'fecha': n['periodo'], 'estado': str(n['val'])} for n in notas]
+        return fa.jsonify({'alumno': dict(alumno) if alumno else {}, 'historial': historial})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/matriculas/cupos')
+def rector_matriculas_cupos(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'cupos': []}), 403
+    conn = fa.conectar(slug)
+    try:
+        cursos = conn.execute(
+            'SELECT curso, COUNT(*) as total, GROUP_CONCAT(DISTINCT jornada) as jornada FROM alumnos WHERE activo=1 GROUP BY curso ORDER BY curso').fetchall()
+        return fa.jsonify({'cupos': [{'curso': c['curso'], 'jornada': c['jornada'] or '', 'inscritos': c['total']} for c in cursos]})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/matriculas')
+def rector_matriculas_list(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'matriculas': []}), 403
+    conn = fa.conectar(slug)
+    try:
+        alumnos = conn.execute(
+            'SELECT id, nombre, curso, jornada, activo FROM alumnos ORDER BY curso, nombre').fetchall()
+        result = []
+        for a in alumnos:
+            estado = 'aprobado' if a['activo'] else 'rechazado'
+            result.append({'id': a['id'], 'nombre': a['nombre'], 'curso_solicitado': a['curso'], 'jornada': a['jornada'], 'estado': estado})
+        return fa.jsonify({'matriculas': result})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/matriculas/crear', methods=['POST'])
+def rector_matriculas_crear(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'status': 'error', 'error': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'status': 'error', 'error': 'CSRF'}), 400
+    data = fa.request.get_json(silent=True) or {}
+    nombre = data.get('nombre', '').strip()
+    curso = data.get('curso', '').strip()
+    jornada = data.get('jornada', '').strip()
+    if not nombre or not curso:
+        return fa.jsonify({'status': 'error', 'error': 'Nombre y curso requeridos'}), 400
+    conn = fa.conectar(slug)
+    try:
+        conn.execute(
+            'INSERT INTO alumnos (nombre, curso, jornada, activo) VALUES (?,?,?,1)',
+            (nombre, curso, jornada))
+        conn.commit()
+        return fa.jsonify({'status': 'ok', 'mensaje': 'Alumno matriculado'})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/matriculas/<int:mid>/estado', methods=['POST'])
+def rector_matriculas_estado(slug, mid):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'status': 'error', 'error': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'status': 'error', 'error': 'CSRF'}), 400
+    data = fa.request.get_json(silent=True) or {}
+    estado = data.get('estado', 'aprobado')
+    activo = 1 if estado == 'aprobado' else 0
+    conn = fa.conectar(slug)
+    try:
+        conn.execute('UPDATE alumnos SET activo=? WHERE id=?', (activo, mid))
+        conn.commit()
+        return fa.jsonify({'status': 'ok'})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/tesoreria/facturas')
+def rector_tesoreria_list(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'facturas': []}), 403
+    return fa.jsonify({'facturas': []})
+
+
+@rector_bp.route('/<slug>/tesoreria/facturas/crear', methods=['POST'])
+def rector_tesoreria_crear(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'status': 'error', 'error': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'status': 'error', 'error': 'CSRF'}), 400
+    return fa.jsonify({'status': 'ok', 'mensaje': 'Funcionalidad en desarrollo'})
+
+
+@rector_bp.route('/<slug>/tesoreria/facturas/<int:fid>/pagar', methods=['POST'])
+def rector_tesoreria_pagar(slug, fid):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'status': 'error', 'error': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'status': 'error', 'error': 'CSRF'}), 400
+    return fa.jsonify({'status': 'ok', 'mensaje': 'Funcionalidad en desarrollo'})
+
+
+@rector_bp.route('/<slug>/reportes/tablas')
+def rector_reportes_tablas(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'tablas': []}), 403
+    return fa.jsonify({'tablas': ['alumnos', 'profesores', 'asignaciones_materia', 'notas', 'asistencia', 'actividades', 'comunicaciones', 'audit_log']})
+
+
+@rector_bp.route('/<slug>/reportes/columnas')
+def rector_reportes_columnas(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'columnas': []}), 403
+    tabla = fa.request.args.get('tabla', '')
+    columnas_map = {
+        'alumnos': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'nombre', 'type': 'TEXT'}, {'name': 'curso', 'type': 'TEXT'}, {'name': 'jornada', 'type': 'TEXT'}, {'name': 'activo', 'type': 'INTEGER'}],
+        'profesores': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'nombre', 'type': 'TEXT'}, {'name': 'usuario', 'type': 'TEXT'}, {'name': 'email', 'type': 'TEXT'}, {'name': 'activo', 'type': 'INTEGER'}],
+        'asignaciones_materia': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'profesor_id', 'type': 'INTEGER'}, {'name': 'materia', 'type': 'TEXT'}, {'name': 'jornada', 'type': 'TEXT'}],
+        'notas': [{'name': 'aid', 'type': 'INTEGER'}, {'name': 'actividad_id', 'type': 'INTEGER'}, {'name': 'val', 'type': 'REAL'}],
+        'asistencia': [{'name': 'aid', 'type': 'INTEGER'}, {'name': 'fecha', 'type': 'TEXT'}, {'name': 'presente', 'type': 'INTEGER'}, {'name': 'observacion', 'type': 'TEXT'}],
+        'actividades': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'nombre', 'type': 'TEXT'}, {'name': 'materia', 'type': 'TEXT'}, {'name': 'periodo', 'type': 'INTEGER'}, {'name': 'curso', 'type': 'TEXT'}],
+        'comunicaciones': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'titulo', 'type': 'TEXT'}, {'name': 'contenido', 'type': 'TEXT'}, {'name': 'fecha_creacion', 'type': 'TEXT'}],
+        'audit_log': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'accion', 'type': 'TEXT'}, {'name': 'tabla', 'type': 'TEXT'}, {'name': 'creado', 'type': 'TEXT'}],
+    }
+    return fa.jsonify({'columnas': columnas_map.get(tabla, [])})
+
+
+@rector_bp.route('/<slug>/reportes/ejecutar', methods=['POST'])
+def rector_reportes_ejecutar(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'status': 'error', 'error': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'status': 'error', 'error': 'CSRF'}), 400
+    data = fa.request.get_json(silent=True) or {}
+    tabla = data.get('tabla', '')
+    columnas = data.get('campos', data.get('columnas', []))
+    if not tabla:
+        return fa.jsonify({'status': 'error', 'error': 'Tabla requerida'}), 400
+    conn = fa.conectar(slug)
+    try:
+        cols = ', '.join(columnas) if columnas else '*'
+        col_names = columnas if columnas else [d[0] for d in conn.execute(f'SELECT * FROM {tabla} LIMIT 1').description]
+        filas_raw = conn.execute(f'SELECT {cols} FROM {tabla} LIMIT 200').fetchall()
+        filas = [[row[c] for c in col_names] for row in filas_raw]
+        return fa.jsonify({'columnas': col_names, 'filas': filas, 'total': len(filas)})
+    except Exception as e:
+        return fa.jsonify({'error': str(e)}), 400
+    finally:
+        conn.close()
