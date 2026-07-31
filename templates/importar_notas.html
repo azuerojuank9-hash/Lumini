@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
-{% block title %}Importar Notas &mdash; Lumini{% endblock %}
+{% block title %}Importar Notas — Lumini{% endblock %}
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
@@ -78,7 +78,7 @@ tr:nth-child(even) td{background:rgba(var(--muted-rgb),.015);}
 <div class="topbar">
     <div class="topbar-left">
         <h1>Importar notas desde Excel</h1>
-        <div class="breadcrumb">{{ materia }} &middot; {{ jornada }}</div>
+        <div class="breadcrumb">{{ materia }} · {{ jornada }}</div>
     </div>
     <div class="topbar-right">
         <a href="/{{ slug }}/plantilla_notas?curso={{ curso_sel }}&periodo={{ periodo }}" class="qaction">Descargar plantilla</a>
@@ -91,7 +91,7 @@ tr:nth-child(even) td{background:rgba(var(--muted-rgb),.015);}
     <div class="step-line"></div>
     <div class="step" id="step2"><span class="step-num">2</span> Previsualizar</div>
     <div class="step-line"></div>
-    <div class="step" id="step3"><span class="step-num">3</span> Confirmar importaci&oacute;n</div>
+    <div class="step" id="step3"><span class="step-num">3</span> Confirmar importación</div>
 </div>
 
 <div class="curso-tabs">
@@ -108,8 +108,8 @@ tr:nth-child(even) td{background:rgba(var(--muted-rgb),.015);}
         <div class="card-body">
             <div class="file-zone" id="fileZone" onclick="document.getElementById('fileInput').click()">
                 <div class="icon"><i data-lucide="file-spreadsheet" style="width:40px;height:40px;"></i></div>
-                <div class="label">Haz clic o arrastra un archivo .xlsx aqu&iacute;</div>
-                <div class="hint">El archivo debe tener el formato oficial de LUMINI (columnas: N&deg;, Estudiante, AID, actividades, Evaluaci&oacute;n, Autoevaluaci&oacute;n, Promedio)</div>
+                <div class="label">Haz clic o arrastra un archivo .xlsx aquí</div>
+                <div class="hint">El archivo debe tener el formato oficial de LUMINI (columnas: N°, Estudiante, AID, actividades, Evaluación, Autoevaluación, Promedio)</div>
                 <input type="file" id="fileInput" name="archivo" accept=".xlsx" style="display:none" onchange="updateFileLabel(this)">
             </div>
             <div id="fileInfo" style="display:none;margin-bottom:10px;padding:10px 14px;background:rgba(var(--accent-rgb),.08);border-radius:var(--radius-sm);font-size:13px;"></div>

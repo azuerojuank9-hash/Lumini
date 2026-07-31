@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
-{% block title %}Dashboard - {{ slug }}{% endblock %}
+{% block title %}Panel - {{ slug }}{% endblock %}
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_head %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>{% endblock %}
@@ -116,7 +116,7 @@
 <div class="page-header">
     <div>
       <h1>{% if instance == 'rector' %}Panel de Control Institucional{% else %}Panel del Docente{% endif %}</h1>
-      <div class="greeting">Bienvenido, <strong>{{ nombre }}</strong> &middot; {{ hoy_str }} {% if materia %} &middot; {{ materia }}{% endif %}{% if jornada %} &middot; {{ jornada }}{% endif %}</div>
+      <div class="greeting">Bienvenido, <strong>{{ nombre }}</strong> · {{ hoy_str }} {% if materia %} · {{ materia }}{% endif %}{% if jornada %} · {{ jornada }}{% endif %}</div>
     </div>
     <div class="export-bar">
       <button onclick="exportPDF()" class="btn btn-secondary btn-sm"><i data-lucide="file-text"></i> PDF</button>
@@ -150,7 +150,7 @@
           <span class="schedule-franja">{{ sc.franja }}</span>
           <div class="schedule-info">
             <div class="schedule-materia">{{ sc.materia if sc.materia else '--' }}</div>
-            <div class="schedule-curso">{{ sc.curso }}{% if sc.num %} &middot; {{ sc.num }}{% endif %}</div>
+            <div class="schedule-curso">{{ sc.curso }}{% if sc.num %} · {{ sc.num }}{% endif %}</div>
           </div>
         </div>
         {% endfor %}
@@ -190,7 +190,7 @@
           <div class="comms-icon"><i data-lucide="message-circle" style="width:14px;height:14px;color:var(--muted)"></i></div>
           <div>
             <div class="comms-subject">{{ com.titulo }}</div>
-            <div class="comms-date">{{ com.fecha_publicacion }} &middot; {{ com.creado_por }}</div>
+            <div class="comms-date">{{ com.fecha_publicacion }} · {{ com.creado_por }}</div>
           </div>
         </div>
         {% endfor %}
@@ -323,7 +323,7 @@ function loadDashboard(){
       renderRankings(d.rankings||{});
       renderStats(d.estadisticas||{});
       renderLowPerformers(d.alerts||{});
-      if(window.showToast)window.showToast('Dashboard actualizado','success');
+      if(window.showToast)window.showToast('Panel actualizado','success');
     })
     .catch(function(e){
       console.error('Dashboard load error:',e);
@@ -410,25 +410,25 @@ function renderAlerts(a){
   if(a.estudiantes_bajo&&a.estudiantes_bajo.length){
     hasAlerts=true;
     a.estudiantes_bajo.forEach(function(s){
-      h+='<div class="alert-item alert-red"><i data-lucide="user-x"></i><strong>'+escHtml(s.nombre)+'</strong> &mdash; Promedio: '+escHtml(String(s.promedio))+' ('+escHtml(s.curso)+')</div>';
+      h+='<div class="alert-item alert-red"><i data-lucide="user-x"></i><strong>'+escHtml(s.nombre)+'</strong> — Promedio: '+escHtml(String(s.promedio))+' ('+escHtml(s.curso)+')</div>';
     });
   }
   if(a.cursos_bajo&&a.cursos_bajo.length){
     hasAlerts=true;
     a.cursos_bajo.forEach(function(c){
-      h+='<div class="alert-item alert-orange"><i data-lucide="alert-circle"></i><strong>'+escHtml(c.curso)+'</strong> &mdash; Promedio: '+escHtml(String(c.promedio))+'</div>';
+      h+='<div class="alert-item alert-orange"><i data-lucide="alert-circle"></i><strong>'+escHtml(c.curso)+'</strong> — Promedio: '+escHtml(String(c.promedio))+'</div>';
     });
   }
   if(a.actividades_bajo&&a.actividades_bajo.length){
     hasAlerts=true;
     a.actividades_bajo.forEach(function(a2){
-      h+='<div class="alert-item alert-yellow"><i data-lucide="alert-triangle"></i><strong>'+escHtml(a2.actividad)+'</strong> &mdash; Promedio: '+escHtml(String(a2.promedio))+'</div>';
+      h+='<div class="alert-item alert-yellow"><i data-lucide="alert-triangle"></i><strong>'+escHtml(a2.actividad)+'</strong> — Promedio: '+escHtml(String(a2.promedio))+'</div>';
     });
   }
   if(a.destacados&&a.destacados.length){
     hasAlerts=true;
     a.destacados.forEach(function(s){
-      h+='<div class="alert-item alert-green"><i data-lucide="award"></i><strong>'+escHtml(s.nombre)+'</strong> &mdash; Promedio: '+escHtml(String(s.promedio))+' \u2b50</div>';
+      h+='<div class="alert-item alert-green"><i data-lucide="award"></i><strong>'+escHtml(s.nombre)+'</strong> — Promedio: '+escHtml(String(s.promedio))+' \u2b50</div>';
     });
   }
   if(!hasAlerts)h+='<div class="empty-msg">Sin alertas en este per\u00edodo</div>';

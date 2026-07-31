@@ -69,6 +69,7 @@ def login_estudiante(slug, codigo, password, alumno, verificar_pw=None, necesita
         return None, 'PIN incorrecto.'
     session_clear()
     set_permanent(True)
+    session_set(f'rol_{slug}', 'estudiante')
     session_set(f'alumno_id_{slug}', alumno['id'])
     session_regenerate()
     return 'estudiante', None

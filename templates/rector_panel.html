@@ -373,14 +373,14 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
 <div class="overlay" id="matModal" onclick="if(event.target===this)cerrarMatriculas()">
 <div class="modal" style="max-width:750px;">
     <div class="modal-header">
-        <h2><i data-lucide="clipboard-check" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Matr&iacute;culas</h2>
+        <h2><i data-lucide="clipboard-check" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Matrículas</h2>
         <button class="close-btn" onclick="cerrarMatriculas()"><i data-lucide="x"></i></button>
     </div>
     <div class="modal-body">
         <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
             <input type="text" id="matNombre" placeholder="Nombre del aspirante" style="flex:2;min-width:140px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
             <input type="text" id="matDoc" placeholder="Documento" style="flex:1;min-width:80px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
-            <input type="email" id="matEmail" placeholder="Email" style="flex:1;min-width:100px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
+            <input type="email" id="matEmail" placeholder="Correo" style="flex:1;min-width:100px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
             <input type="text" id="matCurso" placeholder="Curso solicitado" style="flex:1;min-width:80px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
             <button class="btn btn-primary btn-sm" onclick="crearMatricula()"><i data-lucide="plus" style="width:14px;height:14px;"></i> Agregar</button>
         </div>
@@ -396,7 +396,7 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
 <div class="overlay" id="tesModal" onclick="if(event.target===this)cerrarTesoreria()">
 <div class="modal" style="max-width:800px;">
     <div class="modal-header">
-        <h2><i data-lucide="wallet" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Tesorer&iacute;a</h2>
+        <h2><i data-lucide="wallet" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Tesorería</h2>
         <button class="close-btn" onclick="cerrarTesoreria()"><i data-lucide="x"></i></button>
     </div>
     <div class="modal-body">
@@ -451,7 +451,7 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
 <div class="overlay" id="gestionModal" onclick="if(event.target===this)cerrarGestion()">
 <div class="modal" style="max-width:700px;">
     <div class="modal-header">
-        <h2><i data-lucide="school" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Gesti&oacute;n Acad&eacute;mica</h2>
+        <h2><i data-lucide="school" style="width:18px;height:18px;vertical-align:middle;margin-right:6px;"></i> Gestión Académica</h2>
         <button class="close-btn" onclick="cerrarGestion()"><i data-lucide="x"></i></button>
     </div>
     <div class="modal-body">
@@ -475,7 +475,7 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
             </div>
         </div>
         <div style="margin-top:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;">
-            <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;"><i data-lucide="clock" style="width:14px;height:14px;vertical-align:middle;"></i> Historial Acad&eacute;mico</h4>
+            <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;"><i data-lucide="clock" style="width:14px;height:14px;vertical-align:middle;"></i> Historial Académico</h4>
             <input type="text" id="gHistSearch" placeholder="Buscar estudiante..." style="width:100%;padding:6px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;margin-bottom:8px;box-sizing:border-box;" oninput="buscarHistorial()">
             <div id="gHistResult" style="font-size:12px;color:var(--muted);">Escribe el nombre de un estudiante para ver su historial.</div>
         </div>
@@ -678,7 +678,7 @@ function abrirHomeRector(){
             });
         }
         h+='</div>';
-        h+='<div style="text-align:center;padding:12px;background:var(--bg3);border-radius:var(--radius-md);border:1px solid var(--border);font-size:12px;color:var(--muted);">Panel de inicio &mdash; Lumini</div>';
+        h+='<div style="text-align:center;padding:12px;background:var(--bg3);border-radius:var(--radius-md);border:1px solid var(--border);font-size:12px;color:var(--muted);">Panel de inicio — Lumini</div>';
         body.innerHTML=h;
     }).catch(function(){body.innerHTML='<div style="text-align:center;padding:24px;color:var(--danger);">Error al cargar</div>';});
 }
@@ -762,7 +762,7 @@ function cargarFacturas(){
         h+='<th style="padding:5px 6px;text-align:left;border-bottom:2px solid var(--border);">Concepto</th>';
         h+='<th style="padding:5px 6px;text-align:right;border-bottom:2px solid var(--border);">Monto</th>';
         h+='<th style="padding:5px 6px;text-align:center;border-bottom:2px solid var(--border);">Estado</th>';
-        h+='<th style="padding:5px 6px;text-align:center;border-bottom:2px solid var(--border);">Acci&oacute;n</th></tr></thead><tbody>';
+        h+='<th style="padding:5px 6px;text-align:center;border-bottom:2px solid var(--border);">Acción</th></tr></thead><tbody>';
         (d.facturas||[]).forEach(function(f){
             h+='<tr><td style="padding:5px 6px;border-bottom:1px solid var(--border);">'+escHtml(f.alumno_nombre||'N/A')+'</td>';
             h+='<td style="padding:5px 6px;border-bottom:1px solid var(--border);">'+escHtml(f.concepto)+'</td>';

@@ -32,6 +32,8 @@ from flask import (  # noqa: F401
     url_for,
 )
 
+from flask.sessions import SecureCookieSessionInterface
+
 from app.logging import get_logger
 from config import settings
 
@@ -48,6 +50,19 @@ app.permanent_session_lifetime = timedelta(hours=settings.PERMANENT_SESSION_LIFE
 app.config['SESSION_COOKIE_HTTPONLY'] = settings.SESSION_COOKIE_HTTPONLY
 app.config['SESSION_COOKIE_SAMESITE'] = settings.SESSION_COOKIE_SAMESITE
 app.config['SESSION_COOKIE_SECURE'] = settings.SESSION_COOKIE_SECURE
+
+
+class LuminiSessionInterface(SecureCookieSessionInterface):
+    """Only mark the session cookie Secure when the connection is actually HTTPS.
+    Over plain HTTP the browser would refuse to send it back, dropping the session
+    and breaking CSRF on login/registration/password forms."""
+
+    def get_cookie_secure(self, app):
+        from flask import request
+        return bool(app.config.get('SESSION_COOKIE_SECURE', False)) and request.is_secure
+
+
+app.session_interface = LuminiSessionInterface()
 
 if ENV == 'production' and settings.SESSION_COOKIE_SECURE:
     logger.info("Producción — SESSION_COOKIE_SECURE=True, asegúrate de tener HTTPS.")

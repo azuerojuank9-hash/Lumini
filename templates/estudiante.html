@@ -272,7 +272,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
       </div>
       <div style="display:flex;gap:6px;margin-top:10px;margin-left:18px;">
         <button onclick="estAbrirModalComunicado({{ c.id }},'{{ c.titulo|replace("'","&#039;") }}','{{ (c.fecha_publicacion or c.fecha_creacion)[:10] }}','{{ (c.contenido or '')|replace("\\","\\\\")|replace("'","&#039;") }}','{{ pc_name.get(c.prioridad,'') }}','background:{{ pc.get(c.prioridad,'var(--blue)') }}15;color:{{ pc.get(c.prioridad,'var(--blue)') }};')" class="btn btn-sm btn-ghost" style="background:rgba(var(--accent-rgb),.1);color:var(--accent);"><i data-lucide="eye"></i> Ver comunicado</button>
-        <button onclick="marcarLeido({{ c.id }}, this)" class="btn btn-sm btn-ghost"><i data-lucide="check"></i> Marcar como le&iacute;do</button>
+        <button onclick="marcarLeido({{ c.id }}, this)" class="btn btn-sm btn-ghost"><i data-lucide="check"></i> Marcar como leído</button>
       </div>
     </div>
     {% endfor %}
@@ -299,7 +299,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
         <div class="canales-main">
           <div class="canales-empty" id="canalEmptyEst">
             <i data-lucide="message-square"></i>
-            <p>Selecciona un canal para iniciar la conversaci&oacute;n</p>
+            <p>Selecciona un canal para iniciar la conversación</p>
           </div>
           <div class="canales-chat" id="canalChatViewEst" style="display:none;">
             <div class="canal-chat-header">
@@ -307,7 +307,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
               <div class="canal-chat-title" id="canalChatTitleEst"></div>
               <div class="canal-chat-actions" style="margin-left:auto;display:flex;gap:4px;">
                 <button id="canalSearchBtnEst" class="canal-hdr-btn" title="Buscar" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 6px;font-size:13px;"><i data-lucide="search"></i></button>
-                <button id="canalInfoBtnEst" class="canal-hdr-btn" title="Informaci&oacute;n del canal" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 6px;font-size:13px;"><i data-lucide="info"></i></button>
+                <button id="canalInfoBtnEst" class="canal-hdr-btn" title="Información del canal" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 6px;font-size:13px;"><i data-lucide="info"></i></button>
               </div>
             </div>
             <div class="canal-search-bar" id="canalSearchBarEst" style="display:none;padding:8px 12px;border-bottom:1px solid var(--border);">
@@ -763,7 +763,7 @@ function hideComToastEst(){var t=document.getElementById('comToastEst');if(t)t.c
 </div>
 <div id="estComModalContent" style="padding:14px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;white-space:pre-wrap;color:var(--text);margin-bottom:14px;"></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-<button onclick="var b=document.getElementById('estComModalLeerBtn');marcarLeido(parseInt(b.getAttribute('data-cid')),b);estCerrarComunicado();" id="estComModalLeerBtn" style="padding:8px 14px;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px;"><i data-lucide="check"></i> Marcar como le&iacute;do</button>
+<button onclick="var b=document.getElementById('estComModalLeerBtn');marcarLeido(parseInt(b.getAttribute('data-cid')),b);estCerrarComunicado();" id="estComModalLeerBtn" style="padding:8px 14px;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;background:rgba(var(--accent-rgb),.1);color:var(--accent);font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px;"><i data-lucide="check"></i> Marcar como leído</button>
 <button onclick="estCerrarComunicado()" style="padding:8px 14px;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--muted);font-family:'Inter',sans-serif;">Cerrar</button>
 </div>
 </div>
@@ -783,6 +783,6 @@ window.addEventListener('scroll',function(){
   <div class="com-toast-body">
     <div class="com-toast-title" id="comToastTitleEst">Nuevo comunicado</div>
     <div class="com-toast-msg" id="comToastMsgEst"></div>
-    <div class="com-toast-time">Reci&eacute;n publicado</div>
+    <div class="com-toast-time">Recién publicado</div>
   </div>
 {% endblock %}

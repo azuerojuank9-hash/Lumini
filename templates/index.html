@@ -92,7 +92,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.03)!important;}
 .tnum{color:var(--muted);font-size:10px;width:36px;font-weight:600;}
 .tnombrecell{text-align:left;font-weight:600;cursor:pointer;font-size:12px;padding-left:8px;}
 .tnombrecell:hover{color:var(--accent);}
-.ni{width:32px;padding:2px 0;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text);font-size:12px;text-align:center;font-family:'Inter',sans-serif;transition:border-color .15s ease-out,background .15s ease-out;caret-color:var(--accent);-moz-appearance:textfield;line-height:1.5;font-weight:500;border-radius:2px;}
+.ni{width:38px;padding:2px 0;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text);font-size:13px;text-align:center;font-family:'Inter',sans-serif;transition:border-color .15s ease-out,background .15s ease-out;caret-color:var(--accent);-moz-appearance:textfield;line-height:1.5;font-weight:500;border-radius:2px;}
 .ni::-webkit-inner-spin-button,.ni::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .ni:focus::-webkit-inner-spin-button,.ni:focus::-webkit-outer-spin-button{-webkit-appearance:auto;opacity:.4;}
 .ni:hover{background:rgba(var(--accent-rgb),.04);}
@@ -101,11 +101,13 @@ tr:hover td{background:rgba(var(--accent-rgb),.03)!important;}
 .pc{font-weight:700;font-size:13px;}
 .ph{color:var(--success);}.pm{color:var(--warning);}.pb{color:var(--danger);}
 th.th-eval,th.th-autoev{font-weight:600;color:var(--text);background:var(--bg3);}
-th.th-prom{font-weight:700;color:var(--text);background:var(--bg3);border-left:2px solid var(--border);min-width:36px;}
-th.th-nf{font-weight:800;color:var(--text);background:var(--bg3);font-size:10px;letter-spacing:.04em;min-width:40px;border-left:2px solid var(--border);}
+th.th-prom{font-weight:700;color:var(--text);background:var(--bg3);border-left:2px solid var(--border);min-width:44px;}
+th.th-nf{font-weight:800;color:var(--text);background:var(--bg3);font-size:10px;letter-spacing:.04em;min-width:48px;border-left:2px solid var(--border);}
 th.th-eval{border-left:1px solid rgba(var(--accent-rgb),.12);}
+th.th-eval,th.th-autoev{background:rgba(var(--accent-rgb),.03);}
 .prom-cell{background:rgba(var(--accent-rgb),.02);border-left:2px solid var(--border);font-weight:700;}
 .nf-cell{background:rgba(var(--accent-rgb),.04);border-left:2px solid var(--border);font-size:13px;font-weight:800;}
+#gradeTable tbody td:nth-last-child(4),#gradeTable tbody td:nth-last-child(3){background:rgba(var(--accent-rgb),.02);}
 th.th-nf .tip-wrap{color:var(--text-on-accent);}
 th.th-nf .info-icon{background:rgba(var(--accent-rgb),.25);color:var(--text-on-accent);}
 .th-pct{font-size:10px;font-weight:400;opacity:.7;display:block;line-height:1.3;}
@@ -120,6 +122,10 @@ th.th-nf .info-icon{background:rgba(var(--accent-rgb),.25);color:var(--text-on-a
 .qf-btn.active{background:var(--accent);border-color:var(--accent);color:var(--text-on-accent);}
 /* -- Frozen columns (Excel freeze-pane style) ------------------------- */
 .grade-scroll{overflow-x:auto;overflow-y:visible;position:relative;padding-bottom:4px;border-radius:var(--radius-md);}
+/* Grades table: single scroll region so sticky header/frozen columns work */
+#gradeScroll{overflow:visible;}
+#gradeScroll .tw{max-height:calc(100vh - 250px);min-height:160px;overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;}
+@media(max-width:768px){ #gradeScroll .tw{max-height:calc(100vh - 300px);} }
 #gradeTable{width:auto;min-width:100%;table-layout:auto;}
 #gradeTable thead th{position:sticky;z-index:2;}
 #gradeTable thead th:nth-child(1),#gradeTable thead th:nth-child(2){position:sticky;left:0;z-index:4;background:var(--bg3);}
@@ -231,6 +237,13 @@ tr.selected{background:rgba(var(--accent-rgb),.06)!important;outline:2px solid r
 #gradeTable tbody tr.riesgo-medio .tnombrecell::after{content:'';position:absolute;right:6px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:#f1c40f;border:2px solid rgba(241,196,15,.3);}
 #gradeTable tbody tr.riesgo-bueno .tnombrecell{position:relative;}
 #gradeTable tbody tr.riesgo-bueno .tnombrecell::after{content:'';position:absolute;right:6px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;background:#2ecc71;border:2px solid rgba(46,204,113,.3);}
+/* Risk legend */
+.risk-legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;padding:2px 2px 8px;font-size:10px;color:var(--muted);}
+.risk-legend .rl-item{display:inline-flex;align-items:center;gap:5px;}
+.risk-legend .rl-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.risk-legend .rl-dot.high{background:#e74c3c;border:2px solid rgba(231,76,60,.3);}
+.risk-legend .rl-dot.mid{background:#f1c40f;border:2px solid rgba(241,196,15,.3);}
+.risk-legend .rl-dot.good{background:#2ecc71;border:2px solid rgba(46,204,113,.3);}
 /* Analytics modal */
 .analytics-modal{max-width:90vw;width:900px;padding:0;overflow:hidden;}
 .analytics-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
@@ -996,6 +1009,13 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 <a href="/{{ slug }}?curso={{ c }}&periodo={{ periodo_sel }}" class="ctab {% if c==curso_sel %}active{% endif %}">{{ c }}</a>
 {% endfor %}
 </div>
+{% if num_periodos and num_periodos > 1 %}
+<div class="curso-tabs" style="margin-top:4px;">
+{% for p in range(1, num_periodos + 1) %}
+<a href="/{{ slug }}?curso={{ curso_sel }}&periodo={{ p }}" class="ctab {% if p == periodo_sel %}active{% endif %}" aria-label="Período {{ p }}">P{{ p }}</a>
+{% endfor %}
+</div>
+{% endif %}
 {% else %}
 <div style="background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.2);border-radius:9px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--muted);">
   No tienes cursos asignados. Ve a <a href="/{{ slug }}/cambiar_password" style="color:var(--accent)">Perfil</a> para agregar cursos.
@@ -1013,11 +1033,12 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
   <div class="tb-left">
     <span class="tb-title">{{ materia }}</span>
     <span class="tb-sep">·</span>
-    <span class="tb-sub">{{ curso_sel }} &middot; P{{ periodo_sel }}</span>
+    <span class="tb-sub">{{ curso_sel }} · P{{ periodo_sel }}</span>
     <span class="tb-sep">·</span>
     <span class="tb-meta-item" style="{% if periodo_cerrado %}color:var(--danger);font-weight:600{% else %}color:var(--success){% endif %}">{% if periodo_cerrado %}&#x1f512; Cerrado{% else %}&#x1f513; Abierto{% endif %}</span>
   </div>
   <div class="tb-right">
+    <div class="tb-meta-item"><span class="tb-dot online" id="connStatusDot"></span><span id="connStatusText">En línea</span></div>
     <div class="tb-search">
       <i data-lucide="search" style="width:12px;height:12px;color:var(--muted);flex-shrink:0;"></i>
       <input type="text" id="searchInput" placeholder="Buscar estudiante..." aria-label="Buscar estudiante por nombre" oninput="filtrarEstudiantes()">
@@ -1028,6 +1049,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
       <div class="tb-more-menu" id="toolsMenu" style="display:none;">
         <button onclick="abrirResumen()"><i data-lucide="bar-chart-3"></i> Resumen del curso</button>
         <button onclick="abrirMigrar()"><i data-lucide="upload"></i> Importar desde Excel</button>
+        <button onclick="window.location.href='/{{ slug }}/exportar_notas?curso='+encodeURIComponent(cursoSel)+'&periodo='+periodoSel"><i data-lucide="download"></i> Exportar Excel</button>
         <button onclick="abrirAIAssistant()"><i data-lucide="sparkles"></i> Asistente IA</button>
         <button onclick="abrirAnalitica()"><i data-lucide="bar-chart-3"></i> Analítica</button>
         <button onclick="abrirCC()"><i data-lucide="layout-dashboard"></i> Centro de Control</button>
@@ -1053,11 +1075,19 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 </div>
 
 <div id="panelNotas">
+<div class="save-bar" id="saveBar" role="status" aria-live="polite"><span class="sb-dot"></span><span id="saveBarText">Sin cambios</span></div>
 <div class="quick-filters" id="quickFilters">
     <button class="qf-btn active" data-filter="all" onclick="aplicarFiltro('all')" aria-pressed="true">Todos</button>
     <button class="qf-btn" data-filter="bajo" onclick="aplicarFiltro('bajo')" aria-pressed="false">Bajo rendimiento</button>
     <button class="qf-btn" data-filter="sinnotas" onclick="aplicarFiltro('sinnotas')" aria-pressed="false">Sin nota</button>
     <button class="qf-btn" data-filter="pendientes" onclick="aplicarFiltro('pendientes')" aria-pressed="false">Pendientes</button>
+    <button class="qf-btn" data-filter="conobs" onclick="aplicarFiltro('conobs')" aria-pressed="false">Con observaciones</button>
+    <button class="qf-btn" data-filter="excelente" onclick="aplicarFiltro('excelente')" aria-pressed="false">Excelente</button>
+</div>
+<div class="risk-legend" id="riskLegend">
+    <span class="rl-item"><span class="rl-dot high"></span> Riesgo alto</span>
+    <span class="rl-item"><span class="rl-dot mid"></span> En seguimiento</span>
+    <span class="rl-item"><span class="rl-dot good"></span> Buen nivel</span>
 </div>
 <div class="validation-banner" id="validationBanner">
     <div class="vb-head"><i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Revisión previa</div>
@@ -1122,7 +1152,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
                 {% set nota = e.notas_map.get(act.id) %}
                 <div class="ni-wrap">
                 <input class="ni nota-input{% if nota and nota.val is not none %} val-{{ nota.val|int }}{% endif %}" type="number" min="0" max="5" step="0.1"
-                       value="{{ nota.val if nota else '' }}" placeholder="&mdash;"
+                       value="{{ nota.val if nota else '' }}" placeholder="—"
                        data-aid="{{ e.id }}" data-actid="{{ act.id }}" data-actnombre="{{ act.nombre|replace("'", "\\'") }}"
                        {% if periodo_cerrado %}disabled{% endif %}
                        aria-label="{{ act.nombre|replace('"', '&quot;') }} - {{ e.nombre|replace('"', '&quot;') }}"
@@ -1132,16 +1162,16 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
                 {% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},{{ act.id }},{{ nota.val if nota else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','{{ act.nombre|replace("'", "\\'") }}','actividad')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}
             </td>
             {% endfor %}
-            <td class="{% if periodo_cerrado %}td-locked{% endif %}"><div class="ni-wrap"><input class="ni eval-input{% if e.evaluacion is not none %} val-{{ e.evaluacion|int }}{% endif %}" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="&mdash;" data-aid="{{ e.id }}" data-campo="evaluacion" {% if periodo_cerrado %}disabled{% endif %} aria-label="Evaluación {{ e.nombre }}" oninput="cambioEval(this)" onmouseenter="notaHistorial(this,{{ e.id }},null,'evaluacion')" onmouseleave="ocultarNotaHistorial()"><span class="save-indicator"></span></div>{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.evaluacion if e.evaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Evaluaci\u00f3n','evaluacion')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
-            <td class="{% if periodo_cerrado %}td-locked{% endif %}"><div class="ni-wrap"><input class="ni eval-input{% if e.autoevaluacion is not none %} val-{{ e.autoevaluacion|int }}{% endif %}" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="&mdash;" data-aid="{{ e.id }}" data-campo="autoevaluacion" {% if periodo_cerrado %}disabled{% endif %} aria-label="Autoevaluación {{ e.nombre }}" oninput="cambioEval(this)" onmouseenter="notaHistorial(this,{{ e.id }},null,'autoevaluacion')" onmouseleave="ocultarNotaHistorial()"><span class="save-indicator"></span></div>{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.autoevaluacion if e.autoevaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Autoevaluaci\u00f3n','autoevaluacion')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
+            <td class="{% if periodo_cerrado %}td-locked{% endif %}"><div class="ni-wrap"><input class="ni eval-input{% if e.evaluacion is not none %} val-{{ e.evaluacion|int }}{% endif %}" type="number" min="0" max="5" step="0.1" value="{{ e.evaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="evaluacion" {% if periodo_cerrado %}disabled{% endif %} aria-label="Evaluación {{ e.nombre }}" oninput="cambioEval(this)" onmouseenter="notaHistorial(this,{{ e.id }},null,'evaluacion')" onmouseleave="ocultarNotaHistorial()"><span class="save-indicator"></span></div>{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.evaluacion if e.evaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Evaluaci\u00f3n','evaluacion')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
+            <td class="{% if periodo_cerrado %}td-locked{% endif %}"><div class="ni-wrap"><input class="ni eval-input{% if e.autoevaluacion is not none %} val-{{ e.autoevaluacion|int }}{% endif %}" type="number" min="0" max="5" step="0.1" value="{{ e.autoevaluacion }}" placeholder="—" data-aid="{{ e.id }}" data-campo="autoevaluacion" {% if periodo_cerrado %}disabled{% endif %} aria-label="Autoevaluación {{ e.nombre }}" oninput="cambioEval(this)" onmouseenter="notaHistorial(this,{{ e.id }},null,'autoevaluacion')" onmouseleave="ocultarNotaHistorial()"><span class="save-indicator"></span></div>{% if periodo_cerrado %}<span class="lock-overlay" onclick="abrirSolicitud({{ e.id }},null,{{ e.autoevaluacion if e.autoevaluacion is not none else 'null' }},'{{ e.nombre|replace("'", "\\'") }}','Autoevaluaci\u00f3n','autoevaluacion')" title="Solicitar modificación"><i data-lucide="lock"></i></span>{% endif %}</td>
             <td class="pc prom-cell" id="prom-{{ e.id }}">
                 <span class="{% if e.promedio is not none and e.promedio>=3.5 %}ph{% elif e.promedio is not none and e.promedio>=3.0 %}pm{% elif e.promedio is not none %}pb{% endif %}">
-                    {{ e.promedio if e.promedio is not none else '&mdash;' }}
+                    {{ e.promedio if e.promedio is not none else '—' }}
                 </span>
             </td>
             <td class="pc nf-cell" id="nf-{{ e.id }}">
                 <span class="{% if e.nota_final is not none and e.nota_final>=3.5 %}ph{% elif e.nota_final is not none and e.nota_final>=3.0 %}pm{% elif e.nota_final is not none %}pb{% endif %}">
-                    {{ e.nota_final if e.nota_final is not none else '&mdash;' }}
+                    {{ e.nota_final if e.nota_final is not none else '—' }}
                 </span>
             </td>
         </tr>
@@ -1167,7 +1197,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 <div id="panelAsistencia" style="display:none;">
 <div class="card">
     <div class="card-head">
-        <span class="card-title"><i data-lucide="calendar-check" ></i> Asistencia &mdash; {{ curso_sel }} &middot; {{ materia }}</span>
+        <span class="card-title"><i data-lucide="calendar-check" ></i> Asistencia — {{ curso_sel }} · {{ materia }}</span>
     </div>
     <div class="tw zebra">
         <table>
@@ -1186,7 +1216,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
                 <td>{{ e.nombre }}</td>
                 <td>
                     <span class="asist-badge {% if e.asistencia=='P' %}bp{% elif e.asistencia=='A' %}ba{% elif e.asistencia=='T' %}bt{% elif e.asistencia=='E' %}be{% elif e.asistencia=='X' %}bx{% elif e.asistencia=='S' %}bs{% else %}bn{% endif %}" id="asist-tab-{{ e.id }}">
-                        {% if e.asistencia=='P' %}P{% elif e.asistencia=='A' %}A{% elif e.asistencia=='T' %}T{% elif e.asistencia=='E' %}E{% elif e.asistencia=='X' %}X{% elif e.asistencia=='S' %}S{% else %}&mdash;{% endif %}
+                        {% if e.asistencia=='P' %}P{% elif e.asistencia=='A' %}A{% elif e.asistencia=='T' %}T{% elif e.asistencia=='E' %}E{% elif e.asistencia=='X' %}X{% elif e.asistencia=='S' %}S{% else %}—{% endif %}
                     </span>
                 </td>
                 <td>
@@ -1217,7 +1247,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 <div id="panelObservaciones" style="display:none;">
 <div class="card">
     <div class="card-head">
-        <span class="card-title"><i data-lucide="eye" ></i> Observaciones &mdash; {{ curso_sel }} &middot; {{ materia }}</span>
+        <span class="card-title"><i data-lucide="eye" ></i> Observaciones — {{ curso_sel }} · {{ materia }}</span>
     </div>
     <div class="card-body">
         <div style="margin-bottom:14px;">
@@ -1238,7 +1268,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Debe mejorar')">Debe mejorar</button>
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'No entregó')">No entregó</button>
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Entrega incompleta')">Entrega incompleta</button>
-                <button class="qc-btn" onclick="insertarComentarioRapido(this,'Buen desempeño')">Buen desempe&ntilde;o</button>
+                <button class="qc-btn" onclick="insertarComentarioRapido(this,'Buen desempeño')">Buen desempeño</button>
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Participó activamente')">Participó activamente</button>
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Debe prestar más atención')">Debe prestar más atención</button>
                 <button class="qc-btn" onclick="insertarComentarioRapido(this,'Trabajo en equipo destacado')">Trabajo en equipo destacado</button>
@@ -1352,6 +1382,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" id="csrfToken" style="display:none;">
 
 <input type="hidden" id="csrf-global" value="{{ csrf_token() }}">
+<input type="hidden" name="curso_sel" value="{{ curso_sel }}">
 
 <script>
 function toggleSidebar(){
@@ -2985,7 +3016,7 @@ function cerrarComunicado(){
 <div class="overlay" id="execDashboardModal" onclick="if(event.target===this)cerrarDashboardEjecutivo()">
 <div class="modal exec-modal">
     <div class="analytics-head">
-        <h2><i data-lucide="layout-dashboard" style="width:20px;height:20px;vertical-align:middle;margin-right:8px;"></i> Dashboard Ejecutivo</h2>
+        <h2><i data-lucide="layout-dashboard" style="width:20px;height:20px;vertical-align:middle;margin-right:8px;"></i> Panel Ejecutivo</h2>
         <button class="close-btn" onclick="cerrarDashboardEjecutivo()"><i data-lucide="x"></i></button>
     </div>
     <div class="exec-body" id="execBody">
@@ -3130,7 +3161,7 @@ function cerrarComunicado(){
     <div class="analytics-tabs" id="analyticsTabs">
         <button class="analytics-tab active" data-tab="distribucion" onclick="switchAnalyticsTab('distribucion')">Distribución</button>
         <button class="analytics-tab" data-tab="actividades" onclick="switchAnalyticsTab('actividades')">Actividades</button>
-        <button class="analytics-tab" data-tab="ranking" onclick="switchAnalyticsTab('ranking')">Ranking</button>
+        <button class="analytics-tab" data-tab="ranking" onclick="switchAnalyticsTab('ranking')">Clasificación</button>
     </div>
     <div class="analytics-body">
         <div class="analytics-panel" id="analyticsDistribucion">
@@ -3770,34 +3801,44 @@ function eliminarActividad(id){
     .catch(function(e){showToast('<i data-lucide="alert-circle"></i> '+(e.message||'Error'));});
 }
 // ── FASE 3: Search, Filters, Selection, Batch Save, Drag, Student Drawer ──
-var _batchChanges={}, _batchTimer=null, _undoSnapshot=null, _selAids=[], _dragId=null, _sdAid=null;
-function filtrarEstudiantes(){
-    var q=document.getElementById('searchInput').value.toLowerCase();
+var _batchChanges={}, _batchTimer=null, _undoSnapshot=null, _selAids=[], _dragId=null, _sdAid=null, _paginaVisibles=null;
+function _filaCumpleFiltro(r,f){
+    if(f==='all') return true;
+    var prom=parseFloat(r.querySelector('.prom-cell span')?.textContent);if(isNaN(prom))prom=-1;
+    var nf=parseFloat(r.querySelector('.nf-cell span')?.textContent);if(isNaN(nf))nf=-1;
+    var notas=Array.prototype.slice.call(r.querySelectorAll('.nota-input'));
+    var tieneNotas=notas.some(function(i){return (i.value||'').trim()!=='';});
+    if(f==='bajo') return prom>=0&&prom<3;
+    if(f==='sinnotas') return !tieneNotas;
+    if(f==='conobs') return r.classList.contains('has-obs');
+    if(f==='excelente') return nf>=4.5;
+    if(f==='pendientes') return notas.length>0&&tieneNotas&&notas.some(function(i){return (i.value||'').trim()==='';});
+    return true;
+}
+function renderFilas(){
+    var inp=document.getElementById('searchInput');
+    var q=inp?(inp.value||'').toLowerCase():'';
+    var btn=document.querySelector('#quickFilters .qf-btn.active');
+    var f=btn?btn.getAttribute('data-filter'):'all';
     document.querySelectorAll('#gradeTable tbody tr[data-aid]').forEach(function(r){
-        var nombre=(r.getAttribute('data-nombre')||'').toLowerCase();
-        r.style.display=nombre.includes(q)?'':'none';
+        var aid=r.getAttribute('data-aid');
+        var enPagina=(_paginaVisibles===null||q)?true:(!!_paginaVisibles[aid]);
+        var enBusqueda=!q||((r.getAttribute('data-nombre')||'').toLowerCase().indexOf(q)!==-1);
+        var enFiltro=_filaCumpleFiltro(r,f);
+        r.style.display=(enPagina&&enBusqueda&&enFiltro)?'':'none';
     });
 }
+function filtrarEstudiantes(){renderFilas();}
 function aplicarFiltro(f){
     document.querySelectorAll('#quickFilters .qf-btn').forEach(function(b){b.classList.remove('active');b.setAttribute('aria-pressed','false');});
-    var btn=document.querySelector('#quickFilters .qf-btn[data-filter="'+f+'"]');btn.classList.add('active');btn.setAttribute('aria-pressed','true');
-    document.querySelectorAll('#gradeTable tbody tr[data-aid]').forEach(function(r){
-        if(f==='all'){r.style.display='';return;}
-        var prom=parseFloat(r.querySelector('.prom-cell span')?.textContent)||-1;
-        var nf=parseFloat(r.querySelector('.nf-cell span')?.textContent)||-1;
-        var hasObs=r.classList.contains('has-obs');
-        var hasNotes=!!r.querySelector('.nota-input[value]:not([value=""])');
-        var show=false;
-        if(f==='bajo') show=(prom>=0&&prom<3);
-        else if(f==='sinnotas') show=!hasNotes;
-        else if(f==='conobs') show=hasObs;
-        else if(f==='excelente') show=(nf>=4.5);
-        else if(f==='pendientes') show=(hasNotes&&prom<0);
-        r.style.display=show?'':'none';
-    });
+    var btn=document.querySelector('#quickFilters .qf-btn[data-filter="'+f+'"]');
+    if(btn){btn.classList.add('active');btn.setAttribute('aria-pressed','true');}
+    renderFilas();
 }
 function seleccionarTodos(cb){
-    document.querySelectorAll('#gradeTable tbody .sel-cb').forEach(function(c){c.checked=cb.checked;});
+    document.querySelectorAll('#gradeTable tbody tr[data-aid]').forEach(function(r){
+        if(r.style.display!=='none'){var c=r.querySelector('.sel-cb');if(c)c.checked=cb.checked;}
+    });
     actualizarSeleccion();
 }
 function actualizarSeleccion(){
@@ -4581,20 +4622,21 @@ window.addEventListener('online',actualizarConexion);
 window.addEventListener('offline',actualizarConexion);
 setInterval(actualizarConexion,5000);
 // Override save bar messages
+function _sbSet(txt){var el=document.getElementById('saveBarText');if(el)el.textContent=txt;}
 var _origMarcarDirty=marcarDirty;
 marcarDirty=function(n){
     _origMarcarDirty(n);
-    document.getElementById('saveBarText').textContent=!navigator.onLine?'Cambios pendientes (sin conexión)':n+' cambios pendientes';
+    _sbSet(!navigator.onLine?'Cambios pendientes (sin conexión)':n+' cambios pendientes');
 };
 var _origMarcarSaving=marcarSaving;
 marcarSaving=function(n){
     _origMarcarSaving(n);
-    document.getElementById('saveBarText').textContent=!navigator.onLine?'Guardando localmente...':'Sincronizando...';
+    _sbSet(!navigator.onLine?'Guardando localmente...':'Sincronizando...');
 };
 var _origMarcarSaved2=marcarSaved;
 marcarSaved=function(){
     _origMarcarSaved2();
-    document.getElementById('saveBarText').textContent=navigator.onLine?'Todos los cambios guardados':'Guardado localmente';
+    _sbSet(navigator.onLine?'Todos los cambios guardados':'Guardado localmente');
 };
 // ── Fase 6: Alert Center ──
 function abrirAlertas(){
@@ -5185,39 +5227,27 @@ var _paginaActual=1;
 var _paginaTotal=1;
 function cambiarPagina(p){
     _paginaActual=p;
-    document.getElementById('pagInfo').textContent='Página '+_paginaActual+' de '+_paginaTotal;
-    document.getElementById('pagPrev').disabled=_paginaActual<=1;
-    document.getElementById('pagNext').disabled=_paginaActual>=_paginaTotal;
-    // Fetch paginated data
-    var perPage=document.getElementById('pagPerPage').value;
-    fetch('/{{ slug }}/notas/pagina?page='+_paginaActual+'&per_page='+perPage+'&curso='+encodeURIComponent(document.querySelector('input[name="curso_sel"]')?.value||'')).then(function(r){return r.json();}).then(function(d){
-        _paginaTotal=d.total_pages;
-        document.getElementById('pagInfo').textContent='Página '+_paginaActual+' de '+_paginaTotal+' ('+d.total+' estudiantes)';
+    var perPage=document.getElementById('pagPerPage')?.value||'25';
+    var curso=document.querySelector('input[name="curso_sel"]')?.value||'';
+    fetch('/{{ slug }}/notas/pagina?page='+_paginaActual+'&per_page='+perPage+'&periodo={{ periodo_sel }}&curso='+encodeURIComponent(curso))
+    .then(function(r){return r.json();}).then(function(d){
+        if(!d||d.error){_paginaVisibles=null;return;}
+        _paginaTotal=d.total_pages||1;
+        _paginaVisibles={};
+        (d.alumnos||[]).forEach(function(al){_paginaVisibles[al.id]=true;});
+        var info=document.getElementById('pagInfo');
+        if(info) info.textContent='Página '+_paginaActual+' de '+_paginaTotal+' ('+d.total+' estudiantes)';
         document.getElementById('pagPrev').disabled=_paginaActual<=1;
         document.getElementById('pagNext').disabled=_paginaActual>=_paginaTotal;
-        // Hide old rows and only show matching ones
-        var tbody=document.querySelector('#gradeTable tbody');
-        if(!tbody)return;
-        var rows=tbody.querySelectorAll('tr[data-aid]');
-        var visibleAids={};
-        d.alumnos.forEach(function(al){visibleAids[al.id]=true;});
-        rows.forEach(function(r){
-            var aid=r.getAttribute('data-aid');
-            r.style.display=visibleAids[aid]?'':'none';
-        });
+        renderFilas();
     }).catch(function(){});
 }
 function paginaAnterior(){if(_paginaActual>1)cambiarPagina(_paginaActual-1);}
 function paginaSiguiente(){if(_paginaActual<_paginaTotal)cambiarPagina(_paginaActual+1);}
-// Initialize pagination on load
+// Initialize pagination on load (restrict view to page 1, matching server)
 setTimeout(function(){
-    var tbody=document.querySelector('#gradeTable tbody');
-    if(tbody){
-        var totalRows=tbody.querySelectorAll('tr[data-aid]').length;
-        _paginaTotal=Math.ceil(totalRows/25);
-        document.getElementById('pagInfo').textContent='Página 1 de '+_paginaTotal+' ('+totalRows+' estudiantes)';
-    }
-},1000);
+    cambiarPagina(1);
+},300);
 // ── Fase 13: High contrast ──
 function toggleContraste(){
     document.body.classList.toggle('high-contrast');
@@ -5323,7 +5353,7 @@ function cargarPlantillas(){
         if(!d.plantillas||!d.plantillas.length){lst.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px;">No tienes plantillas guardadas. Crea una desde el formulario de arriba.</div>';return;}
         var h='';
         d.plantillas.forEach(function(t){
-            h+='<div class="tmpl-item"><div class="tmpl-info"><div class="tmpl-name">'+escHtml(t.nombre)+'</div><div class="tmpl-meta">'+escHtml(t.tipo)+' &middot; Peso: '+t.peso+'</div></div><div class="tmpl-actions"><button onclick="aplicarPlantilla('+t.id+',\''+escJsStr(t.nombre)+'\')" title="Usar en este curso">Usar</button><button style="color:var(--danger);" onclick="eliminarPlantilla('+t.id+')">Eliminar</button></div></div>';
+            h+='<div class="tmpl-item"><div class="tmpl-info"><div class="tmpl-name">'+escHtml(t.nombre)+'</div><div class="tmpl-meta">'+escHtml(t.tipo)+' · Peso: '+t.peso+'</div></div><div class="tmpl-actions"><button onclick="aplicarPlantilla('+t.id+',\''+escJsStr(t.nombre)+'\')" title="Usar en este curso">Usar</button><button style="color:var(--danger);" onclick="eliminarPlantilla('+t.id+')">Eliminar</button></div></div>';
         });
         lst.innerHTML=h;
     }).catch(function(){lst.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger);font-size:12px;">Error al cargar</div>';});

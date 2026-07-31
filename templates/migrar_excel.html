@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Migrar desde Excel &mdash; Lumini{% endblock %}
+{% block title %}Migrar desde Excel — Lumini{% endblock %}
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
 .steps{display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap;}
@@ -45,7 +45,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 <div class="topbar">
   <div class="topbar-left">
     <h1><i data-lucide="upload" style="color:var(--accent);"></i> Migrar desde Excel</h1>
-    <div class="breadcrumb">Asistente de migración de datos &middot; {{ materia }} &middot; {{ jornada }}</div>
+    <div class="breadcrumb">Asistente de migración de datos · {{ materia }} · {{ jornada }}</div>
   </div>
   <div class="topbar-right">
     <a href="/{{ slug }}/plantilla_notas?curso={{ curso_sel }}&periodo={{ periodo }}" class="btn btn-outline"><i data-lucide="download"></i> Descargar plantilla</a>

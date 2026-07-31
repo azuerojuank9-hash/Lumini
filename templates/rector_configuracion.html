@@ -118,8 +118,8 @@
           <div style="font-size:13px;font-weight:600;">Periodo {{ p }}</div>
           <div style="font-size:11px;color:var(--sub);">
             <span style="color:{{ 'var(--success)' if estado=='abierto' else 'var(--danger)' }};">{{ 'Abierto' if estado=='abierto' else 'Cerrado' }}</span>
-            {% if pe.get('fecha_apertura') %} &middot; Apertura: {{ pe['fecha_apertura'] }}{% endif %}
-            {% if pe.get('fecha_cierre') %} &middot; Cierre: {{ pe['fecha_cierre'] }}{% endif %}
+            {% if pe.get('fecha_apertura') %} · Apertura: {{ pe['fecha_apertura'] }}{% endif %}
+            {% if pe.get('fecha_cierre') %} · Cierre: {{ pe['fecha_cierre'] }}{% endif %}
           </div>
         </div>
         <form method="POST" action="/{{ slug }}/rector/periodos/{{ p }}/{{ 'abrir' if estado=='cerrado' else 'cerrar' }}" style="display:inline;">
