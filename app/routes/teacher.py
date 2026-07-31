@@ -8,6 +8,8 @@ from io import BytesIO
 
 from flask import Blueprint, Response, jsonify, redirect, render_template, request, session, url_for
 
+from app.infra.attendance import _asistencia_stats
+from app.repositories.notification_repository import get_notificaciones_no_leidas_count
 from app.utils.security import extension_permitida, validar_csrf
 
 logger = logging.getLogger(__name__)
@@ -2633,11 +2635,30 @@ def dashboard(slug):
     num_periodos = colegio['num_periodos'] if colegio and 'num_periodos' in colegio.keys() else 4
     conn = f.conectar(slug)
     materias_list = []
+    hoy_schedule = []
+    comunicados_recientes = []
+    notif_count = 0
+    asistencia_stats = None
     if prof:
         jornada, materia = f.get_sesion_jornada_materia(slug)
         mis_cursos = f.get_cursos_profesor(slug, prof['id'], materia or '', jornada or '')
         instance = 'profesor'
         nombre = prof['nombre']
+        dias_semana = ['Lun', 'Mar', 'Mi\u00e9', 'Jue', 'Vie', 'S\u00e1b', 'Dom']
+        hoy_idx = datetime.now().weekday()
+        hoy_dia = dias_semana[hoy_idx]
+        for curso in mis_cursos[:3]:
+            filas = conn.execute(
+                'SELECT dia, franja, num, materia FROM horarios_curso WHERE curso=? AND jornada=? AND dia=? ORDER BY franja',
+                (curso, jornada, hoy_dia)).fetchall()
+            for r in filas:
+                hoy_schedule.append({'curso': curso, 'dia': r['dia'], 'franja': r['franja'], 'num': r['num'], 'materia': r['materia']})
+        fechas = conn.execute(
+            'SELECT id, asunto, fecha_publicacion, creado_por FROM comunicaciones WHERE activo=1 AND estado=\'publicado\' ORDER BY fecha_publicacion DESC LIMIT 5').fetchall()
+        comunicados_recientes = [dict(r) for r in fechas]
+        notif_count = get_notificaciones_no_leidas_count(conn, 'profesor', prof['id'])
+        if mis_cursos:
+            asistencia_stats = _asistencia_stats(conn, curso=mis_cursos[0], jornada=jornada)
     elif rector:
         jornada = ''
         materia = ''
@@ -2647,12 +2668,20 @@ def dashboard(slug):
             'SELECT DISTINCT materia FROM asignaciones_materia ORDER BY materia').fetchall()]
         instance = 'rector'
         nombre = rector['nombre']
+        notif_count = get_notificaciones_no_leidas_count(conn, 'rector', rector['id'])
     conn.close()
     colegio_dash = f.get_colegio(slug)
+    dias_es = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
+    meses_es = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+    ahora = datetime.now()
+    hoy_str = f"{dias_es[ahora.weekday()]}, {ahora.day} de {meses_es[ahora.month-1]} de {ahora.year}"
     return render_template('dashboard.html', slug=slug, colegio=colegio_dash, instance=instance, nombre=nombre,
                            num_periodos=num_periodos, mis_cursos=mis_cursos,
                            materias_list=materias_list if rector else [materia] if materia else [],
-                           jornada=jornada, materia=materia)
+                           jornada=jornada, materia=materia,
+                           hoy_schedule=hoy_schedule, comunicados_recientes=comunicados_recientes,
+                           notif_count=notif_count, asistencia_stats=asistencia_stats,
+                           hoy_str=hoy_str)
 
 
 @teacher_bp.route('/<slug>/dashboard_data')

@@ -5,13 +5,21 @@
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_head %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>{% endblock %}
 {% block extra_styles %}
+:root{
+  --widget-radius:12px;
+  --widget-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --widget-shadow-hover:0 4px 12px rgba(0,0,0,.1),0 2px 4px rgba(0,0,0,.06);
+}
 .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-.page-header h1{font-size:20px;font-weight:700;margin:0}
-.subtitle{font-size:12px;color:var(--muted);margin:2px 0 0}
-.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
-.filter-bar select,.filter-bar input{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer}
-.filter-bar select:focus{outline:2px solid var(--accent);outline-offset:2px}
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+.page-header h1{font-size:22px;font-weight:800;margin:0;letter-spacing:-.3px}
+.page-header .greeting{font-size:13px;color:var(--muted);margin:2px 0 0}
+.page-header .greeting strong{color:var(--text)}
+.export-bar{display:flex;gap:8px;flex-wrap:wrap}
+.quick-actions{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.quick-action{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--widget-radius);background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none;box-shadow:var(--widget-shadow)}
+.quick-action:hover{box-shadow:var(--widget-shadow-hover);transform:translateY(-1px);border-color:var(--accent);color:var(--accent)}
+.quick-action .qa-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px}
 .bg-purple{background:rgba(var(--accent-rgb),.2);color:var(--accent)}
 .bg-blue{background:rgba(var(--blue-rgb),.2);color:var(--blue)}
 .bg-green{background:rgba(var(--success-rgb),.2);color:var(--success)}
@@ -20,6 +28,50 @@
 .bg-orange{background:rgba(var(--orange-rgb),.2);color:var(--orange)}
 .bg-pink{background:rgba(var(--pink-rgb),.2);color:var(--pink)}
 .bg-teal{background:rgba(var(--teal-rgb),.2);color:var(--teal)}
+.widget-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:900px){.widget-grid{grid-template-columns:1fr}}
+.widget{background:var(--bg2);border:1px solid var(--border);border-radius:var(--widget-radius);padding:16px;box-shadow:var(--widget-shadow)}
+.widget-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.widget-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+.widget-link{font-size:12px;color:var(--accent);text-decoration:none;font-weight:500}
+.widget-link:hover{text-decoration:underline}
+.schedule-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.schedule-item:last-child{border-bottom:none}
+.schedule-franja{font-size:11px;font-weight:700;color:var(--muted);min-width:24px;text-align:center;background:var(--bg3);border-radius:4px;padding:2px 6px}
+.schedule-info{flex:1}
+.schedule-curso{font-size:11px;color:var(--muted)}
+.schedule-materia{font-size:13px;font-weight:600}
+.pending-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.pending-item:last-child{border-bottom:none}
+.pending-info{font-size:13px}
+.pending-curso{font-weight:600}
+.pending-count{font-size:11px;color:var(--muted)}
+.pending-badge{background:rgba(var(--warning-rgb),.15);color:var(--warning);padding:2px 10px;border-radius:12px;font-size:12px;font-weight:700}
+.comms-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.comms-item:last-child{border-bottom:none}
+.comms-icon{margin-top:2px;flex-shrink:0}
+.comms-subject{font-size:13px;font-weight:600}
+.comms-date{font-size:11px;color:var(--muted)}
+.notif-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.notif-item:last-child{border-bottom:none}
+.notif-count-large{font-size:28px;font-weight:800;color:var(--accent)}
+.notif-text{font-size:13px;color:var(--muted)}
+.low-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
+.low-item:last-child{border-bottom:none}
+.low-name{flex:1;font-size:13px;font-weight:600}
+.low-grade{font-size:13px;font-weight:700;color:var(--danger)}
+.att-stat{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}
+.att-stat-label{color:var(--muted)}
+.att-stat-value{font-weight:700}
+.att-stat-value.green{color:var(--success)}
+.att-stat-value.red{color:var(--danger)}
+.att-stat-value.yellow{color:var(--warning)}
+.att-ring{position:relative;width:80px;height:80px;margin:0 auto 12px}
+.att-ring svg{transform:rotate(-90deg)}
+.att-ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:800}
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.filter-bar select,.filter-bar input{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer}
+.filter-bar select:focus{outline:2px solid var(--accent);outline-offset:2px}
 .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:12px;margin-bottom:20px}
 .chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px}
 .chart-card .chart-title{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text)}
@@ -44,19 +96,18 @@
 .stat-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center}
 .stat-item .stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
 .stat-item .stat-value{font-size:16px;font-weight:700;margin-top:3px}
-.export-bar{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.empty-msg{text-align:center;color:var(--muted);font-size:13px;padding:24px 0}
 .skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius-sm)}
 .skeleton-card{height:80px}
 .skeleton-chart{height:280px}
 .skeleton-row{height:20px;margin-bottom:8px}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-.dash-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:4px}
-.dash-tab{padding:8px 16px;border-radius:var(--radius-sm) var(--radius-sm) 0 0;font-size:13px;cursor:pointer;color:var(--muted);border:none;background:none;font-family:inherit;font-weight:500}
+.dash-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:4px;overflow-x:auto}
+.dash-tab{padding:8px 16px;border-radius:var(--radius-sm) var(--radius-sm) 0 0;font-size:13px;cursor:pointer;color:var(--muted);border:none;background:none;font-family:inherit;font-weight:500;white-space:nowrap}
 .dash-tab.active{color:var(--accent);background:var(--bg3);font-weight:600}
 .dash-tab:hover{color:var(--text)}
 .tab-content{display:none}
 .tab-content.active{display:block}
-.empty-msg{text-align:center;color:var(--muted);font-size:13px;padding:24px 0}
 {% endblock %}
 
 {% block sidebar %}{% include "components/sidebar_teacher.html" %}{% endblock %}
@@ -64,12 +115,140 @@
 {% block content %}
 <div class="page-header">
     <div>
-      <h1>Dashboard {{ instance == 'rector' and 'Institucional' or 'Acad\u00e9mico' }}</h1>
-      <div class="subtitle">Indicadores y estadísticas en tiempo real</div>
+      <h1>{% if instance == 'rector' %}Panel de Control Institucional{% else %}Panel del Docente{% endif %}</h1>
+      <div class="greeting">Bienvenido, <strong>{{ nombre }}</strong> &middot; {{ hoy_str }} {% if materia %} &middot; {{ materia }}{% endif %}{% if jornada %} &middot; {{ jornada }}{% endif %}</div>
     </div>
     <div class="export-bar">
       <button onclick="exportPDF()" class="btn btn-secondary btn-sm"><i data-lucide="file-text"></i> PDF</button>
       <button onclick="exportExcel()" class="btn btn-secondary btn-sm"><i data-lucide="file-spreadsheet"></i> Excel</button>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <a href="/{{ slug }}/" class="quick-action"><span class="qa-icon bg-blue"><i data-lucide="edit-3" style="width:16px;height:16px"></i></span> Ingresar Notas</a>
+    <a href="/{{ slug }}/importar_notas" class="quick-action"><span class="qa-icon bg-green"><i data-lucide="upload" style="width:16px;height:16px"></i></span> Importar Excel</a>
+    <a href="/{{ slug }}/asistencia" class="quick-action"><span class="qa-icon bg-orange"><i data-lucide="calendar-check" style="width:16px;height:16px"></i></span> Asistencia</a>
+    <a href="/{{ slug }}/horarios" class="quick-action"><span class="qa-icon bg-purple"><i data-lucide="calendar" style="width:16px;height:16px"></i></span> Horario</a>
+    <a href="/{{ slug }}/notificaciones" class="quick-action"><span class="qa-icon bg-pink"><i data-lucide="bell" style="width:16px;height:16px"></i></span> Notificaciones{% if notif_count %} <span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+  </div>
+
+  <div class="card-grid" id="cardGrid">
+    {% for _ in range(instance == 'rector' and 12 or 10) %}
+    <div class="card"><div class="skeleton skeleton-card"></div></div>
+    {% endfor %}
+  </div>
+
+  <div class="widget-grid">
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="calendar" style="width:16px;height:16px;color:var(--accent)"></i> Clases de Hoy</div>
+        {% if mis_cursos %}<a href="/{{ slug }}/horarios" class="widget-link">Ver horario completo</a>{% endif %}
+      </div>
+      {% if hoy_schedule %}
+        {% for sc in hoy_schedule %}
+        <div class="schedule-item">
+          <span class="schedule-franja">{{ sc.franja }}</span>
+          <div class="schedule-info">
+            <div class="schedule-materia">{{ sc.materia if sc.materia else '--' }}</div>
+            <div class="schedule-curso">{{ sc.curso }}{% if sc.num %} &middot; {{ sc.num }}{% endif %}</div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-msg">No hay clases programadas para hoy</div>
+      {% endif %}
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="edit-3" style="width:16px;height:16px;color:var(--warning)"></i> Calificaciones Pendientes</div>
+        <a href="/{{ slug }}/" class="widget-link">Ir a notas</a>
+      </div>
+      {% if mis_cursos %}
+        {% for c in mis_cursos[:5] %}
+        <div class="pending-item">
+          <div class="pending-info">
+            <div class="pending-curso">{{ c }}</div>
+            <div class="pending-count">Por calificar</div>
+          </div>
+          <span class="pending-badge"><i data-lucide="clock" style="width:12px;height:12px;display:inline"></i> Pendiente</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-msg">Sin cursos asignados</div>
+      {% endif %}
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="message-square" style="width:16px;height:16px;color:var(--blue)"></i> Últimas Comunicaciones</div>
+        <a href="/{{ slug }}/comunicados" class="widget-link">Ver todas</a>
+      </div>
+      {% if comunicados_recientes %}
+        {% for com in comunicados_recientes %}
+        <div class="comms-item">
+          <div class="comms-icon"><i data-lucide="message-circle" style="width:14px;height:14px;color:var(--muted)"></i></div>
+          <div>
+            <div class="comms-subject">{{ com.asunto }}</div>
+            <div class="comms-date">{{ com.fecha_publicacion }} &middot; {{ com.creado_por }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-msg">Sin comunicaciones recientes</div>
+      {% endif %}
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="bell" style="width:16px;height:16px;color:var(--pink)"></i> Notificaciones</div>
+        <a href="/{{ slug }}/notificaciones" class="widget-link">Ver todas</a>
+      </div>
+      <div style="text-align:center;padding:16px 0">
+        {% if notif_count > 0 %}
+        <div class="notif-count-large">{{ notif_count }}</div>
+        <div class="notif-text">notificaciones sin leer</div>
+        {% else %}
+        <div style="font-size:40px;color:var(--muted);margin-bottom:8px"><i data-lucide="bell-off" style="width:40px;height:40px"></i></div>
+        <div class="notif-text">No hay notificaciones pendientes</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--danger)"></i> Estudiantes con Bajo Rendimiento</div>
+      </div>
+      <div id="lowPerformersWidget">
+        <div class="empty-msg">Cargando datos...</div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="calendar-check" style="width:16px;height:16px;color:var(--success)"></i> Resumen de Asistencia</div>
+        <a href="/{{ slug }}/asistencia" class="widget-link">Ver detalle</a>
+      </div>
+      {% if asistencia_stats %}
+      <div style="display:flex;flex-direction:column;align-items:center;padding:8px 0">
+        <div class="att-ring">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="var(--bg3)" stroke-width="6"/>
+            <circle cx="40" cy="40" r="34" fill="none" stroke="var(--success)" stroke-width="6"
+              stroke-dasharray="{{ (asistencia_stats.porcentaje_asistencia / 100 * 213.6)|round }} 213.6"/>
+          </svg>
+          <div class="att-ring-text">{{ (asistencia_stats.porcentaje_asistencia)|round }}%</div>
+        </div>
+        <div style="width:100%">
+          <div class="att-stat"><span class="att-stat-label"><i data-lucide="check-circle" style="width:12px;height:12px;color:var(--success)"></i> Presentes</span><span class="att-stat-value green">{{ asistencia_stats.P }}</span></div>
+          <div class="att-stat"><span class="att-stat-label"><i data-lucide="x-circle" style="width:12px;height:12px;color:var(--danger)"></i> Ausencias</span><span class="att-stat-value red">{{ asistencia_stats.A }}</span></div>
+          <div class="att-stat"><span class="att-stat-label"><i data-lucide="clock" style="width:12px;height:12px;color:var(--warning)"></i> Tardanzas</span><span class="att-stat-value yellow">{{ asistencia_stats.T }}</span></div>
+          <div class="att-stat"><span class="att-stat-label">Total registros</span><span class="att-stat-value">{{ asistencia_stats.total }}</span></div>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-msg">Sin datos de asistencia</div>
+      {% endif %}
     </div>
   </div>
 
@@ -80,12 +259,6 @@
     {% endif %}
     <select id="filterPeriodo">{% for p in range(1, num_periodos + 1) %}<option value="{{ p }}" {{ 'selected' if p == 1 else '' }}>Periodo {{ p }}</option>{% endfor %}</select>
     <button onclick="loadDashboard()" class="btn btn-primary"><i data-lucide="refresh-cw"></i> Actualizar</button>
-  </div>
-
-  <div class="card-grid" id="cardGrid">
-    {% for _ in range(instance == 'rector' and 12 or 10) %}
-    <div class="card"><div class="skeleton skeleton-card"></div></div>
-    {% endfor %}
   </div>
 
   <div class="dash-tabs" id="dashTabs">
@@ -149,6 +322,7 @@ function loadDashboard(){
       renderAlerts(d.alerts||{});
       renderRankings(d.rankings||{});
       renderStats(d.estadisticas||{});
+      renderLowPerformers(d.alerts||{});
       if(window.showToast)window.showToast('Dashboard actualizado','success');
     })
     .catch(function(e){
@@ -222,10 +396,6 @@ function renderCharts(ch){
   if(ch.promedio_por_curso&&ch.promedio_por_curso.length){
     var c2=document.getElementById('chart-xcurso');
     if(c2){new Chart(c2,{type:'bar',data:{labels:ch.promedio_por_curso.map(function(d){return d.curso}),datasets:[{label:'Promedio',data:ch.promedio_por_curso.map(function(d){return d.promedio}),backgroundColor:'rgba(var(--accent-rgb),.6)',borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});}
-  }
-  if(ch.promedio_por_materia&&ch.promedio_por_materia.length){
-    var c3=document.getElementById('chart-xmateria');
-    if(c3){new Chart(c3,{type:'bar',data:{labels:ch.promedio_por_materia.map(function(d){return d.materia}),datasets:[{label:'Promedio',data:ch.promedio_por_materia.map(function(d){return d.promedio}),backgroundColor:'rgba(var(--success-rgb),.6)',borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});}
   }
   if(ch.evolucion_periodos&&ch.evolucion_periodos.length){
     var c4=document.getElementById('chart-evol');
@@ -323,6 +493,25 @@ function renderStats(s){
   h+='</div>';
   g.innerHTML=h;
   if(window.lucide)lucide.createIcons();
+}
+
+function renderLowPerformers(a){
+  var g=document.getElementById('lowPerformersWidget');if(!g)return;
+  if(a.estudiantes_bajo&&a.estudiantes_bajo.length){
+    var h='';
+    a.estudiantes_bajo.slice(0,5).forEach(function(s){
+      h+='<div class="low-item"><span class="low-name">'+escHtml(s.nombre)+'</span><span class="low-grade">'+escHtml(String(s.promedio))+'</span></div>';
+    });
+    g.innerHTML=h;
+  }else if(a.destacados&&a.destacados.length){
+    var h='';
+    a.destacados.slice(0,5).forEach(function(s){
+      h+='<div class="low-item"><span class="low-name">'+escHtml(s.nombre)+' \u2b50</span><span class="low-grade" style="color:var(--success)">'+escHtml(String(s.promedio))+'</span></div>';
+    });
+    g.innerHTML=h;
+  }else{
+    g.innerHTML='<div class="empty-msg">Sin datos de rendimiento</div>';
+  }
 }
 
 function exportPDF(){window.print();}
