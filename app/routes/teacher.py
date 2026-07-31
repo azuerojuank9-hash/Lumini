@@ -2654,7 +2654,7 @@ def dashboard(slug):
             for r in filas:
                 hoy_schedule.append({'curso': curso, 'dia': r['dia'], 'franja': r['franja'], 'num': r['num'], 'materia': r['materia']})
         fechas = conn.execute(
-            'SELECT id, asunto, fecha_publicacion, creado_por FROM comunicaciones WHERE activo=1 AND estado=\'publicado\' ORDER BY fecha_publicacion DESC LIMIT 5').fetchall()
+            'SELECT c.id, c.titulo, c.fecha_publicacion, r.nombre as creado_por FROM comunicaciones c JOIN rectores r ON r.id=c.rector_id WHERE c.activo=1 AND c.estado=\'publicado\' ORDER BY c.fecha_publicacion DESC LIMIT 5').fetchall()
         comunicados_recientes = [dict(r) for r in fechas]
         notif_count = get_notificaciones_no_leidas_count(conn, 'profesor', prof['id'])
         if mis_cursos:

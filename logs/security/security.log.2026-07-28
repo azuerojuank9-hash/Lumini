@@ -1,0 +1,1338 @@
+2026-07-28 15:26:03,869 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:26:04,353 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:26:05,687 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:26:19,032 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-28 15:26:19,165 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:26:21,584 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:26:21,687 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:26:21,802 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:26:21,936 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:26:22,029 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:26:22,132 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:26:22,241 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:26:22,336 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:26:22,571 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:26:22,669 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:26:22,827 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:26:22,836 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:26:23,253 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-28 15:26:23,417 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:26:23,544 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:26:23,849 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:26:24,098 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:26:35,747 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 15:26:56,843 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:27:29,671 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:27:30,226 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-28 15:28:07,903 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-28 15:28:22,707 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:28:22,850 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:28:23,100 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:28:33,503 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-28 15:28:33,621 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:28:35,924 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:28:36,040 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:28:36,136 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:28:36,249 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:28:36,345 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:28:36,468 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:28:36,590 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:28:36,697 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:28:36,939 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:28:37,031 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:28:37,181 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:28:37,191 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:28:37,563 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-28 15:28:37,681 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:28:37,768 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:28:38,027 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:28:38,204 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:28:53,146 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 15:29:10,960 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:29:43,797 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:29:44,420 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-28 15:30:20,265 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-28 15:30:47,081 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:30:47,223 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:30:47,495 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:30:57,256 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-28 15:30:57,370 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:30:59,408 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:30:59,509 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:30:59,610 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:30:59,721 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:30:59,809 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:30:59,906 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:31:00,009 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:31:00,105 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:31:00,323 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:31:00,417 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:31:00,554 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:31:00,561 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:31:00,907 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-28 15:31:01,026 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:31:01,124 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:31:01,397 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:31:01,537 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:32:01,443 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:32:01,603 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:32:01,881 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:32:11,730 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-28 15:32:11,842 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:32:13,942 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:32:14,040 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:32:14,129 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:32:14,234 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:32:14,346 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:32:14,450 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:32:14,552 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:32:14,668 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:32:14,871 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:32:14,956 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:32:15,107 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:32:15,114 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:32:15,476 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-28 15:32:15,595 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:32:15,686 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:32:15,945 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:32:16,088 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:32:31,912 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 15:32:48,862 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:33:21,667 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:33:22,127 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-28 15:33:57,562 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-28 15:42:59,297 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:42:59,441 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:42:59,919 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:43:00,019 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 6...
+2026-07-28 15:43:00,022 [INFO   ] [-] app.infra.database: [testcolegio] Versión 6 aplicada.
+2026-07-28 15:43:00,022 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 7...
+2026-07-28 15:43:00,025 [INFO   ] [-] app.infra.database: [testcolegio] Versión 7 aplicada.
+2026-07-28 15:43:00,026 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 8...
+2026-07-28 15:43:00,028 [INFO   ] [-] app.infra.database: [testcolegio] Versión 8 aplicada.
+2026-07-28 15:43:00,028 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 9...
+2026-07-28 15:43:00,031 [INFO   ] [-] app.infra.database: [testcolegio] Versión 9 aplicada.
+2026-07-28 15:43:00,031 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 10...
+2026-07-28 15:43:00,035 [INFO   ] [-] app.infra.database: [testcolegio] Versión 10 aplicada.
+2026-07-28 15:43:00,036 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 11...
+2026-07-28 15:43:00,043 [INFO   ] [-] app.infra.database: [testcolegio] Versión 11 aplicada.
+2026-07-28 15:43:00,044 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 12...
+2026-07-28 15:43:00,045 [INFO   ] [-] app.infra.database: [testcolegio] Versión 12 aplicada.
+2026-07-28 15:43:00,045 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 13...
+2026-07-28 15:43:00,050 [INFO   ] [-] app.infra.database: [testcolegio] Versión 13 aplicada.
+2026-07-28 15:43:00,050 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 14...
+2026-07-28 15:43:00,057 [INFO   ] [-] app.infra.database: [testcolegio] Versión 14 aplicada.
+2026-07-28 15:43:00,058 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 15...
+2026-07-28 15:43:00,069 [INFO   ] [-] app.infra.database: [testcolegio] Versión 15 aplicada.
+2026-07-28 15:43:00,069 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 16...
+2026-07-28 15:43:00,086 [INFO   ] [-] app.infra.database: [testcolegio] Versión 16 aplicada.
+2026-07-28 15:43:00,087 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 17...
+2026-07-28 15:43:00,120 [INFO   ] [-] app.infra.database: [testcolegio] Versión 17 aplicada.
+2026-07-28 15:43:00,120 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 18...
+2026-07-28 15:43:00,123 [INFO   ] [-] app.infra.database: [testcolegio] Versión 18 aplicada.
+2026-07-28 15:43:00,123 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 19...
+2026-07-28 15:43:00,127 [INFO   ] [-] app.infra.database: [testcolegio] Versión 19 aplicada.
+2026-07-28 15:43:00,128 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 20...
+2026-07-28 15:43:00,132 [INFO   ] [-] app.infra.database: [testcolegio] Versión 20 aplicada.
+2026-07-28 15:43:00,132 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 21...
+2026-07-28 15:43:00,137 [INFO   ] [-] app.infra.database: [testcolegio] Versión 21 aplicada.
+2026-07-28 15:43:11,930 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=4.5 nf=2.93
+2026-07-28 15:43:12,041 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:43:14,470 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:43:14,565 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:43:14,652 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:43:14,749 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:43:14,839 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:43:14,933 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:43:15,031 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:43:15,120 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:43:15,332 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:43:15,421 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:43:15,549 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:43:15,555 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:43:15,888 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.5 nf=2.27
+2026-07-28 15:43:16,004 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:43:16,088 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:43:16,318 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:43:16,442 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:43:29,945 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 15:43:49,260 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:44:22,062 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:44:22,496 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-28 15:44:57,817 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-28 15:45:01,574 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 6...
+2026-07-28 15:45:01,578 [INFO   ] [-] app.infra.database: [test-school] Versión 6 aplicada.
+2026-07-28 15:45:01,578 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 7...
+2026-07-28 15:45:01,581 [INFO   ] [-] app.infra.database: [test-school] Versión 7 aplicada.
+2026-07-28 15:45:01,581 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 8...
+2026-07-28 15:45:01,584 [INFO   ] [-] app.infra.database: [test-school] Versión 8 aplicada.
+2026-07-28 15:45:01,585 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 9...
+2026-07-28 15:45:01,587 [INFO   ] [-] app.infra.database: [test-school] Versión 9 aplicada.
+2026-07-28 15:45:01,588 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 10...
+2026-07-28 15:45:01,593 [INFO   ] [-] app.infra.database: [test-school] Versión 10 aplicada.
+2026-07-28 15:45:01,593 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 11...
+2026-07-28 15:45:01,600 [INFO   ] [-] app.infra.database: [test-school] Versión 11 aplicada.
+2026-07-28 15:45:01,600 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 12...
+2026-07-28 15:45:01,601 [INFO   ] [-] app.infra.database: [test-school] Versión 12 aplicada.
+2026-07-28 15:45:01,602 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 13...
+2026-07-28 15:45:01,606 [INFO   ] [-] app.infra.database: [test-school] Versión 13 aplicada.
+2026-07-28 15:45:01,607 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 14...
+2026-07-28 15:45:01,614 [INFO   ] [-] app.infra.database: [test-school] Versión 14 aplicada.
+2026-07-28 15:45:01,614 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 15...
+2026-07-28 15:45:01,627 [INFO   ] [-] app.infra.database: [test-school] Versión 15 aplicada.
+2026-07-28 15:45:01,627 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 16...
+2026-07-28 15:45:01,644 [INFO   ] [-] app.infra.database: [test-school] Versión 16 aplicada.
+2026-07-28 15:45:01,645 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 17...
+2026-07-28 15:45:01,684 [INFO   ] [-] app.infra.database: [test-school] Versión 17 aplicada.
+2026-07-28 15:45:01,685 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 18...
+2026-07-28 15:45:01,687 [INFO   ] [-] app.infra.database: [test-school] Versión 18 aplicada.
+2026-07-28 15:45:01,687 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 19...
+2026-07-28 15:45:01,691 [INFO   ] [-] app.infra.database: [test-school] Versión 19 aplicada.
+2026-07-28 15:45:01,692 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 20...
+2026-07-28 15:45:01,697 [INFO   ] [-] app.infra.database: [test-school] Versión 20 aplicada.
+2026-07-28 15:45:01,697 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 21...
+2026-07-28 15:45:01,702 [INFO   ] [-] app.infra.database: [test-school] Versión 21 aplicada.
+2026-07-28 15:45:42,690 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:45:42,847 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:45:43,323 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:45:43,424 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 6...
+2026-07-28 15:45:43,427 [INFO   ] [-] app.infra.database: [testcolegio] Versión 6 aplicada.
+2026-07-28 15:45:43,428 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 7...
+2026-07-28 15:45:43,431 [INFO   ] [-] app.infra.database: [testcolegio] Versión 7 aplicada.
+2026-07-28 15:45:43,431 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 8...
+2026-07-28 15:45:43,434 [INFO   ] [-] app.infra.database: [testcolegio] Versión 8 aplicada.
+2026-07-28 15:45:43,435 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 9...
+2026-07-28 15:45:43,437 [INFO   ] [-] app.infra.database: [testcolegio] Versión 9 aplicada.
+2026-07-28 15:45:43,438 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 10...
+2026-07-28 15:45:43,443 [INFO   ] [-] app.infra.database: [testcolegio] Versión 10 aplicada.
+2026-07-28 15:45:43,444 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 11...
+2026-07-28 15:45:43,451 [INFO   ] [-] app.infra.database: [testcolegio] Versión 11 aplicada.
+2026-07-28 15:45:43,452 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 12...
+2026-07-28 15:45:43,453 [INFO   ] [-] app.infra.database: [testcolegio] Versión 12 aplicada.
+2026-07-28 15:45:43,453 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 13...
+2026-07-28 15:45:43,459 [INFO   ] [-] app.infra.database: [testcolegio] Versión 13 aplicada.
+2026-07-28 15:45:43,459 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 14...
+2026-07-28 15:45:43,466 [INFO   ] [-] app.infra.database: [testcolegio] Versión 14 aplicada.
+2026-07-28 15:45:43,466 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 15...
+2026-07-28 15:45:43,477 [INFO   ] [-] app.infra.database: [testcolegio] Versión 15 aplicada.
+2026-07-28 15:45:43,478 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 16...
+2026-07-28 15:45:43,497 [INFO   ] [-] app.infra.database: [testcolegio] Versión 16 aplicada.
+2026-07-28 15:45:43,498 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 17...
+2026-07-28 15:45:43,533 [INFO   ] [-] app.infra.database: [testcolegio] Versión 17 aplicada.
+2026-07-28 15:45:43,534 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 18...
+2026-07-28 15:45:43,536 [INFO   ] [-] app.infra.database: [testcolegio] Versión 18 aplicada.
+2026-07-28 15:45:43,536 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 19...
+2026-07-28 15:45:43,540 [INFO   ] [-] app.infra.database: [testcolegio] Versión 19 aplicada.
+2026-07-28 15:45:43,540 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 20...
+2026-07-28 15:45:43,545 [INFO   ] [-] app.infra.database: [testcolegio] Versión 20 aplicada.
+2026-07-28 15:45:43,545 [INFO   ] [-] app.infra.database: [testcolegio] Migrando a versión 21...
+2026-07-28 15:45:43,551 [INFO   ] [-] app.infra.database: [testcolegio] Versión 21 aplicada.
+2026-07-28 15:45:55,199 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=4.5 nf=2.93
+2026-07-28 15:45:55,307 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:45:57,640 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:45:57,738 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:45:57,824 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:45:57,919 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:45:58,005 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:45:58,117 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:45:58,214 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:45:58,302 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:45:58,508 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:45:58,594 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:45:58,733 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:45:58,739 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:45:59,060 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.5 nf=2.27
+2026-07-28 15:45:59,176 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:45:59,264 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:45:59,501 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:45:59,629 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:46:13,351 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 15:46:32,458 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:47:05,289 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:47:05,728 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-28 15:47:40,999 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-28 15:47:45,345 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 6...
+2026-07-28 15:47:45,348 [INFO   ] [-] app.infra.database: [test-school] Versión 6 aplicada.
+2026-07-28 15:47:45,349 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 7...
+2026-07-28 15:47:45,352 [INFO   ] [-] app.infra.database: [test-school] Versión 7 aplicada.
+2026-07-28 15:47:45,352 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 8...
+2026-07-28 15:47:45,356 [INFO   ] [-] app.infra.database: [test-school] Versión 8 aplicada.
+2026-07-28 15:47:45,356 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 9...
+2026-07-28 15:47:45,359 [INFO   ] [-] app.infra.database: [test-school] Versión 9 aplicada.
+2026-07-28 15:47:45,360 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 10...
+2026-07-28 15:47:45,366 [INFO   ] [-] app.infra.database: [test-school] Versión 10 aplicada.
+2026-07-28 15:47:45,366 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 11...
+2026-07-28 15:47:45,376 [INFO   ] [-] app.infra.database: [test-school] Versión 11 aplicada.
+2026-07-28 15:47:45,377 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 12...
+2026-07-28 15:47:45,378 [INFO   ] [-] app.infra.database: [test-school] Versión 12 aplicada.
+2026-07-28 15:47:45,379 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 13...
+2026-07-28 15:47:45,385 [INFO   ] [-] app.infra.database: [test-school] Versión 13 aplicada.
+2026-07-28 15:47:45,386 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 14...
+2026-07-28 15:47:45,393 [INFO   ] [-] app.infra.database: [test-school] Versión 14 aplicada.
+2026-07-28 15:47:45,393 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 15...
+2026-07-28 15:47:45,408 [INFO   ] [-] app.infra.database: [test-school] Versión 15 aplicada.
+2026-07-28 15:47:45,408 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 16...
+2026-07-28 15:47:45,427 [INFO   ] [-] app.infra.database: [test-school] Versión 16 aplicada.
+2026-07-28 15:47:45,428 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 17...
+2026-07-28 15:47:45,469 [INFO   ] [-] app.infra.database: [test-school] Versión 17 aplicada.
+2026-07-28 15:47:45,469 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 18...
+2026-07-28 15:47:45,471 [INFO   ] [-] app.infra.database: [test-school] Versión 18 aplicada.
+2026-07-28 15:47:45,471 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 19...
+2026-07-28 15:47:45,475 [INFO   ] [-] app.infra.database: [test-school] Versión 19 aplicada.
+2026-07-28 15:47:45,475 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 20...
+2026-07-28 15:47:45,480 [INFO   ] [-] app.infra.database: [test-school] Versión 20 aplicada.
+2026-07-28 15:47:45,480 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 21...
+2026-07-28 15:47:45,485 [INFO   ] [-] app.infra.database: [test-school] Versión 21 aplicada.
+2026-07-28 15:48:06,358 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:48:06,502 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:48:07,005 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:48:17,675 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-28 15:48:17,801 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:48:20,425 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:48:20,531 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:48:20,621 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:48:20,734 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:48:20,827 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:48:20,934 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:48:21,041 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:48:21,149 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:48:21,359 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:48:21,450 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:48:21,593 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:48:21,600 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:48:21,954 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-28 15:48:22,081 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:48:22,177 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:48:22,430 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:48:22,565 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:48:37,043 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 15:48:55,348 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:49:28,163 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:49:28,628 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-28 15:50:03,857 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-28 15:50:07,570 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 6...
+2026-07-28 15:50:07,573 [INFO   ] [-] app.infra.database: [test-school] Versión 6 aplicada.
+2026-07-28 15:50:07,573 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 7...
+2026-07-28 15:50:07,575 [INFO   ] [-] app.infra.database: [test-school] Versión 7 aplicada.
+2026-07-28 15:50:07,576 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 8...
+2026-07-28 15:50:07,579 [INFO   ] [-] app.infra.database: [test-school] Versión 8 aplicada.
+2026-07-28 15:50:07,580 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 9...
+2026-07-28 15:50:07,582 [INFO   ] [-] app.infra.database: [test-school] Versión 9 aplicada.
+2026-07-28 15:50:07,583 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 10...
+2026-07-28 15:50:07,588 [INFO   ] [-] app.infra.database: [test-school] Versión 10 aplicada.
+2026-07-28 15:50:07,588 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 11...
+2026-07-28 15:50:07,597 [INFO   ] [-] app.infra.database: [test-school] Versión 11 aplicada.
+2026-07-28 15:50:07,597 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 12...
+2026-07-28 15:50:07,599 [INFO   ] [-] app.infra.database: [test-school] Versión 12 aplicada.
+2026-07-28 15:50:07,599 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 13...
+2026-07-28 15:50:07,605 [INFO   ] [-] app.infra.database: [test-school] Versión 13 aplicada.
+2026-07-28 15:50:07,605 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 14...
+2026-07-28 15:50:07,612 [INFO   ] [-] app.infra.database: [test-school] Versión 14 aplicada.
+2026-07-28 15:50:07,612 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 15...
+2026-07-28 15:50:07,626 [INFO   ] [-] app.infra.database: [test-school] Versión 15 aplicada.
+2026-07-28 15:50:07,627 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 16...
+2026-07-28 15:50:07,644 [INFO   ] [-] app.infra.database: [test-school] Versión 16 aplicada.
+2026-07-28 15:50:07,645 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 17...
+2026-07-28 15:50:07,688 [INFO   ] [-] app.infra.database: [test-school] Versión 17 aplicada.
+2026-07-28 15:50:07,689 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 18...
+2026-07-28 15:50:07,691 [INFO   ] [-] app.infra.database: [test-school] Versión 18 aplicada.
+2026-07-28 15:50:07,692 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 19...
+2026-07-28 15:50:07,697 [INFO   ] [-] app.infra.database: [test-school] Versión 19 aplicada.
+2026-07-28 15:50:07,697 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 20...
+2026-07-28 15:50:07,702 [INFO   ] [-] app.infra.database: [test-school] Versión 20 aplicada.
+2026-07-28 15:50:07,702 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 21...
+2026-07-28 15:50:07,709 [INFO   ] [-] app.infra.database: [test-school] Versión 21 aplicada.
+2026-07-28 15:51:13,152 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:51:13,308 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:51:13,773 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:51:24,384 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-28 15:51:24,490 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:51:27,007 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:51:27,105 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:51:27,191 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:51:27,286 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:51:27,371 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:51:27,496 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:51:27,599 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:51:27,685 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:51:27,904 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:51:27,993 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:51:28,145 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:51:28,153 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:51:28,502 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-28 15:51:28,611 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:51:28,706 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:51:28,961 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:51:29,102 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:51:43,804 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 15:52:01,905 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:52:34,740 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:52:35,182 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-28 15:53:10,460 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-28 15:53:13,789 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 6...
+2026-07-28 15:53:13,792 [INFO   ] [-] app.infra.database: [test-school] Versión 6 aplicada.
+2026-07-28 15:53:13,792 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 7...
+2026-07-28 15:53:13,795 [INFO   ] [-] app.infra.database: [test-school] Versión 7 aplicada.
+2026-07-28 15:53:13,795 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 8...
+2026-07-28 15:53:13,798 [INFO   ] [-] app.infra.database: [test-school] Versión 8 aplicada.
+2026-07-28 15:53:13,798 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 9...
+2026-07-28 15:53:13,801 [INFO   ] [-] app.infra.database: [test-school] Versión 9 aplicada.
+2026-07-28 15:53:13,802 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 10...
+2026-07-28 15:53:13,807 [INFO   ] [-] app.infra.database: [test-school] Versión 10 aplicada.
+2026-07-28 15:53:13,807 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 11...
+2026-07-28 15:53:13,812 [INFO   ] [-] app.infra.database: [test-school] Versión 11 aplicada.
+2026-07-28 15:53:13,813 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 12...
+2026-07-28 15:53:13,814 [INFO   ] [-] app.infra.database: [test-school] Versión 12 aplicada.
+2026-07-28 15:53:13,814 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 13...
+2026-07-28 15:53:13,819 [INFO   ] [-] app.infra.database: [test-school] Versión 13 aplicada.
+2026-07-28 15:53:13,819 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 14...
+2026-07-28 15:53:13,826 [INFO   ] [-] app.infra.database: [test-school] Versión 14 aplicada.
+2026-07-28 15:53:13,826 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 15...
+2026-07-28 15:53:13,843 [INFO   ] [-] app.infra.database: [test-school] Versión 15 aplicada.
+2026-07-28 15:53:13,844 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 16...
+2026-07-28 15:53:13,861 [INFO   ] [-] app.infra.database: [test-school] Versión 16 aplicada.
+2026-07-28 15:53:13,862 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 17...
+2026-07-28 15:53:13,895 [INFO   ] [-] app.infra.database: [test-school] Versión 17 aplicada.
+2026-07-28 15:53:13,895 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 18...
+2026-07-28 15:53:13,897 [INFO   ] [-] app.infra.database: [test-school] Versión 18 aplicada.
+2026-07-28 15:53:13,897 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 19...
+2026-07-28 15:53:13,901 [INFO   ] [-] app.infra.database: [test-school] Versión 19 aplicada.
+2026-07-28 15:53:13,901 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 20...
+2026-07-28 15:53:13,905 [INFO   ] [-] app.infra.database: [test-school] Versión 20 aplicada.
+2026-07-28 15:53:13,905 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 21...
+2026-07-28 15:53:13,910 [INFO   ] [-] app.infra.database: [test-school] Versión 21 aplicada.
+2026-07-28 15:53:24,625 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:53:24,770 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:53:25,228 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:53:35,750 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-28 15:53:35,861 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:53:38,162 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:53:38,288 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:53:38,375 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:53:38,468 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:53:38,558 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:53:38,657 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:53:38,760 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:53:38,850 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:53:39,058 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:53:39,142 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:53:39,271 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:53:39,277 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:53:39,629 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-28 15:53:39,738 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:53:39,831 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:53:40,072 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:53:40,203 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:53:55,247 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 15:54:13,028 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:54:45,850 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:54:46,286 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-28 15:55:21,546 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-28 15:55:35,299 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:55:35,451 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:55:35,962 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:55:46,083 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-28 15:55:46,198 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:55:48,499 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:55:48,597 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:55:48,681 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:55:48,776 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:55:48,870 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:55:48,964 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:55:49,072 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:55:49,165 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:55:49,367 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:55:49,452 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:55:49,579 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:55:49,585 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:55:49,917 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-28 15:55:50,027 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:55:50,112 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:55:50,347 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:55:50,477 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:56:05,990 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 15:56:23,185 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:56:55,962 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:56:56,421 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-28 15:57:31,780 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-28 15:57:44,153 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 15:57:44,302 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 15:57:44,754 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 15:57:54,941 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.75 nf=3.74
+2026-07-28 15:57:55,047 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=1.6 prom_est=1.6 nf=1.04
+2026-07-28 15:57:57,339 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=3.05 nf=2.98
+2026-07-28 15:57:57,437 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=2.3 nf=2.5
+2026-07-28 15:57:57,524 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=2.8 nf=2.82
+2026-07-28 15:57:57,617 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=3.3 nf=3.15
+2026-07-28 15:57:57,701 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.6
+2026-07-28 15:57:57,797 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.6
+2026-07-28 15:57:57,889 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=6.0 prom_est=4.5 nf=3.93
+2026-07-28 15:57:57,979 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.27
+2026-07-28 15:57:58,181 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=5.0 prom_est=4.0 nf=3.9
+2026-07-28 15:57:58,264 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=2 val=3.0 prom_est=4.0 nf=3.9
+2026-07-28 15:57:58,391 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 15:57:58,398 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 15:57:58,736 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=1 val=3.5 prom_est=3.85 nf=2.5
+2026-07-28 15:57:58,845 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=2.0 prom_est=2.5 nf=3.21
+2026-07-28 15:57:58,943 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=3.5 nf=3.85
+2026-07-28 15:57:59,185 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.5 prom_est=4.0 nf=2.6
+2026-07-28 15:57:59,325 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=2 actividad_id=2 val=4.2 prom_est=3.85 nf=2.5
+2026-07-28 15:58:14,783 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 15:58:32,129 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:59:04,952 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 15:59:05,379 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=3.0 prom_est=3.0 nf=3.25
+2026-07-28 15:59:40,665 [WARNING] [-] app.infra.audit: [auditar_nota] database is locked
+2026-07-28 16:09:20,616 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:09:20,676 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:09:20,888 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:10:06,853 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:10:06,904 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:10:06,996 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:10:07,047 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 6...
+2026-07-28 16:10:07,048 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 6 aplicada.
+2026-07-28 16:10:07,048 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 7...
+2026-07-28 16:10:07,049 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 7 aplicada.
+2026-07-28 16:10:07,049 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 8...
+2026-07-28 16:10:07,051 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 8 aplicada.
+2026-07-28 16:10:07,051 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 9...
+2026-07-28 16:10:07,053 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 9 aplicada.
+2026-07-28 16:10:07,053 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 10...
+2026-07-28 16:10:07,055 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 10 aplicada.
+2026-07-28 16:10:07,055 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 11...
+2026-07-28 16:10:07,060 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 11 aplicada.
+2026-07-28 16:10:07,060 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 12...
+2026-07-28 16:10:07,061 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 12 aplicada.
+2026-07-28 16:10:07,061 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 13...
+2026-07-28 16:10:07,064 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 13 aplicada.
+2026-07-28 16:10:07,064 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 14...
+2026-07-28 16:10:07,067 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 14 aplicada.
+2026-07-28 16:10:07,067 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 15...
+2026-07-28 16:10:07,073 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 15 aplicada.
+2026-07-28 16:10:07,073 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 16...
+2026-07-28 16:10:07,080 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 16 aplicada.
+2026-07-28 16:10:07,080 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 17...
+2026-07-28 16:10:07,096 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 17 aplicada.
+2026-07-28 16:10:07,096 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 18...
+2026-07-28 16:10:07,097 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 18 aplicada.
+2026-07-28 16:10:07,097 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 19...
+2026-07-28 16:10:07,099 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 19 aplicada.
+2026-07-28 16:10:07,099 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 20...
+2026-07-28 16:10:07,101 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 20 aplicada.
+2026-07-28 16:10:07,101 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 21...
+2026-07-28 16:10:07,103 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 21 aplicada.
+2026-07-28 16:10:56,442 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:10:56,491 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:10:56,635 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:11:51,036 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:11:51,089 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:11:51,180 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:12:10,723 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:12:10,773 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:12:10,867 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:12:49,985 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:12:50,035 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:12:50,127 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:12:58,160 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:12:58,211 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:12:58,304 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:13:30,786 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:13:30,943 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:13:31,083 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:14:19,963 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:14:20,016 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:14:20,121 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:14:25,797 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=4.0 nf=4.22
+2026-07-28 16:24:59,852 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 16:25:19,469 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:25:19,519 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:25:19,617 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:25:40,362 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:25:40,411 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:25:40,514 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:25:51,177 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:25:51,231 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:25:51,337 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:26:08,590 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:26:08,642 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:26:08,744 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:27:25,177 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:27:25,226 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:27:25,494 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:27:25,553 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 6...
+2026-07-28 16:27:25,554 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 6 aplicada.
+2026-07-28 16:27:25,554 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 7...
+2026-07-28 16:27:25,555 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 7 aplicada.
+2026-07-28 16:27:25,555 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 8...
+2026-07-28 16:27:25,556 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 8 aplicada.
+2026-07-28 16:27:25,556 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 9...
+2026-07-28 16:27:25,558 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 9 aplicada.
+2026-07-28 16:27:25,558 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 10...
+2026-07-28 16:27:25,560 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 10 aplicada.
+2026-07-28 16:27:25,560 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 11...
+2026-07-28 16:27:25,563 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 11 aplicada.
+2026-07-28 16:27:25,563 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 12...
+2026-07-28 16:27:25,564 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 12 aplicada.
+2026-07-28 16:27:25,565 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 13...
+2026-07-28 16:27:25,567 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 13 aplicada.
+2026-07-28 16:27:25,567 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 14...
+2026-07-28 16:27:25,570 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 14 aplicada.
+2026-07-28 16:27:25,570 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 15...
+2026-07-28 16:27:25,576 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 15 aplicada.
+2026-07-28 16:27:25,576 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 16...
+2026-07-28 16:27:25,584 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 16 aplicada.
+2026-07-28 16:27:25,584 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 17...
+2026-07-28 16:27:25,599 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 17 aplicada.
+2026-07-28 16:27:25,600 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 18...
+2026-07-28 16:27:25,601 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 18 aplicada.
+2026-07-28 16:27:25,601 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 19...
+2026-07-28 16:27:25,603 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 19 aplicada.
+2026-07-28 16:27:25,603 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 20...
+2026-07-28 16:27:25,605 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 20 aplicada.
+2026-07-28 16:27:25,605 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 21...
+2026-07-28 16:27:25,607 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 21 aplicada.
+2026-07-28 16:27:29,811 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=None nf=None
+2026-07-28 16:27:55,509 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 16:28:02,602 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 16:28:30,136 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:28:30,187 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:28:30,289 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:28:35,706 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:28:35,754 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:28:35,858 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:29:08,053 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:29:08,102 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:29:08,206 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:29:18,386 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:29:18,434 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:29:18,537 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:29:28,180 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:29:28,232 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:29:28,339 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:29:52,998 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:29:53,056 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:29:53,162 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:30:09,940 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:30:09,990 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:30:10,096 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:30:31,520 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:30:31,570 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:30:31,673 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:30:47,630 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:30:47,681 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:30:47,788 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:31:05,790 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:31:05,841 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:31:05,946 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:31:24,455 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:31:24,508 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:31:24,613 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:31:59,953 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:32:00,005 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:32:00,111 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:32:20,399 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:32:20,450 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:32:20,557 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:34:20,693 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:34:20,741 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:34:20,843 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:34:20,901 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 6...
+2026-07-28 16:34:20,902 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 6 aplicada.
+2026-07-28 16:34:20,903 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 7...
+2026-07-28 16:34:20,904 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 7 aplicada.
+2026-07-28 16:34:20,904 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 8...
+2026-07-28 16:34:20,906 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 8 aplicada.
+2026-07-28 16:34:20,906 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 9...
+2026-07-28 16:34:20,907 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 9 aplicada.
+2026-07-28 16:34:20,907 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 10...
+2026-07-28 16:34:20,910 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 10 aplicada.
+2026-07-28 16:34:20,910 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 11...
+2026-07-28 16:34:20,913 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 11 aplicada.
+2026-07-28 16:34:20,913 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 12...
+2026-07-28 16:34:20,914 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 12 aplicada.
+2026-07-28 16:34:20,914 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 13...
+2026-07-28 16:34:20,916 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 13 aplicada.
+2026-07-28 16:34:20,916 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 14...
+2026-07-28 16:34:20,919 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 14 aplicada.
+2026-07-28 16:34:20,920 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 15...
+2026-07-28 16:34:20,927 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 15 aplicada.
+2026-07-28 16:34:20,927 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 16...
+2026-07-28 16:34:20,934 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 16 aplicada.
+2026-07-28 16:34:20,935 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 17...
+2026-07-28 16:34:20,950 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 17 aplicada.
+2026-07-28 16:34:20,950 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 18...
+2026-07-28 16:34:20,951 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 18 aplicada.
+2026-07-28 16:34:20,951 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 19...
+2026-07-28 16:34:20,954 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 19 aplicada.
+2026-07-28 16:34:20,954 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 20...
+2026-07-28 16:34:20,956 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 20 aplicada.
+2026-07-28 16:34:20,956 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 21...
+2026-07-28 16:34:20,958 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 21 aplicada.
+2026-07-28 16:34:25,197 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=4.0 nf=4.22
+2026-07-28 16:34:50,865 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 16:34:57,976 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 16:36:08,932 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:36:08,984 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:36:09,086 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:36:09,146 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 6...
+2026-07-28 16:36:09,147 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 6 aplicada.
+2026-07-28 16:36:09,147 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 7...
+2026-07-28 16:36:09,148 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 7 aplicada.
+2026-07-28 16:36:09,148 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 8...
+2026-07-28 16:36:09,149 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 8 aplicada.
+2026-07-28 16:36:09,149 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 9...
+2026-07-28 16:36:09,151 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 9 aplicada.
+2026-07-28 16:36:09,151 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 10...
+2026-07-28 16:36:09,153 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 10 aplicada.
+2026-07-28 16:36:09,153 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 11...
+2026-07-28 16:36:09,156 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 11 aplicada.
+2026-07-28 16:36:09,156 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 12...
+2026-07-28 16:36:09,157 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 12 aplicada.
+2026-07-28 16:36:09,157 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 13...
+2026-07-28 16:36:09,159 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 13 aplicada.
+2026-07-28 16:36:09,159 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 14...
+2026-07-28 16:36:09,163 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 14 aplicada.
+2026-07-28 16:36:09,163 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 15...
+2026-07-28 16:36:09,171 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 15 aplicada.
+2026-07-28 16:36:09,171 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 16...
+2026-07-28 16:36:09,180 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 16 aplicada.
+2026-07-28 16:36:09,180 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 17...
+2026-07-28 16:36:09,197 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 17 aplicada.
+2026-07-28 16:36:09,197 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 18...
+2026-07-28 16:36:09,198 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 18 aplicada.
+2026-07-28 16:36:09,198 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 19...
+2026-07-28 16:36:09,200 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 19 aplicada.
+2026-07-28 16:36:09,200 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 20...
+2026-07-28 16:36:09,202 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 20 aplicada.
+2026-07-28 16:36:09,202 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 21...
+2026-07-28 16:36:09,205 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 21 aplicada.
+2026-07-28 16:36:13,501 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=4.0 nf=4.22
+2026-07-28 16:36:39,104 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 16:36:46,269 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 16:37:17,781 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:37:17,831 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:37:17,931 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:37:17,987 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 6...
+2026-07-28 16:37:17,988 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 6 aplicada.
+2026-07-28 16:37:17,988 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 7...
+2026-07-28 16:37:17,989 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 7 aplicada.
+2026-07-28 16:37:17,989 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 8...
+2026-07-28 16:37:17,990 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 8 aplicada.
+2026-07-28 16:37:17,990 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 9...
+2026-07-28 16:37:17,992 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 9 aplicada.
+2026-07-28 16:37:17,992 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 10...
+2026-07-28 16:37:17,994 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 10 aplicada.
+2026-07-28 16:37:17,994 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 11...
+2026-07-28 16:37:17,998 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 11 aplicada.
+2026-07-28 16:37:17,998 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 12...
+2026-07-28 16:37:17,999 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 12 aplicada.
+2026-07-28 16:37:17,999 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 13...
+2026-07-28 16:37:18,001 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 13 aplicada.
+2026-07-28 16:37:18,001 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 14...
+2026-07-28 16:37:18,004 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 14 aplicada.
+2026-07-28 16:37:18,004 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 15...
+2026-07-28 16:37:18,010 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 15 aplicada.
+2026-07-28 16:37:18,010 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 16...
+2026-07-28 16:37:18,020 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 16 aplicada.
+2026-07-28 16:37:18,020 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 17...
+2026-07-28 16:37:18,036 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 17 aplicada.
+2026-07-28 16:37:18,036 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 18...
+2026-07-28 16:37:18,037 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 18 aplicada.
+2026-07-28 16:37:18,037 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 19...
+2026-07-28 16:37:18,039 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 19 aplicada.
+2026-07-28 16:37:18,039 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 20...
+2026-07-28 16:37:18,041 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 20 aplicada.
+2026-07-28 16:37:18,041 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 21...
+2026-07-28 16:37:18,044 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 21 aplicada.
+2026-07-28 16:37:22,274 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=4.0 nf=4.22
+2026-07-28 16:37:47,958 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 16:37:55,073 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 16:38:01,115 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:38:01,173 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:38:01,288 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:38:05,279 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,437 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,484 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,530 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,576 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,623 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,674 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,732 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,777 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,825 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,872 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,920 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:05,967 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,014 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,061 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,109 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,159 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,207 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,255 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,305 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,354 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,518 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,569 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,623 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,681 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,731 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,778 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,826 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,875 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,924 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,930 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:06,979 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,026 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,075 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,126 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,131 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,135 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,139 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,188 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,241 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,289 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,339 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,388 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,439 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,490 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,538 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,590 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,639 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,700 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,751 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,799 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,847 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,893 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,943 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:07,992 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,042 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,091 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,139 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,188 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,238 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,295 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,353 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,404 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,473 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,541 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,608 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,677 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,729 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,732 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,782 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,841 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,891 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,942 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,994 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:08,997 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,000 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,002 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,067 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 16:38:09,070 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 16:38:09,074 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,126 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,180 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,183 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,237 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,291 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,346 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,398 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,401 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,450 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,506 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,562 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,621 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,677 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,734 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,791 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,848 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,910 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:09,974 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,040 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,119 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,180 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,246 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,312 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,376 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,444 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,509 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,512 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,563 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,619 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,674 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:10,724 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,065 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,118 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,174 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,218 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,263 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,306 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,358 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,406 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,452 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,496 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,541 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,591 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,676 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,730 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,785 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,843 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,912 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:11,957 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,002 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,047 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,091 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,139 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,187 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,233 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,278 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,325 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,371 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,421 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,477 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,525 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,572 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,617 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,665 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,709 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,763 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,810 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,868 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,924 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,991 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:12,997 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,002 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,762 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,771 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,779 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,787 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,795 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,804 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,811 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,821 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,829 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,837 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,845 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,853 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,861 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,869 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,873 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:38:13,914 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 6...
+2026-07-28 16:38:13,915 [INFO   ] [-] app.infra.database: [test-school] Versión 6 aplicada.
+2026-07-28 16:38:13,915 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 7...
+2026-07-28 16:38:13,917 [INFO   ] [-] app.infra.database: [test-school] Versión 7 aplicada.
+2026-07-28 16:38:13,917 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 8...
+2026-07-28 16:38:13,919 [INFO   ] [-] app.infra.database: [test-school] Versión 8 aplicada.
+2026-07-28 16:38:13,919 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 9...
+2026-07-28 16:38:13,921 [INFO   ] [-] app.infra.database: [test-school] Versión 9 aplicada.
+2026-07-28 16:38:13,921 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 10...
+2026-07-28 16:38:13,924 [INFO   ] [-] app.infra.database: [test-school] Versión 10 aplicada.
+2026-07-28 16:38:13,924 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 11...
+2026-07-28 16:38:13,927 [INFO   ] [-] app.infra.database: [test-school] Versión 11 aplicada.
+2026-07-28 16:38:13,927 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 12...
+2026-07-28 16:38:13,928 [INFO   ] [-] app.infra.database: [test-school] Versión 12 aplicada.
+2026-07-28 16:38:13,928 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 13...
+2026-07-28 16:38:13,930 [INFO   ] [-] app.infra.database: [test-school] Versión 13 aplicada.
+2026-07-28 16:38:13,931 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 14...
+2026-07-28 16:38:13,934 [INFO   ] [-] app.infra.database: [test-school] Versión 14 aplicada.
+2026-07-28 16:38:13,934 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 15...
+2026-07-28 16:38:13,942 [INFO   ] [-] app.infra.database: [test-school] Versión 15 aplicada.
+2026-07-28 16:38:13,942 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 16...
+2026-07-28 16:38:13,950 [INFO   ] [-] app.infra.database: [test-school] Versión 16 aplicada.
+2026-07-28 16:38:13,950 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 17...
+2026-07-28 16:38:13,967 [INFO   ] [-] app.infra.database: [test-school] Versión 17 aplicada.
+2026-07-28 16:38:13,967 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 18...
+2026-07-28 16:38:13,968 [INFO   ] [-] app.infra.database: [test-school] Versión 18 aplicada.
+2026-07-28 16:38:13,968 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 19...
+2026-07-28 16:38:13,970 [INFO   ] [-] app.infra.database: [test-school] Versión 19 aplicada.
+2026-07-28 16:38:13,970 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 20...
+2026-07-28 16:38:13,972 [INFO   ] [-] app.infra.database: [test-school] Versión 20 aplicada.
+2026-07-28 16:38:13,972 [INFO   ] [-] app.infra.database: [test-school] Migrando a versión 21...
+2026-07-28 16:38:13,976 [INFO   ] [-] app.infra.database: [test-school] Versión 21 aplicada.
+2026-07-28 16:44:10,584 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:44:10,633 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:44:10,735 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:44:20,848 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:44:20,895 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:44:21,000 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:44:21,011 [INFO   ] [-] waitress: Serving on http://127.0.0.1:8000
+2026-07-28 16:44:51,019 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 16:45:33,311 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:45:33,360 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:45:33,467 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:45:33,524 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 6...
+2026-07-28 16:45:33,525 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 6 aplicada.
+2026-07-28 16:45:33,525 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 7...
+2026-07-28 16:45:33,527 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 7 aplicada.
+2026-07-28 16:45:33,527 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 8...
+2026-07-28 16:45:33,528 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 8 aplicada.
+2026-07-28 16:45:33,528 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 9...
+2026-07-28 16:45:33,529 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 9 aplicada.
+2026-07-28 16:45:33,530 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 10...
+2026-07-28 16:45:33,532 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 10 aplicada.
+2026-07-28 16:45:33,532 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 11...
+2026-07-28 16:45:33,535 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 11 aplicada.
+2026-07-28 16:45:33,535 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 12...
+2026-07-28 16:45:33,536 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 12 aplicada.
+2026-07-28 16:45:33,536 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 13...
+2026-07-28 16:45:33,539 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 13 aplicada.
+2026-07-28 16:45:33,539 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 14...
+2026-07-28 16:45:33,542 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 14 aplicada.
+2026-07-28 16:45:33,543 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 15...
+2026-07-28 16:45:33,549 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 15 aplicada.
+2026-07-28 16:45:33,549 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 16...
+2026-07-28 16:45:33,558 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 16 aplicada.
+2026-07-28 16:45:33,559 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 17...
+2026-07-28 16:45:33,574 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 17 aplicada.
+2026-07-28 16:45:33,574 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 18...
+2026-07-28 16:45:33,576 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 18 aplicada.
+2026-07-28 16:45:33,576 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 19...
+2026-07-28 16:45:33,578 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 19 aplicada.
+2026-07-28 16:45:33,578 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 20...
+2026-07-28 16:45:33,580 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 20 aplicada.
+2026-07-28 16:45:33,580 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 21...
+2026-07-28 16:45:33,582 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 21 aplicada.
+2026-07-28 16:46:40,781 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:46:40,830 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:46:40,978 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:46:41,034 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 6...
+2026-07-28 16:46:41,035 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 6 aplicada.
+2026-07-28 16:46:41,036 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 7...
+2026-07-28 16:46:41,037 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 7 aplicada.
+2026-07-28 16:46:41,037 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 8...
+2026-07-28 16:46:41,038 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 8 aplicada.
+2026-07-28 16:46:41,038 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 9...
+2026-07-28 16:46:41,039 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 9 aplicada.
+2026-07-28 16:46:41,039 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 10...
+2026-07-28 16:46:41,042 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 10 aplicada.
+2026-07-28 16:46:41,043 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 11...
+2026-07-28 16:46:41,046 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 11 aplicada.
+2026-07-28 16:46:41,046 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 12...
+2026-07-28 16:46:41,047 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 12 aplicada.
+2026-07-28 16:46:41,047 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 13...
+2026-07-28 16:46:41,049 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 13 aplicada.
+2026-07-28 16:46:41,049 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 14...
+2026-07-28 16:46:41,052 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 14 aplicada.
+2026-07-28 16:46:41,052 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 15...
+2026-07-28 16:46:41,060 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 15 aplicada.
+2026-07-28 16:46:41,060 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 16...
+2026-07-28 16:46:41,069 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 16 aplicada.
+2026-07-28 16:46:41,069 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 17...
+2026-07-28 16:46:41,085 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 17 aplicada.
+2026-07-28 16:46:41,086 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 18...
+2026-07-28 16:46:41,087 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 18 aplicada.
+2026-07-28 16:46:41,087 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 19...
+2026-07-28 16:46:41,089 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 19 aplicada.
+2026-07-28 16:46:41,089 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 20...
+2026-07-28 16:46:41,092 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 20 aplicada.
+2026-07-28 16:46:41,092 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 21...
+2026-07-28 16:46:41,095 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 21 aplicada.
+2026-07-28 16:47:02,363 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:47:02,412 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:47:02,514 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:47:21,720 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:47:21,769 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:47:21,870 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:47:29,174 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:47:29,222 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:47:29,324 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:47:37,815 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:47:37,865 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:47:37,968 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:47:44,590 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:47:44,639 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:47:44,743 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:48:18,224 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:48:18,273 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:48:18,377 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:48:18,597 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 6...
+2026-07-28 16:48:18,598 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 6 aplicada.
+2026-07-28 16:48:18,598 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 7...
+2026-07-28 16:48:18,599 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 7 aplicada.
+2026-07-28 16:48:18,599 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 8...
+2026-07-28 16:48:18,601 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 8 aplicada.
+2026-07-28 16:48:18,601 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 9...
+2026-07-28 16:48:18,602 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 9 aplicada.
+2026-07-28 16:48:18,602 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 10...
+2026-07-28 16:48:18,604 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 10 aplicada.
+2026-07-28 16:48:18,604 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 11...
+2026-07-28 16:48:18,607 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 11 aplicada.
+2026-07-28 16:48:18,607 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 12...
+2026-07-28 16:48:18,608 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 12 aplicada.
+2026-07-28 16:48:18,608 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 13...
+2026-07-28 16:48:18,611 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 13 aplicada.
+2026-07-28 16:48:18,611 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 14...
+2026-07-28 16:48:18,614 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 14 aplicada.
+2026-07-28 16:48:18,614 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 15...
+2026-07-28 16:48:18,620 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 15 aplicada.
+2026-07-28 16:48:18,620 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 16...
+2026-07-28 16:48:18,628 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 16 aplicada.
+2026-07-28 16:48:18,628 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 17...
+2026-07-28 16:48:18,644 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 17 aplicada.
+2026-07-28 16:48:18,644 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 18...
+2026-07-28 16:48:18,645 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 18 aplicada.
+2026-07-28 16:48:18,645 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 19...
+2026-07-28 16:48:18,647 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 19 aplicada.
+2026-07-28 16:48:18,647 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 20...
+2026-07-28 16:48:18,649 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 20 aplicada.
+2026-07-28 16:48:18,649 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 21...
+2026-07-28 16:48:18,652 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 21 aplicada.
+2026-07-28 16:48:32,572 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:48:32,622 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:48:32,728 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:48:40,936 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:48:40,985 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:48:41,090 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:50:13,088 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:50:13,136 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:50:13,240 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:50:32,946 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:50:32,994 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:50:33,095 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:51:33,367 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:51:33,415 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:51:33,520 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:51:33,577 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 6...
+2026-07-28 16:51:33,578 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 6 aplicada.
+2026-07-28 16:51:33,578 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 7...
+2026-07-28 16:51:33,579 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 7 aplicada.
+2026-07-28 16:51:33,579 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 8...
+2026-07-28 16:51:33,581 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 8 aplicada.
+2026-07-28 16:51:33,581 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 9...
+2026-07-28 16:51:33,582 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 9 aplicada.
+2026-07-28 16:51:33,583 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 10...
+2026-07-28 16:51:33,585 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 10 aplicada.
+2026-07-28 16:51:33,585 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 11...
+2026-07-28 16:51:33,588 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 11 aplicada.
+2026-07-28 16:51:33,588 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 12...
+2026-07-28 16:51:33,589 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 12 aplicada.
+2026-07-28 16:51:33,589 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 13...
+2026-07-28 16:51:33,591 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 13 aplicada.
+2026-07-28 16:51:33,591 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 14...
+2026-07-28 16:51:33,594 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 14 aplicada.
+2026-07-28 16:51:33,594 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 15...
+2026-07-28 16:51:33,601 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 15 aplicada.
+2026-07-28 16:51:33,601 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 16...
+2026-07-28 16:51:33,608 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 16 aplicada.
+2026-07-28 16:51:33,608 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 17...
+2026-07-28 16:51:33,624 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 17 aplicada.
+2026-07-28 16:51:33,624 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 18...
+2026-07-28 16:51:33,625 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 18 aplicada.
+2026-07-28 16:51:33,625 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 19...
+2026-07-28 16:51:33,627 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 19 aplicada.
+2026-07-28 16:51:33,627 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 20...
+2026-07-28 16:51:33,629 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 20 aplicada.
+2026-07-28 16:51:33,629 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 21...
+2026-07-28 16:51:33,632 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 21 aplicada.
+2026-07-28 16:51:36,756 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.5 prom_est=4.17 nf=4.34
+2026-07-28 16:52:10,065 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:52:10,123 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:52:10,228 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:52:13,535 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,542 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,546 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,552 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,557 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,563 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,570 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,575 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,580 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,587 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,592 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,599 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,605 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,610 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,615 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,621 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,626 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,631 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,636 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,643 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,648 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,722 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,727 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,732 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,738 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,746 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,752 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,757 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,762 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,768 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,773 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,779 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,785 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,790 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,795 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,798 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,803 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,807 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,812 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,818 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,823 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,828 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,833 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,839 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,844 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,849 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,855 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,860 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,865 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,871 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,876 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,880 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,887 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,892 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,896 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,902 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,908 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,912 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,918 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,923 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,928 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,942 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,947 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,953 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,958 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,963 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,969 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,974 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,977 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,981 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,988 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,992 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:13,997 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,005 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,008 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,010 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,012 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,034 [WARNING] [-] app.infra.database: [test] Recreando tabla evaluaciones (UNIQUE incorrecto)
+2026-07-28 16:52:14,037 [WARNING] [-] app.infra.database: [test] Recreando tabla horarios_curso (UNIQUE incorrecto)
+2026-07-28 16:52:14,041 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,048 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,059 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,062 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,072 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,081 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,089 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,096 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,099 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,105 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,118 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,129 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,143 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,156 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,169 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,181 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,193 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,210 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,228 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,246 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,263 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,281 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,297 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,319 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,339 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,362 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,381 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,385 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,390 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,395 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,400 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,406 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,671 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,683 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,707 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,712 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,718 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,724 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,730 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,736 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,740 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,745 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,751 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,758 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,763 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,769 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,774 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,779 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,785 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,790 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,795 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,801 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,806 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,811 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,817 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,822 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,827 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,833 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,838 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,843 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,859 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,864 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,871 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,875 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,880 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,886 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,891 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,896 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,907 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,917 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,936 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,940 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:14,944 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,662 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,667 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,674 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,680 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,687 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,692 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,697 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,703 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,708 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,713 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,719 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,724 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,729 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,735 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:15,739 [WARNING] [-] app.handlers: NotFound: Colegio no encontrado (id=testcolegio)
+2026-07-28 16:52:22,421 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:52:22,470 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:52:22,571 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:52:22,629 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 6...
+2026-07-28 16:52:22,630 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 6 aplicada.
+2026-07-28 16:52:22,630 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 7...
+2026-07-28 16:52:22,631 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 7 aplicada.
+2026-07-28 16:52:22,631 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 8...
+2026-07-28 16:52:22,632 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 8 aplicada.
+2026-07-28 16:52:22,632 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 9...
+2026-07-28 16:52:22,634 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 9 aplicada.
+2026-07-28 16:52:22,634 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 10...
+2026-07-28 16:52:22,636 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 10 aplicada.
+2026-07-28 16:52:22,636 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 11...
+2026-07-28 16:52:22,639 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 11 aplicada.
+2026-07-28 16:52:22,639 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 12...
+2026-07-28 16:52:22,640 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 12 aplicada.
+2026-07-28 16:52:22,640 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 13...
+2026-07-28 16:52:22,642 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 13 aplicada.
+2026-07-28 16:52:22,643 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 14...
+2026-07-28 16:52:22,645 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 14 aplicada.
+2026-07-28 16:52:22,645 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 15...
+2026-07-28 16:52:22,652 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 15 aplicada.
+2026-07-28 16:52:22,652 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 16...
+2026-07-28 16:52:22,659 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 16 aplicada.
+2026-07-28 16:52:22,659 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 17...
+2026-07-28 16:52:22,675 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 17 aplicada.
+2026-07-28 16:52:22,675 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 18...
+2026-07-28 16:52:22,676 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 18 aplicada.
+2026-07-28 16:52:22,676 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 19...
+2026-07-28 16:52:22,678 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 19 aplicada.
+2026-07-28 16:52:22,678 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 20...
+2026-07-28 16:52:22,680 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 20 aplicada.
+2026-07-28 16:52:22,680 [INFO   ] [-] app.infra.database: [colegio-qa] Migrando a versión 21...
+2026-07-28 16:52:22,683 [INFO   ] [-] app.infra.database: [colegio-qa] Versión 21 aplicada.
+2026-07-28 16:52:27,457 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=4.0 nf=4.22
+2026-07-28 16:52:52,597 [INFO   ] [-] flask_app: Backup automático completado: 2026-07-28
+2026-07-28 16:53:00,440 [WARNING] [-] app.infra.audit: [audit] database is locked
+2026-07-28 16:53:52,811 [WARNING] [-] flask_app: SENDGRID_API_KEY no definido — el envío de correos estará deshabilitado.
+2026-07-28 16:53:52,877 [INFO   ] [-] flask_app: API v1 blueprint registrado.
+2026-07-28 16:53:53,003 [INFO   ] [-] flask_app: Blueprints modulares (app/routes/) registrados.
+2026-07-28 16:53:53,398 [INFO   ] [-] app.routes.teacher: guardar_nota: aid=1 actividad_id=1 val=4.0 prom_est=4.0 nf=4.22

@@ -16,6 +16,16 @@ TEST_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
                        'colegios_db', 'testcolegio.db')
 
 def seed_test_db():
+    # Ensure testcolegio exists in master DB
+    from flask_app import conectar_master
+    mconn = conectar_master()
+    cur = mconn.execute('SELECT id FROM colegios WHERE slug=?', ('testcolegio',))
+    if not cur.fetchone():
+        mconn.execute(
+            'INSERT INTO colegios (slug, nombre, activo, codigo_profesores, codigo_directoras, codigo_rectores, schema_version) VALUES (?,?,?,?,?,?,?)',
+            ('testcolegio', 'Test Colegio', 1, 'prof_test', 'dir_test', 'rec_test', 20))
+        mconn.commit()
+    mconn.close()
     # Ensure DB schema exists (creates tables + runs all migrations including v11)
     init_db('testcolegio')
     conn = sqlite3.connect(TEST_DB)
