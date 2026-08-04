@@ -52,9 +52,40 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;min-heigh
   .pp-login{margin:40px 16px;padding:24px;}
   .pp-hijo-stats{grid-template-columns:repeat(2,1fr);}
 }
+/* -- Dark mode ----------------------------------------------------- */
+html[data-theme="dark"] body{background:#0f172a;color:#e2e8f0;}
+html[data-theme="dark"] .pp-login{background:#1e293b;box-shadow:0 4px 24px rgba(0,0,0,.4);}
+html[data-theme="dark"] .pp-login h1{color:#f1f5f9;}
+html[data-theme="dark"] .pp-login .sub{color:#94a3b8;}
+html[data-theme="dark"] .pp-login label{color:#cbd5e1;}
+html[data-theme="dark"] .pp-login input{background:#0f172a;border-color:#334155;color:#f1f5f9;}
+html[data-theme="dark"] .pp-header h1{color:#f1f5f9;}
+html[data-theme="dark"] .pp-header .pp-user{color:#94a3b8;}
+html[data-theme="dark"] .pp-header button{background:transparent;border-color:#334155;color:#cbd5e1;}
+html[data-theme="dark"] .pp-header button:hover{background:#1e293b;}
+html[data-theme="dark"] .pp-hijo-card{background:#1e293b;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+html[data-theme="dark"] .pp-hijo-card h3{color:#f1f5f9;}
+html[data-theme="dark"] .pp-stat{background:#0f172a;}
+html[data-theme="dark"] .pp-stat .pp-num{color:#818cf8;}
+html[data-theme="dark"] .pp-stat .pp-lbl{color:#94a3b8;}
+html[data-theme="dark"] .pp-hijo-actions button{background:#0f172a;border-color:#334155;color:#cbd5e1;}
+html[data-theme="dark"] .pp-hijo-actions button:hover{border-color:#818cf8;color:#818cf8;}
+html[data-theme="dark"] .pp-modal-content{background:#1e293b;}
+html[data-theme="dark"] .pp-modal-content h2{color:#f1f5f9;}
+html[data-theme="dark"] .pp-modal-content button.close{color:#94a3b8;}
+html[data-theme="dark"] .pp-table th{color:#94a3b8;border-bottom-color:#334155;}
+html[data-theme="dark"] .pp-table td{border-bottom-color:#334155;}
+html[data-theme="dark"] .pp-com-item{border-color:#334155;}
+html[data-theme="dark"] .pp-com-item h4{color:#f1f5f9;}
+html[data-theme="dark"] .pp-com-item p{color:#cbd5e1;}
+html[data-theme="dark"] .pp-com-item .pp-date{color:#64748b;}
+html[data-theme="dark"] #ppNotasResumen table,html[data-theme="dark"] #ppNotasResumen tr{background:transparent;}
+html[data-theme="dark"] .pp-box{border-color:#334155!important;}
+html[data-theme="dark"] .pp-prom{background:#0f172a!important;border-color:#334155!important;}
+html[data-theme="dark"] .pp-hist-box{border-color:#334155!important;}
 {% endblock %}
 {% block content %}
-<div id="ppLogin" class="pp-login" style="display:block;">
+<div id="ppLogin" class="pp-login" style="display:{% if step == 'dashboard' %}none{% else %}block{% endif %};">
   <h1>Portal de Padres</h1>
   <div class="sub">Accede al rendimiento académico de tus hijos</div>
   <div class="pp-error" id="ppError"></div>
@@ -64,7 +95,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;min-heigh
   <input type="password" id="ppPin" placeholder="Ingresa tu PIN" autocomplete="current-password">
   <button class="pp-btn" onclick="ppLogin()">Ingresar</button>
 </div>
-<div id="ppDashboard" class="pp-dash" style="display:none;">
+<div id="ppDashboard" class="pp-dash" style="display:{% if step == 'dashboard' %}block{% else %}none{% endif %};">
   <div class="pp-header">
     <div><h1>Portal de Padres</h1><div class="pp-user" id="ppUserInfo"></div></div>
     <button onclick="ppLogout()">Cerrar sesión</button>
@@ -74,6 +105,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;min-heigh
 <div class="pp-modal" id="ppModalNotas"><div class="pp-modal-content">
   <button class="close" onclick="ppCerrarModal('ppModalNotas')">&times;</button>
   <h2 id="ppModalTitle">Notas</h2>
+  <div id="ppNotasResumen" style="margin-bottom:12px;"></div>
   <table class="pp-table"><thead><tr><th>Actividad</th><th>Tipo</th><th>Peso</th><th>Nota</th></tr></thead><tbody id="ppNotasBody"></tbody></table>
 </div></div>
 <div class="pp-modal" id="ppModalAsistencia"><div class="pp-modal-content">
@@ -93,6 +125,21 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;min-heigh
   <h2>Comunicados</h2>
   <div id="ppCommsBody" class="pp-com-list"></div>
 </div></div>
+<div class="pp-modal" id="ppModalHorario"><div class="pp-modal-content">
+  <button class="close" onclick="ppCerrarModal('ppModalHorario')">&times;</button>
+  <h2 id="ppHorarioTitle">Horario</h2>
+  <table class="pp-table"><thead><tr><th>Día</th><th>Hora</th><th>Materia</th><th>Profesor</th></tr></thead><tbody id="ppHorarioBody"></tbody></table>
+</div></div>
+<div class="pp-modal" id="ppModalObs"><div class="pp-modal-content">
+  <button class="close" onclick="ppCerrarModal('ppModalObs')">&times;</button>
+  <h2 id="ppObsTitle">Observaciones</h2>
+  <div id="ppObsBody" class="pp-com-list"></div>
+</div></div>
+<div class="pp-modal" id="ppModalHistorial"><div class="pp-modal-content">
+  <button class="close" onclick="ppCerrarModal('ppModalHistorial')">&times;</button>
+  <h2 id="ppHistTitle">Historial académico</h2>
+  <div id="ppHistBody"></div>
+</div></div>
 {% endblock %}
 {% block extra_scripts %}
 <script>
@@ -109,8 +156,11 @@ function ppLogin(){
     if(d.error){err.textContent=d.error;err.style.display='block';return;}
     document.getElementById('ppLogin').style.display='none';
     document.getElementById('ppUserInfo').textContent='Bienvenido, '+d.padre.nombre;
-    renderHijos(d.hijos);
     document.getElementById('ppDashboard').style.display='block';
+    renderHijos(d.hijos);
+    fetch('/'+slug+'/portal/dashboard').then(function(r){return r.json();}).then(function(x){
+      if(x.hijos&&x.hijos.length)renderHijos(x.hijos);
+    }).catch(function(){});
   }).catch(function(){err.textContent='Error de conexión';err.style.display='block';});
 }
 function renderHijos(hijos){
@@ -118,7 +168,7 @@ function renderHijos(hijos){
   var h='';
   hijos.forEach(function(hijo){
     h+='<div class="pp-hijo-card"><h3>'+escHtml(hijo.nombre)+' <span style="font-weight:400;font-size:13px;color:#888;">· '+escHtml(hijo.curso)+' · '+escHtml(hijo.jornada)+'</span></h3>';
-    h+='<div class="pp-hijo-stats"><div class="pp-stat"><div class="pp-num">'+hijo.promedio+'</div><div class="pp-lbl">Promedio</div></div>';
+    h+='<div class="pp-hijo-stats"><div class="pp-stat"><div class="pp-num">'+(hijo.promedio==null?'&mdash;':hijo.promedio)+'</div><div class="pp-lbl">Promedio</div></div>';
     h+='<div class="pp-stat"><div class="pp-num">'+hijo.actividades+'</div><div class="pp-lbl">Actividades</div></div>';
     if(hijo.asistencia){
       var total=hijo.asistencia.reduce(function(s,a){return s+a.cnt;},0);
@@ -128,6 +178,9 @@ function renderHijos(hijos){
     h+='<div class="pp-hijo-actions">';
     h+='<button onclick="ppVerNotas('+hijo.id+',\''+escJsStr(hijo.nombre)+'\')">Ver notas</button>';
     h+='<button onclick="ppVerAsistencia('+hijo.id+',\''+escJsStr(hijo.nombre)+'\')">Asistencia</button>';
+    h+='<button onclick="ppVerHorario('+hijo.id+',\''+escJsStr(hijo.nombre)+'\')">Horario</button>';
+    h+='<button onclick="ppVerObservaciones('+hijo.id+',\''+escJsStr(hijo.nombre)+'\')">Observaciones</button>';
+    h+='<button onclick="ppVerHistorial('+hijo.id+',\''+escJsStr(hijo.nombre)+'\')">Historial</button>';
     h+='<button onclick="ppVerComms()">Comunicados</button>';
     h+='</div></div>';
   });
@@ -135,17 +188,37 @@ function renderHijos(hijos){
 }
 function ppVerNotas(aid,nombre){
   document.getElementById('ppModalTitle').textContent='Notas - '+nombre;
+  document.getElementById('ppNotasResumen').innerHTML='';
   document.getElementById('ppNotasBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:#999;">Cargando...</td></tr>';
   document.getElementById('ppModalNotas').classList.add('active');
   fetch('/'+slug+'/portal/notas/'+aid).then(function(r){return r.json();}).then(function(d){
     if(d.error){document.getElementById('ppNotasBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:#e74c3c;">'+d.error+'</td></tr>';return;}
+    var res='';
+    var materias=d.materias||[];
+    if(materias.length){
+      res+='<div class="pp-box" style="border:1px solid #e6e8f0;border-radius:10px;overflow:hidden;">';
+      res+='<table class="pp-table"><thead><tr><th>Materia</th><th>Evaluaci\u00f3n</th><th>Autoevaluaci\u00f3n</th><th>Nota final</th></tr></thead><tbody>';
+      materias.forEach(function(m){
+        res+='<tr><td>'+escHtml(m.materia)+'</td>';
+        res+='<td>'+fmtNota(m.evaluacion)+'</td>';
+        res+='<td>'+fmtNota(m.autoevaluacion)+'</td>';
+        res+='<td style="font-weight:800;color:'+(m.nota_final==null?'#999':(m.nota_final>=3.0?'#2ecc71':'#e74c3c'))+';">'+fmtNota(m.nota_final)+'</td></tr>';
+      });
+      res+='</tbody></table></div>';
+      res+='<div class="pp-prom" style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:10px 14px;background:#f8f9ff;border-radius:10px;">';
+      res+='<span style="font-weight:700;font-size:13px;">Promedio general</span>';
+      res+='<span style="font-weight:800;font-size:16px;color:'+(d.promedio_general==null?'#999':(d.promedio_general>=3.0?'#2ecc71':'#e74c3c'))+';">'+fmtNota(d.promedio_general)+'</span></div>';
+    }
+    document.getElementById('ppNotasResumen').innerHTML=res;
     var h='';
     (d.actividades||[]).forEach(function(a){
       h+='<tr><td>'+escHtml(a.nombre)+'</td><td>'+escHtml(a.tipo)+'</td><td>'+a.peso+'</td><td style="font-weight:700;color:'+(a.prom<3.0?'#e74c3c':'#2ecc71')+';">'+a.prom+'</td></tr>';
     });
+    if(!h)h='<tr><td colspan="4" style="text-align:center;color:#999;">Sin notas registradas a\u00fan.</td></tr>';
     document.getElementById('ppNotasBody').innerHTML=h;
   }).catch(function(){document.getElementById('ppNotasBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:#e74c3c;">Error</td></tr>';});
 }
+function fmtNota(v){return (v==null||v==='')?'\u2014':v;}
 function ppVerAsistencia(aid,nombre){
   document.getElementById('ppModalAsistTitle').textContent='Asistencia - '+nombre;
   document.getElementById('ppAsistBody').innerHTML='<div style="color:#999;text-align:center;">Cargando...</div>';
@@ -167,11 +240,63 @@ function ppVerComms(){
     if(d.error){document.getElementById('ppCommsBody').innerHTML='<div style="color:#e74c3c;">'+d.error+'</div>';return;}
     var h='';
     (d.comunicados||[]).forEach(function(c){
-      h+='<div class="pp-com-item"><h4>'+escHtml(c.titulo)+'</h4><p>'+escHtml(c.contenido)+'</p><div class="pp-date">'+c.created_at+'</div></div>';
+      h+='<div class="pp-com-item"><h4>'+escHtml(c.titulo)+'</h4><p>'+escHtml(c.contenido)+'</p><div class="pp-date">'+escHtml(c.fecha_creacion||'')+'</div></div>';
     });
     if(!h) h='<div style="color:#999;text-align:center;">No hay comunicados disponibles</div>';
     document.getElementById('ppCommsBody').innerHTML=h;
   }).catch(function(){document.getElementById('ppCommsBody').innerHTML='<div style="color:#e74c3c;">Error</div>';});
+}
+function ppVerHorario(aid,nombre){
+  document.getElementById('ppHorarioTitle').textContent='Horario - '+nombre;
+  document.getElementById('ppHorarioBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:#999;">Cargando...</td></tr>';
+  document.getElementById('ppModalHorario').classList.add('active');
+  fetch('/'+slug+'/portal/horario/'+aid).then(function(r){return r.json();}).then(function(d){
+    if(d.error){document.getElementById('ppHorarioBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:#e74c3c;">'+d.error+'</td></tr>';return;}
+    var h='';
+    (d.horario||[]).forEach(function(x){
+      h+='<tr><td>'+escHtml(x.dia)+'</td><td>'+escHtml(x.franja)+'</td><td>'+escHtml(x.materia)+'</td><td>'+escHtml(x.profesor||'')+'</td></tr>';
+    });
+    if(!h) h='<tr><td colspan="4" style="text-align:center;color:#999;">No hay horario publicado para este curso.</td></tr>';
+    document.getElementById('ppHorarioBody').innerHTML=h;
+  }).catch(function(){document.getElementById('ppHorarioBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:#e74c3c;">Error</td></tr>';});
+}
+function ppVerObservaciones(aid,nombre){
+  document.getElementById('ppObsTitle').textContent='Observaciones - '+nombre;
+  document.getElementById('ppObsBody').innerHTML='<div style="color:#999;text-align:center;">Cargando...</div>';
+  document.getElementById('ppModalObs').classList.add('active');
+  fetch('/'+slug+'/portal/observaciones/'+aid).then(function(r){return r.json();}).then(function(d){
+    if(d.error){document.getElementById('ppObsBody').innerHTML='<div style="color:#e74c3c;">'+d.error+'</div>';return;}
+    var h='';
+    (d.observaciones||[]).forEach(function(o){
+      h+='<div class="pp-com-item"><h4>'+escHtml(o.materia||'General')+'</h4><p>'+escHtml(o.texto)+'</p><div class="pp-date">'+escHtml(o.fecha||'')+'</div></div>';
+    });
+    if(!h) h='<div style="color:#999;text-align:center;">No hay observaciones registradas.</div>';
+    document.getElementById('ppObsBody').innerHTML=h;
+  }).catch(function(){document.getElementById('ppObsBody').innerHTML='<div style="color:#e74c3c;">Error</div>';});
+}
+function ppVerHistorial(aid,nombre){
+  document.getElementById('ppHistTitle').textContent='Historial académico - '+nombre;
+  document.getElementById('ppHistBody').innerHTML='<div style="color:#999;text-align:center;">Cargando...</div>';
+  document.getElementById('ppModalHistorial').classList.add('active');
+  fetch('/'+slug+'/portal/historial/'+aid).then(function(r){return r.json();}).then(function(d){
+    if(d.error){document.getElementById('ppHistBody').innerHTML='<div style="color:#e74c3c;">'+d.error+'</div>';return;}
+    var per=d.historial||{};
+    var periodos=per.periodos||{};
+    var totales=per.totales||{};
+    var keys=Object.keys(periodos).map(Number).sort(function(a,b){return a-b;});
+    if(!keys.length){document.getElementById('ppHistBody').innerHTML='<div style="color:#999;text-align:center;">Sin notas registradas aún.</div>';return;}
+    var h='';
+    keys.forEach(function(p){
+      h+='<div class="pp-hist-box" style="border:1px solid #eee;border-radius:10px;padding:12px 14px;margin-bottom:10px;">';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><strong>Periodo '+p+'</strong><span style="font-weight:800;color:'+(totales[p]>=3.0?'#2ecc71':'#e74c3c')+';">'+totales[p]+'</span></div>';
+      h+='<table class="pp-table"><thead><tr><th>Materia</th><th>Promedio</th></tr></thead><tbody>';
+      periodos[p].forEach(function(m){
+        h+='<tr><td>'+escHtml(m.materia)+'</td><td style="font-weight:700;color:'+(m.promedio>=3.0?'#2ecc71':'#e74c3c')+';">'+m.promedio+'</td></tr>';
+      });
+      h+='</tbody></table></div>';
+    });
+    document.getElementById('ppHistBody').innerHTML=h;
+  }).catch(function(){document.getElementById('ppHistBody').innerHTML='<div style="color:#e74c3c;">Error</div>';});
 }
 function ppCerrarModal(id){document.getElementById(id).classList.remove('active');}
 function ppLogout(){
@@ -185,5 +310,12 @@ function escJsStr(s){
   if(!s) return '';
   return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
 }
+{% if step == 'dashboard' and hijos %}
+(function(){
+  var ppPadreNombre = {{ (padre.nombre if padre else '')|tojson }};
+  document.getElementById('ppUserInfo').textContent='Bienvenido, '+ppPadreNombre;
+  renderHijos({{ hijos | tojson }});
+})();
+{% endif %}
 </script>
 {% endblock %}

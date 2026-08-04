@@ -45,4 +45,4 @@
   </div>
   <button onclick="toggleTheme()" class="btn btn-ghost sidebar-theme-btn"><i data-lucide="moon"></i> Cambiar tema</button>
 </nav>
-<script>(function(){var p=window.location.pathname.replace(/\/+$/,'');document.querySelectorAll('#sidebar .sidebar-item').forEach(function(a){var h=a.getAttribute('href').replace(/\/+$/,'');if(p===h){a.classList.add('active')}});})()</script>
+<script>(function(){var p=window.location.pathname.replace(/\/+$/,'');var best=null,bestLen=-1;document.querySelectorAll('#sidebar .sidebar-item').forEach(function(a){var h=((a.getAttribute('href')||'').split('?')[0]).replace(/\/+$/,'');if(!h)return;var s=-1;if(p===h){s=9999;}else if(p.indexOf(h+'/')===0){s=h.length;}if(s>bestLen){bestLen=s;best=a;}});if(best){best.classList.add('active');best.setAttribute('aria-current','page');}})()</script>

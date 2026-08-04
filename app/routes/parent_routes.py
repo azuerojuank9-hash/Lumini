@@ -49,8 +49,7 @@ def portal_padre_notas(slug, alumno_id):
     try:
         if not ParentService.verificar_relacion(conn, pid, alumno_id):
             return jsonify({'error': 'No autorizado'}), 403
-        actividades = ParentService.get_notas_alumno(conn, alumno_id)
-        return jsonify({'actividades': actividades})
+        return jsonify(ParentService.get_notas_alumno(conn, alumno_id))
     finally:
         conn.close()
 
@@ -83,5 +82,56 @@ def portal_padre_comms(slug):
     try:
         comunicados = ParentService.get_comunicados(conn, pid)
         return jsonify({'comunicados': comunicados})
+    finally:
+        conn.close()
+
+
+@parent_bp.route('/<slug>/portal/horario/<int:alumno_id>')
+def portal_padre_horario(slug, alumno_id):
+    fa = _fa()
+    fa.require_colegio(slug)
+    pid = session.get(f'padre_id_{slug}')
+    if not pid:
+        return jsonify({'error': 'No autorizado'}), 403
+    conn = fa.conectar(slug)
+    try:
+        if not ParentService.verificar_relacion(conn, pid, alumno_id):
+            return jsonify({'error': 'No autorizado'}), 403
+        horario = ParentService.get_horario_alumno(conn, alumno_id)
+        return jsonify({'horario': horario})
+    finally:
+        conn.close()
+
+
+@parent_bp.route('/<slug>/portal/observaciones/<int:alumno_id>')
+def portal_padre_observaciones(slug, alumno_id):
+    fa = _fa()
+    fa.require_colegio(slug)
+    pid = session.get(f'padre_id_{slug}')
+    if not pid:
+        return jsonify({'error': 'No autorizado'}), 403
+    conn = fa.conectar(slug)
+    try:
+        if not ParentService.verificar_relacion(conn, pid, alumno_id):
+            return jsonify({'error': 'No autorizado'}), 403
+        observaciones = ParentService.get_observaciones_alumno(conn, alumno_id)
+        return jsonify({'observaciones': observaciones})
+    finally:
+        conn.close()
+
+
+@parent_bp.route('/<slug>/portal/historial/<int:alumno_id>')
+def portal_padre_historial(slug, alumno_id):
+    fa = _fa()
+    fa.require_colegio(slug)
+    pid = session.get(f'padre_id_{slug}')
+    if not pid:
+        return jsonify({'error': 'No autorizado'}), 403
+    conn = fa.conectar(slug)
+    try:
+        if not ParentService.verificar_relacion(conn, pid, alumno_id):
+            return jsonify({'error': 'No autorizado'}), 403
+        historial = ParentService.get_historial_alumno(conn, alumno_id)
+        return jsonify({'historial': historial})
     finally:
         conn.close()

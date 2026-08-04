@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}Auditoría — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
@@ -37,7 +38,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 {% block content %}
 <div class="topbar">
   <h1><i data-lucide="clock-rewind" style="color:var(--accent);"></i> Auditoría</h1>
-  <div class="breadcrumb">Registro de cambios y accesos al sistema</div>
+  {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Auditoría',None)]) }}
 </div>
 
   <div class="card" style="padding:0;overflow:hidden;">

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips, breadcrumbs %}
 {% block title %}Mi Boletín — {{ alumno.nombre }}{% endblock %}
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
@@ -177,6 +177,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 {% endblock %}
 
 {% block content %}
+{{ breadcrumbs([('Mi Boletín', '/' ~ slug ~ '/estudiante'), ('Notas', None)]) }}
 <div class="est-header">
 
     <div class="est-avatar">{{ alumno.nombre[0] }}</div>
@@ -185,7 +186,7 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
       <div class="est-nombre">{{ alumno.nombre }}</div>
 
-      <div class="est-meta">Curso {{ alumno.curso }} · {{ alumno.jornada }} · {{ colegio.nombre if colegio else slug }}</div>
+      <div class="est-meta">Curso {{ alumno.curso }} · {{ alumno.jornada }} · {{ colegio.nombre if colegio else slug }} · Período {{ periodo }} de {{ num_periodos }}</div>
 
     </div>
 
@@ -242,6 +243,16 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
           <div class="stat-item" style="flex:1;padding:12px;min-width:0;">
             <div class="stat-label" style="font-size:10px;">Promedio</div>
             <div class="stat-value dval" style="font-size:1.2rem;color:{% if promedio_general is not none and promedio_general >= 3.5 %}var(--success){% elif promedio_general is not none and promedio_general >= 3.0 %}var(--warning){% else %}var(--danger){% endif %};">{{ promedio_general if promedio_general is not none else '—' }}</div>
+          </div>
+        </div>
+        <div class="stat-row" style="gap:8px;margin-bottom:0;margin-top:8px;">
+          <div class="stat-item" style="flex:1;padding:12px;min-width:0;">
+            <div class="stat-label" style="font-size:10px;">Inasistencias</div>
+            <div class="stat-value dval" style="font-size:1.2rem;color:{% if inasistencias > 0 %}var(--danger){% else %}var(--success){% endif %};">{{ inasistencias }}</div>
+          </div>
+          <div class="stat-item" style="flex:1;padding:12px;min-width:0;">
+            <div class="stat-label" style="font-size:10px;">Próximas evaluaciones</div>
+            <div class="stat-value dval" style="font-size:1.2rem;">{{ proximas_evaluaciones|length }}</div>
           </div>
         </div>
       </div>

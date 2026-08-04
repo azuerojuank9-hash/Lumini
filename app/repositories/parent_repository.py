@@ -6,10 +6,10 @@ class ParentRepository:
             (padre_id,)).fetchall()
 
     @staticmethod
-    def get_promedio_alumno(conn, alumno_id, curso):
+    def get_alumno(conn, alumno_id):
         return conn.execute(
-            'SELECT COALESCE(AVG(n.val),0) as prom FROM notas n JOIN actividades a ON a.id=n.actividad_id WHERE n.aid=? AND a.curso=?',
-            (alumno_id, curso)).fetchone()
+            'SELECT id, nombre, curso, jornada FROM alumnos WHERE id=? AND activo=1',
+            (alumno_id,)).fetchone()
 
     @staticmethod
     def get_asistencia_resumen(conn, alumno_id):
@@ -51,3 +51,19 @@ class ParentRepository:
         return conn.execute(
             'SELECT id, titulo, contenido, fecha_creacion FROM comunicaciones WHERE destinatario_tipo IN ("todo_colegio","estudiantes") AND estado="publicado" ORDER BY fecha_creacion DESC LIMIT ?',
             (limite,)).fetchall()
+
+    @staticmethod
+    def get_horario_alumno(conn, alumno_id):
+        alumno = conn.execute(
+            'SELECT curso, jornada FROM alumnos WHERE id=?', (alumno_id,)).fetchone()
+        if not alumno:
+            return []
+        return conn.execute(
+            'SELECT dia, franja, num, materia, profesor FROM horarios_curso WHERE curso=? AND jornada=? ORDER BY dia, franja',
+            (alumno['curso'], alumno['jornada'])).fetchall()
+
+    @staticmethod
+    def get_observaciones_alumno(conn, alumno_id):
+        return conn.execute(
+            'SELECT materia, texto, fecha FROM observaciones WHERE aid=? ORDER BY fecha DESC',
+            (alumno_id,)).fetchall()

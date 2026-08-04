@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}Profesores — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
@@ -30,7 +31,7 @@
 {% block content %}
 <div class="topbar">
   <h1><i data-lucide="presentation" style="color:var(--accent);"></i> Profesores</h1>
-  <div class="breadcrumb">Listado de docentes de la institución</div>
+  {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Profesores',None)]) }}
 </div>
 <div class="card" style="padding:0;overflow:hidden;">
   <div style="padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">

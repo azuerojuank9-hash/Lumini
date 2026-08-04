@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}Asistencia — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
@@ -62,7 +63,7 @@
 <div class="topbar">
   <div>
     <div class="page-title"><i data-lucide="calendar-check" style="width:20px;height:20px;vertical-align:middle;"></i> Panel de Asistencia</div>
-    <div class="page-sub">Vista general de asistencia institucional</div>
+    {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Asistencia',None)]) }}
   </div>
   <div style="display:flex;gap:8px;">
     <a href="#" onclick="exportarExcel();return false;" class="btn btn-secondary btn-sm"><i data-lucide="file-spreadsheet"></i> Excel</a>

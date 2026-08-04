@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}Reportes — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
@@ -29,7 +30,7 @@
 {% block content %}
 <div class="topbar">
   <h1><i data-lucide="bar-chart-3" style="color:var(--accent);"></i> Reportes</h1>
-  <div class="breadcrumb">Estadísticas generales de la institución</div>
+  {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Reportes',None)]) }}
 </div>
 <div class="stats-grid">
   <div class="stat-card purple">

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips, breadcrumbs %}
 {% block title %}Panel - {{ slug }}{% endblock %}
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
@@ -113,6 +113,7 @@
 {% block sidebar %}{% include "components/sidebar_teacher.html" %}{% endblock %}
 
 {% block content %}
+{{ breadcrumbs([('Panel', '/' ~ slug ~ '/dashboard'), ('Panel del Docente', None)]) }}
 <div class="page-header">
     <div>
       <h1>{% if instance == 'rector' %}Panel de Control Institucional{% else %}Panel del Docente{% endif %}</h1>

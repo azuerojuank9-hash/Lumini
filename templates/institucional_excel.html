@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
+{% block title %}Excel institucional — Lumini{% endblock %}
+
+{% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_styles %}
+:root{--import-trans:.2s cubic-bezier(.4,0,.2,1);}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
+.topbar-left h1{font-size:22px;font-weight:800;letter-spacing:-.5px;margin:0;}
+.topbar-left .breadcrumb{font-size:13px;color:var(--muted);margin-top:3px;}
+.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:28px;box-shadow:0 1px 3px rgba(0,0,0,.06);animation:fadeSlideIn .4s ease;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px;}
+.stat-card{display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.stat-icon.green{background:rgba(var(--success-rgb),.12);color:var(--success);}
+.stat-icon.blue{background:rgba(var(--accent-rgb),.12);color:var(--accent);}
+.stat-info .stat-num{font-size:20px;font-weight:800;line-height:1;}
+.stat-info .stat-label{font-size:11px;color:var(--muted);}
+.grid-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;}
+.action-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px;display:flex;flex-direction:column;gap:10px;transition:all var(--import-trans);}
+.action-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08);border-color:rgba(var(--accent-rgb),.25);}
+.action-card .ac-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(var(--accent-rgb),.25);}
+.action-card h3{margin:0;font-size:14px;font-weight:700;}
+.action-card p{margin:0;font-size:12px;color:var(--muted);line-height:1.5;flex:1;}
+.qaction{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);font-size:13px;font-weight:600;cursor:pointer;min-height:36px;text-decoration:none;font-family:'Inter',sans-serif;transition:all var(--import-trans);}
+.qaction:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(var(--accent-rgb),.3);}
+.qaction.ghost{background:transparent;color:var(--text);border:1.5px solid var(--border);}
+.qaction.ghost:hover{background:rgba(var(--accent-rgb),.06);border-color:rgba(var(--accent-rgb),.2);}
+.aviso{display:flex;gap:10px;padding:12px 16px;border-radius:var(--radius-md);font-size:12px;line-height:1.5;margin-bottom:20px;}
+.aviso.info{background:rgba(var(--accent-rgb),.08);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.2);}
+@media(max-width:640px){.dash-wrap{padding:16px;}}
+{% endblock %}
+
+{% block sidebar %}{% include "components/sidebar_" + rol + ".html" %}{% endblock %}
+
+{% block content %}
+<div class="dash-wrap">
+<div class="topbar">
+    <div class="topbar-left">
+        <h1><i data-lucide="file-spreadsheet" style="width:22px;height:22px;vertical-align:middle;"></i> Excel institucional</h1>
+        {{ breadcrumbs([('Panel', '/'~slug~'/dashboard'), ('Excel institucional', None)]) }}
+    </div>
+</div>
+
+<div class="aviso info"><i data-lucide="info" style="width:16px;height:16px;flex-shrink:0;margin-top:1px;"></i>
+  <span>Exportaciones con datos reales del colegio. Las descargas se generan en formato .xlsx compatible con Excel. Los datos institucionales solo están disponibles para rector y directora.</span>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon green"><i data-lucide="users" style="width:20px;height:20px;"></i></div>
+        <div class="stat-info"><span class="stat-num">{{ total_est }}</span><span class="stat-label">Estudiantes activos</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue"><i data-lucide="school" style="width:20px;height:20px;"></i></div>
+        <div class="stat-info"><span class="stat-num">{{ total_cursos }}</span><span class="stat-label">Cursos</span></div>
+    </div>
+</div>
+
+<div class="grid-actions">
+    <div class="action-card">
+        <div class="ac-icon"><i data-lucide="users" style="width:22px;height:22px;"></i></div>
+        <h3>Exportar estudiantes</h3>
+        <p>Lista completa de estudiantes activos con ID, nombre, curso y jornada.</p>
+        <a href="/{{ slug }}/institucional/exportar_estudiantes" class="qaction"><i data-lucide="download" style="width:16px;height:16px;"></i> Descargar .xlsx</a>
+    </div>
+    <div class="action-card">
+        <div class="ac-icon"><i data-lucide="school" style="width:22px;height:22px;"></i></div>
+        <h3>Exportar cursos</h3>
+        <p>Resumen de cursos con jornada y cantidad de estudiantes por curso.</p>
+        <a href="/{{ slug }}/institucional/exportar_cursos" class="qaction"><i data-lucide="download" style="width:16px;height:16px;"></i> Descargar .xlsx</a>
+    </div>
+    <div class="action-card">
+        <div class="ac-icon"><i data-lucide="import" style="width:22px;height:22px;"></i></div>
+        <h3>Importar estudiantes</h3>
+        <p>Agrega estudiantes en masa desde un archivo .xlsx con columna "Nombre" (y opcional "Documento").</p>
+        <a href="/{{ slug }}/institucional/importar_estudiantes" class="qaction"><i data-lucide="upload" style="width:16px;height:16px;"></i> Ir al importador</a>
+    </div>
+    {% if rol == 'rector' %}
+    <div class="action-card">
+        <div class="ac-icon"><i data-lucide="bar-chart-3" style="width:22px;height:22px;"></i></div>
+        <h3>Reportes y consultas</h3>
+        <p>Consulta tablas institucionales (alumnos, notas, asistencia, actividades) y expórtalas a Excel.</p>
+        <a href="/{{ slug }}/rector/reportes" class="qaction ghost"><i data-lucide="arrow-right" style="width:16px;height:16px;"></i> Abrir reportes</a>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

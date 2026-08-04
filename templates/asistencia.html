@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}Asistencia - {{ materia }} · LUMINI{% endblock %}
 
@@ -81,9 +82,10 @@
 <div class="topbar">
   <div class="topbar-left">
     <h1><i data-lucide="calendar-check" style="width:22px;height:22px;vertical-align:middle;"></i> Asistencia</h1>
-    <div class="breadcrumb">{{ materia }} · {{ jornada }} · {{ profesor.nombre }}</div>
+    {{ breadcrumbs([('Panel','/'~slug~'/dashboard'),('Asistencia · '~materia~' · '~jornada,None)]) }}
   </div>
   <div style="display:flex;gap:8px;align-items:center;">
+    <a href="/{{ slug }}/importar_asistencia?curso={{ curso_sel }}" class="btn btn-secondary btn-sm"><i data-lucide="upload"></i> Importar Excel</a>
     <button type="button" onclick="exportarExcel()" class="btn btn-secondary btn-sm"><i data-lucide="file-spreadsheet"></i> Excel</button>
   </div>
 </div>

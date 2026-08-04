@@ -5,6 +5,7 @@ from app.infra.grades import _promedio_ponderado
 def _excel_armar_wb(slug, prof, materia, jornada, curso_sel, periodo, actividades, alumnos):
     from openpyxl import Workbook
     from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+    from openpyxl.utils import get_column_letter
     wb = Workbook()
     ws = wb.active
     ws.title = 'Notas'
@@ -70,5 +71,5 @@ def _excel_armar_wb(slug, prof, materia, jornada, curso_sel, periodo, actividade
     ws.column_dimensions['B'].width = 35
     ws.column_dimensions['C'].width = 8
     for j in range(len(actividades)):
-        ws.column_dimensions[chr(68 + j)].width = 14
+        ws.column_dimensions[get_column_letter(4 + j)].width = 14
     return wb

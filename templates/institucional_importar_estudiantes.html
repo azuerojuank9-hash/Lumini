@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% from "components.html" import breadcrumbs %}
-{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
-{% block title %}Importar Notas — Lumini{% endblock %}
+{% block title %}Importar Estudiantes — Lumini{% endblock %}
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
 {% block extra_styles %}
@@ -13,8 +12,8 @@
 .card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;min-height:48px;}
 .card-title{font-size:13px;font-weight:700;color:var(--text);}
 .card-body{padding:16px 18px;flex:1;}
-.finput{padding:8px 12px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;transition:all var(--import-trans);width:100%;}
-.finput:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12);}
+.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:28px;box-shadow:0 1px 3px rgba(0,0,0,.06);animation:fadeSlideIn .4s ease;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
 .bsm{padding:8px 18px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;min-height:38px;transition:all var(--import-trans);display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
 .bsm:active{transform:scale(.97);}
 .badd{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);box-shadow:0 2px 8px rgba(var(--accent-rgb),.25);}
@@ -25,37 +24,33 @@
 .bgreen{background:linear-gradient(135deg,var(--success),var(--green-dark));color:var(--text-on-accent);box-shadow:0 2px 8px rgba(var(--success-rgb),.25);}
 .bgreen:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 3px 12px rgba(var(--success-rgb),.3);}
 .bgreen:disabled{opacity:.5;cursor:not-allowed;}
-.dash-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:28px;box-shadow:0 1px 3px rgba(0,0,0,.06);animation:fadeSlideIn .4s ease;}
-@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
 .qaction{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;font-family:'Inter',sans-serif;transition:all var(--import-trans);}
 .qaction:hover{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.25);color:var(--accent);transform:translateY(-1px);}
 .tw{overflow-x:auto;border-radius:0 0 var(--radius-md) var(--radius-md);border:1px solid var(--border);margin:0 -1px -1px;}
 table{border-collapse:collapse;min-width:100%;font-size:12px;}
-th{padding:8px 8px;text-align:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3);font-weight:700;vertical-align:middle;}
-td{padding:7px 6px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle;}
+th{padding:8px 10px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3);font-weight:700;}
+td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:rgba(var(--accent-rgb),.03);}
-tr:nth-child(even) td{background:rgba(var(--muted-rgb),.015);}
-.ta{text-align:left;font-weight:500;}
 .err-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:99px;font-size:10px;font-weight:700;}
 .err-badge.ok{background:rgba(var(--success-rgb),.12);color:var(--success);}
+.err-badge.warn{background:rgba(var(--warning-rgb),.15);color:var(--warning);}
 .err-badge.fail{background:rgba(var(--danger-rgb),.12);color:var(--danger);}
-.file-zone{border:2px dashed var(--border);border-radius:var(--radius-md);padding:40px 20px;text-align:center;cursor:pointer;transition:all var(--import-trans);margin-bottom:14px;background:var(--bg3);}
+.file-zone{border:2px dashed var(--border);border-radius:var(--radius-md);padding:36px 20px;text-align:center;cursor:pointer;transition:all var(--import-trans);margin-bottom:14px;background:var(--bg3);}
 .file-zone:hover{border-color:var(--accent);background:rgba(var(--accent-rgb),.04);}
 .file-zone.dragover{border-color:var(--accent);background:rgba(var(--accent-rgb),.08);border-style:solid;}
-.file-zone .icon{font-size:40px;color:var(--muted);margin-bottom:10px;}
+.file-zone .icon{font-size:36px;color:var(--muted);margin-bottom:8px;}
 .file-zone .label{font-size:14px;color:var(--text);margin-bottom:4px;font-weight:600;}
 .file-zone .hint{font-size:11px;color:var(--sub);}
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--text-on-accent);border-radius:50%;animation:spin .6s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .preview-section{display:none;}
 .preview-section.show{display:block;animation:fadeSlideIn .4s ease;}
-.errlist{list-style:none;padding:0;margin:4px 0 0;}
-.errlist li{font-size:11px;color:var(--danger);padding:2px 0;}
-.curso-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;}
-.ctab{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;min-height:36px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all var(--import-trans);}
-.ctab:hover{background:rgba(var(--accent-rgb),.06);color:var(--text);border-color:rgba(var(--accent-rgb),.2);}
-.ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);border-color:transparent;box-shadow:0 2px 8px rgba(var(--accent-rgb),.2);}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px;}
+.form-field{display:flex;flex-direction:column;gap:5px;}
+.form-field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.form-field select,.form-field input{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;min-height:38px;}
+.form-field select:focus,.form-field input:focus{outline:none;border-color:var(--accent);}
 .steps{display:flex;gap:0;margin-bottom:24px;align-items:center;}
 .step{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--muted);}
 .step.active{color:var(--accent);}
@@ -69,61 +64,67 @@ tr:nth-child(even) td{background:rgba(var(--muted-rgb),.015);}
 .toast.show{opacity:1;transform:translateY(0);}
 .toast.ok{border-left-color:var(--success);}
 .toast.err{border-left-color:var(--danger);}
-@media(max-width:640px){
-  .dash-wrap{padding:16px;}
-  .steps{flex-wrap:wrap;gap:8px;}
-  .step-line{display:none;}
-}
+@media(max-width:640px){.dash-wrap{padding:16px;}.steps{flex-wrap:wrap;gap:8px;}.step-line{display:none;}}
 {% endblock %}
 
-{% block sidebar %}{% include "components/sidebar_teacher.html" %}{% endblock %}
+{% block sidebar %}{% include "components/sidebar_" + rol + ".html" %}{% endblock %}
 
 {% block content %}
 <div class="dash-wrap">
 <div class="topbar">
     <div class="topbar-left">
-        <h1>Importar notas desde Excel</h1>
-        {{ breadcrumbs([('Panel','/'~slug~'/dashboard'),('Importar Notas · '~materia~' · '~jornada,None)]) }}
+        <h1>Importar estudiantes desde Excel</h1>
+        {{ breadcrumbs([('Panel', '/'~slug~'/dashboard'), ('Excel institucional', '/'~slug~'/institucional/excel'), ('Importar Estudiantes', None)]) }}
     </div>
     <div class="topbar-right">
-        <a href="/{{ slug }}/plantilla_notas?curso={{ curso_sel }}&periodo={{ periodo }}" class="qaction">Descargar plantilla</a>
-        <a href="/{{ slug }}/exportar_notas?curso={{ curso_sel }}&periodo={{ periodo }}" class="qaction">Exportar actual</a>
+        <a href="/{{ slug }}/institucional/exportar_estudiantes" class="qaction">Descargar plantilla (estudiantes actuales)</a>
+        <a href="/{{ slug }}/institucional/excel" class="qaction">Volver a Excel institucional</a>
     </div>
 </div>
 
 <div class="steps">
-    <div class="step active" id="step1"><span class="step-num">1</span> Seleccionar archivo</div>
+    <div class="step active" id="step1"><span class="step-num">1</span> Seleccionar curso y archivo</div>
     <div class="step-line" id="stepLine1"></div>
     <div class="step" id="step2"><span class="step-num">2</span> Previsualizar</div>
     <div class="step-line" id="stepLine2"></div>
     <div class="step" id="step3"><span class="step-num">3</span> Confirmar importación</div>
 </div>
 
-<div class="curso-tabs">
-    {% for c in mis_cursos %}
-    <a href="/{{ slug }}/importar_notas?curso={{ c }}&periodo={{ periodo }}" class="ctab{% if c == curso_sel %} active{% endif %}">{{ c }}</a>
-    {% endfor %}
-</div>
-
 <form id="uploadForm" enctype="multipart/form-data" onsubmit="return uploadFile(event)">
     <div class="card">
-        <div class="card-head">
-            <div class="card-title">Seleccionar archivo Excel</div>
-        </div>
+        <div class="card-head"><div class="card-title">Seleccionar curso, jornada y archivo</div></div>
         <div class="card-body">
+            <div class="form-grid">
+                <div class="form-field">
+                    <label>Curso</label>
+                    <select name="curso" id="cursoSel" required>
+                        <option value="">Selecciona un curso</option>
+                        {% for c in cursos %}
+                        <option value="{{ c }}">{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Jornada</label>
+                    <select name="jornada" id="jornadaSel" required>
+                        <option value="">Selecciona una jornada</option>
+                        {% for j in jornadas %}
+                        <option value="{{ j }}">{{ j }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
             <div class="file-zone" id="fileZone" onclick="document.getElementById('fileInput').click()">
-                <div class="icon"><i data-lucide="file-spreadsheet" style="width:40px;height:40px;"></i></div>
+                <div class="icon"><i data-lucide="file-spreadsheet" style="width:36px;height:36px;"></i></div>
                 <div class="label">Haz clic o arrastra un archivo .xlsx aquí</div>
-                <div class="hint">El archivo debe tener el formato oficial de LUMINI (columnas: N°, Estudiante, AID, actividades, Evaluación, Autoevaluación, Promedio)</div>
+                <div class="hint">Formato: columna "Nombre" (obligatoria). La plantilla descargable es un ejemplo válido.</div>
                 <input type="file" id="fileInput" name="archivo" accept=".xlsx" style="display:none" onchange="updateFileLabel(this)">
             </div>
             <div id="fileInfo" style="display:none;margin-bottom:10px;padding:10px 14px;background:rgba(var(--accent-rgb),.08);border-radius:var(--radius-sm);font-size:13px;"></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <input type="hidden" name="curso" value="{{ curso_sel }}">
-                <input type="hidden" name="periodo" value="{{ periodo }}">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" id="previewBtn" class="bsm badd" disabled>Previsualizar</button>
-                <button type="button" class="bsm bout" onclick="window.location.href='/{{ slug }}/'">Cancelar</button>
+                <button type="button" class="bsm bout" onclick="window.location.href='/{{ slug }}/institucional/excel'">Cancelar</button>
             </div>
         </div>
     </div>
@@ -133,15 +134,14 @@ tr:nth-child(even) td{background:rgba(var(--muted-rgb),.015);}
     <div class="card">
         <div class="card-head">
             <div class="card-title">Vista previa</div>
-            <div style="display:flex;gap:8px;align-items:center;">
-                <span id="previewSummary" style="font-size:12px;color:var(--muted);"></span>
-            </div>
+            <span id="previewSummary" style="font-size:12px;color:var(--muted);"></span>
         </div>
         <div class="card-body">
-            <div id="newActivitiesNotice" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(var(--info-rgb),.08);border-radius:var(--radius-sm);font-size:12px;color:var(--info);"></div>
-            <div class="tw" id="previewTableWrap">
-                <table id="previewTable">
-                    <thead id="previewHead"><tr></tr></thead>
+            <div class="tw">
+                <table>
+                    <thead>
+                        <tr><th>Fila</th><th>Nombre</th><th>Estado</th><th>Detalle</th></tr>
+                    </thead>
                     <tbody id="previewBody"></tbody>
                 </table>
             </div>
@@ -175,12 +175,24 @@ function updateFileLabel(inp){
   if(inp.files&&inp.files.length){
     fi.style.display='block';
     fi.textContent='Archivo: '+inp.files[0].name+' ('+(inp.files[0].size/1024).toFixed(1)+' KB)';
-    btn.disabled=false;
+    var cur=document.getElementById('cursoSel').value;
+    var jor=document.getElementById('jornadaSel').value;
+    btn.disabled=!(cur&&jor);
   }else{
     fi.style.display='none';
     btn.disabled=true;
   }
 }
+
+function checkForm(){
+  var cur=document.getElementById('cursoSel').value;
+  var jor=document.getElementById('jornadaSel').value;
+  var btn=document.getElementById('previewBtn');
+  var fi=document.getElementById('fileInput');
+  btn.disabled=!(cur&&jor&&fi.files&&fi.files.length);
+}
+document.getElementById('cursoSel').addEventListener('change',checkForm);
+document.getElementById('jornadaSel').addEventListener('change',checkForm);
 
 function uploadFile(e){
   e.preventDefault();
@@ -188,15 +200,14 @@ function uploadFile(e){
   btn.disabled=true;
   btn.innerHTML='<span class="spinner"></span> Analizando...';
   var fd=new FormData(document.getElementById('uploadForm'));
-  fetch('/{{ slug }}/importar_notas/preview',{method:'POST',body:fd})
+  fetch('/{{ slug }}/institucional/importar_estudiantes/preview',{method:'POST',body:fd})
   .then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d};});})
   .then(function(res){
     var d=res.d;
     btn.disabled=false;
     btn.textContent='Previsualizar';
     if(!res.ok||d.status==='error'){
-      var msg=d.mensaje||'Error al analizar el archivo. Verifica el formato.';
-      showToast(msg,'err');
+      showToast(d.mensaje||'Error al analizar el archivo. Verifica el formato.','err');
       return;
     }
     previewData=d;
@@ -211,45 +222,21 @@ function renderPreview(d){
   document.getElementById('step1').classList.remove('active');
   document.getElementById('stepLine1').classList.add('done');
   document.getElementById('step2').classList.add('active');
-  document.getElementById('previewSummary').textContent=d.total+' estudiantes · '+d.validos+' válidos'+(d.errores?' · '+d.errores+' errores':'');
-  var head=document.getElementById('previewHead').querySelector('tr');
-  if(!head){head=document.createElement('tr');document.getElementById('previewHead').appendChild(head);}
-  head.innerHTML='<th>Fila</th><th>Estudiante</th><th>Estado</th><th>Detalle</th>';
+  document.getElementById('previewSummary').textContent=d.total+' filas · '+d.nuevos+' nuevos · '+d.existentes+' ya existen'+(d.errores?' · '+d.errores+' errores':'');
   var body=document.getElementById('previewBody');
   body.innerHTML='';
   d.filas.forEach(function(f){
+    var badge,label;
+    if(f.estado==='nuevo'){badge='ok';label='Nuevo';}
+    else if(f.estado==='existe'){badge='warn';label='Ya existe';}
+    else{badge='fail';label='Error';}
     var tr=document.createElement('tr');
-    var det='';
-    if(f.changes){
-      var partes=[];
-      Object.keys(f.changes).forEach(function(k){
-        var ch=f.changes[k];
-        var nombre=ch.tipo==='evaluacion'?'Evaluación':ch.tipo==='autoevaluacion'?'Autoevaluación':(ch.nombre_col||'Actividad');
-        partes.push(nombre+': '+(ch.valor!==null&&ch.valor!==undefined?ch.valor:'—'));
-      });
-      if(partes.length)det=partes.join(', ');
-    }
-    tr.innerHTML='<td>'+(f.fila||'')+'</td>'+
-      '<td class="ta">'+(f.nombre||'')+'</td>'+
-      '<td><span class="err-badge '+(f.ok?'ok':'fail')+'">'+(f.ok?'Válido':'Error')+'</span></td>'+
-      '<td class="ta" style="font-size:11px;color:var(--muted);">'+(det||'')+'</td>';
-    if(f.errors&&f.errors.length){
-      var trErr=document.createElement('tr');
-      trErr.innerHTML='<td colspan="4" style="padding:2px 10px 8px;font-size:11px;color:var(--danger);text-align:left;">'+f.errors.join(' · ')+'</td>';
-      body.appendChild(tr);
-      body.appendChild(trErr);
-    }else{
-      body.appendChild(tr);
-    }
+    tr.innerHTML='<td>'+f.fila+'</td><td>'+(f.nombre||'')+'</td>'+
+      '<td><span class="err-badge '+badge+'">'+label+'</span></td>'+
+      '<td style="font-size:11px;color:var(--muted);">'+(f.errores&&f.errores.length?f.errores.join(' · '):(f.estado==='existe'?'Se omite (no duplica)':'Listo para guardar'))+'</td>';
+    body.appendChild(tr);
   });
-  var notice=document.getElementById('newActivitiesNotice');
-  if(d.nuevas_actividades&&d.nuevas_actividades.length){
-    notice.style.display='block';
-    notice.textContent='Se crearán '+d.nuevas_actividades.length+' nueva(s) actividad(es): '+d.nuevas_actividades.map(function(a){return a.nombre;}).join(', ')+'.';
-  }else{
-    notice.style.display='none';
-  }
-  document.getElementById('confirmBtn').disabled=d.errores>0;
+  document.getElementById('confirmBtn').disabled=(d.errores>0||d.nuevos===0);
   document.getElementById('previewSection').classList.add('show');
 }
 
@@ -259,11 +246,10 @@ function confirmImport(){
   btn.disabled=true;
   btn.textContent='Guardando...';
   var fd=new FormData();
+  previewData.csrf=document.querySelector('input[name="_csrf_token"]').value;
   fd.append('data',JSON.stringify(previewData));
-  fd.append('curso',document.querySelector('input[name="curso"]').value);
-  fd.append('periodo',document.querySelector('input[name="periodo"]').value);
   fd.append('_csrf_token',document.querySelector('input[name="_csrf_token"]').value);
-  fetch('/{{ slug }}/importar_notas/confirmar',{method:'POST',body:fd})
+  fetch('/{{ slug }}/institucional/importar_estudiantes/confirmar',{method:'POST',body:fd})
   .then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d};});})
   .then(function(res){
     var d=res.d;
@@ -275,9 +261,7 @@ function confirmImport(){
       showToast(d.mensaje||'Importación completada','ok');
       btn.textContent='Guardar todo';
     }else{
-      var msg=d.mensaje||'Error al guardar';
-      if(d.errores&&d.errores.length){msg=msg+' ('+d.errores[0]+')';}
-      showToast(msg,'err');
+      showToast(d.mensaje||'Error al guardar','err');
       btn.disabled=false;
       btn.textContent='Guardar todo';
     }

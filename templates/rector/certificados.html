@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% block title %}LUMINI — Certificados{% endblock %}
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
@@ -9,7 +10,7 @@
 <div class="topbar" style="align-items:flex-start;">
   <div>
     <h1><i data-lucide="file-text" style="color:var(--accent);"></i> Certificados</h1>
-    <div class="breadcrumb">Generación de documentos oficiales</div>
+    {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Certificados',None)]) }}
   </div>
 </div>
 <div class="card" style="margin-bottom:20px;">

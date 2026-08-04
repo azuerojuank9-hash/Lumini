@@ -487,6 +487,17 @@ def portal_padre_login(slug):
     fa = _import_flask_app()
     fa.require_colegio(slug)
     if request.method == 'GET':
+        pid = session.get(f'padre_id_{slug}')
+        if pid:
+            conn = fa.conectar(slug)
+            try:
+                from app.services.parent_service import ParentService
+                hijos = ParentService.get_dashboard_data(conn, pid)
+                padre = conn.execute('SELECT * FROM padres WHERE id=?', (pid,)).fetchone()
+            finally:
+                conn.close()
+            return render_template('portal_padre.html', slug=slug, colegio=fa.get_colegio(slug),
+                                   step='dashboard', hijos=hijos, padre=padre)
         return render_template('portal_padre.html', slug=slug, colegio=fa.get_colegio(slug), step='login')
     ip = request.remote_addr or '0.0.0.0'
     if fa.ip_bloqueada(ip, prefijo=f'parent_{slug}'):

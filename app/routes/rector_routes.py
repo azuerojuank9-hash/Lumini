@@ -1,8 +1,84 @@
 import json
+import logging
 from datetime import datetime
+
+from flask import Response
 
 from app.routes import rector_bp
 from app.services.channel_service import nombre_usuario_canal as _nombre_usuario_canal
+from app.services.excel_service import (
+    extension_excel_valida,
+    leer_workbook,
+    wb_desde_filas,
+    xlsx_bytes,
+)
+
+logger = logging.getLogger(__name__)
+
+MIME_XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+# Allow-list de tablas/columnas para reportes (evita inyección SQL).
+COLUMNAS_REPORTES = {
+    'alumnos': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'nombre', 'type': 'TEXT'},
+                {'name': 'curso', 'type': 'TEXT'}, {'name': 'jornada', 'type': 'TEXT'},
+                {'name': 'documento', 'type': 'TEXT'}, {'name': 'activo', 'type': 'INTEGER'}],
+    'profesores': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'nombre', 'type': 'TEXT'},
+                   {'name': 'usuario', 'type': 'TEXT'}, {'name': 'email', 'type': 'TEXT'},
+                   {'name': 'activo', 'type': 'INTEGER'}],
+    'asignaciones_materia': [{'name': 'id', 'type': 'INTEGER'},
+                             {'name': 'profesor_id', 'type': 'INTEGER'},
+                             {'name': 'materia', 'type': 'TEXT'}, {'name': 'jornada', 'type': 'TEXT'}],
+    'notas': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'aid', 'type': 'INTEGER'},
+              {'name': 'actividad_id', 'type': 'INTEGER'}, {'name': 'val', 'type': 'REAL'}],
+    'asistencia': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'aid', 'type': 'INTEGER'},
+                   {'name': 'fecha', 'type': 'TEXT'}, {'name': 'estado', 'type': 'TEXT'},
+                   {'name': 'observacion', 'type': 'TEXT'}],
+    'actividades': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'nombre', 'type': 'TEXT'},
+                    {'name': 'materia', 'type': 'TEXT'}, {'name': 'periodo', 'type': 'INTEGER'},
+                    {'name': 'curso', 'type': 'TEXT'}],
+    'comunicaciones': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'titulo', 'type': 'TEXT'},
+                       {'name': 'contenido', 'type': 'TEXT'}, {'name': 'fecha_creacion', 'type': 'TEXT'}],
+    'audit_log': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'usuario_id', 'type': 'INTEGER'},
+                  {'name': 'accion', 'type': 'TEXT'}, {'name': 'tabla', 'type': 'TEXT'},
+                  {'name': 'creado', 'type': 'TEXT'}],
+}
+
+
+def _institucional(fa, slug):
+    """Devuelve (rol, usuario) para rector o directora, o (None, None)."""
+    rector = fa.get_rector(slug)
+    if rector:
+        return 'rector', dict(rector)
+    directora = fa.get_directora(slug)
+    if directora:
+        return 'directora', dict(directora)
+    return None, None
+
+
+def _ctx_institucional(fa, rol, usuario):
+    """Variables extra que requieren los sidebars (rector o directora)."""
+    if rol == 'rector':
+        return {'rector': usuario}
+    return {'directora': usuario,
+            'curso': usuario.get('curso', ''),
+            'jornada': usuario.get('jornada', ''),
+            'periodo': 1}
+
+
+def _filtrar_columnas_reportes(tabla, columnas):
+    """Valida columnas contra el allow-list. Devuelve (col_names, error)."""
+    permitidas = COLUMNAS_REPORTES.get(tabla)
+    if not permitidas:
+        return None, 'Tabla no permitida.'
+    nombres_permitidos = {c['name'] for c in permitidas}
+    if columnas:
+        if not isinstance(columnas, list) or not columnas:
+            return None, 'Columnas inválidas.'
+        cols = [c for c in columnas if isinstance(c, str) and c in nombres_permitidos]
+        if len(cols) != len(columnas):
+            return None, 'Columna no permitida.'
+        return cols, None
+    return list(nombres_permitidos), None
 
 
 def _fa():
@@ -42,6 +118,48 @@ def rector_panel(slug):
     ultimos_profesores = [dict(r) for r in ultimos_profesores]
     proximos_eventos = conn.execute('''SELECT titulo, fecha, materia, curso, jornada FROM compromisos WHERE fecha >= ? ORDER BY fecha LIMIT 5''', (hoy,)).fetchall()
     proximos_eventos = [dict(r) for r in proximos_eventos]
+    solicitudes_pendientes = conn.execute(
+        "SELECT COUNT(*) as c FROM solicitudes_modificacion WHERE estado='pendiente' AND slug=?", (slug,)).fetchone()['c']
+    periodos_estado_raw = conn.execute('SELECT * FROM periodos_estado ORDER BY periodo').fetchall()
+    periodos_estado = {r['periodo']: dict(r) for r in periodos_estado_raw}
+    periodo_actual = 1
+    periodo_actual_estado = periodos_estado.get(periodo_actual, {}).get('estado', 'abierto')
+    prom_inst = conn.execute('SELECT ROUND(AVG(val),2) as p FROM notas').fetchone()
+    promedio_institucional = prom_inst['p'] if prom_inst and prom_inst['p'] is not None else None
+    bajo_rows = conn.execute(
+        '''SELECT a.id, a.nombre, a.curso, a.jornada, ROUND(AVG(n.val),2) as promedio
+           FROM notas n JOIN alumnos a ON a.id=n.aid
+           WHERE a.activo=1
+           GROUP BY a.id HAVING AVG(n.val) < 3.0
+           ORDER BY promedio ASC LIMIT 5''').fetchall()
+    bajo_rendimiento = [dict(r) for r in bajo_rows]
+    prom_curso_rows = conn.execute(
+        '''SELECT ac.curso, ROUND(AVG(n.val),2) as promedio
+           FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+           GROUP BY ac.curso ORDER BY ac.curso''').fetchall()
+    promedio_por_curso = [dict(r) for r in prom_curso_rows]
+    dist_rows = conn.execute(
+        '''SELECT a.id, AVG(n.val) as prom FROM notas n
+           JOIN alumnos a ON a.id=n.aid WHERE a.activo=1 GROUP BY a.id''').fetchall()
+    dist = {'bajo': 0, 'medio': 0, 'alto': 0, 'sobresaliente': 0}
+    for r in dist_rows:
+        p = r['prom']
+        if p is None:
+            continue
+        if p < 3.0:
+            dist['bajo'] += 1
+        elif p < 3.5:
+            dist['medio'] += 1
+        elif p < 4.0:
+            dist['alto'] += 1
+        else:
+            dist['sobresaliente'] += 1
+    distribucion = [
+        {'label': 'Bajo (<3.0)', 'count': dist['bajo']},
+        {'label': 'Medio (3.0–3.4)', 'count': dist['medio']},
+        {'label': 'Alto (3.5–3.9)', 'count': dist['alto']},
+        {'label': 'Sobresaliente (≥4.0)', 'count': dist['sobresaliente']},
+    ]
     conn.close()
     return fa.render_template('rector_panel.html',
                            slug=slug, colegio=colegio, rector=rector,
@@ -56,7 +174,14 @@ def rector_panel(slug):
                            actividad_reciente=actividad_reciente,
                            ultimos_estudiantes=ultimos_estudiantes,
                            ultimos_profesores=ultimos_profesores,
-                           proximos_eventos=proximos_eventos)
+                           proximos_eventos=proximos_eventos,
+                           solicitudes_pendientes=solicitudes_pendientes,
+                           periodo_actual=periodo_actual,
+                           periodo_actual_estado=periodo_actual_estado,
+                           promedio_institucional=promedio_institucional,
+                           bajo_rendimiento=bajo_rendimiento,
+                           promedio_por_curso=promedio_por_curso,
+                           distribucion=distribucion)
 
 
 @rector_bp.route('/<slug>/rector/horarios')
@@ -1339,7 +1464,7 @@ def rector_reportes_tablas(slug):
     fa.require_colegio(slug)
     if not fa.get_rector(slug):
         return fa.jsonify({'tablas': []}), 403
-    return fa.jsonify({'tablas': ['alumnos', 'profesores', 'asignaciones_materia', 'notas', 'asistencia', 'actividades', 'comunicaciones', 'audit_log']})
+    return fa.jsonify({'tablas': list(COLUMNAS_REPORTES.keys())})
 
 
 @rector_bp.route('/<slug>/reportes/columnas')
@@ -1349,17 +1474,7 @@ def rector_reportes_columnas(slug):
     if not fa.get_rector(slug):
         return fa.jsonify({'columnas': []}), 403
     tabla = fa.request.args.get('tabla', '')
-    columnas_map = {
-        'alumnos': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'nombre', 'type': 'TEXT'}, {'name': 'curso', 'type': 'TEXT'}, {'name': 'jornada', 'type': 'TEXT'}, {'name': 'activo', 'type': 'INTEGER'}],
-        'profesores': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'nombre', 'type': 'TEXT'}, {'name': 'usuario', 'type': 'TEXT'}, {'name': 'email', 'type': 'TEXT'}, {'name': 'activo', 'type': 'INTEGER'}],
-        'asignaciones_materia': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'profesor_id', 'type': 'INTEGER'}, {'name': 'materia', 'type': 'TEXT'}, {'name': 'jornada', 'type': 'TEXT'}],
-        'notas': [{'name': 'aid', 'type': 'INTEGER'}, {'name': 'actividad_id', 'type': 'INTEGER'}, {'name': 'val', 'type': 'REAL'}],
-        'asistencia': [{'name': 'aid', 'type': 'INTEGER'}, {'name': 'fecha', 'type': 'TEXT'}, {'name': 'presente', 'type': 'INTEGER'}, {'name': 'observacion', 'type': 'TEXT'}],
-        'actividades': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'nombre', 'type': 'TEXT'}, {'name': 'materia', 'type': 'TEXT'}, {'name': 'periodo', 'type': 'INTEGER'}, {'name': 'curso', 'type': 'TEXT'}],
-        'comunicaciones': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'titulo', 'type': 'TEXT'}, {'name': 'contenido', 'type': 'TEXT'}, {'name': 'fecha_creacion', 'type': 'TEXT'}],
-        'audit_log': [{'name': 'id', 'type': 'INTEGER'}, {'name': 'accion', 'type': 'TEXT'}, {'name': 'tabla', 'type': 'TEXT'}, {'name': 'creado', 'type': 'TEXT'}],
-    }
-    return fa.jsonify({'columnas': columnas_map.get(tabla, [])})
+    return fa.jsonify({'columnas': COLUMNAS_REPORTES.get(tabla, [])})
 
 
 @rector_bp.route('/<slug>/reportes/ejecutar', methods=['POST'])
@@ -1372,17 +1487,254 @@ def rector_reportes_ejecutar(slug):
         return fa.jsonify({'status': 'error', 'error': 'CSRF'}), 400
     data = fa.request.get_json(silent=True) or {}
     tabla = data.get('tabla', '')
-    columnas = data.get('campos', data.get('columnas', []))
-    if not tabla:
-        return fa.jsonify({'status': 'error', 'error': 'Tabla requerida'}), 400
+    col_names, err = _filtrar_columnas_reportes(
+        tabla, data.get('campos', data.get('columnas', [])))
+    if err:
+        return fa.jsonify({'status': 'error', 'error': err}), 400
+    cols_sql = ', '.join(col_names)
     conn = fa.conectar(slug)
     try:
-        cols = ', '.join(columnas) if columnas else '*'
-        col_names = columnas if columnas else [d[0] for d in conn.execute(f'SELECT * FROM {tabla} LIMIT 1').description]
-        filas_raw = conn.execute(f'SELECT {cols} FROM {tabla} LIMIT 200').fetchall()
+        filas_raw = conn.execute(f'SELECT {cols_sql} FROM {tabla} LIMIT 500').fetchall()
         filas = [[row[c] for c in col_names] for row in filas_raw]
         return fa.jsonify({'columnas': col_names, 'filas': filas, 'total': len(filas)})
     except Exception as e:
         return fa.jsonify({'error': str(e)}), 400
     finally:
         conn.close()
+
+
+@rector_bp.route('/<slug>/reportes/exportar_excel', methods=['POST'])
+def rector_reportes_exportar_excel(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    rol, usuario = _institucional(fa, slug)
+    if not rol:
+        return fa.jsonify({'status': 'error', 'mensaje': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'status': 'error', 'mensaje': 'Error CSRF'}), 403
+    data = fa.request.get_json(silent=True) or {}
+    tabla = data.get('tabla', '')
+    col_names, err = _filtrar_columnas_reportes(
+        tabla, data.get('campos', data.get('columnas', [])))
+    if err:
+        return fa.jsonify({'status': 'error', 'mensaje': err}), 400
+    cols_sql = ', '.join(col_names)
+    conn = fa.conectar(slug)
+    try:
+        filas_raw = conn.execute(f'SELECT {cols_sql} FROM {tabla} LIMIT 5000').fetchall()
+        filas = [[row[c] for c in col_names] for row in filas_raw]
+    except Exception:
+        return fa.jsonify({'status': 'error', 'mensaje': 'Error al consultar la tabla.'}), 400
+    finally:
+        conn.close()
+    wb = wb_desde_filas(col_names, filas, tabla[:28])
+    fname = f'reporte_{tabla}_{slug}.xlsx'
+    return Response(xlsx_bytes(wb), mimetype=MIME_XLSX,
+                    headers={'Content-Disposition': f'attachment; filename="{fname}"'})
+
+
+# ── Excel institucional (rector y directora) ──
+
+@rector_bp.route('/<slug>/institucional/excel')
+def institucional_excel(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    rol, usuario = _institucional(fa, slug)
+    if not rol:
+        return fa.redirect(fa.url_for('auth.login', slug=slug))
+    colegio = fa.get_colegio(slug)
+    conn = fa.conectar(slug)
+    total_est = conn.execute('SELECT COUNT(*) as c FROM alumnos WHERE activo=1').fetchone()['c']
+    total_cursos = len(conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1').fetchall())
+    conn.close()
+    return fa.render_template('institucional_excel.html', slug=slug, colegio=colegio, rol=rol,
+                              **_ctx_institucional(fa, rol, usuario),
+                              total_est=total_est, total_cursos=total_cursos,
+                              notif_count=fa.notificaciones_no_leidas(slug, rol, usuario['id']))
+
+
+@rector_bp.route('/<slug>/institucional/importar_estudiantes', methods=['GET'])
+def institucional_importar_estudiantes(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    rol, usuario = _institucional(fa, slug)
+    if not rol:
+        return fa.redirect(fa.url_for('auth.login', slug=slug))
+    colegio = fa.get_colegio(slug)
+    conn = fa.conectar(slug)
+    cursos = [r['curso'] for r in conn.execute(
+        'SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()]
+    jornadas = [r['jornada'] for r in conn.execute(
+        'SELECT DISTINCT jornada FROM alumnos WHERE activo=1 ORDER BY jornada').fetchall()]
+    conn.close()
+    return fa.render_template('institucional_importar_estudiantes.html', slug=slug,
+                              colegio=colegio, rol=rol, cursos=cursos, jornadas=jornadas,
+                              **_ctx_institucional(fa, rol, usuario),
+                              notif_count=fa.notificaciones_no_leidas(slug, rol, usuario['id']))
+
+
+@rector_bp.route('/<slug>/institucional/importar_estudiantes/preview', methods=['POST'])
+def institucional_importar_estudiantes_preview(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    rol, usuario = _institucional(fa, slug)
+    if not rol:
+        return fa.jsonify({'status': 'error', 'mensaje': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'status': 'error', 'mensaje': 'Error CSRF'}), 403
+    curso = fa.request.form.get('curso', '').strip()
+    jornada = fa.request.form.get('jornada', '').strip()
+    if not curso or not jornada:
+        return fa.jsonify({'status': 'error', 'mensaje': 'Curso y jornada son obligatorios.'}), 400
+    if 'archivo' not in fa.request.files:
+        return fa.jsonify({'status': 'error', 'mensaje': 'No se envió ningún archivo.'}), 400
+    archivo = fa.request.files['archivo']
+    if not archivo.filename or not extension_excel_valida(archivo.filename):
+        return fa.jsonify({'status': 'error', 'mensaje': 'El archivo debe ser .xlsx.'}), 400
+    try:
+        headers, filas = leer_workbook(archivo.read())
+    except ValueError as e:
+        return fa.jsonify({'status': 'error', 'mensaje': str(e)}), 400
+    idx_nombre = None
+    for i, h in enumerate(headers):
+        hl = h.lower()
+        if any(k in hl for k in ('nombre', 'name', 'estudiante', 'alumno')):
+            if idx_nombre is None:
+                idx_nombre = i
+    if idx_nombre is None:
+        return fa.jsonify({'status': 'error',
+                           'mensaje': 'No se encontró una columna "Nombre" en el archivo.'}), 400
+    conn = fa.conectar(slug)
+    try:
+        existentes = conn.execute(
+            'SELECT id, nombre FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
+            (curso, jornada)).fetchall()
+        existentes_by_nombre = {
+            r['nombre'].strip().lower(): r for r in existentes if r['nombre']
+        }
+        preview_rows = []
+        seen = set()
+        for nro, vals in filas:
+            nombre = str(vals[idx_nombre]).strip() if idx_nombre < len(vals) else ''
+            errores = []
+            if not nombre:
+                estado = 'error'
+                errores.append('nombre vacío')
+            else:
+                nl = nombre.lower()
+                if nl in seen:
+                    estado = 'error'
+                    errores.append('duplicado en el archivo')
+                elif nl in existentes_by_nombre:
+                    estado = 'existe'
+                else:
+                    estado = 'nuevo'
+                    seen.add(nl)
+            preview_rows.append({'fila': nro, 'nombre': nombre,
+                                 'estado': estado, 'errores': errores})
+        nuevos = sum(1 for r in preview_rows if r['estado'] == 'nuevo')
+        exist = sum(1 for r in preview_rows if r['estado'] == 'existe')
+        errores_count = sum(1 for r in preview_rows if r['estado'] == 'error')
+        return fa.jsonify({'status': 'ok', 'curso': curso, 'jornada': jornada,
+                           'filas': preview_rows, 'nuevos': nuevos, 'existentes': exist,
+                           'errores': errores_count, 'total': len(preview_rows)})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/institucional/importar_estudiantes/confirmar', methods=['POST'])
+def institucional_importar_estudiantes_confirmar(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    rol, usuario = _institucional(fa, slug)
+    if not rol:
+        return fa.jsonify({'status': 'error', 'mensaje': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'status': 'error', 'mensaje': 'Error CSRF'}), 403
+    data_json = fa.request.form.get('data', '')
+    if not data_json:
+        return fa.jsonify({'status': 'error', 'mensaje': 'No hay datos para guardar.'}), 400
+    try:
+        data = json.loads(data_json)
+    except (json.JSONDecodeError, TypeError):
+        return fa.jsonify({'status': 'error', 'mensaje': 'Datos inválidos.'}), 400
+    curso = data.get('curso', '').strip()
+    jornada = data.get('jornada', '').strip()
+    filas = data.get('filas', [])
+    if not curso or not jornada:
+        return fa.jsonify({'status': 'error', 'mensaje': 'Curso y jornada son obligatorios.'}), 400
+    if not filas:
+        return fa.jsonify({'status': 'error', 'mensaje': 'No hay filas para importar.'}), 400
+    conn = fa.conectar(slug)
+    try:
+        insertados = 0
+        for f in filas:
+            if f.get('estado') != 'nuevo':
+                continue
+            nombre = str(f.get('nombre', '')).strip()
+            if not nombre:
+                continue
+            existe = conn.execute(
+                'SELECT id FROM alumnos WHERE nombre=? AND curso=? AND jornada=? AND activo=1',
+                (nombre, curso, jornada)).fetchone()
+            if existe:
+                continue
+            cur = conn.execute(
+                'INSERT INTO alumnos (nombre, curso, jornada, activo) VALUES (?,?,?,1)',
+                (nombre, curso, jornada))
+            nuevo_id = cur.lastrowid
+            conn.commit()
+            fa.audit_log(slug, usuario['id'], 'importar_estudiantes', 'alumnos', nuevo_id,
+                         valor_nuevo={'nombre': nombre, 'curso': curso, 'jornada': jornada})
+            insertados += 1
+        conn.commit()
+    except Exception as e:
+        conn.close()
+        logger.error('Error confirmando importación de estudiantes: %s', e)
+        return fa.jsonify({'status': 'error', 'mensaje': 'Error al guardar. Intenta de nuevo.'}), 500
+    conn.close()
+    return fa.jsonify({'status': 'ok',
+                       'mensaje': f'Importación completada. {insertados} estudiante(s) agregado(s).',
+                       'insertados': insertados})
+
+
+@rector_bp.route('/<slug>/institucional/exportar_estudiantes')
+def institucional_exportar_estudiantes(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    rol, usuario = _institucional(fa, slug)
+    if not rol:
+        return fa.redirect(fa.url_for('auth.login', slug=slug))
+    conn = fa.conectar(slug)
+    try:
+        alumnos = conn.execute(
+            'SELECT id, nombre, curso, jornada FROM alumnos '
+            'WHERE activo=1 ORDER BY curso, nombre COLLATE NOCASE').fetchall()
+    finally:
+        conn.close()
+    filas = [[a['id'], a['nombre'], a['curso'], a['jornada']] for a in alumnos]
+    wb = wb_desde_filas(['ID', 'Nombre', 'Curso', 'Jornada'], filas, 'Estudiantes')
+    fname = f'estudiantes_{slug}.xlsx'
+    return Response(xlsx_bytes(wb), mimetype=MIME_XLSX,
+                    headers={'Content-Disposition': f'attachment; filename="{fname}"'})
+
+
+@rector_bp.route('/<slug>/institucional/exportar_cursos')
+def institucional_exportar_cursos(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    rol, usuario = _institucional(fa, slug)
+    if not rol:
+        return fa.redirect(fa.url_for('auth.login', slug=slug))
+    conn = fa.conectar(slug)
+    try:
+        filas_raw = conn.execute(
+            'SELECT curso, jornada, COUNT(*) as n FROM alumnos WHERE activo=1 '
+            'GROUP BY curso, jornada ORDER BY curso, jornada').fetchall()
+    finally:
+        conn.close()
+    filas = [[r['curso'], r['jornada'], r['n']] for r in filas_raw]
+    wb = wb_desde_filas(['Curso', 'Jornada', 'Estudiantes'], filas, 'Cursos')
+    fname = f'cursos_{slug}.xlsx'
+    return Response(xlsx_bytes(wb), mimetype=MIME_XLSX,
+                    headers={'Content-Disposition': f'attachment; filename="{fname}"'})

@@ -10,6 +10,11 @@ from flask import Blueprint, Response, jsonify, redirect, render_template, reque
 
 from app.infra.attendance import _asistencia_stats
 from app.repositories.notification_repository import get_notificaciones_no_leidas_count
+from app.services.excel_service import (
+    extension_excel_valida,
+    leer_workbook,
+    revalidar_importacion_notas,
+)
 from app.utils.security import extension_permitida, validar_csrf
 
 logger = logging.getLogger(__name__)
@@ -40,6 +45,7 @@ def _session(slug):
 def _excel_armar_wb(slug, prof, materia, jornada, curso_sel, periodo, actividades, alumnos):
     from openpyxl import Workbook
     from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+    from openpyxl.utils import get_column_letter
 
     from app.repositories.grade_repository import get_all_evaluaciones_for_curso, get_all_notas_for_curso
     from app.services.grade_service import promedio_ponderado
@@ -97,7 +103,7 @@ def _excel_armar_wb(slug, prof, materia, jornada, curso_sel, periodo, actividade
     ws.column_dimensions['B'].width = 35
     ws.column_dimensions['C'].width = 8
     for j in range(len(actividades)):
-        ws.column_dimensions[chr(68 + j)].width = 14
+        ws.column_dimensions[get_column_letter(4 + j)].width = 14
     return wb
 
 
@@ -1436,6 +1442,17 @@ def importar_notas_confirmar(slug):
         return jsonify({'status':'error','mensaje':'Hay errores que deben corregirse primero'}), 400
     conn = f.conectar(slug)
     try:
+        ok_rev, errores_rev = revalidar_importacion_notas(
+            data, conn, prof, materia, jornada, curso_sel, periodo)
+    except Exception as e:
+        conn.close()
+        logger.error(f'Error revalidando importacion: {e}')
+        return jsonify({'status':'error','mensaje':'Error al validar los datos. Intenta de nuevo.'}), 500
+    if not ok_rev:
+        conn.close()
+        return jsonify({'status':'error','mensaje':'Hay errores que deben corregirse primero',
+                        'errores': errores_rev[:20]}), 400
+    try:
         new_act_names = {}
         for na in data.get('nuevas_actividades', []):
             conn.execute(
@@ -1466,6 +1483,7 @@ def importar_notas_confirmar(slug):
                                 (aid, act_id, ch['valor']))
                         elif existing:
                             conn.execute('DELETE FROM notas WHERE aid=? AND actividad_id=?', (aid, act_id))
+                        conn.commit()
                         f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'notas', aid,
                                      curso_sel, materia, periodo,
                                      campo='nota', actividad_id=act_id,
@@ -1489,6 +1507,7 @@ def importar_notas_confirmar(slug):
                             conn.execute(
                                 'UPDATE evaluaciones SET evaluacion=NULL WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?',
                                 (aid, prof['id'], materia, jornada, periodo))
+                        conn.commit()
                         f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'evaluaciones', aid,
                                      curso_sel, materia, periodo, campo='evaluacion',
                                      valor_anterior=old_val, valor_nuevo=ch['valor'],
@@ -1511,6 +1530,7 @@ def importar_notas_confirmar(slug):
                             conn.execute(
                                 'UPDATE evaluaciones SET autoevaluacion=NULL WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?',
                                 (aid, prof['id'], materia, jornada, periodo))
+                        conn.commit()
                         f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'evaluaciones', aid,
                                      curso_sel, materia, periodo, campo='autoevaluacion',
                                      valor_anterior=old_val, valor_nuevo=ch['valor'],
@@ -1563,18 +1583,21 @@ def migrar_excel_analizar(slug):
     if 'archivo' not in request.files:
         return jsonify({'status':'error','mensaje':'No se envio ningun archivo'}), 400
     archivo = request.files['archivo']
-    if not archivo.filename or not extension_permitida(archivo.filename):
+    if not archivo.filename or not extension_excel_valida(archivo.filename):
         return jsonify({'status':'error','mensaje':'Formato no valido. Usa .xlsx'}), 400
     import os
     import tempfile
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx')
     try:
         archivo.save(tmp.name)
+        tmp.close()
         import openpyxl
         wb = openpyxl.load_workbook(tmp.name, read_only=True, data_only=True)
         ws = wb.active
         rows = list(ws.iter_rows(values_only=True))
         wb.close()
+        if len(rows) > 2001:
+            return jsonify({'status':'error','mensaje':'El archivo tiene demasiadas filas (max 2000).'}), 400
         if len(rows) < 2:
             return jsonify({'status':'error','mensaje':'El archivo debe tener al menos una fila de encabezados y una fila de datos'}), 400
         encabezados = [str(c).strip() if c is not None else '' for c in rows[0]]
@@ -3266,6 +3289,8 @@ def migrar_previsualizar(slug):
     prof = f.get_profesor(slug)
     if not prof:
         return jsonify({'error': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'error': 'Error CSRF'}), 403
     data = request.get_json(silent=True) or {}
     contenido = data.get('contenido', '')
     tipo = data.get('tipo', 'estudiantes')
@@ -3287,6 +3312,8 @@ def migrar_ejecutar(slug):
     prof = f.get_profesor(slug)
     if not prof:
         return jsonify({'error': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'error': 'Error CSRF'}), 403
     data = request.get_json(silent=True) or {}
     contenido = data.get('contenido', '')
     tipo = data.get('tipo', 'estudiantes')

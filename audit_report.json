@@ -1,8 +1,8 @@
 {
-  "ok": 88,
-  "redirect": 11,
-  "fail": 20,
-  "total_pages": 119,
+  "ok": 89,
+  "redirect": 10,
+  "fail": 19,
+  "total_pages": 118,
   "errors": [
     "[HTTP 405] Rector Registrar: /testcolegio/rector/registrar",
     "[HTTP 405] Directora Registrar: /testcolegio/directora/registrar_directo",
@@ -22,7 +22,6 @@
     "[HTTP 400] Teacher Curso Analitica: /testcolegio/curso/analitica",
     "[HTTP 400] Teacher Curso Ranking: /testcolegio/curso/ranking",
     "[HTTP 405] Teacher Validar: /testcolegio/validar",
-    "[HTTP 405] Teacher Actividad 1: /testcolegio/actividades/1",
-    "[REDIRECT] Student Dashboard: /testcolegio/estudiante -> 302 -> /testcolegio/login"
+    "[HTTP 405] Teacher Actividad 1: /testcolegio/actividades/1"
   ]
 }

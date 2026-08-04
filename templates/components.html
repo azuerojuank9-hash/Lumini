@@ -177,3 +177,9 @@
   {% endfor %}
 </div>
 {% endmacro %}
+
+{% macro breadcrumbs(items) %}
+<nav class="breadcrumb" aria-label="Ruta de navegación">
+  {% for label, url in items %}{% if url %}<a href="{{ url }}">{{ label }}</a>{% else %}<span class="current">{{ label }}</span>{% endif %}{% if not loop.last %}<span class="sep" aria-hidden="true">›</span>{% endif %}{% endfor %}
+</nav>
+{% endmacro %}

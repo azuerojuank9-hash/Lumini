@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}Cursos — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
@@ -31,7 +32,7 @@
 {% block content %}
 <div class="topbar">
   <h1><i data-lucide="book" style="color:var(--accent);"></i> Cursos</h1>
-  <div class="breadcrumb">Vista general de los cursos de la institución</div>
+  {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Cursos',None)]) }}
 </div>
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
   <span style="font-size:12px;color:var(--muted);">{{ total }} curso{{ 's' if total != 1 }}</span>

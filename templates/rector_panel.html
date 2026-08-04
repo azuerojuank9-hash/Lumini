@@ -3,6 +3,7 @@
 {% block title %}Rector — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
+{% block extra_head %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>{% endblock %}
 {% block extra_styles %}
 html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
@@ -87,18 +88,13 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
         <div class="icon-wrap"><i data-lucide="graduation-cap" style="width:20px;height:20px;"></i></div>
         <div class="dval {% if total_estudiantes == 0 and total_estudiantes is not none %}na{% endif %}">{{ total_estudiantes if total_estudiantes > 0 else '--' }}</div>
         <div class="dlabel">Estudiantes</div>
-        <div class="dash-trend up">+{{ (total_estudiantes * 0.05)|int if total_estudiantes > 0 else 0 }} vs mes ant.</div>
-        <div class="dtag">activos en el sistema</div>
+        <div class="dtag">activos en el sistema · {{ ((total_estudiantes / total_cursos)|round(1)) if total_cursos > 0 else '—' }} por curso</div>
     </div>
     <div class="dash-card blue">
         <div class="icon-wrap"><i data-lucide="chalkboard-teacher" style="width:20px;height:20px;"></i></div>
         <div class="dval {% if total_profesores == 0 %}na{% endif %}">{{ total_profesores if total_profesores > 0 else '--' }}</div>
         <div class="dlabel">Profesores</div>
-        <div class="dtag">activos</div>
-        <div class="dash-progress">
-            <div class="dp-label"><span>Ocupación</span><span>{{ (total_profesores / total_cursos * 100)|round|int if total_cursos > 0 else 0 }}%</span></div>
-            <div class="dp-bar"><div class="dp-fill" style="width:{{ (total_profesores / total_cursos * 100)|round|int if total_cursos > 0 else 0 }}%;"></div></div>
-        </div>
+        <div class="dtag">activos · {{ ((total_materias / total_profesores)|round(1)) if total_profesores > 0 else '—' }} materias por prof.</div>
     </div>
     <div class="dash-card green">
         <div class="icon-wrap"><i data-lucide="book" style="width:20px;height:20px;"></i></div>
@@ -106,19 +102,14 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
         <div class="dlabel">Cursos</div>
         <div class="dtag">en la institución</div>
         <div class="dash-footer">
-            <span style="font-size:10px;color:var(--sub);">{{ total_materias if total_materias > 0 else 0 }} materias</span>
-            <span class="trend-badge up">+{{ (total_cursos * 0.1)|int if total_cursos > 0 else 0 }}</span>
+            <span style="font-size:10px;color:var(--sub);">{{ total_materias if total_materias > 0 else 0 }} materias asignadas</span>
         </div>
     </div>
     <div class="dash-card orange">
         <div class="icon-wrap"><i data-lucide="beaker" style="width:20px;height:20px;"></i></div>
         <div class="dval {% if total_materias == 0 %}na{% endif %}">{{ total_materias if total_materias > 0 else '--' }}</div>
         <div class="dlabel">Materias</div>
-        <div class="dtag">asignadas</div>
-        <div class="dash-progress">
-            <div class="dp-label"><span>Cobertura</span><span>{{ (total_materias / 20 * 100)|round|int if total_materias > 0 else 0 }}%</span></div>
-            <div class="dp-bar orange"><div class="dp-fill" style="width:{{ (total_materias / 20 * 100)|round|int if total_materias > 0 else 0 }}%;"></div></div>
-        </div>
+        <div class="dtag">asignadas · {{ ((total_materias / total_cursos)|round(1)) if total_cursos > 0 else '—' }} por curso</div>
     </div>
     <div class="dash-card teal">
         <div class="icon-wrap"><i data-lucide="users" style="width:20px;height:20px;"></i></div>
@@ -136,6 +127,30 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
             <span style="font-size:10px;color:var(--sub);">{{ asis_pct_r }}% del total</span>
         </div>
     </div>
+    <a href="/{{ slug }}/rector/solicitudes" class="dash-card orange" style="text-decoration:none;">
+        <div class="icon-wrap"><i data-lucide="clipboard-list" style="width:20px;height:20px;"></i></div>
+        <div class="dval {% if solicitudes_pendientes == 0 %}na{% endif %}">{{ solicitudes_pendientes if solicitudes_pendientes > 0 else '0' }}</div>
+        <div class="dlabel">Solicitudes pendientes</div>
+        <div class="dtag">de modificación de notas</div>
+    </a>
+    <a href="/{{ slug }}/rector/configuracion" class="dash-card {% if periodo_actual_estado == 'abierto' %}green{% else %}pink{% endif %}" style="text-decoration:none;">
+        <div class="icon-wrap"><i data-lucide="calendar-range" style="width:20px;height:20px;"></i></div>
+        <div class="dval" style="font-size:1.1rem;">{{ 'Abierto' if periodo_actual_estado == 'abierto' else 'Cerrado' }}</div>
+        <div class="dlabel">Período {{ periodo_actual }}</div>
+        <div class="dtag">estado académico actual</div>
+    </a>
+    <a href="#charts-rector" class="dash-card purple" style="text-decoration:none;">
+        <div class="icon-wrap"><i data-lucide="target" style="width:20px;height:20px;"></i></div>
+        <div class="dval {% if promedio_institucional is none %}na{% endif %}">{{ promedio_institucional if promedio_institucional is not none else '--' }}</div>
+        <div class="dlabel">Promedio institucional</div>
+        <div class="dtag">de notas registradas</div>
+    </a>
+    <a href="#bajo-rendimiento" class="dash-card pink" style="text-decoration:none;">
+        <div class="icon-wrap"><i data-lucide="alert-triangle" style="width:20px;height:20px;"></i></div>
+        <div class="dval {% if bajo_rendimiento|length == 0 %}na{% endif %}">{{ bajo_rendimiento|length if bajo_rendimiento|length > 0 else '0' }}</div>
+        <div class="dlabel">Bajo rendimiento</div>
+        <div class="dtag">estudiantes con promedio &lt; 3.0</div>
+    </a>
 </div>
 
 <div class="btn-group" style="gap:8px;flex-wrap:wrap;margin-bottom:12px;">
@@ -324,6 +339,73 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
                 <span class="summary-item"><span class="dot dot-teal"></span> {{ total_directoras if total_directoras > 0 else 0 }} directores</span>
                 <span class="summary-item"><span class="dot dot-danger"></span> {{ asistencia_hoy if asistencia_hoy > 0 else 0 }} asistencias hoy</span>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="dash-modules fade-in" id="charts-rector">
+    <div class="dash-module">
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="pie-chart" style="width:14px;height:14px;"></i></span>
+            Distribución de rendimiento
+        </div>
+        <div class="dash-module-body" style="padding:16px;">
+            {% if distribucion|selectattr('count','gt',0)|list %}
+            <canvas id="chartDistRector" style="height:220px;"></canvas>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;font-size:11px;">
+                {% for d in distribucion %}
+                <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:3px;display:inline-block;"></span> {{ d.label }}: <strong>{{ d.count }}</strong></span>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state" style="min-height:90px;padding:18px;">
+                <div class="empty-title" style="font-size:13px;">No hay datos suficientes para generar esta gráfica.</div>
+                <div class="empty-desc">No hay notas registradas con las que calcular la distribución del rendimiento.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="dash-module">
+        <div class="dash-module-head">
+            <span class="icon"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i></span>
+            Promedio por curso
+        </div>
+        <div class="dash-module-body" style="padding:16px;">
+            {% if promedio_por_curso %}
+            <canvas id="chartCursoRector" style="height:220px;"></canvas>
+            {% else %}
+            <div class="empty-state" style="min-height:90px;padding:18px;">
+                <div class="empty-title" style="font-size:13px;">No hay datos suficientes para generar esta gráfica.</div>
+                <div class="empty-desc">Aún no hay notas registradas en ningún curso.</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="fade-in" id="bajo-rendimiento" style="margin-top:16px;">
+    <div class="card">
+        <div class="card-head">
+            <i data-lucide="alert-triangle"></i>
+            Estudiantes con bajo rendimiento
+            <a href="/{{ slug }}/rector/estudiantes" class="see-all" style="margin-left:auto;">Ver todos</a>
+        </div>
+        <div class="card-body" style="padding:8px 16px 16px;">
+            {% if bajo_rendimiento %}
+            <div style="display:flex;flex-direction:column;gap:6px;">
+                {% for e in bajo_rendimiento %}
+                <div class="activity-item">
+                    <div class="av pink"><i data-lucide="alert-triangle" style="width:12px;height:12px;"></i></div>
+                    <div class="act-content">
+                        <div class="act-text">{{ e.nombre }} <span style="color:var(--muted);font-size:11px;">· {{ e.curso }} · {{ e.jornada }}</span></div>
+                        <div class="act-meta">Promedio <strong style="color:var(--danger);">{{ e.promedio }}</strong></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            {{ empty_state('check', 'Sin bajo rendimiento', 'No hay estudiantes con promedio inferior a 3.0 en las notas registradas.') }}
+            {% endif %}
         </div>
     </div>
 </div>
@@ -896,6 +978,23 @@ function exportarReporteCSV(){
     link.download='reporte_'+document.getElementById('rptTabla').value+'.csv';
     link.click();
 }
+// ── P6: Gráficas del panel (datos reales) ──
+var RECTOR_DIST = {{ distribucion | tojson | safe }};
+var RECTOR_CURSO = {{ promedio_por_curso | tojson | safe }};
+function renderRectorCharts(){
+    if(typeof Chart==='undefined') return;
+    var c1=document.getElementById('chartDistRector');
+    if(c1){
+        var tot=RECTOR_DIST.reduce(function(s,d){return s+d.count;},0);
+        var palette=['rgba(231,76,60,.75)','rgba(230,126,34,.75)','rgba(241,196,15,.75)','rgba(46,204,113,.75)'];
+        new Chart(c1,{type:'bar',data:{labels:RECTOR_DIST.map(function(d){return d.label;}),datasets:[{label:'Estudiantes',data:RECTOR_DIST.map(function(d){return d.count;}),backgroundColor:palette,borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});
+    }
+    var c2=document.getElementById('chartCursoRector');
+    if(c2){
+        new Chart(c2,{type:'bar',data:{labels:RECTOR_CURSO.map(function(d){return d.curso;}),datasets:[{label:'Promedio',data:RECTOR_CURSO.map(function(d){return d.promedio;}),backgroundColor:'rgba(var(--accent-rgb),.6)',borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:5,grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});
+    }
+}
+document.addEventListener('DOMContentLoaded',renderRectorCharts);
 function escHtml(s){
     if(!s) return '';
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');

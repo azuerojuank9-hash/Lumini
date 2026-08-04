@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}Gestión de Rectores — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
@@ -42,7 +43,7 @@
 <div class="topbar">
   <div class="topbar-left">
     <h1>Gestión de Rectores</h1>
-    <div class="breadcrumb">Administra las cuentas de rector del colegio</div>
+    {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Gestión de Rectores',None)]) }}
   </div>
   <div class="topbar-actions">
     <a href="/{{ slug }}/rector/gestion-rectores" class="btn btn-outline {% if not crear and not editar %}active{% endif %}"><i data-lucide="list"></i> Listado</a>

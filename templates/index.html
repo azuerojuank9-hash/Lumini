@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% block title %}Lumini  {{ colegio.nombre if colegio else slug }}{% endblock %}
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
@@ -84,25 +85,25 @@ body .main{padding-top:14px!important;padding-bottom:14px!important;}
 table{border-collapse:collapse;min-width:100%;font-size:12px;width:100%;}
 thead{position:relative;}
 th{padding:4px 6px;text-align:center;color:var(--sub);font-size:10px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3);position:sticky;top:0;font-weight:700;vertical-align:middle;}
-th.tnombre{text-align:left;min-width:140px;padding-left:10px;}
+th.tnombre{text-align:left;min-width:200px;padding-left:10px;}
 td{padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle;font-size:12px;line-height:1.5;}
 tr:last-child td{border-bottom:none;}
 tr:nth-child(even) td{background:rgba(var(--muted-rgb),.015);}
 tr:hover td{background:rgba(var(--accent-rgb),.03)!important;}
 .tnum{color:var(--muted);font-size:10px;width:36px;font-weight:600;}
-.tnombrecell{text-align:left;font-weight:600;cursor:pointer;font-size:12px;padding-left:8px;}
+.tnombrecell{text-align:left;font-weight:600;cursor:pointer;font-size:13px;padding-left:8px;}
 .tnombrecell:hover{color:var(--accent);}
-.ni{width:38px;padding:2px 0;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text);font-size:13px;text-align:center;font-family:'Inter',sans-serif;transition:border-color .15s ease-out,background .15s ease-out;caret-color:var(--accent);-moz-appearance:textfield;line-height:1.5;font-weight:500;border-radius:2px;}
+.ni{width:50px;padding:3px 0;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text);font-size:14px;text-align:center;font-family:'Inter',sans-serif;transition:border-color .15s ease-out,background .15s ease-out;caret-color:var(--accent);-moz-appearance:textfield;line-height:1.5;font-weight:500;border-radius:2px;}
 .ni::-webkit-inner-spin-button,.ni::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .ni:focus::-webkit-inner-spin-button,.ni:focus::-webkit-outer-spin-button{-webkit-appearance:auto;opacity:.4;}
 .ni:hover{background:rgba(var(--accent-rgb),.04);}
 .ni:focus{outline:none;background:rgba(var(--accent-rgb),.08);box-shadow:inset 0 0 0 2px var(--accent);border-radius:3px;}
 .ni.dirty{background:rgba(var(--warning-rgb),.08)!important;box-shadow:inset 0 0 0 2px rgba(var(--warning-rgb),.4);}
-.pc{font-weight:700;font-size:13px;}
+.pc{font-weight:700;font-size:14px;}
 .ph{color:var(--success);}.pm{color:var(--warning);}.pb{color:var(--danger);}
-th.th-eval,th.th-autoev{font-weight:600;color:var(--text);background:var(--bg3);}
-th.th-prom{font-weight:700;color:var(--text);background:var(--bg3);border-left:2px solid var(--border);min-width:44px;}
-th.th-nf{font-weight:800;color:var(--text);background:var(--bg3);font-size:10px;letter-spacing:.04em;min-width:48px;border-left:2px solid var(--border);}
+th.th-eval,th.th-autoev{font-weight:600;color:var(--text);background:var(--bg3);min-width:46px;font-size:11px;}
+th.th-prom{font-weight:700;color:var(--text);background:var(--bg3);border-left:2px solid var(--border);min-width:58px;font-size:11px;}
+th.th-nf{font-weight:800;color:var(--text);background:var(--bg3);font-size:11px;letter-spacing:.04em;min-width:64px;border-left:2px solid var(--border);}
 th.th-eval{border-left:1px solid rgba(var(--accent-rgb),.12);}
 th.th-eval,th.th-autoev{background:rgba(var(--accent-rgb),.03);}
 .prom-cell{background:rgba(var(--accent-rgb),.02);border-left:2px solid var(--border);font-weight:700;}
@@ -132,16 +133,16 @@ th.th-nf .info-icon{background:rgba(var(--accent-rgb),.25);color:var(--text-on-a
 #gradeTable thead th:nth-child(1){left:0;}
 #gradeTable thead th:nth-child(2){left:36px;}
 #gradeTable thead th.th-prom,#gradeTable thead th.th-nf{position:sticky;right:0;z-index:4;background:var(--bg3);}
-#gradeTable thead th.th-prom{right:90px;}
+#gradeTable thead th.th-prom{right:70px;}
 #gradeTable thead th.th-nf{right:0;}
 #gradeTable tbody td:nth-child(1),#gradeTable tbody td:nth-child(2){position:sticky;left:0;z-index:3;background:var(--bg);}
 #gradeTable tbody td:nth-child(1){left:0;}
 #gradeTable tbody td:nth-child(2){left:36px;}
 #gradeTable tbody td.prom-cell,#gradeTable tbody td.nf-cell{position:sticky;right:0;z-index:3;background:var(--bg);}
-#gradeTable tbody td.prom-cell{right:90px;}
+#gradeTable tbody td.prom-cell{right:70px;}
 #gradeTable tbody td.nf-cell{right:0;}
 /* -- Activity card headers --------------------------------------------- */
-.act-th{min-width:70px;max-width:95px;white-space:normal;vertical-align:top;padding:4px 3px!important;font-size:10px;line-height:1.3;text-align:center;border-left:3px solid transparent;}
+.act-th{min-width:115px;max-width:none;white-space:normal;vertical-align:top;padding:6px 5px!important;font-size:11px;line-height:1.35;text-align:center;border-left:3px solid transparent;}
 .act-th[data-tipo="quiz"]{border-left-color:#e74c3c;}
 .act-th[data-tipo="taller"]{border-left-color:#3498db;}
 .act-th[data-tipo="examen"]{border-left-color:#9b59b6;}
@@ -394,10 +395,15 @@ tr.selected{background:rgba(var(--accent-rgb),.06)!important;outline:2px solid r
 .act-th.est-borrador .act-tipo-tag{color:var(--warning);}
 .act-th.est-publicada .act-tipo-tag{color:var(--success);}
 .act-th.est-cerrada .act-tipo-tag{color:var(--muted);}
-.act-th .act-peso-tag{display:inline-block;font-size:7px;font-weight:600;opacity:.4;margin-left:2px;}
+.act-th .act-peso-tag{display:inline-block;font-size:10px;font-weight:600;opacity:.5;margin-left:2px;}
 .act-th-inner{display:flex;align-items:center;justify-content:space-between;gap:4px;white-space:nowrap;}
-.act-th-nombre{overflow:hidden;text-overflow:ellipsis;max-width:120px;}
+.act-th-nombre{overflow:hidden;text-overflow:ellipsis;max-width:150px;}
 .act-th-meta{display:flex;align-items:center;gap:4px;margin-top:2px;justify-content:center;}
+.act-estado-label{display:inline-block;font-size:8px;text-transform:uppercase;letter-spacing:.04em;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(var(--muted-rgb),.1);color:var(--muted);}
+.act-estado-label.est-borrador{background:rgba(var(--warning-rgb),.14);color:var(--warning);}
+.act-estado-label.est-publicada{background:rgba(var(--success-rgb),.14);color:var(--success);}
+.act-estado-label.est-cerrada{background:rgba(var(--muted-rgb),.16);color:var(--muted);}
+.act-estado-label.est-archivada{background:rgba(var(--danger-rgb),.12);color:var(--danger);}
 .act-menu-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:4px;border:none;background:transparent;color:var(--muted);cursor:pointer;transition:all var(--tr);flex-shrink:0;}
 .act-menu-btn:hover{background:rgba(var(--muted-rgb),.12);color:var(--text);}
 .est-dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;}
@@ -1029,6 +1035,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 </div>
 {% endif %}
 
+{{ breadcrumbs([('Panel','/'~slug~'/dashboard'),('Notas',None)]) }}
 <div class="topbar" id="topBar">
   <div class="tb-left">
     <span class="tb-title">{{ materia }}</span>
@@ -1130,6 +1137,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
                         {% if act.tipo %}<span class="act-tipo-tag">{{ act.tipo }}</span>{% endif %}
                         {% if act.peso %}<span class="act-peso-tag">{{ act.peso }}%</span>{% endif %}
                         <span class="est-dot est-{{ act.estado_act or 'borrador' }}"></span>
+                        <span class="act-estado-label est-{{ act.estado_act or 'borrador' }}">{{ {'borrador':'Borrador','publicada':'Publicada','cerrada':'Cerrada','archivada':'Archivada'}.get(act.estado_act or 'borrador','Borrador') }}</span>
                     </div>
                 </th>
                 {% endfor %}

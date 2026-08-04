@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
+{% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, breadcrumbs, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}Panel Directora — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
 {% block accent_css %}{{ accent_css(colegio) }}{% endblock %}
@@ -70,6 +70,8 @@
 {% block content %}
 <div class="main">
 
+{{ breadcrumbs([('Panel', '/' ~ slug ~ '/directora/panel'), ('Panel de la Directora', None)]) }}
+
 <div class="periodo-tabs">
 
         <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Periodo:</span>
@@ -80,6 +82,80 @@
 
         {% endfor %}
 
+    </div>
+
+    {% set promedios_dir = tabla|selectattr("promedio","ne",None)|map(attribute="promedio")|list %}
+    <div class="dash-modules" style="margin-bottom:16px;">
+        <div class="dash-module">
+            <div class="dash-module-head">
+                <span class="icon"><i data-lucide="activity" style="width:15px;height:15px;"></i></span>
+                Indicadores del período {{ periodo }}
+            </div>
+            <div class="dash-module-body">
+                <div class="info-grid">
+                    <a href="#table-consolidada" class="info-item" style="text-decoration:none;color:inherit;">
+                        <span class="info-label">Estudiantes</span>
+                        <span class="info-value">{{ tabla|length }}</span>
+                    </a>
+                    <a href="#table-consolidada" class="info-item" style="text-decoration:none;color:inherit;">
+                        <span class="info-label">Promedio</span>
+                        <span class="info-value" style="color:{% if promedios_dir %}{% set avg_dir = (promedios_dir|sum / promedios_dir|length)|round(2) %}{% if avg_dir >= 3.5 %}var(--success){% elif avg_dir >= 3.0 %}var(--warning){% else %}var(--danger){% endif %}{% else %}var(--muted){% endif %};">{% if promedios_dir %}{{ (promedios_dir|sum / promedios_dir|length)|round(2) }}{% else %}—{% endif %}</span>
+                    </a>
+                    <a href="#table-consolidada" class="info-item" style="text-decoration:none;color:inherit;">
+                        <span class="info-label">Aprobados</span>
+                        <span class="info-value" style="color:var(--success);">{{ aprobados }}</span>
+                    </a>
+                    <a href="#table-consolidada" class="info-item" style="text-decoration:none;color:inherit;">
+                        <span class="info-label">Reprobados</span>
+                        <span class="info-value" style="color:{% if reprobados > 0 %}var(--danger){% else %}var(--success){% endif %};">{{ reprobados }}</span>
+                    </a>
+                    <a href="#table-consolidada" class="info-item" style="text-decoration:none;color:inherit;">
+                        <span class="info-label">Sin notas</span>
+                        <span class="info-value" style="color:var(--muted);">{{ sin_notas }}</span>
+                    </a>
+                    <a href="#table-consolidada" class="info-item" style="text-decoration:none;color:inherit;">
+                        <span class="info-label">Materias</span>
+                        <span class="info-value">{{ lista_materias|length }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="dash-module">
+            <div class="dash-module-head">
+                <span class="icon"><i data-lucide="bar-chart-3" style="width:14px;height:14px;"></i></span>
+                Promedio por materia — {{ curso }} · {{ jornada }} · Periodo {{ periodo }}
+            </div>
+            <div class="dash-module-body" style="padding:16px;">
+                {% set mats_con_prom = [] %}
+                {% for mat in lista_materias %}
+                    {% set finals = [] %}
+                    {% for f in tabla %}
+                        {% if f.materias.get(mat) and f.materias[mat].final is not none %}
+                            {% set _ = finals.append(f.materias[mat].final) %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if finals %}
+                        {% set prom_mat = (finals|sum / finals|length)|round(2) %}
+                        {% set _ = mats_con_prom.append({'materia': mat, 'prom': prom_mat}) %}
+                        <div style="margin-bottom:10px;">
+                            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                                <span style="color:var(--muted);">{{ mat }}</span>
+                                <span style="font-weight:700;color:{% if prom_mat >= 3.5 %}var(--success){% elif prom_mat >= 3.0 %}var(--warning){% else %}var(--danger){% endif %};">{{ prom_mat }}</span>
+                            </div>
+                            <div class="progress-bar {% if prom_mat >= 3.0 %}green{% else %}red{% endif %}">
+                                <div class="fill" style="width:{{ (prom_mat / 5 * 100)|round|int }}%;"></div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                {% if not mats_con_prom %}
+                <div class="empty-state" style="min-height:80px;padding:16px;">
+                    <div class="empty-title" style="font-size:12px;">No hay datos suficientes para generar esta gráfica.</div>
+                    <div class="empty-desc">Ningún estudiante tiene notas finales en este período.</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <div class="dash-modules">

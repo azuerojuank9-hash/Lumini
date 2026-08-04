@@ -8,3 +8,4 @@ bcrypt>=4.0
 Pillow>=10.0
 flask-compress>=1.14
 waitress>=2.1
+openpyxl>=3.1

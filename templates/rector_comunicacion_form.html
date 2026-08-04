@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}{% if comunicacion %}Editar{% else %}Nueva{% endif %} comunicación — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
@@ -42,7 +43,7 @@
 {% block content %}
 <div class="topbar">
   <h1>{% if comunicacion %}Editar comunicación{% else %}Nueva comunicación{% endif %}</h1>
-  <div class="breadcrumb">{{ colegio.nombre if colegio else slug }}</div>
+  {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Comunicaciones','/'~slug~'/rector/comunicaciones'),('Nueva',None)]) }}
 </div>
 
 <div class="card">

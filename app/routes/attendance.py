@@ -221,3 +221,173 @@ def asistencia_reporte_excel(slug):
     return Response(output.getvalue(),
                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                     headers={'Content-Disposition': f'attachment; filename=asistencia_{slug}_{curso}.xlsx'})
+
+
+# ── Importación de asistencia desde Excel ──
+
+def _perfil_profesor(f, slug):
+    """Valida profesor activo con jornada/materia en sesión."""
+    f.require_colegio(slug)
+    prof = f.get_profesor(slug)
+    if not prof:
+        return None, None, None
+    jornada, materia = f.get_sesion_jornada_materia(slug)
+    if not jornada or not materia:
+        return None, None, None
+    return prof, jornada, materia
+
+
+@attendance_bp.route('/<slug>/importar_asistencia', methods=['GET'])
+def importar_asistencia(slug):
+    f = _fa()
+    prof, jornada, materia = _perfil_profesor(f, slug)
+    if not prof:
+        return redirect(url_for('auth.login', slug=slug))
+    colegio = f.get_colegio(slug)
+    mis_cursos = f.get_cursos_profesor(slug, prof['id'], materia, jornada)
+    curso_sel = request.args.get('curso', mis_cursos[0] if mis_cursos else '')
+    return render_template('importar_asistencia.html', slug=slug, colegio=colegio, profesor=prof,
+                           mis_cursos=mis_cursos, curso_sel=curso_sel,
+                           materia=materia, jornada=jornada,
+                           estados_asistencia=ESTADOS_ASISTENCIA)
+
+
+@attendance_bp.route('/<slug>/importar_asistencia/preview', methods=['POST'])
+def importar_asistencia_preview(slug):
+    from app.services.excel_service import extension_excel_valida, leer_workbook, parsear_estado_asistencia, parsear_fecha
+    from app.repositories.attendance_repository import get_students_by_curso
+    f = _fa()
+    prof, jornada, materia = _perfil_profesor(f, slug)
+    if not prof:
+        return jsonify({'status': 'error', 'mensaje': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'status': 'error', 'mensaje': 'Error CSRF'}), 403
+    curso_sel = request.form.get('curso', '')
+    if not curso_sel:
+        return jsonify({'status': 'error', 'mensaje': 'Selecciona un curso.'}), 400
+    if 'archivo' not in request.files:
+        return jsonify({'status': 'error', 'mensaje': 'No se envió ningún archivo.'}), 400
+    archivo = request.files['archivo']
+    if not archivo.filename or not extension_excel_valida(archivo.filename):
+        return jsonify({'status': 'error', 'mensaje': 'El archivo debe ser .xlsx.'}), 400
+    try:
+        headers, filas = leer_workbook(archivo.read())
+    except ValueError as e:
+        return jsonify({'status': 'error', 'mensaje': str(e)}), 400
+    if len(headers) < 3:
+        return jsonify({'status': 'error',
+                        'mensaje': 'Formato inválido. Se esperan columnas #, Estudiante y al menos una fecha.'}), 400
+    fechas_headers = headers[2:]
+    fechas = []
+    errores_fecha = []
+    for h in fechas_headers:
+        fecha, err = parsear_fecha(h)
+        if err:
+            errores_fecha.append(f'Columna "{h}": {err}.')
+        else:
+            fechas.append(fecha)
+    if not fechas:
+        return jsonify({'status': 'error',
+                        'mensaje': 'No se encontraron columnas de fecha válidas (AAAA-MM-DD).',
+                        'errores': errores_fecha[:5]}), 400
+    conn = f.conectar(slug)
+    try:
+        alumnos = get_students_by_curso(conn, curso_sel, jornada)
+        if not alumnos:
+            return jsonify({'status': 'error', 'mensaje': 'El curso no tiene estudiantes.'}), 400
+        alumnos_by_num = {}
+        for a in alumnos:
+            if a['num_curso'] is not None:
+                alumnos_by_num[str(a['num_curso']).strip()] = a
+        alumnos_by_nombre = {a['nombre'].strip().lower(): a for a in alumnos}
+        preview_rows = []
+        all_ok = True
+        for nro, vals in filas:
+            nombre = str(vals[1]).strip() if len(vals) > 1 and vals[1] is not None else ''
+            num = str(vals[0]).strip() if vals and vals[0] is not None else ''
+            errores = []
+            alumno = None
+            if nombre:
+                alumno = alumnos_by_nombre.get(nombre.lower())
+            if not alumno and num:
+                alumno = alumnos_by_num.get(num)
+            if not alumno:
+                errores.append('estudiante no encontrado en el curso')
+                all_ok = False
+            cambios = {}
+            for fecha in fechas:
+                col_idx = 2 + fechas.index(fecha)
+                v = vals[col_idx] if col_idx < len(vals) else ''
+                estado, err = parsear_estado_asistencia(v)
+                if err:
+                    errores.append(f'{fecha}: {err}')
+                    all_ok = False
+                    cambios[fecha] = {'estado': None}
+                elif estado is not None:
+                    cambios[fecha] = {'estado': estado}
+            preview_rows.append({'fila': nro, 'aid': alumno['id'] if alumno else None,
+                                 'nombre': alumno['nombre'] if alumno else (nombre or f'Fila {nro}'),
+                                 'ok': len(errores) == 0, 'errores': errores, 'cambios': cambios})
+        validos = sum(1 for r in preview_rows if r['ok'])
+        return jsonify({'status': 'ok' if all_ok else 'warning', 'curso': curso_sel,
+                        'fechas': fechas, 'filas': preview_rows, 'total': len(preview_rows),
+                        'validos': validos, 'errores': len(preview_rows) - validos,
+                        'all_ok': all_ok})
+    finally:
+        conn.close()
+
+
+@attendance_bp.route('/<slug>/importar_asistencia/confirmar', methods=['POST'])
+def importar_asistencia_confirmar(slug):
+    import json as _json
+    from app.services.excel_service import parsear_estado_asistencia, parsear_fecha
+    from app.repositories.attendance_repository import upsert_asistencia
+    f = _fa()
+    prof, jornada, materia = _perfil_profesor(f, slug)
+    if not prof:
+        return jsonify({'status': 'error', 'mensaje': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'status': 'error', 'mensaje': 'Error CSRF'}), 403
+    curso_sel = request.form.get('curso', '')
+    data_json = request.form.get('data', '')
+    if not data_json:
+        return jsonify({'status': 'error', 'mensaje': 'No hay datos para guardar.'}), 400
+    try:
+        data = _json.loads(data_json)
+    except (_json.JSONDecodeError, TypeError):
+        return jsonify({'status': 'error', 'mensaje': 'Datos inválidos.'}), 400
+    if not data.get('all_ok'):
+        return jsonify({'status': 'error', 'mensaje': 'Hay errores que deben corregirse primero.'}), 400
+    fechas = data.get('fechas', [])
+    filas = data.get('filas', [])
+    if not fechas or not filas:
+        return jsonify({'status': 'error', 'mensaje': 'No hay datos para importar.'}), 400
+    conn = f.conectar(slug)
+    try:
+        for fecha in fechas:
+            if parsear_fecha(fecha)[1]:
+                conn.close()
+                return jsonify({'status': 'error', 'mensaje': 'Fecha no válida en los datos.'}), 400
+        updated = 0
+        for fila in filas:
+            if not fila.get('ok') or not fila.get('aid'):
+                continue
+            aid = fila['aid']
+            for fecha, ch in (fila.get('cambios') or {}).items():
+                estado, err = parsear_estado_asistencia(ch.get('estado'))
+                if err or estado is None:
+                    continue
+                upsert_asistencia(conn, aid, fecha, estado, usuario_tipo='profesor', usuario_id=prof['id'])
+                conn.commit()
+                f.audit_log(slug, prof['id'], 'asistencia_importada', 'asistencia', aid,
+                            valor_nuevo={'fecha': fecha, 'estado': estado})
+                updated += 1
+        conn.commit()
+    except Exception as e:
+        conn.close()
+        logger.exception('Error confirmando importación de asistencia: %s', e)
+        return jsonify({'status': 'error', 'mensaje': 'Error al guardar. Intenta de nuevo.'}), 500
+    conn.close()
+    return jsonify({'status': 'ok',
+                    'mensaje': f'Importación completada. {updated} registros de asistencia actualizados.',
+                    'updated': updated})

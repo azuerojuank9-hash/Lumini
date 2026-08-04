@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "components.html" import breadcrumbs %}
 {% from "components.html" import sidebar_item, badge, status_badge, empty_state, card, btn, alert_error, alert_success, alert_warning, alert_info, input, stats_card, kpi_card, pagination, search_bar, filter_chips %}
 {% block title %}Canales — {{ colegio.nombre if colegio else slug }}{% endblock %}
 
@@ -48,7 +49,7 @@ select.form-control{cursor:pointer;}
 <div class="topbar">
   <div class="topbar-left">
     <h1>Canales de Comunicación</h1>
-    <div class="breadcrumb">Gestiona los canales institucionales de mensajería</div>
+    {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Canales',None)]) }}
   </div>
   <div class="topbar-actions">
     <button class="btn btn-primary" onclick="mostrarFormCrear()"><i data-lucide="plus"></i> Nuevo canal</button>
