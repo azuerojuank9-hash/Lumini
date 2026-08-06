@@ -177,6 +177,23 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 {% endblock %}
 
 {% block content %}
+<nav class="navbar">
+  <div class="navbar-left">
+    {% if colegio and colegio.logo %}
+    <img class="navbar-logo" src="/static/logos/{{ colegio.logo }}" alt="Logo {{ colegio.nombre }}">
+    {% else %}
+    <img class="navbar-logo" src="/static/lumini_logo.webp" alt="Lumini">
+    {% endif %}
+    <div>
+      <div class="brand-name">LUMINI</div>
+      <div class="brand-sub">{{ colegio.nombre if colegio else slug }}</div>
+    </div>
+  </div>
+  <div class="navbar-right">
+    <span style="font-size:12px;color:var(--muted);">{{ alumno.nombre }}</span>
+    <a class="nav-btn" href="/{{ slug }}/logout"><i data-lucide="log-out" style="width:14px;height:14px;"></i> Cerrar sesión</a>
+  </div>
+</nav>
 {{ breadcrumbs([('Mi Boletín', '/' ~ slug ~ '/estudiante'), ('Notas', None)]) }}
 <div class="est-header">
 
@@ -721,7 +738,9 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
 
 function toggleMobileNav(){
 
-    document.getElementById('mobileNav').classList.toggle('open');
+    var nav = document.getElementById('mobileNav');
+
+    if(nav){ nav.classList.toggle('open'); }
 
 }
 
@@ -729,9 +748,11 @@ document.addEventListener('click', function(e){
 
     var nav = document.getElementById('mobileNav');
 
+    if(!nav){ return; }
+
     var ham = document.getElementById('hamburger');
 
-    if(nav.classList.contains('open') && !nav.contains(e.target) && !ham.contains(e.target)){
+    if(nav.classList.contains('open') && (!ham || !ham.contains(e.target))){
 
         nav.classList.remove('open');
 

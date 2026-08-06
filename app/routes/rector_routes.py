@@ -1177,6 +1177,88 @@ def rector_certificados(slug):
     return fa.render_template('rector/certificados.html', slug=slug, colegio=colegio, rector=rector, cursos=cursos, notif_count=notif_count)
 
 
+@rector_bp.route('/<slug>/api/rector/certificados/<tipo>')
+def api_rector_certificados(slug, tipo):
+    fa = _fa()
+    fa.require_colegio(slug)
+    rector = fa.get_rector(slug)
+    if not rector:
+        return fa.jsonify({'ok': False, 'error': 'No autorizado'}), 401
+    aid = fa.request.args.get('estudiante_id', type=int)
+    if not aid:
+        return fa.jsonify({'ok': False, 'error': 'estudiante_id requerido'}), 400
+    conn = fa.conectar(slug)
+    try:
+        alumno = conn.execute('SELECT * FROM alumnos WHERE id=?', (aid,)).fetchone()
+        if not alumno:
+            return fa.jsonify({'ok': False, 'error': 'Estudiante no encontrado'}), 404
+        colegio = fa.get_colegio(slug) or {}
+        firma = rector['nombre']
+        from app.services.certificates import (
+            generar_certificado_conducta,
+            generar_certificado_estudio,
+            generar_constancia_estudio,
+            generar_paz_y_salvo,
+        )
+        if tipo == 'constancia':
+            buf = generar_constancia_estudio(dict(alumno), colegio, firma)
+        elif tipo == 'paz-y-salvo':
+            buf = generar_paz_y_salvo(dict(alumno), colegio, firma)
+        elif tipo == 'conducta':
+            obs_rows = conn.execute(
+                'SELECT texto FROM observaciones WHERE aid=? ORDER BY fecha DESC LIMIT 20',
+                (aid,)).fetchall()
+            observaciones = [{'texto': r['texto'] or ''} for r in obs_rows]
+            buf = generar_certificado_conducta(dict(alumno), colegio, observaciones, firma)
+        elif tipo == 'estudio':
+            curso = alumno['curso']
+            jornada = alumno['jornada']
+            maxp = conn.execute(
+                'SELECT MAX(COALESCE(periodo,1)) as m FROM actividades WHERE curso=? AND jornada=?',
+                (curso, jornada)).fetchone()['m']
+            periodo = maxp or 1
+            lista_materias = [r['materia'] for r in conn.execute(
+                'SELECT DISTINCT materia FROM actividades WHERE curso=? AND jornada=? '
+                'AND COALESCE(periodo,1)=? ORDER BY materia',
+                (curso, jornada, periodo)).fetchall()]
+            materias_set = set(lista_materias)
+            notas_all = conn.execute(
+                '''SELECT ac.materia, n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+                   WHERE n.aid=? AND ac.curso=? AND ac.jornada=? AND COALESCE(ac.periodo,1)=?''',
+                (aid, curso, jornada, periodo)).fetchall()
+            ev_all = conn.execute(
+                '''SELECT materia, evaluacion, autoevaluacion FROM evaluaciones
+                   WHERE aid=? AND jornada=? AND COALESCE(periodo,1)=?''',
+                (aid, jornada, periodo)).fetchall()
+            notas_por_mat = {}
+            for r in notas_all:
+                if r['materia'] in materias_set:
+                    notas_por_mat.setdefault(r['materia'], []).append(r['val'])
+            ev_por_mat = {}
+            for r in ev_all:
+                if r['materia'] in materias_set:
+                    ev_por_mat[r['materia']] = r
+            materias = []
+            todos_finales = []
+            for mat in lista_materias:
+                ev = ev_por_mat.get(mat)
+                eval_v = ev['evaluacion'] if ev and ev['evaluacion'] is not None else None
+                auto_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
+                final = fa._promedio_ponderado(notas_por_mat.get(mat, []), eval_v, auto_v)
+                if final is not None:
+                    materias.append({'nombre': mat, 'nota': round(final, 1)})
+                    todos_finales.append(final)
+            promedio = round(sum(todos_finales) / len(todos_finales), 1) if todos_finales else 0
+            buf = generar_certificado_estudio(dict(alumno), colegio, materias, promedio, firma)
+        else:
+            return fa.jsonify({'ok': False, 'error': 'Tipo de certificado inválido'}), 400
+        resp = Response(buf.getvalue(), mimetype='application/pdf')
+        resp.headers['Content-Disposition'] = f"inline; filename=certificado_{tipo}.pdf"
+        return resp
+    finally:
+        conn.close()
+
+
 @rector_bp.route('/<slug>/rector/calendario')
 def rector_calendario(slug):
     fa = _fa()
