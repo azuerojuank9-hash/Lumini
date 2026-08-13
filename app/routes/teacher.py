@@ -371,6 +371,8 @@ def borrar_actividad(slug, act_id):
         conn.close()
         return jsonify({'status': 'error', 'codigo': 'PERIODO_CERRADO', 'mensaje': 'El per\u00edodo est\u00e1 cerrado.'}), 403
     notas_borradas = conn.execute('SELECT aid, val FROM notas WHERE actividad_id=?', (act_id,)).fetchall()
+    conn.execute('DELETE FROM entregas WHERE actividad_id=?', (act_id,))
+    conn.execute('DELETE FROM solicitudes_modificacion WHERE actividad_id=?', (act_id,))
     conn.execute('DELETE FROM notas WHERE actividad_id=?', (act_id,))
     conn.execute('DELETE FROM actividades WHERE id=?', (act_id,))
     conn.commit()
@@ -688,7 +690,7 @@ def notas_batch(slug):
             if aid is None or actividad_id is None:
                 errors.append({'aid': aid, 'actividad_id': actividad_id, 'error': 'Datos invalidos'})
                 continue
-            if val is not None and (not isinstance(val, (int, float)) or isinstance(val, bool)):
+            if val is not None and (not isinstance(val, (int, float)) or isinstance(val, bool) or val != val):
                 errors.append({'aid': aid, 'actividad_id': actividad_id, 'val': val, 'error': 'Valor invalido'})
                 continue
             if val is not None and (val < escala_min or val > escala_max):
@@ -761,8 +763,9 @@ def notas_deshacer(slug):
             conn.close()
             return jsonify({'status': 'error', 'mensaje': 'No autorizado'}), 403
         if val_anterior is not None:
-            conn.execute('UPDATE notas SET val=? WHERE aid=? AND actividad_id=?',
-                         (val_anterior, aid, actividad_id))
+            conn.execute('''INSERT INTO notas (aid, actividad_id, val) VALUES (?,?,?)
+                            ON CONFLICT(aid, actividad_id) DO UPDATE SET val=excluded.val''',
+                         (aid, actividad_id, val_anterior))
         else:
             conn.execute('DELETE FROM notas WHERE aid=? AND actividad_id=?', (aid, actividad_id))
         conn.commit()
@@ -900,8 +903,12 @@ def guardar_evaluacion(slug):
     if not validar_csrf(): return ('Error CSRF', 403)
     jornada, materia = f.get_sesion_jornada_materia(slug)
     aid     = request.form.get('aid', type=int)
-    ev      = request.form.get('evaluacion', type=float)
-    au      = request.form.get('autoevaluacion', type=float)
+    ev_raw  = request.form.get('evaluacion')
+    au_raw  = request.form.get('autoevaluacion')
+    ev      = float(ev_raw) if ev_raw not in (None, '') else None
+    au      = float(au_raw) if au_raw not in (None, '') else None
+    ev_set  = 'evaluacion' in request.form
+    au_set  = 'autoevaluacion' in request.form
     periodo = request.form.get('periodo', 1, type=int)
     curso   = request.form.get('curso', '')
     if aid is None: return ('', 400)
@@ -919,8 +926,8 @@ def guardar_evaluacion(slug):
     ).fetchone()
     old_eval = existing['evaluacion'] if existing else None
     old_auto = existing['autoevaluacion'] if existing else None
-    ev_final = ev if ev is not None else old_eval
-    au_final = au if au is not None else old_auto
+    ev_final = ev if ev_set else old_eval
+    au_final = au if au_set else old_auto
     try:
         conn.execute(
             '''INSERT INTO evaluaciones
@@ -958,13 +965,13 @@ def guardar_evaluacion(slug):
     f.audit_log(slug, prof['id'], 'evaluacion_editada', 'evaluaciones', registro_id=None,
               valor_anterior={'aid': aid, 'evaluacion': old_eval, 'autoevaluacion': old_auto},
               valor_nuevo={'aid': aid, 'evaluacion': ev_final, 'autoevaluacion': au_final})
-    if ev is not None:
-        tipo_ev = 'creacion' if old_eval is None else 'modificacion'
+    if ev_set and ev_final != old_eval:
+        tipo_ev = 'modificacion' if old_eval is not None else 'creacion'
         f.auditar_nota(slug, prof['id'], 'profesor', tipo_ev, 'evaluaciones', aid,
                      curso, materia, periodo, campo='evaluacion',
                      valor_anterior=old_eval, valor_nuevo=ev_final)
-    if au is not None:
-        tipo_au = 'creacion' if old_auto is None else 'modificacion'
+    if au_set and au_final != old_auto:
+        tipo_au = 'modificacion' if old_auto is not None else 'creacion'
         f.auditar_nota(slug, prof['id'], 'profesor', tipo_au, 'evaluaciones', aid,
                      curso, materia, periodo, campo='autoevaluacion',
                      valor_anterior=old_auto, valor_nuevo=au_final)
@@ -1297,6 +1304,12 @@ def importar_notas_preview(slug):
     jornada, materia = f.get_sesion_jornada_materia(slug)
     if not jornada or not materia:
         return jsonify({'status':'error','mensaje':'Sesion no valida'}), 400
+    cfg = f.config_get(slug)
+    try:
+        escala_min = float(cfg.get('escala_min', 0.0))
+        escala_max = float(cfg.get('escala_max', 5.0))
+    except (TypeError, ValueError):
+        escala_min, escala_max = 0.0, 5.0
     curso_sel = request.form.get('curso', '')
     periodo = request.form.get('periodo', 1, type=int)
     if 'archivo' not in request.files:
@@ -1310,7 +1323,19 @@ def importar_notas_preview(slug):
         ws = wb.active
     except Exception as e:
         logger.error(f'Error al leer archivo de notas: {e}')
-        return jsonify({'status':'error','mensaje':'Error al leer el archivo. Verifica el formato.'}), 400
+        # Mostrar la causa concreta del error en lugar de un mensaje genérico
+        mensaje_error = 'Error al leer el archivo.'
+        try:
+            from openpyxl.utils.exceptions import InvalidFileException
+            from zipfile import BadZipFile
+            if isinstance(e, (BadZipFile, InvalidFileException)):
+                mensaje_error = 'El archivo no es un Excel .xlsx válido o está corrupto.'
+            elif hasattr(e, 'msg') and e.msg:
+                mensaje_error = f'Error al leer el archivo: {e.msg}'
+        except ImportError:
+            if str(e):
+                mensaje_error = f'Error al leer el archivo: {e}'
+        return jsonify({'status':'error','mensaje':mensaje_error}), 400
     header_row = list(ws.iter_rows(min_row=1, max_row=1, values_only=True))[0]
     if not header_row or str(header_row[0]).strip() != 'N\u00b0':
         return jsonify({'status':'error','mensaje':'Formato de archivo invalido. La primera columna debe ser N\u00b0'}), 400
@@ -1391,8 +1416,8 @@ def importar_notas_preview(slug):
                 if raw_val is not None:
                     try:
                         val = float(str(raw_val).replace(',', '.'))
-                        if val < 0 or val > 5:
-                            row_errors.append(f'{cinfo["nombre"]}: nota fuera de rango (0-5)')
+                        if val < escala_min or val > escala_max:
+                            row_errors.append(f'{cinfo["nombre"]}: nota fuera de rango ({escala_min}-{escala_max})')
                             all_ok = False
                             continue
                     except (ValueError, TypeError):
@@ -1407,7 +1432,7 @@ def importar_notas_preview(slug):
                     if raw_val is not None:
                         try:
                             val = float(str(raw_val).replace(',', '.'))
-                            if val < 0 or val > 5:
+                            if val < escala_min or val > escala_max:
                                 row_errors.append('Evaluaci\u00f3n fuera de rango')
                                 all_ok = False
                             else:
@@ -1420,7 +1445,7 @@ def importar_notas_preview(slug):
                     if raw_val is not None:
                         try:
                             val = float(str(raw_val).replace(',', '.'))
-                            if val < 0 or val > 5:
+                            if val < escala_min or val > escala_max:
                                 row_errors.append('Autoevaluaci\u00f3n fuera de rango')
                                 all_ok = False
                             else:
@@ -1473,10 +1498,17 @@ def importar_notas_confirmar(slug):
         return jsonify({'status':'error','mensaje':'Datos invalidos'}), 400
     if not data.get('all_ok'):
         return jsonify({'status':'error','mensaje':'Hay errores que deben corregirse primero'}), 400
+    cfg = f.config_get(slug)
+    try:
+        escala_min = float(cfg.get('escala_min', 0.0))
+        escala_max = float(cfg.get('escala_max', 5.0))
+    except (TypeError, ValueError):
+        escala_min, escala_max = 0.0, 5.0
     conn = f.conectar(slug)
     try:
         ok_rev, errores_rev = revalidar_importacion_notas(
-            data, conn, prof, materia, jornada, curso_sel, periodo)
+            data, conn, prof, materia, jornada, curso_sel, periodo,
+            escala_min=escala_min, escala_max=escala_max)
     except Exception as e:
         conn.close()
         logger.error(f'Error revalidando importacion: {e}')
@@ -1876,6 +1908,7 @@ def observaciones_json(slug):
     f.require_colegio(slug)
     prof = f.get_profesor(slug)
     if not prof: return jsonify({'observaciones':[]})
+    if not validar_csrf(): return jsonify({'observaciones':[]}), 403
     data = request.get_json(silent=True) or {}
     aid = data.get('aid')
     if not aid: return jsonify({'observaciones':[]})
@@ -2037,6 +2070,8 @@ def estudiante_tendencia(slug, aid):
     conn = f.conectar(slug)
     try:
         jornada, materia = f.get_sesion_jornada_materia(slug)
+        cfg = f.config_get(slug)
+        escala_max = float(cfg.get('escala_max', 5.0)) if cfg else 5.0
         rows = conn.execute(
             '''SELECT n.val, n.actividad_id, ac.nombre as act_nombre, ac.orden, ac.periodo
                FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
@@ -2060,7 +2095,7 @@ def estudiante_tendencia(slug, aid):
             den = sum((i - x_avg) ** 2 for i in range(n))
             slope = num / den if den != 0 else 0
             pred = y_avg + slope * (n + 2 - x_avg)
-            pred = max(0, min(5, round(pred, 2)))
+            pred = max(0, min(escala_max, round(pred, 2)))
             confianza = min(95, max(30, int(100 - abs(slope) * 20)))
         else:
             pred = puntos[-1]['valor'] if puntos else None
@@ -2080,7 +2115,8 @@ def estudiante_tendencia(slug, aid):
             'confianza':confianza,
             'promedio_estudiante':prom_est,
             'promedio_curso':prom_curso,
-            'diferencia_porcentual':diff
+            'diferencia_porcentual':diff,
+            'escala_max':escala_max
         })
     finally:
         conn.close()
@@ -2092,6 +2128,7 @@ def observaciones_sugerir(slug):
     f.require_colegio(slug)
     prof = f.get_profesor(slug)
     if not prof: return jsonify({'error':'No autorizado'}), 403
+    if not validar_csrf(): return jsonify({'error': 'Error CSRF'}), 403
     data = request.get_json(silent=True) or {}
     aid = data.get('aid')
     cambio = data.get('cambio', '')
@@ -2249,8 +2286,18 @@ def actividades_masiva(slug):
     try:
         placeholders = ','.join('?' for _ in ids)
         params = ids
+        # Bloquear acciones sobre actividades de períodos cerrados.
+        periodos = [r['periodo'] for r in conn.execute(
+            f'SELECT DISTINCT periodo FROM actividades WHERE id IN ({placeholders}) AND profesor_id=?',
+            params + [prof['id']]).fetchall() if r['periodo'] is not None]
+        for p in periodos:
+            if f.periodo_cerrado(slug, p):
+                return jsonify({'status':'error','codigo':'PERIODO_CERRADO',
+                                'mensaje':'El per\u00edodo est\u00e1 cerrado.'}), 403
         if accion == 'eliminar':
             for aid in ids:
+                conn.execute('DELETE FROM entregas WHERE actividad_id=?', (aid,))
+                conn.execute('DELETE FROM solicitudes_modificacion WHERE actividad_id=?', (aid,))
                 conn.execute('DELETE FROM notas WHERE actividad_id=?', (aid,))
             conn.execute(f'DELETE FROM actividades WHERE id IN ({placeholders}) AND profesor_id=?', params + [prof['id']])
         elif accion == 'publicar':
@@ -2264,11 +2311,12 @@ def actividades_masiva(slug):
                 act = conn.execute('SELECT * FROM actividades WHERE id=? AND profesor_id=?', (aid, prof['id'])).fetchone()
                 if act:
                     old_notas = conn.execute('SELECT aid, val FROM notas WHERE actividad_id=?', (aid,)).fetchall()
+                    orden = act['orden'] if act['orden'] is not None else 0
                     conn.execute(
                         'INSERT INTO actividades (nombre, tipo, peso, fecha_limite, estado_act, materia, jornada, curso, periodo, profesor_id, orden) '
                         'VALUES (?,?,?,?,?,?,?,?,?,?,?)',
                         (act['nombre']+' (copia)', act['tipo'], act['peso'], act['fecha_limite'], 'borrador',
-                         act['materia'], act['jornada'], act['curso'], act['periodo'], prof['id'], act.get('orden',0)))
+                         act['materia'], act['jornada'], act['curso'], act['periodo'], prof['id'], orden))
                     new_id = conn.execute('SELECT last_insert_rowid() as lid').fetchone()['lid']
                     for n in old_notas:
                         conn.execute('INSERT INTO notas (actividad_id, aid, val) VALUES (?,?,?)', (new_id, n['aid'], n['val']))
@@ -2285,6 +2333,12 @@ def actividades_masiva(slug):
             if fecha:
                 conn.execute(f'UPDATE actividades SET fecha_limite=? WHERE id IN ({placeholders}) AND profesor_id=?', [fecha] + params + [prof['id']])
         conn.commit()
+        try:
+            f.audit_log(slug, prof['id'], 'actividad_'+accion, 'actividades', registro_id=None,
+                      valor_anterior={'ids': ids, 'extra': {k: v for k, v in data.items() if k not in ('ids', 'accion')}},
+                      valor_nuevo={'accion': accion, 'ids': ids})
+        except Exception as e:
+            logger.warning('[%s] audit masiva: %s', slug, e)
         return jsonify({'status':'ok'})
     finally:
         conn.close()
@@ -2296,6 +2350,7 @@ def curso_validar(slug):
     f.require_colegio(slug)
     prof = f.get_profesor(slug)
     if not prof: return jsonify({'error':'No autorizado'}), 403
+    if not validar_csrf(): return jsonify({'error': 'Error CSRF'}), 403
     data = request.get_json(silent=True) or {}
     conn = f.conectar(slug)
     try:
@@ -2650,7 +2705,9 @@ def analitica_comparar(slug):
     conn = f.conectar(slug)
     try:
         jornada, materia = f.get_sesion_jornada_materia(slug)
-        result = {'tipo':tipo,'datos':[]}
+        cfg = f.config_get(slug)
+        escala_max = float(cfg.get('escala_max', 5.0)) if cfg else 5.0
+        result = {'tipo':tipo,'datos':[],'escala_max':escala_max}
         if tipo == 'periodos':
             for p in [1,2,3,4]:
                 acts = conn.execute(
@@ -3086,6 +3143,8 @@ def comunicados_leer(slug, cid):
     prof = f.get_profesor(slug)
     if not prof:
         return jsonify({'error': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'error': 'Error CSRF'}), 403
     conn = f.conectar(slug)
     try:
         conn.execute("UPDATE comunicaciones SET estado='leido' WHERE id=?", (cid,))
@@ -3235,6 +3294,8 @@ def plantillas_crear(slug):
     prof = f.get_profesor(slug)
     if not prof:
         return jsonify({'error': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'error': 'Error CSRF'}), 403
     data = request.get_json(silent=True) or {}
     nombre = data.get('nombre', '')
     tipo = data.get('tipo', 'tarea')
@@ -3258,6 +3319,8 @@ def plantillas_aplicar(slug):
     prof = f.get_profesor(slug)
     if not prof:
         return jsonify({'error': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'error': 'Error CSRF'}), 403
     data = request.get_json(silent=True) or {}
     tmpl_id = data.get('plantilla_id')
     curso = data.get('curso', '')
@@ -3267,7 +3330,10 @@ def plantillas_aplicar(slug):
     conn = f.conectar(slug)
     try:
         from app.services.template_service import apply_template
-        jornada = data.get('jornada') or 'mañana'
+        ses_jornada, ses_materia = f.get_sesion_jornada_materia(slug)
+        jornada = data.get('jornada') or ses_jornada or 'ma\u00f1ana'
+        if not materia:
+            materia = ses_materia
         periodo = data.get('periodo', 1)
         ok, err = apply_template(conn, prof['id'], tmpl_id, curso, materia, jornada, periodo)
         if not ok:
@@ -3284,6 +3350,8 @@ def plantillas_eliminar(slug, tid):
     prof = f.get_profesor(slug)
     if not prof:
         return jsonify({'error': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'error': 'Error CSRF'}), 403
     conn = f.conectar(slug)
     try:
         from app.services.template_service import delete
@@ -3300,6 +3368,8 @@ def planificacion_copiar(slug):
     prof = f.get_profesor(slug)
     if not prof:
         return jsonify({'error': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'error': 'Error CSRF'}), 403
     data = request.get_json(silent=True) or {}
     origen_curso = data.get('origen_curso')
     destino_cursos = data.get('destino_cursos', [])
@@ -3470,6 +3540,8 @@ def ai_ask(slug):
     rector = f.get_rector(slug)
     if not prof and not rector:
         return jsonify({'error': 'No autorizado'}), 403
+    if not validar_csrf():
+        return jsonify({'error': 'Error CSRF'}), 403
     data = request.get_json(silent=True) or {}
     pregunta = data.get('pregunta', '').lower().strip()
     if not pregunta:

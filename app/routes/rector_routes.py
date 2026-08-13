@@ -124,41 +124,74 @@ def rector_panel(slug):
     periodos_estado = {r['periodo']: dict(r) for r in periodos_estado_raw}
     periodo_actual = 1
     periodo_actual_estado = periodos_estado.get(periodo_actual, {}).get('estado', 'abierto')
-    prom_inst = conn.execute('SELECT ROUND(AVG(val),2) as p FROM notas').fetchone()
-    promedio_institucional = prom_inst['p'] if prom_inst and prom_inst['p'] is not None else None
-    bajo_rows = conn.execute(
-        '''SELECT a.id, a.nombre, a.curso, a.jornada, ROUND(AVG(n.val),2) as promedio
-           FROM notas n JOIN alumnos a ON a.id=n.aid
-           WHERE a.activo=1
-           GROUP BY a.id HAVING AVG(n.val) < 3.0
-           ORDER BY promedio ASC LIMIT 5''').fetchall()
-    bajo_rendimiento = [dict(r) for r in bajo_rows]
-    prom_curso_rows = conn.execute(
-        '''SELECT ac.curso, ROUND(AVG(n.val),2) as promedio
-           FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
-           GROUP BY ac.curso ORDER BY ac.curso''').fetchall()
-    promedio_por_curso = [dict(r) for r in prom_curso_rows]
-    dist_rows = conn.execute(
-        '''SELECT a.id, AVG(n.val) as prom FROM notas n
-           JOIN alumnos a ON a.id=n.aid WHERE a.activo=1 GROUP BY a.id''').fetchall()
+    # M4: mismas métricas ponderadas (65/25/10) que el dashboard del rector,
+    # con umbrales relativos a la escala del colegio.
+    cfg = fa.config_get(slug)
+    escala_max = float(cfg.get('escala_max', 5.0))
+    nota_min_aprobar = float(cfg.get('nota_minima_aprobar', 3.0))
+    if escala_max > 5.0:
+        nota_min_aprobar /= 2.0
+    notas_all = conn.execute(
+        '''SELECT n.aid, n.val, ac.materia, ac.jornada
+           FROM notas n JOIN actividades ac ON ac.id = n.actividad_id''').fetchall()
+    ev_all = conn.execute(
+        'SELECT aid, materia, jornada, evaluacion, autoevaluacion FROM evaluaciones').fetchall()
+    notas_idx = {}
+    for r in notas_all:
+        notas_idx.setdefault((r['aid'], r['materia'], r['jornada']), []).append(r['val'])
+    ev_idx = {}
+    for r in ev_all:
+        ev_idx[(r['aid'], r['materia'], r['jornada'])] = r
+    subj_final = {}
+    for key in set(notas_idx) | set(ev_idx):
+        ev = ev_idx.get(key)
+        ev_v = ev['evaluacion'] if ev and ev['evaluacion'] is not None else None
+        au_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
+        final = fa._promedio_ponderado(notas_idx.get(key, []), ev_v, au_v)
+        if final is not None:
+            subj_final[key] = final
+    student_overall = {}
+    for (aid, _m, _j), final in subj_final.items():
+        student_overall.setdefault(aid, []).append(final)
+    student_overall = {aid: round(sum(v) / len(v), 2) for aid, v in student_overall.items()}
+    all_finals = list(student_overall.values())
+    prom_inst = round(sum(all_finals) / len(all_finals), 2) if all_finals else None
+    promedio_institucional = prom_inst
+    # Alumnos de bajo rendimiento (ponderado y escala-aware).
+    bajo_rows = []
+    for aid, avg in sorted(student_overall.items(), key=lambda x: x[1]):
+        if avg < nota_min_aprobar:
+            a = conn.execute('SELECT id, nombre, curso, jornada FROM alumnos WHERE id=? AND activo=1', (aid,)).fetchone()
+            if a:
+                bajo_rows.append({'nombre': a['nombre'], 'promedio': avg, 'curso': a['curso']})
+            if len(bajo_rows) >= 5:
+                break
+    bajo_rendimiento = bajo_rows
+    # Promedio por curso (ponderado por estudiante).
+    curso_avgs = {}
+    for a in conn.execute('SELECT id, curso FROM alumnos WHERE activo=1').fetchall():
+        avg = student_overall.get(a['id'])
+        if avg is not None:
+            curso_avgs.setdefault(a['curso'], []).append(avg)
+    promedio_por_curso = [{'curso': k, 'promedio': round(sum(v) / len(v), 2)}
+                          for k, v in sorted(curso_avgs.items())]
+    # Distribución por alumno con umbrales relativos a la escala.
+    step = (escala_max / 5.0) * 0.5
     dist = {'bajo': 0, 'medio': 0, 'alto': 0, 'sobresaliente': 0}
-    for r in dist_rows:
-        p = r['prom']
-        if p is None:
-            continue
-        if p < 3.0:
+    for p in all_finals:
+        if p < nota_min_aprobar:
             dist['bajo'] += 1
-        elif p < 3.5:
+        elif p < nota_min_aprobar + step:
             dist['medio'] += 1
-        elif p < 4.0:
+        elif p < nota_min_aprobar + 2 * step:
             dist['alto'] += 1
         else:
             dist['sobresaliente'] += 1
     distribucion = [
-        {'label': 'Bajo (<3.0)', 'count': dist['bajo']},
-        {'label': 'Medio (3.0–3.4)', 'count': dist['medio']},
-        {'label': 'Alto (3.5–3.9)', 'count': dist['alto']},
-        {'label': 'Sobresaliente (≥4.0)', 'count': dist['sobresaliente']},
+        {'label': 'Bajo (<%.1f)' % nota_min_aprobar, 'count': dist['bajo']},
+        {'label': 'Medio (%.1f\u2013%.1f)' % (nota_min_aprobar, round(nota_min_aprobar + step - 0.05, 1)), 'count': dist['medio']},
+        {'label': 'Alto (%.1f\u2013%.1f)' % (round(nota_min_aprobar + step, 1), round(nota_min_aprobar + 2 * step - 0.05, 1)), 'count': dist['alto']},
+        {'label': 'Sobresaliente (\u2265%.1f)' % round(nota_min_aprobar + 2 * step, 1), 'count': dist['sobresaliente']},
     ]
     conn.close()
     return fa.render_template('rector_panel.html',
@@ -181,7 +214,8 @@ def rector_panel(slug):
                            promedio_institucional=promedio_institucional,
                            bajo_rendimiento=bajo_rendimiento,
                            promedio_por_curso=promedio_por_curso,
-                           distribucion=distribucion)
+                           distribucion=distribucion,
+                           escala_max=escala_max)
 
 
 @rector_bp.route('/<slug>/rector/horarios')

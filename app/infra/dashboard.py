@@ -365,7 +365,7 @@ def _dashboard_profesor_data(conn, slug, prof, curso=None, materia=None, jornada
             dist['3-4'] += 1
         else:
             dist['4-5'] += 1
-    distribucion = [{'label': k, 'count': v} for k, v in dist.items()]
+    distribucion = [{'label': k, 'count': v} for k, v in dist.items() if v > 0]
     _batch_aids = aids or []
     if _batch_aids:
         ph_b = ','.join('?' * len(_batch_aids))
@@ -406,16 +406,18 @@ def _dashboard_profesor_data(conn, slug, prof, curso=None, materia=None, jornada
     for r in all_ev_periodos:
         ev_by_aid_p[(r['aid'], r['periodo'])] = r['evaluacion']
     evol = []
-    max_periodo = max((r['periodo'] for r in all_ev_periodos), default=4)
-    for p in range(1, max_periodo + 1):
-        finals_p = []
-        for a in all_alumnos:
-            vals_p = notas_by_aid_p.get((a['id'], p), [])
-            ev_p = ev_by_aid_p.get((a['id'], p))
-            ff = _promedio_ponderado(vals_p, ev_p, None)
-            if ff is not None:
-                finals_p.append(ff)
-        evol.append({'periodo': p, 'promedio': round(sum(finals_p) / len(finals_p), 2) if finals_p else None, 'count': len(finals_p)})
+    max_periodo = max((r['periodo'] for r in all_ev_periodos), default=None)
+    if max_periodo is not None:
+        for p in range(1, max_periodo + 1):
+            finals_p = []
+            for a in all_alumnos:
+                vals_p = notas_by_aid_p.get((a['id'], p), [])
+                ev_p = ev_by_aid_p.get((a['id'], p))
+                ff = _promedio_ponderado(vals_p, ev_p, None)
+                if ff is not None:
+                    finals_p.append(ff)
+            if finals_p:
+                evol.append({'periodo': p, 'promedio': round(sum(finals_p) / len(finals_p), 2), 'count': len(finals_p)})
     acts = conn.execute(
         'SELECT id, nombre FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND (? IS NULL OR curso=?) AND (? IS NULL OR periodo=?) ORDER BY orden',
         (prof['id'], m, j, curso, curso, periodo, periodo)).fetchall()
@@ -956,7 +958,7 @@ def _dashboard_rector_data(conn, slug, rector):
             'periodos_abiertos': periodos_abiertos, 'periodos_cerrados': periodos_cerrados,
         },
         'charts': {
-            'distribucion': [{'label': k, 'count': v} for k, v in dist.items()],
+            'distribucion': [{'label': k, 'count': v} for k, v in dist.items() if v > 0],
             'promedio_por_curso': [{'curso': k, 'promedio': v} for k, v in sorted(curso_avgs.items(), key=lambda x: x[1], reverse=True)],
             'promedio_por_materia': [{'materia': k, 'promedio': v} for k, v in sorted(subj_avgs.items(), key=lambda x: x[1], reverse=True)],
             'rendimiento_actividades': [],

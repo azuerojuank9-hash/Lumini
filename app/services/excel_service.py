@@ -64,8 +64,8 @@ def leer_workbook(archivo_bytes, max_filas=EXCEL_MAX_FILAS, max_columnas=EXCEL_M
         wb.close()
 
 
-def parsear_nota(valor, nombre_columna=''):
-    """Convierte un valor a nota válida en [0.0, 5.0].
+def parsear_nota(valor, nombre_columna='', escala_min=0.0, escala_max=5.0):
+    """Convierte un valor a nota válida dentro de la escala del colegio.
     Devuelve (float|None, error|None)."""
     if valor is None or str(valor).strip() == '':
         return None, None
@@ -73,8 +73,8 @@ def parsear_nota(valor, nombre_columna=''):
         num = float(str(valor).replace(',', '.'))
     except (ValueError, TypeError):
         return None, 'valor no numérico'
-    if num < 0 or num > 5:
-        return None, 'la nota debe estar entre 0.0 y 5.0'
+    if num < escala_min or num > escala_max:
+        return None, f'la nota debe estar entre {escala_min} y {escala_max}'
     return round(num, 2), None
 
 
@@ -104,7 +104,8 @@ def parsear_estado_asistencia(valor):
     return None, 'estado no válido (P/A/T/E/X/S)'
 
 
-def revalidar_importacion_notas(data, conn, prof, materia, jornada, curso_sel, periodo):
+def revalidar_importacion_notas(data, conn, prof, materia, jornada, curso_sel, periodo,
+                                escala_min=0.0, escala_max=5.0):
     """Revalida en el servidor el payload de importar_notas/confirmar para no
     confiar en los datos enviados por el cliente. Devuelve (ok, errores)."""
     errores = []
@@ -152,15 +153,15 @@ def revalidar_importacion_notas(data, conn, prof, materia, jornada, curso_sel, p
                     errores.append(
                         f'Fila {nfila}: la actividad no pertenece a esta materia/curso.')
                     continue
-                num, err = parsear_nota(valor, nombre_col)
+                num, err = parsear_nota(valor, nombre_col, escala_min=escala_min, escala_max=escala_max)
                 if err:
                     errores.append(f'Fila {nfila}: {nombre_col}: {err}.')
             elif ch.get('tipo') == 'evaluacion':
-                num, err = parsear_nota(valor)
+                num, err = parsear_nota(valor, escala_min=escala_min, escala_max=escala_max)
                 if err:
                     errores.append(f'Fila {nfila}: Evaluación: {err}.')
             elif ch.get('tipo') == 'autoevaluacion':
-                num, err = parsear_nota(valor)
+                num, err = parsear_nota(valor, escala_min=escala_min, escala_max=escala_max)
                 if err:
                     errores.append(f'Fila {nfila}: Autoevaluación: {err}.')
     return len(errores) == 0, errores

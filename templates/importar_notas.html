@@ -194,10 +194,16 @@ function uploadFile(e){
     var d=res.d;
     btn.disabled=false;
     btn.textContent='Previsualizar';
-    if(!res.ok||d.status==='error'){
-      var msg=d.mensaje||'Error al analizar el archivo. Verifica el formato.';
-      showToast(msg,'err');
+    if(!res.ok){
+      showToast(d.mensaje||'Error al analizar el archivo. Verifica el formato.','err');
       return;
+    }
+    if(d.status==='error'&&(!d.filas||!d.filas.length)){
+      showToast(d.mensaje||'No se pudo analizar el archivo. Verifica el formato.','err');
+      return;
+    }
+    if(d.status==='error'){
+      showToast('El archivo tiene '+d.errores+' fila(s) con errores. Corrígelas en el archivo y vuelve a subirlo.','err');
     }
     previewData=d;
     renderPreview(d);

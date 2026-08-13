@@ -536,6 +536,21 @@ class TestCSRF:
         html = r.get_data(as_text=True)
         assert 'Error de seguridad' not in html
 
+    def test_teacher_state_routes_require_csrf(self, client, teacher_session):
+        """A8: rutas POST state-changing del profesor rechazan sin token CSRF."""
+        for url, kwargs in [
+            ('/testcolegio/plantillas/crear', {'json': {'nombre': 'x'}}),
+            ('/testcolegio/plantillas/aplicar', {'json': {'plantilla_id': 1, 'curso': 'Primero A'}}),
+            ('/testcolegio/plantillas/eliminar/1', {'json': {}}),
+            ('/testcolegio/planificacion/copiar', {'json': {'origen_curso': 'Primero A', 'destino_cursos': ['Primero B']}}),
+            ('/testcolegio/comunicados/1/leer', {'json': {}}),
+            ('/testcolegio/observaciones_json', {'json': {'aid': 1}}),
+            ('/testcolegio/observaciones/sugerir', {'json': {'aid': 1}}),
+            ('/testcolegio/validar', {'json': {'curso': 'Primero A', 'notas': {}}}),
+        ]:
+            r = client.post(url, **kwargs)
+            assert r.status_code == 403, f'{url} debería requerir CSRF (got {r.status_code})'
+
 
 # ── Rendered HTML Quality ──
 
@@ -1141,6 +1156,109 @@ class TestMigraciones:
         assert row is not None
         assert row[0] == 4.8
         assert row[1] == 3.8
+
+    def test_plantilla_aplicar_respeta_jornada_y_periodo(self, client, teacher_session):
+        """Aplicar una plantilla usa la jornada y periodo del front, no los de la sesión."""
+        conn = sqlite3.connect(TEST_DB)
+        conn.execute('DELETE FROM plantillas WHERE profesor_id=1')
+        conn.execute("DELETE FROM actividades WHERE nombre LIKE 'Plantilla test A4%'")
+        conn.commit()
+        conn.close()
+        r = client.post('/testcolegio/plantillas/crear', json={
+            'nombre': 'Plantilla test A4', 'tipo': 'tarea', 'peso': 10, 'descripcion': ''},
+            headers={'X-CSRF-Token': 'pytest_csrf_token'})
+        assert r.status_code == 200, r.get_data(as_text=True)
+        conn = sqlite3.connect(TEST_DB)
+        tmpl = conn.execute("SELECT id FROM plantillas WHERE profesor_id=1 AND nombre='Plantilla test A4'").fetchone()
+        conn.close()
+        assert tmpl is not None
+        r = client.post('/testcolegio/plantillas/aplicar', json={
+            'plantilla_id': tmpl[0], 'curso': 'Primero A', 'materia': 'Matemáticas',
+            'jornada': 'Tarde', 'periodo': 2},
+            headers={'X-CSRF-Token': 'pytest_csrf_token'})
+        assert r.status_code == 200, r.get_data(as_text=True)
+        conn = sqlite3.connect(TEST_DB)
+        act = conn.execute(
+            "SELECT * FROM actividades WHERE profesor_id=1 AND nombre='Plantilla test A4'").fetchone()
+        conn.execute("DELETE FROM plantillas WHERE id=?", (tmpl[0],))
+        conn.commit()
+        conn.close()
+        assert act is not None
+        assert act[3] == 'Tarde'
+        assert act[7] == 2
+        assert act[4] == 'Primero A'
+
+class TestAccionesMasivas:
+    CSRF = 'pytest_csrf_token'
+
+    def _session(self, client):
+        with client.session_transaction() as sess:
+            sess['profesor_id_testcolegio'] = 1
+            sess['rol_testcolegio'] = 'profesor'
+            sess['jornada_testcolegio'] = 'Mañana'
+            sess['materia_testcolegio'] = 'Matemáticas'
+            sess['_csrf_token'] = self.CSRF
+
+    def test_masiva_periodo_cerrado_bloquea_eliminar(self, client):
+        self._session(client)
+        conn = sqlite3.connect(TEST_DB)
+        conn.execute('INSERT OR REPLACE INTO periodos_estado (periodo, estado) VALUES (1, ?)', ('cerrado',))
+        conn.commit()
+        try:
+            r = client.post('/testcolegio/actividades/masiva',
+                            json={'accion': 'eliminar', 'ids': [1]},
+                            headers={'X-CSRF-Token': self.CSRF})
+            assert r.status_code == 403, r.get_data(as_text=True)
+            assert r.get_json()['codigo'] == 'PERIODO_CERRADO'
+            still = conn.execute('SELECT COUNT(*) FROM actividades WHERE id=1').fetchone()[0]
+            assert still == 1
+        finally:
+            conn.execute('INSERT OR REPLACE INTO periodos_estado (periodo, estado) VALUES (1, ?)', ('abierto',))
+            conn.commit()
+            conn.close()
+
+    def test_masiva_duplicar_copia_orden(self, client):
+        self._session(client)
+        conn = sqlite3.connect(TEST_DB)
+        conn.execute("DELETE FROM actividades WHERE nombre LIKE '%(copia)'")
+        conn.commit()
+        r = client.post('/testcolegio/actividades/masiva',
+                        json={'accion': 'duplicar', 'ids': [1]},
+                        headers={'X-CSRF-Token': self.CSRF})
+        assert r.status_code == 200 and r.get_json()['status'] == 'ok'
+        copy = conn.execute("SELECT * FROM actividades WHERE nombre='Tarea 1 (copia)'").fetchone()
+        conn.close()
+        assert copy is not None
+        assert copy[6] == 1
+
+    def test_masiva_eliminar_audita(self, client):
+        self._session(client)
+        conn = sqlite3.connect(TEST_DB)
+        conn.execute('INSERT OR REPLACE INTO periodos_estado (periodo, estado) VALUES (1, ?)', ('abierto',))
+        conn.execute("DELETE FROM audit_log WHERE accion='actividad_eliminar'")
+        cur = conn.execute('INSERT INTO actividades (profesor_id, materia, jornada, curso, nombre, orden, periodo) VALUES (1,"Matemáticas","Mañana","Primero A","Borrable A9",9,1)')
+        new_id = cur.lastrowid
+        conn.commit()
+        conn.close()
+        r = client.post('/testcolegio/actividades/masiva',
+                        json={'accion': 'eliminar', 'ids': [new_id]},
+                        headers={'X-CSRF-Token': self.CSRF})
+        assert r.status_code == 200 and r.get_json()['status'] == 'ok'
+        conn = sqlite3.connect(TEST_DB)
+        gone = conn.execute('SELECT COUNT(*) FROM actividades WHERE id=?', (new_id,)).fetchone()[0]
+        aud = conn.execute('SELECT accion, valor_nuevo FROM audit_log WHERE accion="actividad_eliminar" ORDER BY id DESC LIMIT 1').fetchone()
+        conn.close()
+        assert gone == 0
+        assert aud is not None
+        assert str(new_id) in aud[1]
+
+    def test_index_muestra_toolbar_masiva_y_confirm(self, client, teacher_session):
+        r = client.get('/testcolegio/')
+        html = r.get_data(as_text=True)
+        assert 'masivaActions' in html
+        assert '_modoMasiva' in html
+        assert 'limpiarSeleccionMasiva' in html
+        assert 'Eliminar ' in html and 'confirm(' in html
 
 # ── Auditoría de Notas ──
 

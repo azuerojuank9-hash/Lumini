@@ -104,9 +104,9 @@ def marcar_asistencia(slug):
     fecha = request.form.get('fecha', '')
     observacion = request.form.get('observacion', '').strip()
     hora = request.form.get('hora', '')
-    if aid is None or not estado:
+    if aid is None or (not estado and not observacion):
         return ('', 400)
-    if estado not in ESTADOS_ASISTENCIA:
+    if estado and estado not in ESTADOS_ASISTENCIA:
         return ('', 400)
     if fecha:
         try:

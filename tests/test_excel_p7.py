@@ -139,6 +139,17 @@ class TestExcelService:
         val, err = parsear_nota('abc')
         assert err == 'valor no numérico'
 
+    def test_parsear_nota_respeta_escala(self):
+        from app.services.excel_service import parsear_nota
+        val, err = parsear_nota(8.5, escala_min=1.0, escala_max=10.0)
+        assert val == 8.5 and err is None
+        val, err = parsear_nota(6.0, escala_min=1.0, escala_max=10.0)
+        assert val == 6.0 and err is None
+        val, err = parsear_nota(11.0, escala_min=1.0, escala_max=10.0)
+        assert err and '10.0' in err
+        val, err = parsear_nota(0.5, escala_min=1.0, escala_max=10.0)
+        assert err and '1.0' in err
+
     def test_parsear_fecha(self):
         from app.services.excel_service import parsear_fecha
         assert parsear_fecha('2026-08-10') == ('2026-08-10', None)
@@ -211,11 +222,12 @@ class TestImportarNotasP7:
         assert 'N°' in data['mensaje'] or 'N\u00b0' in data['mensaje']
 
     def test_preview_nota_fuera_de_rango(self, client, teacher, csrf):
+        """Escala 1-10 del testcolegio: 11.0 queda fuera; 6.0 es válido."""
         alumno = primer_alumno_primero_a()
         actividad = primera_actividad()
         assert alumno and actividad
         bio = make_xlsx([['N°', 'Estudiante', 'AID', actividad['nombre'], 'Promedio'],
-                         [1, alumno['nombre'], alumno['id'], 6.0, '']])
+                         [1, alumno['nombre'], alumno['id'], 11.0, '']])
         r = client.post(f'/{SLUG}/importar_notas/preview', data={
             '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
             'archivo': (bio, 'rango.xlsx')})
@@ -224,6 +236,76 @@ class TestImportarNotasP7:
         assert data['all_ok'] is False
         assert data['filas'][0]['ok'] is False
         assert any('rango' in e.lower() for e in data['filas'][0]['errors'])
+
+    def test_preview_nota_dentro_escala_10(self, client, teacher, csrf):
+        """Una nota de 6.0 (escala 1-10) no debe marcarse como error."""
+        alumno = primer_alumno_primero_a()
+        actividad = primera_actividad()
+        assert alumno and actividad
+        bio = make_xlsx([['N°', 'Estudiante', 'AID', actividad['nombre'], 'Promedio'],
+                         [1, alumno['nombre'], alumno['id'], 6.0, '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'escala10.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['all_ok'] is True
+        assert data['filas'][0]['ok'] is True
+
+    def test_preview_reutiliza_formato_exportacion(self, client, teacher, csrf):
+        """El Excel exportado por LUMINI se puede volver a importar (roundtrip)."""
+        r = client.get(f'/{SLUG}/exportar_notas?curso=Primero A&periodo=1')
+        assert r.status_code == 200
+        assert r.content_type == MIME_XLSX
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (io.BytesIO(r.data), 'exportado.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['all_ok'] is True, data.get('filas', [{}])[0].get('errors')
+        assert data['total'] >= 28
+        assert data['validos'] == data['total']
+
+    def test_importar_28_estudiantes_y_confirmar(self, client, teacher, csrf):
+        """Escenario de la prueba de evaluación: 28 estudiantes, varias
+        actividades y notas distintas dentro de la escala 1-10."""
+        conn = db()
+        alumnos = conn.execute(
+            "SELECT id, nombre FROM alumnos WHERE curso='Primero A' AND jornada='Mañana' "
+            "AND activo=1 ORDER BY id LIMIT 28").fetchall()
+        actividades = conn.execute(
+            "SELECT id, nombre FROM actividades WHERE profesor_id=1 AND materia='Matemáticas' "
+            "AND curso='Primero A' AND jornada='Mañana' AND COALESCE(periodo,1)=1 "
+            "AND nombre IN ('Tarea 1','Examen 1') ORDER BY orden LIMIT 2").fetchall()
+        conn.close()
+        assert len(alumnos) == 28
+        assert len(actividades) == 2
+        filas = [['N°', 'Estudiante', 'AID', actividades[0]['nombre'], actividades[1]['nombre'],
+                  'Evaluación', 'Autoevaluación', 'Promedio']]
+        for i, al in enumerate(alumnos, 1):
+            filas.append([i, al['nombre'], al['id'], round(4 + i % 5, 1), round(6 + i % 3, 1),
+                          round(5.5 + i % 3, 1), round(6.5 + i % 2, 1), ''])
+        bio = make_xlsx(filas)
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, '28.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['all_ok'] is True, data.get('filas', [{}])[0].get('errors')
+        assert data['total'] == 28 and data['errores'] == 0
+        r = client.post(f'/{SLUG}/importar_notas/confirmar', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'data': json.dumps(data)})
+        assert r.status_code == 200
+        res = json.loads(r.get_data(as_text=True))
+        assert res['status'] == 'ok'
+        conn = db()
+        saved = conn.execute(
+            'SELECT COUNT(*) c FROM notas WHERE aid IN (%s) AND actividad_id IN (%s)'
+            % (','.join('?' * 28), ','.join('?' * 2)),
+            tuple(a['id'] for a in alumnos) + (actividades[0]['id'], actividades[1]['id'])).fetchone()['c']
+        conn.close()
+        assert saved == 28 * 2
 
     def test_preview_estudiante_inexistente(self, client, teacher, csrf):
         bio = make_xlsx([['N°', 'Estudiante', 'AID', 'Promedio'],

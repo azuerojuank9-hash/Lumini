@@ -1150,6 +1150,23 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
     </div>
 </div>
 <div class="grade-scroll" id="gradeScroll">
+<div class="masiva-toolbar" id="masivaToolbar">
+    <button id="mtToggle" onclick="toggleModoMasiva()" title="Modo selección múltiple" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,8px);background:var(--bg2,#fff);color:var(--text,#111827);font-size:12px;cursor:pointer;">
+        <i data-lucide="check-square" style="width:14px;height:14px;"></i><span>Selección</span>
+    </button>
+    <div id="masivaActions" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span id="masivaCount" style="font-size:12px;color:var(--muted,#6b7280);margin-right:4px;">0</span>
+        <button onclick="ejecutarAccionMasiva('eliminar')" style="padding:6px 10px;border:1px solid var(--danger,#ef4444);color:var(--danger,#ef4444);border-radius:var(--radius-md,8px);background:transparent;font-size:12px;cursor:pointer;">Eliminar</button>
+        <button onclick="ejecutarAccionMasiva('publicar')" style="padding:6px 10px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,8px);background:var(--bg2,#fff);color:var(--text,#111827);font-size:12px;cursor:pointer;">Publicar</button>
+        <button onclick="ejecutarAccionMasiva('cerrar')" style="padding:6px 10px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,8px);background:var(--bg2,#fff);color:var(--text,#111827);font-size:12px;cursor:pointer;">Cerrar</button>
+        <button onclick="ejecutarAccionMasiva('archivar')" style="padding:6px 10px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,8px);background:var(--bg2,#fff);color:var(--text,#111827);font-size:12px;cursor:pointer;">Archivar</button>
+        <button onclick="ejecutarAccionMasiva('duplicar')" style="padding:6px 10px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,8px);background:var(--bg2,#fff);color:var(--text,#111827);font-size:12px;cursor:pointer;">Duplicar</button>
+        <button onclick="ejecutarAccionMasiva('cambiar_peso')" style="padding:6px 10px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,8px);background:var(--bg2,#fff);color:var(--text,#111827);font-size:12px;cursor:pointer;">Peso</button>
+        <button onclick="ejecutarAccionMasiva('cambiar_tipo')" style="padding:6px 10px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,8px);background:var(--bg2,#fff);color:var(--text,#111827);font-size:12px;cursor:pointer;">Tipo</button>
+        <button onclick="ejecutarAccionMasiva('cambiar_fecha')" style="padding:6px 10px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,8px);background:var(--bg2,#fff);color:var(--text,#111827);font-size:12px;cursor:pointer;">Fecha</button>
+        <button onclick="limpiarSeleccionMasiva()" title="Limpiar selección" style="padding:6px 10px;border:1px solid var(--border,#d1d5db);border-radius:var(--radius-md,8px);background:transparent;color:var(--muted,#6b7280);font-size:12px;cursor:pointer;">✕</button>
+    </div>
+</div>
 <div class="tw zebra">
     <table id="gradeTable">
         <thead>
@@ -3587,6 +3604,11 @@ function injectActividadColumn(a){
 }
 var _actCtxId=null;
 function abrirDetalleActividad(id){
+    if(_modoMasiva){
+        var th=document.querySelector('#gradeTable thead th[data-act="'+id+'"]');
+        if(th) toggleActSelect(th,id);
+        return;
+    }
     _actCtxId=id;
     var d=document.getElementById('actDrawer');
     var o=document.getElementById('drawerOverlay');
@@ -3866,6 +3888,7 @@ function eliminarActividad(id){
 // ── FASE 3: Search, Filters, Selection, Batch Save, Drag, Student Drawer ──
 var _batchChanges={}, _batchTimer=null, _undoSnapshot=null, _selAids=[], _dragId=null, _sdAid=null, _paginaVisibles=null;
 var _evalTimers={}, _evalFallidas={};
+var _batchInFlight=false, _batchQueued=false, _batchSeq=0;
 function contarCambiosPendientes(){
     return Object.keys(_batchChanges).length+document.querySelectorAll('.eval-input.dirty').length;
 }
@@ -3988,16 +4011,34 @@ function cerrarStudentDrawer(){document.getElementById('studentDrawer').classLis
 function abrirObsFromDrawer(){if(_sdAid)abrirObs(parseInt(_sdAid),document.getElementById('sdName').textContent);cerrarStudentDrawer();}
 // ── Batch save ──
 function cambioNota(inp){
-    var val=inp.value.trim();var num=val?parseFloat(val):null;
+    var val=inp.value.trim();
+    var num=val?parseFloat(val.replace(',','.')):null;
+    if(val&&(isNaN(num)||num===Infinity||num===-Infinity)){
+        inp.classList.add('input-invalid');
+        inp.classList.remove('dirty');
+        return;
+    }
+    inp.classList.remove('input-invalid');
     // Update color class + dirty indicator
     inp.className='ni nota-input'+(num!==null&&!isNaN(num)?' val-'+Math.floor(num):'');
     inp.classList.add('dirty');
     var aid=inp.getAttribute('data-aid'),actid=inp.getAttribute('data-actid');
+    // Borrar nota solo con gesto explícito: vaciar una celda con valor pide confirmación
+    if(val===''&&(inp.dataset.ov||'')!==''&&!inp.dataset.confirmado){
+        if(!window.confirm('¿Eliminar esta nota? Podrás deshacerlo con el aviso inferior.')){
+            inp.value=inp.dataset.ov||'';
+            inp.classList.remove('dirty');
+            return;
+        }
+        inp.dataset.confirmado='1';
+    }
+    if(val!=='') inp.dataset.confirmado='';
+    inp.dataset.ov=inp.value;
     _batchChanges['n_'+aid+'_'+actid]={aid:parseInt(aid),actividad_id:parseInt(actid),val:num};
     programarBatchSave();
 }
 function cambioEval(inp){
-    var val=inp.value.trim();var num=val?parseFloat(val):null;
+    var val=inp.value.trim();var num=val?parseFloat(val.replace(',','.')):null;
     inp.className='ni eval-input'+(num!==null&&!isNaN(num)?' val-'+Math.floor(num):'');
     inp.classList.add('dirty');
     var aid=inp.getAttribute('data-aid'),campo=inp.getAttribute('data-campo');
@@ -4007,7 +4048,8 @@ function cambioEval(inp){
 }
 function guardarEvalDebounced(aid,campo,num){
     marcarSaving(1);
-    fetch('/{{ slug }}/guardar_evaluacion', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value}, body:'aid='+encodeURIComponent(aid)+'&'+campo+'='+encodeURIComponent(num!==null?num:'')})
+    var curso=document.querySelector('.ctab.active')?.textContent?.trim()||'{{ curso_sel }}';
+    fetch('/{{ slug }}/guardar_evaluacion', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value}, body:'aid='+encodeURIComponent(aid)+'&periodo='+encodeURIComponent('{{ periodo_sel }}')+'&curso='+encodeURIComponent(curso)+'&'+campo+'='+encodeURIComponent(num!==null?num:'')})
     .then(function(r){return r.json();})
     .then(function(resp){
         if(resp.status!=='ok') throw new Error(resp.mensaje||'Error');
@@ -4022,24 +4064,53 @@ function guardarEvalDebounced(aid,campo,num){
 function programarBatchSave(){
     clearTimeout(_batchTimer);
     marcarDirty(Object.keys(_batchChanges).length);
-    _batchTimer=setTimeout(function(){ejecutarBatchSave();},600);
+    _batchTimer=setTimeout(function(){
+        if(_batchInFlight){_batchQueued=true;return;}
+        ejecutarBatchSave();
+    },600);
 }
 function ejecutarBatchSave(){
+    if(_batchInFlight){_batchQueued=true;return;}
     var cambios=Object.values(_batchChanges);
     if(!cambios.length){marcarSaved();return;}
+    var claves=Object.keys(_batchChanges);
+    var seq=++_batchSeq;
+    _batchInFlight=true;
     marcarSaving(cambios.length);
     fetch('/{{ slug }}/notas/batch', {method:'POST', headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value}, body:JSON.stringify({notas:cambios})})
     .then(function(r){return r.json();}).then(function(resp){
+        _batchInFlight=false;
+        if(seq!==_batchSeq) return; // respuesta obsoleta (no aplica sobre cambios más nuevos)
         if(resp.status!=='ok') throw new Error(resp.mensaje||'Error');
         _undoSnapshot=resp.snapshot||null;
-        _batchChanges={};
+        // Solo quitar los cambios que el servidor realmente guardó; si hay
+        // rechazos (rango/periodo cerrado) quedan pendientes para reintentar.
+        var rechazadas={};
+        (resp.errors||[]).forEach(function(e){rechazadas[e.aid+'_'+e.actividad_id]=e.error;});
+        claves.forEach(function(k){
+            var m=k.match(/^n_(\d+)_(\d+)$/);
+            if(m&&rechazadas[m[1]+'_'+m[2]]) return;
+            delete _batchChanges[k];
+        });
         marcarSaved();
-        // Clear dirty indicators
-        document.querySelectorAll('.ni.dirty').forEach(function(el){el.classList.remove('dirty');});
+        // Clear dirty indicators (solo los que ya no están pendientes)
+        document.querySelectorAll('.ni.dirty').forEach(function(el){
+            var k='n_'+(el.getAttribute('data-aid')||'')+'_'+(el.getAttribute('data-actid')||'');
+            if(!_batchChanges[k]) el.classList.remove('dirty');
+        });
+        if(resp.errors&&resp.errors.length){
+            showToast('<i data-lucide="alert-circle"></i> '+resp.errors.length+' cambio(s) rechazado(s): '+resp.errors.slice(0,3).map(function(e){return e.error||'Error';}).join(' · '),'err');
+        }
         // Refresh affected cells using server-computed values when available
         var calc=resp.calculos||{};
         cambios.forEach(function(c){var cl=calc[''+c.aid]||calc[c.aid];actualizarCelda(c.aid, cl);});
-    }).catch(function(e){marcarError();showToast('<i data-lucide="alert-circle"></i> Error al guardar notas');});
+        // Offer undo (último cambio guardado)
+        if(_undoSnapshot&&_undoSnapshot.length){
+            var s=_undoSnapshot[_undoSnapshot.length-1];
+            mostrarDeshacer('Nota guardada. ¿Deshacer?',{aid:s.aid,actividad_id:s.actividad_id,val_anterior:s.val_anterior});
+        }
+        if(Object.keys(_batchChanges).length||_batchQueued){_batchQueued=false;programarBatchSave();}
+    }).catch(function(e){_batchInFlight=false;marcarError();showToast('<i data-lucide="alert-circle"></i> Error al guardar notas');});
 }
 function actualizarCelda(aid, calculo){
     var tr=document.querySelector('#gradeTable tbody tr[data-aid="'+aid+'"]');
@@ -4129,25 +4200,34 @@ function reintentarGuardado(){
 }
 // ── Undo ──
 function mostrarDeshacer(msg,data){
-    document.getElementById('undoMsg').textContent=msg;
-    document.getElementById('undoToast').classList.add('show');
-    document.getElementById('undoToast').dataset.aid=data?.aid||'';
-    document.getElementById('undoToast').dataset.actid=data?.actividad_id||'';
-    document.getElementById('undoToast').dataset.val=data?.val_anterior!==undefined?data.val_anterior:'';
+    var t=document.getElementById('undoToast');
+    if(!t) return;
+    document.getElementById('undoMsg').textContent=msg||'Nota guardada';
+    t.classList.add('show');
+    t.dataset.aid=data?.aid||'';
+    t.dataset.actid=data?.actividad_id||'';
+    t.dataset.val=data?.val_anterior!==undefined?data.val_anterior:'';
     clearTimeout(window._undoTimer);
-    window._undoTimer=setTimeout(function(){document.getElementById('undoToast').classList.remove('show');},10000);
+    window._undoTimer=setTimeout(function(){t.classList.remove('show');},10000);
 }
 function ejecutarDeshacer(){
     var t=document.getElementById('undoToast');
+    if(!t) return;
     var aid=t.getAttribute('data-aid'),actid=t.getAttribute('data-actid'),val=t.getAttribute('data-val');
     if(!aid||!actid) return;
     fetch('/{{ slug }}/notas/deshacer', {method:'POST', headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value}, body:JSON.stringify({aid:parseInt(aid),actividad_id:parseInt(actid),val:val===''?null:parseFloat(val)})})
     .then(function(r){return r.json();}).then(function(resp){
         if(resp.status!=='ok') throw new Error(resp.mensaje||'Error');
         var inp=document.querySelector('.nota-input[data-aid="'+aid+'"][data-actid="'+actid+'"]');
-        if(inp){inp.value=resp.val!==null?resp.val:'';cambioNota(inp);}
+        if(inp){
+            inp.value=resp.val!==null&&resp.val!==undefined?resp.val:'';
+            inp.dataset.ov=inp.value;
+            inp.dataset.confirmado='';
+            inp.classList.remove('dirty');
+            actualizarCelda(aid);
+        }
         showToast('<i data-lucide="rotate-ccw"></i> Cambio deshecho');
-        document.getElementById('undoToast').classList.remove('show');
+        t.classList.remove('show');
     }).catch(function(e){showToast('<i data-lucide="alert-circle"></i> '+(e.message||'Error al deshacer'));});
 }
 // ── Floating history (hover) ──
@@ -4196,9 +4276,9 @@ function dropAct(e,id){
     }else{
         ths[fromIdx].parentNode.insertBefore(ths[fromIdx],ths[toIdx]);
     }
-    // Reorder tbody cells
+    // Reorder tbody cells (all activity columns: server-rendered + dynamic)
     document.querySelectorAll('#gradeTable tbody tr').forEach(function(r){
-        var cells=r.querySelectorAll('td.td-eval, td.td-locked'); // this is approximate
+        var cells=[].filter.call(r.querySelectorAll('td'),function(td){return td.querySelector('input[data-actid]');});
         if(fromIdx<toIdx&&cells[fromIdx]&&cells[toIdx]){
             cells[toIdx].parentNode.insertBefore(cells[fromIdx],cells[toIdx].nextSibling);
         }else if(cells[fromIdx]&&cells[toIdx]){
@@ -4459,7 +4539,7 @@ abrirStudentDrawer=function(aid,nombre){
             var ctx=document.getElementById('sdTendenciaChart');
             if(ctx){
                 if(_sdTendenciaChart) try{_sdTendenciaChart.destroy();}catch(e){}
-                _sdTendenciaChart=new Chart(ctx,{type:'line',data:{labels:pLabels,datasets:[{label:'Nota',data:pVals,borderColor:'rgba(99,102,241,.6)',backgroundColor:'rgba(99,102,241,.1)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'rgba(99,102,241,1)'},{label:'Prom. acum.',data:pAcum,borderColor:'rgba(46,204,113,.6)',borderDash:[4,3],fill:false,tension:.3,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:10,font:{size:10}}}},scales:{y:{min:0,max:5,grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
+                _sdTendenciaChart=new Chart(ctx,{type:'line',data:{labels:pLabels,datasets:[{label:'Nota',data:pVals,borderColor:'rgba(var(--accent-rgb),.6)',backgroundColor:'rgba(var(--accent-rgb),.1)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'rgba(var(--accent-rgb),1)'},{label:'Prom. acum.',data:pAcum,borderColor:'rgba(var(--success-rgb),.6)',borderDash:[4,3],fill:false,tension:.3,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:10,font:{size:10}}}},scales:{y:{min:0,max:d.escala_max||5,grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
             }
         }else{
             var ctx=document.getElementById('sdTendenciaChart');
@@ -4894,7 +4974,7 @@ function abrirEstudiante(aid,nombre){
             if(dd.puntos.length>1){
                 var ctx=document.getElementById('sdTendenciaChart');if(ctx){
                     if(window._sdChart) window._sdChart.destroy();
-                    window._sdChart=new Chart(ctx,{type:'scatter',data:{datasets:[{label:'Notas',data:dd.puntos.map(function(p,i){return{x:i,y:p.valor};}),backgroundColor:'rgba(var(--accent-rgb),.7)',pointRadius:4,pointHoverRadius:6,showLine:!1},{label:'Promedio móvil',data:dd.puntos.map(function(p,i){return{x:i,y:p.promedio_acumulado};}),borderColor:'var(--accent)',backgroundColor:'transparent',type:'line',fill:!1,tension:.3,pointRadius:2,pointHoverRadius:4,showLine:!0}],},options:{animation:!1,responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1,position:'top',labels:{boxWidth:8,boxHeight:8,font:{size:10},padding:8}}},scales:{x:{display:!0,grid:{display:!1},ticks:{display:!1}},y:{beginAtZero:!0,max:5,grid:{color:'rgba(128,128,128,.1)'},ticks:{font:{size:10}}}}}});}
+                    window._sdChart=new Chart(ctx,{type:'scatter',data:{datasets:[{label:'Notas',data:dd.puntos.map(function(p,i){return{x:i,y:p.valor};}),backgroundColor:'rgba(var(--accent-rgb),.7)',pointRadius:4,pointHoverRadius:6,showLine:!1},{label:'Promedio móvil',data:dd.puntos.map(function(p,i){return{x:i,y:p.promedio_acumulado};}),borderColor:'var(--accent)',backgroundColor:'transparent',type:'line',fill:!1,tension:.3,pointRadius:2,pointHoverRadius:4,showLine:!0}],},options:{animation:!1,responsive:!0,maintainAspectRatio:!1,plugins:{legend:{display:!1,position:'top',labels:{boxWidth:8,boxHeight:8,font:{size:10},padding:8}}},                scales:{x:{display:!0,grid:{display:!1},ticks:{display:!1}},y:{beginAtZero:!0,max:dd.escala_max||5,grid:{color:'rgba(128,128,128,.1)'},ticks:{font:{size:10}}}}}});}
             }
         }
     }).catch(function(){});
@@ -5039,6 +5119,14 @@ function seleccionarActSidebar(actId){
 }
 // ── Fase 7: Activity selection for mass actions ──
 var _selectedActIds=[];
+var _modoMasiva=false;
+function toggleModoMasiva(){
+    _modoMasiva=!_modoMasiva;
+    var b=document.getElementById('mtToggle');
+    if(b) b.style.borderColor=_modoMasiva?'var(--accent,#3b82f6)':'';
+    if(!_modoMasiva) limpiarSeleccionMasiva();
+    else showToast('<i data-lucide="info"></i> Clic en una columna para seleccionarla');
+}
 function toggleActSelect(el,actId){
     el.classList.toggle('checked');
     var th=document.querySelector('.act-th[data-act="'+actId+'"]');
@@ -5046,17 +5134,25 @@ function toggleActSelect(el,actId){
     var idx=_selectedActIds.indexOf(String(actId));
     if(idx>-1)_selectedActIds.splice(idx,1);
     else _selectedActIds.push(String(actId));
-    var _mb=document.getElementById('massDeleteBtn');if(_mb)_mb.style.display=_selectedActIds.length>0?'':'none';
+    var _mb=document.getElementById('masivaActions');if(_mb)_mb.style.display=_selectedActIds.length>0?'flex':'none';
+    var _c=document.getElementById('masivaCount');if(_c)_c.textContent=_selectedActIds.length+' seleccionada(s)';
+    if(typeof lucide!=='undefined') lucide.createIcons();
+}
+function limpiarSeleccionMasiva(){
+    _selectedActIds=[];
+    document.querySelectorAll('.asi-selected').forEach(function(th){th.classList.remove('asi-selected','checked');});
+    var _mb=document.getElementById('masivaActions');if(_mb)_mb.style.display='none';
 }
 function ejecutarAccionMasiva(accion){
     if(!_selectedActIds.length){showToast('<i data-lucide="alert-circle"></i> Selecciona actividades primero');return;}
+    if(accion==='eliminar' && !confirm('Eliminar '+_selectedActIds.length+' actividad(es) y sus notas?')) return;
     var extra={};
     if(accion==='cambiar_peso'){var p=prompt('Nuevo peso (%):','10');if(!p||isNaN(p))return;extra.peso=parseFloat(p);}
     if(accion==='cambiar_tipo'){var t=prompt('Nuevo tipo (tarea/examen/taller/proyecto/quiz/oral):','tarea');if(!t)return;extra.tipo=t;}
     if(accion==='cambiar_fecha'){var f=prompt('Nueva fecha (YYYY-MM-DD):','');if(!f)return;extra.fecha=f;}
     fetch('/{{ slug }}/actividades/masiva',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value},body:JSON.stringify(Object.assign({accion:accion,ids:_selectedActIds},extra))}).then(function(r){return r.json();}).then(function(d){
-        if(d.status==='ok'){showToast('<i data-lucide="check"></i> Acción completada');_selectedActIds=[];var _mb=document.getElementById('massDeleteBtn');if(_mb)_mb.style.display='none';setTimeout(function(){location.reload();},800);}
-        else showToast('<i data-lucide="alert-circle"></i> Error al ejecutar acción');
+        if(d.status==='ok'){showToast('<i data-lucide="check"></i> Acción completada');limpiarSeleccionMasiva();setTimeout(function(){location.reload();},800);}
+        else showToast('<i data-lucide="alert-circle"></i> '+(d.mensaje||d.error||'Error al ejecutar acción'));
     }).catch(function(){showToast('<i data-lucide="alert-circle"></i> Error de conexión');});
 }
 // ── Fase 7: Activity stats popover ──
@@ -5565,7 +5661,7 @@ function crearPlantilla(){
 }
 function aplicarPlantilla(id,nombre){
     if(!confirm('Usar la plantilla "'+nombre+'" en el curso actual?')) return;
-    fetch('/{{ slug }}/plantillas/aplicar',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value},body:JSON.stringify({plantilla_id:id,curso:cursoActual||'',materia:materiaActual||''})})
+    fetch('/{{ slug }}/plantillas/aplicar',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]').value},body:JSON.stringify({plantilla_id:id,curso:cursoActual||'',materia:materiaActual||'',jornada:'{{ jornada }}',periodo:{{ periodo_sel }}})})
     .then(function(r){return r.json();}).then(function(d){
         if(d.status==='ok'){showToast('<i data-lucide="check"></i> Actividad creada desde plantilla');if(typeof actualizarTodo==='function')actualizarTodo();}
         else showToast('<i data-lucide="alert-circle"></i> '+d.error);
@@ -5749,7 +5845,7 @@ function switchAnaliticaTab(tipo,btn){
                 maintainAspectRatio:false,
                 plugins:{legend:{display:false}},
                 scales:{
-                    y:{beginAtZero:true,max:5,ticks:{stepSize:1}},
+                    y:{beginAtZero:true,max:d.escala_max||5,ticks:{stepSize:1}},
                     x:{grid:{display:false}}
                 }
             }

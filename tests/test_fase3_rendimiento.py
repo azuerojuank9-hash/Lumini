@@ -157,3 +157,59 @@ def test_notas_batch_valor_invalido(teacher):
     assert len(data['errors']) == 3
     assert all(e.get('error') != 'Datos invalidos' for e in data['errors'])
     assert data['saved'] == 0
+
+
+def test_notas_batch_rechaza_nan(teacher):
+    """NaN (de JSON 'NaN') no debe persistirse: se rechaza como valor invalido."""
+    import json
+    asegurar_periodo_abierto()
+    payload = json.dumps({'notas': [{'aid': AID, 'actividad_id': ACT_ID, 'val': float('nan')}]})
+    r = teacher.post(f'/{SLUG}/notas/batch', data=payload, content_type='application/json',
+                     headers={'X-CSRF-Token': CSRF})
+    assert r.status_code == 200, r.get_data(as_text=True)
+    data = r.get_json()
+    assert data['status'] == 'ok'
+    assert data['saved'] == 0
+    assert any(e.get('error') == 'Valor invalido' for e in data['errors'])
+    conn = db()
+    fila = conn.execute('SELECT val FROM notas WHERE aid=? AND actividad_id=?', (AID, ACT_ID)).fetchone()
+    conn.close()
+    assert fila is None or not (fila['val'] != fila['val'])
+
+
+def test_notas_deshacer_restaura_tras_borrado(teacher):
+    """Deshacer un borrado en batch debe re-crear la fila (upsert), no fallar."""
+    asegurar_periodo_abierto()
+    r = teacher.post(f'/{SLUG}/notas/batch', json={'notas': [
+        {'aid': AID, 'actividad_id': ACT_ID, 'val': 4.0}]}, headers={'X-CSRF-Token': CSRF})
+    assert r.get_json()['status'] == 'ok'
+    r = teacher.post(f'/{SLUG}/notas/batch', json={'notas': [
+        {'aid': AID, 'actividad_id': ACT_ID, 'val': None}]}, headers={'X-CSRF-Token': CSRF})
+    assert r.get_json()['status'] == 'ok'
+    conn = db()
+    fila = conn.execute('SELECT val FROM notas WHERE aid=? AND actividad_id=?', (AID, ACT_ID)).fetchone()
+    conn.close()
+    assert fila is None
+    r = teacher.post(f'/{SLUG}/notas/deshacer', json={'aid': AID, 'actividad_id': ACT_ID, 'val': 4.0},
+                     headers={'X-CSRF-Token': CSRF})
+    assert r.status_code == 200, r.get_data(as_text=True)
+    assert r.get_json()['status'] == 'ok'
+    conn = db()
+    fila = conn.execute('SELECT val FROM notas WHERE aid=? AND actividad_id=?', (AID, ACT_ID)).fetchone()
+    conn.close()
+    assert fila is not None and float(fila['val']) == 4.0
+
+
+def test_notas_deshacer_elimina_creacion(teacher):
+    """Deshacer una creación (val_anterior None) debe borrar la nota."""
+    asegurar_periodo_abierto()
+    r = teacher.post(f'/{SLUG}/notas/batch', json={'notas': [
+        {'aid': AID, 'actividad_id': ACT_ID, 'val': 3.2}]}, headers={'X-CSRF-Token': CSRF})
+    assert r.get_json()['status'] == 'ok'
+    r = teacher.post(f'/{SLUG}/notas/deshacer', json={'aid': AID, 'actividad_id': ACT_ID, 'val': None},
+                     headers={'X-CSRF-Token': CSRF})
+    assert r.status_code == 200, r.get_data(as_text=True)
+    conn = db()
+    fila = conn.execute('SELECT val FROM notas WHERE aid=? AND actividad_id=?', (AID, ACT_ID)).fetchone()
+    conn.close()
+    assert fila is None

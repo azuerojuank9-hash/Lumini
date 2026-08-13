@@ -86,13 +86,13 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
 <div class="dash-cards">
     <div class="dash-card purple">
         <div class="icon-wrap"><i data-lucide="graduation-cap" style="width:20px;height:20px;"></i></div>
-        <div class="dval {% if total_estudiantes == 0 and total_estudiantes is not none %}na{% endif %}">{{ total_estudiantes if total_estudiantes > 0 else '--' }}</div>
+        <div class="dval {% if total_estudiantes == 0 and total_estudiantes is not none %}na{% endif %}">{{ total_estudiantes if total_estudiantes is not none else 0 }}</div>
         <div class="dlabel">Estudiantes</div>
         <div class="dtag">activos en el sistema · {{ ((total_estudiantes / total_cursos)|round(1)) if total_cursos > 0 else '—' }} por curso</div>
     </div>
     <div class="dash-card blue">
         <div class="icon-wrap"><i data-lucide="chalkboard-teacher" style="width:20px;height:20px;"></i></div>
-        <div class="dval {% if total_profesores == 0 %}na{% endif %}">{{ total_profesores if total_profesores > 0 else '--' }}</div>
+        <div class="dval {% if total_profesores == 0 %}na{% endif %}">{{ total_profesores if total_profesores is not none else 0 }}</div>
         <div class="dlabel">Profesores</div>
         <div class="dtag">activos · {{ ((total_materias / total_profesores)|round(1)) if total_profesores > 0 else '—' }} materias por prof.</div>
     </div>
@@ -987,15 +987,26 @@ var RECTOR_DIST = {{ distribucion | tojson | safe }};
 var RECTOR_CURSO = {{ promedio_por_curso | tojson | safe }};
 function renderRectorCharts(){
     if(typeof Chart==='undefined') return;
+    function rv(name,fallback){var v=getComputedStyle(document.documentElement).getPropertyValue(name).trim();return v||fallback;}
+    var accent=rv('--accent-rgb','124,58,237');
+    var danger=rv('--danger-rgb','239,68,68');
+    var warning=rv('--warning-rgb','234,179,8');
+    var success=rv('--success-rgb','34,197,94');
     var c1=document.getElementById('chartDistRector');
     if(c1){
         var tot=RECTOR_DIST.reduce(function(s,d){return s+d.count;},0);
-        var palette=['rgba(231,76,60,.75)','rgba(230,126,34,.75)','rgba(241,196,15,.75)','rgba(46,204,113,.75)'];
-        new Chart(c1,{type:'bar',data:{labels:RECTOR_DIST.map(function(d){return d.label;}),datasets:[{label:'Estudiantes',data:RECTOR_DIST.map(function(d){return d.count;}),backgroundColor:palette,borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});
+        if(tot===0){c1.parentElement.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;">Sin datos de rendimiento</div>';}
+        else{
+            var palette=['rgba('+danger+',.75)','rgba('+warning+',.75)','rgba('+accent+',.75)','rgba('+success+',.75)'];
+            new Chart(c1,{type:'bar',data:{labels:RECTOR_DIST.map(function(d){return d.label;}),datasets:[{label:'Estudiantes',data:RECTOR_DIST.map(function(d){return d.count;}),backgroundColor:palette,borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});
+        }
     }
     var c2=document.getElementById('chartCursoRector');
     if(c2){
-        new Chart(c2,{type:'bar',data:{labels:RECTOR_CURSO.map(function(d){return d.curso;}),datasets:[{label:'Promedio',data:RECTOR_CURSO.map(function(d){return d.promedio;}),backgroundColor:'rgba(var(--accent-rgb),.6)',borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:5,grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});
+        if(!RECTOR_CURSO.length){c2.parentElement.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;">Sin datos de promedios por curso</div>';}
+        else{
+            new Chart(c2,{type:'bar',data:{labels:RECTOR_CURSO.map(function(d){return d.curso;}),datasets:[{label:'Promedio',data:RECTOR_CURSO.map(function(d){return d.promedio;}),backgroundColor:'rgba('+accent+',.6)',borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:{{ escala_max or 5 }},grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});
+        }
     }
 }
 document.addEventListener('DOMContentLoaded',renderRectorCharts);

@@ -100,8 +100,33 @@ class TestRectorDashboard:
         pend_count = conn.execute(
             "SELECT COUNT(*) as c FROM solicitudes_modificacion WHERE estado='pendiente' AND slug=?",
             (SLUG,)).fetchone()['c']
-        prom_inst = conn.execute('SELECT ROUND(AVG(val),2) as p FROM notas').fetchone()
-        prom_val = prom_inst['p']
+        # M4: the rector panel shows the same weighted 65/25/10 institutional
+        # average as the dashboard, so compute the expected value that way.
+        from app.infra.grades import _promedio_ponderado
+        notas_rows = conn.execute(
+            'SELECT n.aid, n.val, ac.materia, ac.jornada '
+            'FROM notas n JOIN actividades ac ON ac.id=n.actividad_id').fetchall()
+        ev_rows = conn.execute(
+            'SELECT aid, materia, jornada, evaluacion, autoevaluacion FROM evaluaciones').fetchall()
+        notas_idx = {}
+        for r in notas_rows:
+            notas_idx.setdefault((r['aid'], r['materia'], r['jornada']), []).append(r['val'])
+        ev_idx = {}
+        for r in ev_rows:
+            ev_idx[(r['aid'], r['materia'], r['jornada'])] = r
+        subj_final = {}
+        for key in set(notas_idx) | set(ev_idx):
+            ev = ev_idx.get(key)
+            ev_v = ev['evaluacion'] if ev and ev['evaluacion'] is not None else None
+            au_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
+            final = _promedio_ponderado(notas_idx.get(key, []), ev_v, au_v)
+            if final is not None:
+                subj_final[key] = final
+        overall = {}
+        for (aid, _m, _j), final in subj_final.items():
+            overall.setdefault(aid, []).append(final)
+        overall = {aid: sum(v) / len(v) for aid, v in overall.items()}
+        prom_val = round(sum(overall.values()) / len(overall), 2) if overall else None
         conn.close()
 
         self._rector_session(client)

@@ -176,3 +176,43 @@ class TestTablaCalificaciones:
         # El promedio ponderado de la materia Matemáticas debe ser 3.85.
         promedios = body.get('promedios') or body.get('materias') or body
         assert _promedio_ponderado([EXPECTED_ACT], EXPECTED_EVAL, EXPECTED_AUTO) == EXPECTED_FINAL
+
+    def test_guardar_evaluacion_vacia_limpia_valor(self, client, csrf):
+        """Vaciar la celda de evaluación debe guardar NULL (no dejar el valor viejo)."""
+        seed_nota_p3()
+        _teacher_session(client)
+        r = client.post(f'/{SLUG}/guardar_evaluacion', data={
+            'aid': 1, 'evaluacion': '', 'periodo': '1', 'curso': 'Primero A', '_csrf_token': CSRF,
+        })
+        assert r.status_code == 200
+        body = r.get_json()
+        assert body['status'] == 'ok'
+        conn = db()
+        row = conn.execute(
+            "SELECT evaluacion, autoevaluacion FROM evaluaciones WHERE aid=1 AND profesor_id=1 "
+            "AND materia='Matemáticas' AND jornada='Mañana' AND periodo=1").fetchone()
+        conn.close()
+        assert row is not None
+        assert row['evaluacion'] is None
+        assert row['autoevaluacion'] == EXPECTED_AUTO
+
+    def test_guardar_evaluacion_respeta_periodo_y_curso(self, client, csrf):
+        """La evaluación se guarda en el período y curso enviados por el front."""
+        seed_nota_p3()
+        _teacher_session(client)
+        conn = db()
+        conn.execute('INSERT OR REPLACE INTO periodos_estado (periodo, estado) VALUES (2, ?)', ('abierto',))
+        conn.execute('DELETE FROM evaluaciones WHERE aid=1 AND periodo=2')
+        conn.commit()
+        conn.close()
+        r = client.post(f'/{SLUG}/guardar_evaluacion', data={
+            'aid': 1, 'evaluacion': '4.2', 'periodo': '2', 'curso': 'Primero A', '_csrf_token': CSRF,
+        })
+        assert r.status_code == 200
+        assert r.get_json()['status'] == 'ok'
+        conn = db()
+        row = conn.execute(
+            "SELECT evaluacion FROM evaluaciones WHERE aid=1 AND profesor_id=1 "
+            "AND materia='Matemáticas' AND jornada='Mañana' AND periodo=2").fetchone()
+        conn.close()
+        assert row is not None and float(row['evaluacion']) == 4.2
