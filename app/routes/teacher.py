@@ -304,6 +304,8 @@ def home(slug):
         solicitudes_pend = conn.execute(
             'SELECT COUNT(*) as c FROM solicitudes_modificacion WHERE profesor_id=? AND estado=? AND slug=?',
             (prof['id'], 'pendiente', slug)).fetchone()['c'] if curso_sel else 0
+        abrir_nueva_actividad = request.args.get('nueva_actividad') == '1'
+        abrir_analitica = request.args.get('analitica') == '1'
     finally:
         conn.close()
 
@@ -321,7 +323,9 @@ def home(slug):
                            periodo_cerrado=pc,
                            error_msg=error_msg,
                            solicitudes_pendientes_mod=solicitudes_pend,
-                           comunicaciones_pendientes=pendientes)
+                           comunicaciones_pendientes=pendientes,
+                           abrir_nueva_actividad=abrir_nueva_actividad,
+                           abrir_analitica=abrir_analitica)
 
 
 # ── ACTIVIDADES ──────────────────────────────────────────────────────
@@ -669,37 +673,62 @@ def notas_batch(slug):
     errors = []
     saved = []
     try:
+        cerrados = {r[0] for r in conn.execute(
+            "SELECT periodo FROM periodos_estado WHERE estado='cerrado'").fetchall()}
+        cfg = f.config_get(slug)
+        try:
+            escala_min = float(cfg.get('escala_min', 0.0))
+            escala_max = float(cfg.get('escala_max', 5.0))
+        except (TypeError, ValueError):
+            escala_min, escala_max = 0.0, 5.0
         for item in notas:
             aid = item.get('aid')
             actividad_id = item.get('actividad_id')
             val = item.get('val')
-            if None in (aid, actividad_id, val):
+            if aid is None or actividad_id is None:
                 errors.append({'aid': aid, 'actividad_id': actividad_id, 'error': 'Datos invalidos'})
                 continue
+            if val is not None and (not isinstance(val, (int, float)) or isinstance(val, bool)):
+                errors.append({'aid': aid, 'actividad_id': actividad_id, 'val': val, 'error': 'Valor invalido'})
+                continue
+            if val is not None and (val < escala_min or val > escala_max):
+                errors.append({'aid': aid, 'actividad_id': actividad_id, 'val': val, 'error': 'Valor fuera de rango'})
+                continue
             act = conn.execute(
-                'SELECT a.id, a.profesor_id, a.curso, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
+                'SELECT a.id, a.profesor_id, a.curso, a.materia, a.jornada, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
                 (actividad_id,)).fetchone()
             if not act or act['profesor_id'] != prof['id']:
                 errors.append({'aid': aid, 'actividad_id': actividad_id, 'error': 'No autorizado'})
                 continue
-            if f.periodo_cerrado(slug, act['p']):
+            if act['p'] in cerrados:
                 errors.append({'aid': aid, 'actividad_id': actividad_id, 'error': 'Periodo cerrado'})
                 continue
             old = conn.execute('SELECT val FROM notas WHERE aid=? AND actividad_id=?',
                                (aid, actividad_id)).fetchone()
             old_val = old['val'] if old else None
-            if old:
+            if val is None:
+                if old:
+                    conn.execute('DELETE FROM notas WHERE aid=? AND actividad_id=?', (aid, actividad_id))
+            elif old:
                 conn.execute('UPDATE notas SET val=? WHERE aid=? AND actividad_id=?', (val, aid, actividad_id))
             else:
                 conn.execute('INSERT INTO notas (aid, actividad_id, val) VALUES (?,?,?)', (aid, actividad_id, val))
             f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'notas', aid,
                            act['curso'], act['materia'], act['p'],
                            campo='nota', actividad_id=actividad_id,
-                           valor_anterior=old_val, valor_nuevo=val)
-            saved.append({'aid': aid, 'actividad_id': actividad_id, 'val_anterior': old_val, 'val_nuevo': val})
+                           valor_anterior=old_val, valor_nuevo=val, conn=conn)
+            saved.append({'aid': aid, 'actividad_id': actividad_id, 'val_anterior': old_val, 'val_nuevo': val,
+                          'curso': act['curso'], 'materia': act['materia'], 'jornada': act['jornada'], 'periodo': act['p']})
         conn.commit()
+        calculos = {}
+        for s in saved:
+            if s['aid'] in calculos:
+                continue
+            prom = f.calcular_stats_estudiante(conn, slug, s['aid'], s['curso'], s['materia'], s['jornada'], s['periodo'], prof['id'])
+            nf = f.calcular_nota_final_estudiante(conn, slug, s['aid'], s['curso'], s['materia'], s['jornada'], s['periodo'], prof['id'])
+            calculos[s['aid']] = {'promedio': prom, 'nota_final': nf}
         return jsonify({'status': 'ok', 'saved': len(saved), 'errors': errors,
-                        'snapshot': saved[-5:] if saved else []})
+                        'snapshot': saved[-5:] if saved else [], 'calculos': calculos})
     except Exception as e:
         logger.error(f'Error batch notas: {e}')
         return jsonify({'status': 'error', 'mensaje': 'Error al guardar'}), 500
@@ -786,19 +815,20 @@ def guardar_nota(slug):
         '''INSERT INTO notas (aid,actividad_id,val) VALUES (?,?,?)
            ON CONFLICT(aid,actividad_id) DO UPDATE SET val=excluded.val''',
         (aid, actividad_id, val))
-    conn.commit()
     f.audit_log(slug, prof['id'], 'nota_editada', 'notas', registro_id=None,
               valor_anterior={'aid': aid, 'actividad_id': actividad_id, 'val': old_val},
-              valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'val': val})
+              valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'val': val},
+              conn=conn)
     tipo_nota = 'creacion' if old_val is None else 'modificacion'
     jornada, materia = f.get_sesion_jornada_materia(slug)
     f.auditar_nota(slug, prof['id'], 'profesor', tipo_nota, 'notas', aid,
                  act['curso'], materia, act['p'],
                  campo='nota', actividad_id=actividad_id,
-                 valor_anterior=old_val, valor_nuevo=val)
+                 valor_anterior=old_val, valor_nuevo=val, conn=conn)
     prom_est = f.calcular_stats_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
     nf = f.calcular_nota_final_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
     curso_stats = f.calcular_stats_curso(conn, slug, act['curso'], materia, jornada, act['p'], prof['id'])
+    conn.commit()
     conn.close()
     logger.info('guardar_nota: aid=%d actividad_id=%d val=%s prom_est=%s nf=%s', aid, actividad_id, val, prom_est, nf)
     return jsonify({'status':'ok','promedio':prom_est,'nota_final':nf,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
@@ -969,6 +999,8 @@ def guardar_nota_batch(slug):
     conn = f.conectar(slug)
     resultados = {}
     try:
+        cerrados = {r[0] for r in conn.execute(
+            "SELECT periodo FROM periodos_estado WHERE estado='cerrado'").fetchall()}
         for item in items:
             aid = item.get('aid')
             actividad_id = item.get('actividad_id')
@@ -976,10 +1008,10 @@ def guardar_nota_batch(slug):
             if None in (aid, actividad_id, val):
                 continue
             act = conn.execute(
-                'SELECT a.id, a.profesor_id, a.curso, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
+                'SELECT a.id, a.profesor_id, a.curso, a.materia, a.jornada, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
                 (actividad_id,)).fetchone()
             if not act or act['profesor_id'] != prof['id']: continue
-            if f.periodo_cerrado(slug, act['p']):
+            if act['p'] in cerrados:
                 continue
             old = conn.execute('SELECT val FROM notas WHERE aid=? AND actividad_id=?', (aid, actividad_id)).fetchone()
             old_val = old['val'] if old else None
@@ -989,12 +1021,13 @@ def guardar_nota_batch(slug):
                 (aid, actividad_id, val))
             f.audit_log(slug, prof['id'], 'nota_editada', 'notas', registro_id=None,
                       valor_anterior={'aid': aid, 'actividad_id': actividad_id, 'val': old_val},
-                      valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'val': val})
+                      valor_nuevo={'aid': aid, 'actividad_id': actividad_id, 'val': val},
+                      conn=conn)
             tipo_nota = 'creacion' if old_val is None else 'modificacion'
             f.auditar_nota(slug, prof['id'], 'profesor', tipo_nota, 'notas', aid,
                          act['curso'], materia, act['p'],
                          campo='nota', actividad_id=actividad_id,
-                         valor_anterior=old_val, valor_nuevo=val)
+                         valor_anterior=old_val, valor_nuevo=val, conn=conn)
         conn.commit()
         aids = set(item.get('aid') for item in items if item.get('aid'))
         for aid in aids:

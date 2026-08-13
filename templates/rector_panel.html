@@ -461,9 +461,12 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
     <div class="modal-body">
         <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
             <input type="text" id="matNombre" placeholder="Nombre del aspirante" style="flex:2;min-width:140px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
-            <input type="text" id="matDoc" placeholder="Documento" style="flex:1;min-width:80px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
-            <input type="email" id="matEmail" placeholder="Correo" style="flex:1;min-width:100px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
-            <input type="text" id="matCurso" placeholder="Curso solicitado" style="flex:1;min-width:80px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
+            <input type="text" id="matCurso" placeholder="Curso" style="flex:1;min-width:80px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
+            <select id="matJornada" style="flex:1;min-width:80px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;">
+                <option value="Mañana">Mañana</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Nocturna">Nocturna</option>
+            </select>
             <button class="btn btn-primary btn-sm" onclick="crearMatricula()"><i data-lucide="plus" style="width:14px;height:14px;"></i> Agregar</button>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:12px;">
@@ -803,11 +806,12 @@ function cargarMatriculas(){
     }).catch(function(){lst.innerHTML='<div style="text-align:center;padding:16px;color:var(--danger);">Error</div>';});
 }
 function crearMatricula(){
-    var data={nombre:document.getElementById('matNombre').value.trim(),documento:document.getElementById('matDoc').value.trim(),email:document.getElementById('matEmail').value.trim(),curso_solicitado:document.getElementById('matCurso').value.trim()};
+    var data={nombre:document.getElementById('matNombre').value.trim(),curso:document.getElementById('matCurso').value.trim(),jornada:document.getElementById('matJornada').value};
     if(!data.nombre){showToast('Nombre requerido');return;}
+    if(!data.curso){showToast('Curso requerido');return;}
     fetch('/'+slug+'/matriculas/crear',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="_csrf_token"]')?.value||''},body:JSON.stringify(data)})
     .then(function(r){return r.json();}).then(function(d){
-        if(d.status==='ok'){showToast('Aspirante registrado');document.getElementById('matNombre').value='';document.getElementById('matDoc').value='';document.getElementById('matEmail').value='';document.getElementById('matCurso').value='';cargarMatriculas();}
+        if(d.status==='ok'){showToast('Aspirante registrado');document.getElementById('matNombre').value='';document.getElementById('matCurso').value='';cargarMatriculas();}
         else showToast('Error: '+d.error);
     }).catch(function(){showToast('Error de conexión');});
 }

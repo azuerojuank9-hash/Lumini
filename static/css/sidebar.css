@@ -19,10 +19,6 @@
 .sidebar-item.active .icon,.sidebar-item.active-page .icon{color:var(--text-on-accent)}
 .sidebar-item .badge-count{margin-left:auto;background:var(--danger);color:var(--text-on-accent);border-radius:99px;padding:1px 7px;font-size:9px;font-weight:700;min-width:18px;text-align:center;line-height:1.5}
 .sidebar-item .chevron{margin-left:auto;width:14px;height:14px;color:var(--muted);transition:transform var(--tr);flex-shrink:0}
-.sidebar-item.open .chevron{transform:rotate(90deg)}
-.sidebar-submenu{overflow:hidden;max-height:0;transition:max-height .25s ease;padding-left:8px}
-.sidebar-submenu.open{max-height:500px}
-.sidebar-submenu .sidebar-item{padding-left:16px;font-size:12px}
 .sidebar-user{padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
 .sidebar-user .avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-on-accent);flex-shrink:0;box-shadow:0 2px 4px rgba(0,0,0,.1)}
 .sidebar-user .info{flex:1;min-width:0}

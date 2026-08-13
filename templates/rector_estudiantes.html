@@ -32,6 +32,7 @@
 {% block sidebar %}{% include "components/sidebar_rector.html" %}{% endblock %}
 
 {% block content %}
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
 <div class="topbar">
   <h1><i data-lucide="graduation-cap" style="color:var(--accent);"></i> Estudiantes</h1>
   {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Estudiantes',None)]) }}
@@ -39,9 +40,12 @@
 <div class="card" style="padding:0;overflow:hidden;">
   <div style="padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
     <span style="font-size:12px;color:var(--muted);">{{ total }} estudiante{{ 's' if total != 1 }}</span>
-    <div class="table-search" style="display:flex;align-items:center;gap:6px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="buscarInput" placeholder="Buscar estudiante..." onkeyup="filtrar()" style="padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;width:200px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="table-search" style="display:flex;align-items:center;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:var(--muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="buscarInput" placeholder="Buscar estudiante..." onkeyup="filtrar()" style="padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:'Inter',sans-serif;outline:none;width:200px;">
+      </div>
+      <button class="btn btn-primary" onclick="abrirModalEstudiante()" style="font-size:12px;padding:6px 12px;"><i data-lucide="user-plus" style="width:14px;height:14px;"></i> Agregar estudiante</button>
     </div>
   </div>
   <div style="overflow-x:auto;">
@@ -52,6 +56,8 @@
         <th>Nombre</th>
         <th>Curso</th>
         <th>Jornada</th>
+        <th>Estado</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -60,6 +66,15 @@
         <td><strong>{{ e.nombre }}</strong></td>
         <td style="color:var(--sub);font-size:12px;">{{ e.curso }}</td>
         <td style="color:var(--sub);font-size:12px;">{{ e.jornada }}</td>
+        <td>{% if e.activo %}<span class="badge badge-active">Activo</span>{% else %}<span class="badge" style="background:rgba(var(--danger-rgb),.1);color:var(--danger);">Inactivo</span>{% endif %}</td>
+        <td style="white-space:nowrap;">
+          <button onclick='abrirModalEstudiante({{ e.id }},{{ e.nombre|tojson }},{{ e.curso|tojson }},{{ e.jornada|tojson }})' style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--text);cursor:pointer;margin-right:4px;">Editar</button>
+          {% if e.activo %}
+          <button onclick="toggleEstudiante({{ e.id }},'rechazado')" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--danger);background:none;color:var(--danger);cursor:pointer;">Desactivar</button>
+          {% else %}
+          <button onclick="toggleEstudiante({{ e.id }},'aprobado')" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--success);background:none;color:var(--success);cursor:pointer;">Activar</button>
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
@@ -75,14 +90,79 @@
   <div class="empty-state" style="min-height:160px;padding:40px 20px;">
     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.2;margin-bottom:12px;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
     <div class="empty-title">No hay estudiantes registrados</div>
-    <div class="empty-desc">Los estudiantes aparecerán aquí una vez que sean inscritos en el sistema.</div>
+    <div class="empty-desc">Agrega el primer estudiante con el botón "Agregar estudiante".</div>
   </div>
   {% endif %}
+  </div>
+</div>
+
+<div class="modal-overlay" id="estModal" style="display:none;" onclick="if(event.target===this)cerrarModalEstudiante()">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="mhead">
+      <h3 id="estModalTitle">Agregar estudiante</h3>
+      <button class="mclose" onclick="cerrarModalEstudiante()">&times;</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;padding:16px;">
+      <div>
+        <label style="display:block;font-size:12px;color:var(--sub);margin-bottom:4px;">Nombre</label>
+        <input type="text" id="estNombre" class="form-input" placeholder="Nombre completo" maxlength="120">
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;color:var(--sub);margin-bottom:4px;">Curso</label>
+        <input type="text" id="estCurso" class="form-input" placeholder="Ej: 10A" maxlength="40">
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;color:var(--sub);margin-bottom:4px;">Jornada</label>
+        <select id="estJornada" class="form-input">
+          <option value="Mañana">Mañana</option>
+          <option value="Tarde">Tarde</option>
+          <option value="Nocturna">Nocturna</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid var(--border);">
+      <button class="btn btn-ghost" onclick="cerrarModalEstudiante()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEstudiante()">Guardar</button>
+    </div>
   </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
+var _estId=null;
+function abrirModalEstudiante(id,nombre,curso,jornada){
+    _estId=id||null;
+    document.getElementById('estModalTitle').textContent=_estId?'Editar estudiante':'Agregar estudiante';
+    document.getElementById('estNombre').value=nombre||'';
+    document.getElementById('estCurso').value=curso||'';
+    document.getElementById('estJornada').value=jornada||'Mañana';
+    document.getElementById('estModal').style.display='flex';
+}
+function cerrarModalEstudiante(){document.getElementById('estModal').style.display='none';}
+function guardarEstudiante(){
+    var nombre=document.getElementById('estNombre').value.trim();
+    var curso=document.getElementById('estCurso').value.trim();
+    var jornada=document.getElementById('estJornada').value;
+    if(!nombre){alert('Escribe el nombre del estudiante');return;}
+    if(!curso){alert('Escribe el curso');return;}
+    var url=_estId?'/{{ slug }}/matriculas/'+_estId+'/editar':'/{{ slug }}/matriculas/crear';
+    var csrf=document.querySelector('input[name="_csrf_token"]').value;
+    fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({nombre:nombre,curso:curso,jornada:jornada})})
+    .then(function(r){return r.json();}).then(function(d){
+        if(d.status!=='ok') throw new Error(d.error||'Error');
+        cerrarModalEstudiante();
+        location.reload();
+    }).catch(function(e){alert(e.message||'Error de conexión');});
+}
+function toggleEstudiante(id,estado){
+    if(!confirm((estado==='aprobado'?'Activar':'Desactivar')+' a este estudiante?')) return;
+    var csrf=document.querySelector('input[name="_csrf_token"]').value;
+    fetch('/{{ slug }}/matriculas/'+id+'/estado',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({estado:estado})})
+    .then(function(r){return r.json();}).then(function(d){
+        if(d.status!=='ok') throw new Error(d.error||'Error');
+        location.reload();
+    }).catch(function(e){alert(e.message||'Error de conexión');});
+}
 function filtrar(){
     var q=document.getElementById('buscarInput').value.toLowerCase().trim();
     var rows=document.querySelectorAll('#estTable tbody tr');

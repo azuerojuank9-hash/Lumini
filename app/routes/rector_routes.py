@@ -258,8 +258,8 @@ def rector_estudiantes(slug):
     per_page = fa.request.args.get('per_page', 50, type=int)
     per_page = min(max(per_page, 10), 200)
     conn = fa.conectar(slug)
-    total = conn.execute('SELECT COUNT(*) as c FROM alumnos WHERE activo=1').fetchone()['c']
-    estudiantes = [dict(r) for r in conn.execute('''SELECT id, nombre, curso, jornada FROM alumnos WHERE activo=1 ORDER BY curso, nombre LIMIT ? OFFSET ?''',
+    total = conn.execute('SELECT COUNT(*) as c FROM alumnos').fetchone()['c']
+    estudiantes = [dict(r) for r in conn.execute('''SELECT id, nombre, curso, jornada, activo FROM alumnos ORDER BY curso, nombre LIMIT ? OFFSET ?''',
                                                   (per_page, (page - 1) * per_page)).fetchall()]
     conn.close()
     return fa.render_template('rector_estudiantes.html',
@@ -1505,6 +1505,30 @@ def rector_matriculas_estado(slug, mid):
         conn.execute('UPDATE alumnos SET activo=? WHERE id=?', (activo, mid))
         conn.commit()
         return fa.jsonify({'status': 'ok'})
+    finally:
+        conn.close()
+
+
+@rector_bp.route('/<slug>/matriculas/<int:mid>/editar', methods=['POST'])
+def rector_matriculas_editar(slug, mid):
+    fa = _fa()
+    fa.require_colegio(slug)
+    if not fa.get_rector(slug):
+        return fa.jsonify({'status': 'error', 'error': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'status': 'error', 'error': 'CSRF'}), 400
+    data = fa.request.get_json(silent=True) or {}
+    nombre = (data.get('nombre') or '').strip()
+    curso = (data.get('curso') or '').strip()
+    jornada = (data.get('jornada') or '').strip()
+    if not nombre or not curso:
+        return fa.jsonify({'status': 'error', 'error': 'Nombre y curso requeridos'}), 400
+    conn = fa.conectar(slug)
+    try:
+        conn.execute('UPDATE alumnos SET nombre=?, curso=?, jornada=? WHERE id=?',
+                     (nombre, curso, jornada, mid))
+        conn.commit()
+        return fa.jsonify({'status': 'ok', 'mensaje': 'Estudiante actualizado'})
     finally:
         conn.close()
 

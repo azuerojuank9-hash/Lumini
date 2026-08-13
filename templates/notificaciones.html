@@ -32,7 +32,7 @@
 <input type="hidden" id="csrf-token-input" name="_csrf_token" value="{{ csrf_token() }}">
 <div class="top-bar">
   <h1><i data-lucide="bell" style="color:var(--accent);"></i> Notificaciones</h1>
-  <a href="javascript:history.back()" class="back"><i data-lucide="arrow-left"></i> Volver</a>
+  <a href="/{{ slug }}{% if usuario_tipo=='rector' %}/rector{% elif usuario_tipo=='directora' %}/directora{% elif usuario_tipo=='estudiante' %}/estudiante{% elif usuario_tipo=='profesor' %}/home{% elif usuario_tipo=='padre' %}/portal/dashboard{% endif %}" class="back"><i data-lucide="arrow-left"></i> Volver</a>
 </div>
 
 {% if notificaciones %}

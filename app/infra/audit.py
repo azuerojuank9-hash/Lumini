@@ -15,11 +15,15 @@ def periodo_cerrado(slug, periodo):
     return row is not None and row['estado'] == 'cerrado'
 
 
-def audit_log(slug, usuario_id, accion, tabla, registro_id=None, valor_anterior=None, valor_nuevo=None):
+def audit_log(slug, usuario_id, accion, tabla, registro_id=None, valor_anterior=None, valor_nuevo=None, conn=None):
     from flask import request as flask_request
-    conn = None
+    cerrar = conn is None
+    if cerrar:
+        try:
+            conn = conectar(slug)
+        except Exception:
+            return
     try:
-        conn = conectar(slug)
         conn.execute(
             '''INSERT INTO audit_log (usuario_id, accion, tabla, registro_id, valor_anterior, valor_nuevo, ip, user_agent)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
@@ -29,19 +33,24 @@ def audit_log(slug, usuario_id, accion, tabla, registro_id=None, valor_anterior=
              flask_request.remote_addr,
              flask_request.user_agent.string if flask_request.user_agent else None)
         )
-        conn.commit()
+        if cerrar:
+            conn.commit()
     except Exception as e:
         logger.warning(f"[audit] {e}")
     finally:
-        if conn:
+        if cerrar and conn:
             conn.close()
 
 
-def auditar_nota(slug, usuario_id, rol, tipo_accion, tabla, aid, curso, materia, periodo, campo=None, actividad_id=None, registro_id=None, valor_anterior=None, valor_nuevo=None, motivo=None):
+def auditar_nota(slug, usuario_id, rol, tipo_accion, tabla, aid, curso, materia, periodo, campo=None, actividad_id=None, registro_id=None, valor_anterior=None, valor_nuevo=None, motivo=None, conn=None):
     from flask import request as flask_request
-    conn = None
+    cerrar = conn is None
+    if cerrar:
+        try:
+            conn = conectar(slug)
+        except Exception:
+            return
     try:
-        conn = conectar(slug)
         conn.execute(
             '''INSERT INTO auditoria_notas
                (usuario_id, rol, ip, curso, materia, periodo, tipo_accion, tabla, registro_id, aid, actividad_id, campo, valor_anterior, valor_nuevo, motivo)
@@ -52,9 +61,10 @@ def auditar_nota(slug, usuario_id, rol, tipo_accion, tabla, aid, curso, materia,
              json.dumps(valor_nuevo) if valor_nuevo is not None else None,
              motivo)
         )
-        conn.commit()
+        if cerrar:
+            conn.commit()
     except Exception as e:
         logger.warning(f"[auditar_nota] {e}")
     finally:
-        if conn:
+        if cerrar and conn:
             conn.close()
