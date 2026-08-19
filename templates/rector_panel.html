@@ -52,6 +52,7 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
 {% block sidebar %}{% include "components/sidebar_rector.html" %}{% endblock %}
 
 {% block content %}
+{% set tabla_labels = {'alumnos':'Estudiantes','profesores':'Profesores','actividades':'Actividades','notas':'Notas','evaluaciones':'Evaluaciones','comunicaciones':'Comunicaciones','eventos_calendario':'Calendario','solicitudes_modificacion':'Solicitudes','auditoria_notas':'Auditoría de Notas','config_institucion':'Configuración','usuarios':'Usuarios','canales':'Canales','observaciones':'Observaciones','asistencia':'Asistencia'} %}
 <div class="topbar">
   <div class="topbar-left">
     <h1>Panel del Rector</h1>
@@ -62,7 +63,7 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
     <button class="btn btn-ghost btn-sm" onclick="abrirAIAssistant()" title="Asistente IA"><i data-lucide="sparkles"></i></button>
     <button class="btn btn-ghost btn-sm" onclick="abrirGestionAcademica()" title="Gestión Académica"><i data-lucide="school"></i></button>
     <button class="btn btn-ghost btn-sm" onclick="abrirMatriculas()" title="Matrículas"><i data-lucide="clipboard-check"></i></button>
-    <button class="btn btn-ghost btn-sm" onclick="abrirTesoreria()" title="Tesorería"><i data-lucide="wallet"></i></button>
+    <!-- <button class="btn btn-ghost btn-sm" onclick="abrirTesoreria()" title="Tesorería"><i data-lucide="wallet"></i></button> -->
     <button class="btn btn-ghost btn-sm" onclick="abrirReportes()" title="Reportes"><i data-lucide="file-bar-chart"></i></button>
     <a href="/{{ slug }}/notificaciones" class="btn btn-icon" style="position:relative;">
       <i data-lucide="bell"></i>
@@ -164,7 +165,7 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
 
 <hr class="dash-divider">
 
-<div class="section-divider">Widgets del panel</div>
+<div class="section-divider">Secciones del panel</div>
 
 <!-- ── Dashboard Modules ────────────────────────────────────── -->
 <div class="dash-modules fade-in fade-in-d1">
@@ -207,14 +208,14 @@ html{scroll-behavior:smooth;--rector-trans:.25s cubic-bezier(.4,0,.2,1);}
                 <div class="av purple"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i></div>
                 <div class="act-content">
                     <div class="act-text">
-                        {% if a.accion == 'crear' %}<strong>Creación</strong> en {{ a.tabla }}
-                        {% elif a.accion == 'archivar' %}<strong>Archivado</strong> en {{ a.tabla }}
-                        {% elif a.accion == 'reactivar' %}<strong>Reactivado</strong> en {{ a.tabla }}
-                        {% elif a.accion == 'eliminar' %}<strong>Eliminado</strong> de {{ a.tabla }}
+                        {% if a.accion == 'crear' %}<strong>Creación</strong> en {{ tabla_labels.get(a.tabla, a.tabla) }}
+                        {% elif a.accion == 'archivar' %}<strong>Archivado</strong> en {{ tabla_labels.get(a.tabla, a.tabla) }}
+                        {% elif a.accion == 'reactivar' %}<strong>Reactivado</strong> en {{ tabla_labels.get(a.tabla, a.tabla) }}
+                        {% elif a.accion == 'eliminar' %}<strong>Eliminado</strong> de {{ tabla_labels.get(a.tabla, a.tabla) }}
                         {% elif a.accion == 'periodo_cerrado' %}<strong>Periodo cerrado</strong>
                         {% elif a.accion == 'periodo_abierto' %}<strong>Periodo abierto</strong>
                         {% elif a.accion == 'nota_editada' %}<strong>Nota editada</strong>
-                        {% else %}<strong>{{ a.accion | capitalize }}</strong> en {{ a.tabla }}{% endif %}
+                        {% else %}<strong>{{ a.accion | capitalize }}</strong> en {{ tabla_labels.get(a.tabla, a.tabla) }}{% endif %}
                     </div>
                     <div class="act-meta">{{ a.creado[:16] if a.creado else '' }}</div>
                 </div>

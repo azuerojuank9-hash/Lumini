@@ -294,7 +294,6 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
     <div class="card-title" style="color:var(--accent);font-weight:700;padding:6px 12px;">
       <div class="comm-tabs">
         <button class="comm-tab active" onclick="switchComTabEst('avisos',this)"><i data-lucide="megaphone"></i> Avisos <span id="comCountBadge" style="display:none;font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent);color:var(--text-on-accent);margin-left:4px;font-weight:600;"></span></button>
-        <button class="comm-tab" onclick="switchComTabEst('canales',this)"><i data-lucide="message-square"></i> Canales <span id="canalesCountBadgeEst" style="display:none;font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent);color:var(--text-on-accent);margin-left:4px;font-weight:600;"></span></button>
       </div>
     </div>
     <div id="panelAvisosEst">
@@ -788,7 +787,7 @@ function estAbrirModalComunicado(id,titulo,meta,contenido,badge,badgeClass){
   document.getElementById('estComModalMeta').textContent=meta;
   document.getElementById('estComModalContent').textContent=contenido;
   var bEl=document.getElementById('estComModalBadge');
-  bEl.textContent=badge;bEl.className=badgeClass;
+  bEl.textContent=badge;bEl.style.cssText=badgeClass;
   var btn=document.getElementById('estComModalLeerBtn');
   btn.setAttribute('data-cid',id);
   document.getElementById('estComModal').style.display='flex';
@@ -831,4 +830,5 @@ window.addEventListener('scroll',function(){
     <div class="com-toast-msg" id="comToastMsgEst"></div>
     <div class="com-toast-time">Recién publicado</div>
   </div>
+</div>
 {% endblock %}
