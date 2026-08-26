@@ -1402,6 +1402,16 @@ def importar_notas_preview(slug):
     rows_data = list(ws.iter_rows(min_row=2, values_only=False))
     if not rows_data:
         return jsonify({'status':'error','mensaje':'El archivo no contiene datos'}), 400
+    _header_normalized = [_norm(h) for h in header_row]
+    _preview_cells = []
+    for _rd in rows_data[:3]:
+        _cv = [c.value for c in _rd]
+        _preview_cells.append(_cv)
+    logger.info(
+        '[IMPORT_DIAG_EXCEL] slug=%s header_raw=%s header_norm=%s '
+        'num_cols=%d num_data_rows=%d | primeras_3_filas=%s',
+        slug, list(header_row), _header_normalized,
+        len(header_row), len(rows_data), _preview_cells)
     conn = f.conectar(slug)
     try:
         actividades_existentes = conn.execute(
@@ -1412,6 +1422,43 @@ def importar_notas_preview(slug):
         alumnos_curso = conn.execute(
             'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
             (curso_sel, jornada)).fetchall()
+        _total_alumnos = conn.execute('SELECT COUNT(*) as c FROM alumnos').fetchone()['c']
+        _alumnos_curso_param = conn.execute(
+            'SELECT COUNT(*) as c FROM alumnos WHERE curso=? AND jornada=?',
+            (curso_sel, jornada)).fetchone()['c']
+        _alumnos_1102_any = conn.execute(
+            "SELECT COUNT(*) as c FROM alumnos WHERE curso='1102'").fetchone()['c']
+        _alumnos_manana_any = conn.execute(
+            "SELECT COUNT(*) as c FROM alumnos WHERE jornada='Ma\u00f1ana'").fetchone()['c']
+        _alumnos_1102_manana = conn.execute(
+            "SELECT COUNT(*) as c FROM alumnos WHERE curso='1102' AND jornada='Ma\u00f1ana'").fetchone()['c']
+        _alumnos_1102_activo = conn.execute(
+            "SELECT COUNT(*) as c FROM alumnos WHERE curso='1102' AND jornada='Ma\u00f1ana' AND activo=1").fetchone()['c']
+        _distinct_cursos = [r[0] for r in conn.execute(
+            'SELECT DISTINCT curso FROM alumnos ORDER BY curso').fetchall()]
+        _distinct_jornadas = [r[0] for r in conn.execute(
+            'SELECT DISTINCT jornada FROM alumnos ORDER BY jornada').fetchall()]
+        _distinct_activo = conn.execute(
+            'SELECT activo, COUNT(*) as c FROM alumnos GROUP BY activo').fetchall()
+        logger.info(
+            '[IMPORT_DIAG_DB] slug=%s total_alumnos=%d '
+            'curso="%s" jornada="%s" alumnos_con_param_exacto=%d '
+            'alumnos_curso_1102_any=%d alumnos_jornada_manana_any=%d '
+            'alumnos_1102_manana=%d alumnos_1102_manana_activo1=%d '
+            'distinct_cursos=%s distinct_jornadas=%s distinct_activo=%s',
+            slug, _total_alumnos,
+            curso_sel, jornada, _alumnos_curso_param,
+            _alumnos_1102_any, _alumnos_manana_any,
+            _alumnos_1102_manana, _alumnos_1102_activo,
+            _distinct_cursos, _distinct_jornadas,
+            [(r['activo'], r['c']) for r in _distinct_activo])
+        logger.info(
+            '[IMPORT_DIAG_BYTES] slug=%s '
+            'curso_raw=%r curso_hex=%s curso_len=%d '
+            'jornada_raw=%r jornada_hex=%s jornada_len=%d',
+            slug,
+            curso_sel, curso_sel.encode('utf-8').hex(), len(curso_sel),
+            jornada, jornada.encode('utf-8').hex(), len(jornada))
         alumno_by_name_norm = {}
         for _al in alumnos_curso:
             _k = _norm_name(_al['nombre'])
