@@ -683,6 +683,8 @@ def notas_batch(slug):
             escala_max = float(cfg.get('escala_max', 5.0))
         except (TypeError, ValueError):
             escala_min, escala_max = 0.0, 5.0
+
+        valid_items = []
         for item in notas:
             aid = item.get('aid')
             actividad_id = item.get('actividad_id')
@@ -696,39 +698,89 @@ def notas_batch(slug):
             if val is not None and (val < escala_min or val > escala_max):
                 errors.append({'aid': aid, 'actividad_id': actividad_id, 'val': val, 'error': 'Valor fuera de rango'})
                 continue
-            act = conn.execute(
-                'SELECT a.id, a.profesor_id, a.curso, a.materia, a.jornada, COALESCE(a.periodo,1) as p FROM actividades a WHERE a.id=?',
-                (actividad_id,)).fetchone()
-            if not act or act['profesor_id'] != prof['id']:
+            valid_items.append(item)
+
+        act_ids = list({it['actividad_id'] for it in valid_items})
+        if act_ids:
+            ph = ','.join('?' for _ in act_ids)
+            act_rows = conn.execute(
+                f'SELECT id, profesor_id, curso, materia, jornada, COALESCE(periodo,1) as p FROM actividades WHERE id IN ({ph})',
+                act_ids).fetchall()
+        else:
+            act_rows = []
+        acts_map = {r[0]: r for r in act_rows}
+
+        aid_act_pairs = [(it['aid'], it['actividad_id']) for it in valid_items]
+        old_map = {}
+        if aid_act_pairs:
+            batch_size = 900
+            for i in range(0, len(aid_act_pairs), batch_size):
+                chunk = aid_act_pairs[i:i+batch_size]
+                conditions = ' OR '.join('(' + ' AND '.join(f'{col}=?' for col in ('aid','actividad_id')) + ')' for _ in chunk)
+                flat = []
+                for a, ac in chunk:
+                    flat.extend([a, ac])
+                old_rows = conn.execute(
+                    f'SELECT aid, actividad_id, val FROM notas WHERE {conditions}',
+                    flat).fetchall()
+                for r in old_rows:
+                    old_map[(r[0], r[1])] = r[2]
+
+        audit_rows = []
+        for item in valid_items:
+            aid = item['aid']
+            actividad_id = item['actividad_id']
+            val = item.get('val')
+            act = acts_map.get(actividad_id)
+            if not act or act[1] != prof['id']:
                 errors.append({'aid': aid, 'actividad_id': actividad_id, 'error': 'No autorizado'})
                 continue
-            if act['p'] in cerrados:
+            if act[5] in cerrados:
                 errors.append({'aid': aid, 'actividad_id': actividad_id, 'error': 'Periodo cerrado'})
                 continue
-            old = conn.execute('SELECT val FROM notas WHERE aid=? AND actividad_id=?',
-                               (aid, actividad_id)).fetchone()
-            old_val = old['val'] if old else None
+            old_val = old_map.get((aid, actividad_id))
             if val is None:
-                if old:
+                if old_val is not None:
                     conn.execute('DELETE FROM notas WHERE aid=? AND actividad_id=?', (aid, actividad_id))
-            elif old:
+                    old_map[(aid, actividad_id)] = None
+            elif old_val is not None:
                 conn.execute('UPDATE notas SET val=? WHERE aid=? AND actividad_id=?', (val, aid, actividad_id))
+                old_map[(aid, actividad_id)] = val
             else:
                 conn.execute('INSERT INTO notas (aid, actividad_id, val) VALUES (?,?,?)', (aid, actividad_id, val))
-            f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'notas', aid,
-                           act['curso'], act['materia'], act['p'],
-                           campo='nota', actividad_id=actividad_id,
-                           valor_anterior=old_val, valor_nuevo=val, conn=conn)
+                old_map[(aid, actividad_id)] = val
+            from flask import request as flask_request
+            audit_rows.append((
+                prof['id'], 'profesor', flask_request.remote_addr,
+                act[2], act[3], act[5],
+                'modificacion', 'notas', None, aid, actividad_id, 'nota',
+                json.dumps(old_val) if old_val is not None else None,
+                json.dumps(val) if val is not None else None, None
+            ))
             saved.append({'aid': aid, 'actividad_id': actividad_id, 'val_anterior': old_val, 'val_nuevo': val,
-                          'curso': act['curso'], 'materia': act['materia'], 'jornada': act['jornada'], 'periodo': act['p']})
+                          'curso': act[2], 'materia': act[3], 'jornada': act[4], 'periodo': act[5]})
+
+        if audit_rows:
+            conn.executemany(
+                '''INSERT INTO auditoria_notas
+                   (usuario_id, rol, ip, curso, materia, periodo, tipo_accion, tabla, registro_id, aid, actividad_id, campo, valor_anterior, valor_nuevo, motivo)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                audit_rows)
+
         conn.commit()
-        calculos = {}
+
+        recalcs = {}
         for s in saved:
-            if s['aid'] in calculos:
+            key = (s['aid'], s['curso'], s['materia'], s['jornada'], s['periodo'])
+            if key in recalcs:
                 continue
-            prom = f.calcular_stats_estudiante(conn, slug, s['aid'], s['curso'], s['materia'], s['jornada'], s['periodo'], prof['id'])
-            nf = f.calcular_nota_final_estudiante(conn, slug, s['aid'], s['curso'], s['materia'], s['jornada'], s['periodo'], prof['id'])
-            calculos[s['aid']] = {'promedio': prom, 'nota_final': nf}
+            prom, nf = f.calcular_stats_y_nota_final(conn, slug, s['aid'], s['curso'], s['materia'], s['jornada'], s['periodo'], prof['id'])
+            recalcs[key] = {'promedio': prom, 'nota_final': nf}
+
+        calculos = {}
+        for (aid, *_), v in recalcs.items():
+            calculos[aid] = v
+
         return jsonify({'status': 'ok', 'saved': len(saved), 'errors': errors,
                         'snapshot': saved[-5:] if saved else [], 'calculos': calculos})
     except Exception as e:
@@ -828,8 +880,7 @@ def guardar_nota(slug):
                  act['curso'], materia, act['p'],
                  campo='nota', actividad_id=actividad_id,
                  valor_anterior=old_val, valor_nuevo=val, conn=conn)
-    prom_est = f.calcular_stats_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
-    nf = f.calcular_nota_final_estudiante(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
+    prom_est, nf = f.calcular_stats_y_nota_final(conn, slug, aid, act['curso'], materia, jornada, act['p'], prof['id'])
     curso_stats = f.calcular_stats_curso(conn, slug, act['curso'], materia, jornada, act['p'], prof['id'])
     conn.commit()
     conn.close()
@@ -975,8 +1026,7 @@ def guardar_evaluacion(slug):
         f.auditar_nota(slug, prof['id'], 'profesor', tipo_au, 'evaluaciones', aid,
                      curso, materia, periodo, campo='autoevaluacion',
                      valor_anterior=old_auto, valor_nuevo=au_final)
-    prom_est = f.calcular_stats_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
-    nf = f.calcular_nota_final_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
+    prom_est, nf = f.calcular_stats_y_nota_final(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
     curso_stats = f.calcular_stats_curso(conn, slug, curso, materia, jornada, periodo, prof['id'])
     conn.close()
     return jsonify({'status':'ok','promedio':prom_est,'nota_final':nf,'promedio_curso':curso_stats['promedio_curso'],'notas_pendientes':curso_stats['notas_pendientes']})
@@ -1038,8 +1088,7 @@ def guardar_nota_batch(slug):
         conn.commit()
         aids = set(item.get('aid') for item in items if item.get('aid'))
         for aid in aids:
-            prom_est = f.calcular_stats_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
-            nf = f.calcular_nota_final_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
+            prom_est, nf = f.calcular_stats_y_nota_final(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
             resultados[aid] = {'promedio': prom_est, 'nota_final': nf}
     except Exception as e:
         conn.close()
@@ -1107,8 +1156,7 @@ def guardar_evaluacion_batch(slug):
         conn.commit()
         aids = set(item.get('aid') for item in items if item.get('aid'))
         for aid in aids:
-            prom_est = f.calcular_stats_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
-            nf = f.calcular_nota_final_estudiante(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
+            prom_est, nf = f.calcular_stats_y_nota_final(conn, slug, aid, curso, materia, jornada, periodo, prof['id'])
             resultados[aid] = {'promedio': prom_est, 'nota_final': nf}
     except Exception as e:
         conn.close()
@@ -1337,7 +1385,9 @@ def importar_notas_preview(slug):
                 mensaje_error = f'Error al leer el archivo: {e}'
         return jsonify({'status':'error','mensaje':mensaje_error}), 400
     header_row = list(ws.iter_rows(min_row=1, max_row=1, values_only=True))[0]
-    if not header_row or str(header_row[0]).strip() != 'N\u00b0':
+    def _norm(v):
+        return str(v).strip().lstrip('\ufeff') if v is not None else ''
+    if not header_row or _norm(header_row[0]) != 'N\u00b0':
         return jsonify({'status':'error','mensaje':'Formato de archivo invalido. La primera columna debe ser N\u00b0'}), 400
     rows_data = list(ws.iter_rows(min_row=2, values_only=False))
     if not rows_data:
@@ -1354,7 +1404,7 @@ def importar_notas_preview(slug):
         for col_idx, h in enumerate(header_row):
             if col_idx <= 2:
                 continue
-            h_str = str(h).strip() if h is not None else ''
+            h_str = _norm(h)
             if h_str == 'Evaluaci\u00f3n':
                 eval_col = col_idx
             elif h_str == 'Autoevaluaci\u00f3n':
@@ -1548,7 +1598,6 @@ def importar_notas_confirmar(slug):
                                 (aid, act_id, ch['valor']))
                         elif existing:
                             conn.execute('DELETE FROM notas WHERE aid=? AND actividad_id=?', (aid, act_id))
-                        conn.commit()
                         f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'notas', aid,
                                      curso_sel, materia, periodo,
                                      campo='nota', actividad_id=act_id,
@@ -1572,7 +1621,6 @@ def importar_notas_confirmar(slug):
                             conn.execute(
                                 'UPDATE evaluaciones SET evaluacion=NULL WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?',
                                 (aid, prof['id'], materia, jornada, periodo))
-                        conn.commit()
                         f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'evaluaciones', aid,
                                      curso_sel, materia, periodo, campo='evaluacion',
                                      valor_anterior=old_val, valor_nuevo=ch['valor'],
@@ -1595,7 +1643,6 @@ def importar_notas_confirmar(slug):
                             conn.execute(
                                 'UPDATE evaluaciones SET autoevaluacion=NULL WHERE aid=? AND profesor_id=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=?',
                                 (aid, prof['id'], materia, jornada, periodo))
-                        conn.commit()
                         f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'evaluaciones', aid,
                                      curso_sel, materia, periodo, campo='autoevaluacion',
                                      valor_anterior=old_val, valor_nuevo=ch['valor'],
@@ -1934,8 +1981,7 @@ def recalcular(slug, aid):
         if not curso_sel:
             al = conn.execute('SELECT curso FROM alumnos WHERE id=?', (aid,)).fetchone()
             curso_sel = al['curso'] if al else ''
-        prom = f.calcular_stats_estudiante(conn, slug, aid, curso_sel, materia, jornada, periodo, prof['id'])
-        nf = f.calcular_nota_final_estudiante(conn, slug, aid, curso_sel, materia, jornada, periodo, prof['id'])
+        prom, nf = f.calcular_stats_y_nota_final(conn, slug, aid, curso_sel, materia, jornada, periodo, prof['id'])
         return jsonify({'promedio':prom,'nota_final':nf})
     except Exception as e:
         logger.error('stats_estudiante: %s', e)
