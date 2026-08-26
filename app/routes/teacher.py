@@ -1385,8 +1385,13 @@ def importar_notas_preview(slug):
                 mensaje_error = f'Error al leer el archivo: {e}'
         return jsonify({'status':'error','mensaje':mensaje_error}), 400
     header_row = list(ws.iter_rows(min_row=1, max_row=1, values_only=True))[0]
+    import unicodedata as _ud
     def _norm(v):
         return str(v).strip().lstrip('\ufeff') if v is not None else ''
+    def _norm_name(v):
+        s = _norm(v).lower()
+        s = ''.join(c for c in _ud.normalize('NFKD', s) if not _ud.combining(c))
+        return s
     if not header_row or _norm(header_row[0]) != 'N\u00b0':
         return jsonify({'status':'error','mensaje':'Formato de archivo invalido. La primera columna debe ser N\u00b0'}), 400
     rows_data = list(ws.iter_rows(min_row=2, values_only=False))
@@ -1399,6 +1404,12 @@ def importar_notas_preview(slug):
                AND COALESCE(periodo,1)=? ORDER BY orden''',
             (prof['id'], materia, jornada, curso_sel, periodo)).fetchall()
         existing_act_names = {a['nombre']: a for a in actividades_existentes}
+        alumnos_curso = conn.execute(
+            'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
+            (curso_sel, jornada)).fetchall()
+        alumno_by_name_norm = {}
+        for _al in alumnos_curso:
+            alumno_by_name_norm[_norm_name(_al['nombre'])] = _al
         act_cols = []
         eval_col = auto_col = None
         for col_idx, h in enumerate(header_row):
@@ -1445,16 +1456,14 @@ def importar_notas_preview(slug):
                 if al and al['curso'] == curso_sel:
                     alumno = al
             if not alumno and raw_nombre:
-                al = conn.execute(
-                    'SELECT * FROM alumnos WHERE nombre=? AND curso=? AND jornada=? AND activo=1',
-                    (raw_nombre, curso_sel, jornada)).fetchone()
+                al = alumno_by_name_norm.get(_norm_name(raw_nombre))
                 if al:
                     alumno = al
                     aid = al['id']
             if not alumno:
                 row_errors.append('Estudiante no encontrado en este curso')
                 all_ok = False
-            if aid:
+            if alumno and aid:
                 if aid in aid_set:
                     row_errors.append('Estudiante duplicado en el archivo')
                     all_ok = False
