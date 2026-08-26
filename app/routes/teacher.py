@@ -1331,6 +1331,11 @@ def importar_notas(slug):
     mis_cursos = f.get_cursos_profesor(slug, prof['id'], materia, jornada)
     curso_sel = request.args.get('curso', mis_cursos[0] if mis_cursos else '')
     periodo = request.args.get('periodo', 1, type=int)
+    logger.info(
+        '[IMPORT_DIAG_GET] slug=%s prof_id=%s materia=%s jornada=%s '
+        'mis_cursos=%s curso_sel="%s" args_curso=%s',
+        slug, prof['id'], materia, jornada,
+        mis_cursos, curso_sel, request.args.get('curso', '<default>'))
     conn = f.conectar(slug)
     actividades = conn.execute(
         '''SELECT * FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND curso=?
@@ -1414,6 +1419,13 @@ def importar_notas_preview(slug):
                 alumno_by_name_norm[_k] = None
             else:
                 alumno_by_name_norm[_k] = _al
+        logger.info(
+            '[IMPORT_DIAG] slug=%s prof_id=%s materia=%s jornada=%s curso=%s '
+            'alumnos_en_curso=%d actividades=%d | DB_AIDs=%s DB_nombres=%s',
+            slug, prof['id'], materia, jornada, curso_sel,
+            len(alumnos_curso), len(actividades_existentes),
+            [a['id'] for a in alumnos_curso[:10]],
+            [a['nombre'] for a in alumnos_curso[:10]])
         act_cols = []
         eval_col = auto_col = None
         for col_idx, h in enumerate(header_row):
@@ -1470,6 +1482,17 @@ def importar_notas_preview(slug):
             if not alumno and not any('duplicado' in e for e in row_errors):
                 row_errors.append('Estudiante no encontrado en este curso')
                 all_ok = False
+                _db_match_aid = None
+                if aid:
+                    _db_al = conn.execute('SELECT id, nombre, curso, activo FROM alumnos WHERE id=?', (aid,)).fetchone()
+                    _db_match_aid = dict(_db_al) if _db_al else 'NO_EXISTE'
+                logger.info(
+                    '[IMPORT_DIAG_MISS] slug=%s curso=%s jornada=%s '
+                    'excel_aid=%s excel_nombre="%s" parsed_aid=%s '
+                    'db_by_aid=%s',
+                    slug, curso_sel, jornada,
+                    raw_aid, raw_nombre, aid,
+                    _db_match_aid)
             if alumno and aid:
                 if aid in aid_set:
                     row_errors.append('Estudiante duplicado en el archivo')
@@ -1530,6 +1553,12 @@ def importar_notas_preview(slug):
             })
     finally:
         conn.close()
+    _found = sum(1 for r in preview_rows if r.get('alumno'))
+    _miss = sum(1 for r in preview_rows if not r.get('alumno'))
+    _miss_names = [r['nombre'] for r in preview_rows if not r.get('alumno')][:5]
+    logger.info(
+        '[IMPORT_DIAG_SUMMARY] slug=%s curso=%s total=%d found=%d miss=%d miss_names=%s',
+        slug, curso_sel, len(preview_rows), _found, _miss, _miss_names)
     return jsonify({
         'status': 'ok' if all_ok else 'error',
         'total': len(preview_rows),
