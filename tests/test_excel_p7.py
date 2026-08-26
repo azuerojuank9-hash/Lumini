@@ -395,6 +395,246 @@ class TestImportarNotasP7:
         assert audit >= 1
 
 
+# ── Importar Notas: robustez AID/Nombre ─────────────────────────────────────
+
+class TestImportarNotasRobustez:
+    """Tests for AID parsing edge cases and name normalization."""
+
+    def test_aid_integer(self, client, teacher, csrf):
+        """AID as integer should work."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'], alumno['id'], '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'int.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+        assert data['filas'][0]['aid'] == alumno['id']
+
+    def test_aid_as_float_in_excel(self, client, teacher, csrf):
+        """AID as float (15.0) should be parsed correctly."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'], float(alumno['id']), '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'float.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+        assert data['filas'][0]['aid'] == alumno['id']
+
+    def test_aid_as_string_integer(self, client, teacher, csrf):
+        """AID as string '15' should be parsed correctly."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'], str(alumno['id']), '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'str_int.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+        assert data['filas'][0]['aid'] == alumno['id']
+
+    def test_aid_as_string_float(self, client, teacher, csrf):
+        """AID as string '15.0' (Excel text format) should be parsed correctly."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'], f'{alumno["id"]}.0', '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'str_float.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+        assert data['filas'][0]['aid'] == alumno['id']
+
+    def test_aid_as_string_with_comma(self, client, teacher, csrf):
+        """AID as string '15,0' (comma decimal) should be parsed correctly."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'], f'{alumno["id"]},0', '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'str_comma.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+        assert data['filas'][0]['aid'] == alumno['id']
+
+    def test_aid_as_string_with_spaces(self, client, teacher, csrf):
+        """AID as string ' 15 ' (extra spaces) should be parsed correctly."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'], f' {alumno["id"]} ', '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'str_spaces.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+        assert data['filas'][0]['aid'] == alumno['id']
+
+    def test_name_lowercase_matches(self, client, teacher, csrf):
+        """Lowercase name should match DB name via normalization."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'].lower(), 999999, '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'lower.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+
+    def test_name_uppercase_matches(self, client, teacher, csrf):
+        """Uppercase name should match DB name via normalization."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'].upper(), 999999, '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'upper.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+
+    def test_name_with_extra_spaces(self, client, teacher, csrf):
+        """Name with leading/trailing spaces should match."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, f'  {alumno["nombre"]}  ', 999999, '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'spaces.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+
+    def test_wrong_aid_correct_name_matches(self, client, teacher, csrf):
+        """Wrong AID but correct name should find student by name."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'], 999999, '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'wrongaid.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+        assert data['filas'][0]['aid'] == alumno['id']
+
+    def test_student_from_other_course_rejected(self, client, teacher, csrf):
+        """Student from a different course must be rejected."""
+        conn = db()
+        ajeno = conn.execute(
+            "SELECT id, nombre FROM alumnos WHERE curso='Segundo A' "
+            "AND jornada='Ma\u00f1ana' AND activo=1 LIMIT 1"
+        ).fetchone()
+        conn.close()
+        assert ajeno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, ajeno['nombre'], ajeno['id'], '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'ajeno.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is False
+        assert any('no encontrado' in e.lower() for e in data['filas'][0]['errors'])
+
+    def test_real_duplicate_student_detected(self, client, teacher, csrf):
+        """Same student appearing twice should be flagged as duplicate."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'], alumno['id'], ''],
+                         [2, alumno['nombre'], alumno['id'], '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'dup.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][1]['ok'] is False
+        assert any('duplicado' in e.lower() for e in data['filas'][1]['errors'])
+
+    def test_28_students_valid(self, client, teacher, csrf):
+        """28 students with correct AIDs should all be valid."""
+        conn = db()
+        alumnos = conn.execute(
+            "SELECT id, nombre FROM alumnos WHERE curso='Primero A' "
+            "AND jornada='Ma\u00f1ana' AND activo=1 ORDER BY id LIMIT 28"
+        ).fetchall()
+        conn.close()
+        assert len(alumnos) == 28
+        filas = [['N\u00b0', 'Estudiante', 'AID', 'Promedio']]
+        for i, al in enumerate(alumnos, 1):
+            filas.append([i, al['nombre'], al['id'], round(4 + i % 5, 1)])
+        bio = make_xlsx(filas)
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, '28.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['all_ok'] is True
+        assert data['total'] == 28
+        assert data['errores'] == 0
+
+    def test_plantilla_roundtrip(self, client, teacher, csrf):
+        """Plantilla downloaded from LUMINI can be re-imported."""
+        r = client.get(f'/{SLUG}/plantilla_notas?curso=Primero A&periodo=1')
+        assert r.status_code == 200
+        r2 = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (io.BytesIO(r.data), 'plantilla.xlsx')})
+        assert r2.status_code == 200
+        data = json.loads(r2.get_data(as_text=True))
+        assert data['all_ok'] is True
+        assert data['total'] >= 28
+        assert data['validos'] == data['total']
+
+    def test_no_duplicate_error_when_student_not_found(self, client, teacher, csrf):
+        """A student not found should NOT also get 'duplicado' error."""
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, 'Fantasma Uno', 999998, ''],
+                         [2, 'Fantasma Dos', 999998, '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'ghost.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is False
+        assert data['filas'][1]['ok'] is False
+        assert any('no encontrado' in e.lower() for e in data['filas'][0]['errors'])
+        assert not any('duplicado' in e.lower() for e in data['filas'][0]['errors'])
+        assert not any('duplicado' in e.lower() for e in data['filas'][1]['errors'])
+
+    def test_export_roundtrip(self, client, teacher, csrf):
+        """Exported notas Excel can be re-imported."""
+        r = client.get(f'/{SLUG}/exportar_notas?curso=Primero A&periodo=1')
+        assert r.status_code == 200
+        r2 = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (io.BytesIO(r.data), 'export.xlsx')})
+        assert r2.status_code == 200
+        data = json.loads(r2.get_data(as_text=True))
+        assert data['all_ok'] is True
+        assert data['validos'] == data['total']
+
+
 # ── Migrar-Excel (obsoleto pero funcional) ────────────────────────────────
 
 class TestMigrarExcel:

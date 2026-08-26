@@ -1409,7 +1409,11 @@ def importar_notas_preview(slug):
             (curso_sel, jornada)).fetchall()
         alumno_by_name_norm = {}
         for _al in alumnos_curso:
-            alumno_by_name_norm[_norm_name(_al['nombre'])] = _al
+            _k = _norm_name(_al['nombre'])
+            if _k in alumno_by_name_norm:
+                alumno_by_name_norm[_k] = None
+            else:
+                alumno_by_name_norm[_k] = _al
         act_cols = []
         eval_col = auto_col = None
         for col_idx, h in enumerate(header_row):
@@ -1447,7 +1451,7 @@ def importar_notas_preview(slug):
             aid = None
             if raw_aid is not None:
                 try:
-                    aid = int(raw_aid)
+                    aid = int(float(str(raw_aid).replace(',', '.').strip()))
                 except (ValueError, TypeError):
                     pass
             alumno = None
@@ -1457,10 +1461,13 @@ def importar_notas_preview(slug):
                     alumno = al
             if not alumno and raw_nombre:
                 al = alumno_by_name_norm.get(_norm_name(raw_nombre))
-                if al:
+                if al is None and _norm_name(raw_nombre) in alumno_by_name_norm:
+                    row_errors.append('Nombre duplicado en el curso, incluye el AID correcto')
+                    all_ok = False
+                elif al:
                     alumno = al
                     aid = al['id']
-            if not alumno:
+            if not alumno and not any('duplicado' in e for e in row_errors):
                 row_errors.append('Estudiante no encontrado en este curso')
                 all_ok = False
             if alumno and aid:
