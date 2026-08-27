@@ -1331,11 +1331,10 @@ def importar_notas(slug):
     mis_cursos = f.get_cursos_profesor(slug, prof['id'], materia, jornada)
     curso_sel = request.args.get('curso', mis_cursos[0] if mis_cursos else '')
     periodo = request.args.get('periodo', 1, type=int)
-    logger.info(
-        '[IMPORT_DIAG_GET] slug=%s prof_id=%s materia=%s jornada=%s '
-        'mis_cursos=%s curso_sel="%s" args_curso=%s',
+    import sys as _sys
+    print('[IMPORT_DIAG_GET] slug=%s prof_id=%r materia=%r jornada=%r mis_cursos=%r curso_sel=%r args_curso=%r' % (
         slug, prof['id'], materia, jornada,
-        mis_cursos, curso_sel, request.args.get('curso', '<default>'))
+        mis_cursos, curso_sel, request.args.get('curso', '<default>')), file=_sys.stderr, flush=True)
     conn = f.conectar(slug)
     actividades = conn.execute(
         '''SELECT * FROM actividades WHERE profesor_id=? AND materia=? AND jornada=? AND curso=?
@@ -1402,16 +1401,15 @@ def importar_notas_preview(slug):
     rows_data = list(ws.iter_rows(min_row=2, values_only=False))
     if not rows_data:
         return jsonify({'status':'error','mensaje':'El archivo no contiene datos'}), 400
-    _header_normalized = [_norm(h) for h in header_row]
-    _preview_cells = []
-    for _rd in rows_data[:3]:
-        _cv = [c.value for c in _rd]
-        _preview_cells.append(_cv)
-    logger.info(
-        '[IMPORT_DIAG_EXCEL] slug=%s header_raw=%s header_norm=%s '
-        'num_cols=%d num_data_rows=%d | primeras_3_filas=%s',
-        slug, list(header_row), _header_normalized,
-        len(header_row), len(rows_data), _preview_cells)
+    import sys as _sys
+    print('[IMPORT_DIAG_EXCEL] slug=%s headers=%r headers_norm=%r row_1=%r row_2=%r row_3=%r' % (
+        slug,
+        list(header_row),
+        [_norm(h) for h in header_row],
+        [c.value for c in rows_data[0]] if len(rows_data) > 0 else None,
+        [c.value for c in rows_data[1]] if len(rows_data) > 1 else None,
+        [c.value for c in rows_data[2]] if len(rows_data) > 2 else None,
+    ), file=_sys.stderr, flush=True)
     conn = f.conectar(slug)
     try:
         actividades_existentes = conn.execute(
@@ -1422,43 +1420,22 @@ def importar_notas_preview(slug):
         alumnos_curso = conn.execute(
             'SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
             (curso_sel, jornada)).fetchall()
-        _total_alumnos = conn.execute('SELECT COUNT(*) as c FROM alumnos').fetchone()['c']
-        _alumnos_curso_param = conn.execute(
-            'SELECT COUNT(*) as c FROM alumnos WHERE curso=? AND jornada=?',
-            (curso_sel, jornada)).fetchone()['c']
-        _alumnos_1102_any = conn.execute(
-            "SELECT COUNT(*) as c FROM alumnos WHERE curso='1102'").fetchone()['c']
-        _alumnos_manana_any = conn.execute(
-            "SELECT COUNT(*) as c FROM alumnos WHERE jornada='Ma\u00f1ana'").fetchone()['c']
-        _alumnos_1102_manana = conn.execute(
-            "SELECT COUNT(*) as c FROM alumnos WHERE curso='1102' AND jornada='Ma\u00f1ana'").fetchone()['c']
-        _alumnos_1102_activo = conn.execute(
-            "SELECT COUNT(*) as c FROM alumnos WHERE curso='1102' AND jornada='Ma\u00f1ana' AND activo=1").fetchone()['c']
-        _distinct_cursos = [r[0] for r in conn.execute(
-            'SELECT DISTINCT curso FROM alumnos ORDER BY curso').fetchall()]
-        _distinct_jornadas = [r[0] for r in conn.execute(
-            'SELECT DISTINCT jornada FROM alumnos ORDER BY jornada').fetchall()]
-        _distinct_activo = conn.execute(
-            'SELECT activo, COUNT(*) as c FROM alumnos GROUP BY activo').fetchall()
-        logger.info(
-            '[IMPORT_DIAG_DB] slug=%s total_alumnos=%d '
-            'curso="%s" jornada="%s" alumnos_con_param_exacto=%d '
-            'alumnos_curso_1102_any=%d alumnos_jornada_manana_any=%d '
-            'alumnos_1102_manana=%d alumnos_1102_manana_activo1=%d '
-            'distinct_cursos=%s distinct_jornadas=%s distinct_activo=%s',
-            slug, _total_alumnos,
-            curso_sel, jornada, _alumnos_curso_param,
-            _alumnos_1102_any, _alumnos_manana_any,
-            _alumnos_1102_manana, _alumnos_1102_activo,
-            _distinct_cursos, _distinct_jornadas,
-            [(r['activo'], r['c']) for r in _distinct_activo])
-        logger.info(
-            '[IMPORT_DIAG_BYTES] slug=%s '
-            'curso_raw=%r curso_hex=%s curso_len=%d '
-            'jornada_raw=%r jornada_hex=%s jornada_len=%d',
-            slug,
-            curso_sel, curso_sel.encode('utf-8').hex(), len(curso_sel),
-            jornada, jornada.encode('utf-8').hex(), len(jornada))
+        _total = conn.execute('SELECT COUNT(*) as c FROM alumnos').fetchone()['c']
+        _cursos_distinct = [r[0] for r in conn.execute('SELECT DISTINCT curso FROM alumnos ORDER BY curso').fetchall()]
+        _jornadas_distinct = [r[0] for r in conn.execute('SELECT DISTINCT jornada FROM alumnos ORDER BY jornada').fetchall()]
+        _activo_groups = [(r['activo'], r['c']) for r in conn.execute('SELECT activo, COUNT(*) as c FROM alumnos GROUP BY activo').fetchall()]
+        _withcurso = conn.execute('SELECT COUNT(*) as c FROM alumnos WHERE curso=?', (curso_sel,)).fetchone()['c']
+        _withjornada = conn.execute('SELECT COUNT(*) as c FROM alumnos WHERE jornada=?', (jornada,)).fetchone()['c']
+        _withboth = conn.execute('SELECT COUNT(*) as c FROM alumnos WHERE curso=? AND jornada=?', (curso_sel, jornada)).fetchone()['c']
+        _withboth_activo = conn.execute('SELECT COUNT(*) as c FROM alumnos WHERE curso=? AND jornada=? AND activo=1', (curso_sel, jornada)).fetchone()['c']
+        print('[IMPORT_DIAG_DB] slug=%s total=%d distinct_cursos=%r distinct_jornadas=%r distinct_activo=%r' % (
+            slug, _total, _cursos_distinct, _jornadas_distinct, _activo_groups), file=_sys.stderr, flush=True)
+        print('[IMPORT_DIAG_PARAMS] slug=%s curso=%r jornada=%r curso_hex=%s jornada_hex=%s' % (
+            slug, curso_sel, jornada,
+            curso_sel.encode('utf-8').hex() if isinstance(curso_sel, str) else '?',
+            jornada.encode('utf-8').hex() if isinstance(jornada, str) else '?'), file=_sys.stderr, flush=True)
+        print('[IMPORT_DIAG_COUNTS] slug=%s curso=%r jornada=%r con_curso=%d con_jornada=%d con_ambos=%d con_ambos_activo1=%d alumnos_en_curso=%d' % (
+            slug, curso_sel, jornada, _withcurso, _withjornada, _withboth, _withboth_activo, len(alumnos_curso)), file=_sys.stderr, flush=True)
         alumno_by_name_norm = {}
         for _al in alumnos_curso:
             _k = _norm_name(_al['nombre'])
@@ -1466,13 +1443,10 @@ def importar_notas_preview(slug):
                 alumno_by_name_norm[_k] = None
             else:
                 alumno_by_name_norm[_k] = _al
-        logger.info(
-            '[IMPORT_DIAG] slug=%s prof_id=%s materia=%s jornada=%s curso=%s '
-            'alumnos_en_curso=%d actividades=%d | DB_AIDs=%s DB_nombres=%s',
-            slug, prof['id'], materia, jornada, curso_sel,
-            len(alumnos_curso), len(actividades_existentes),
-            [a['id'] for a in alumnos_curso[:10]],
-            [a['nombre'] for a in alumnos_curso[:10]])
+        print('[IMPORT_DIAG_QUERY] slug=%s query="SELECT * FROM alumnos WHERE curso=? AND jornada=? AND activo=1" params=(%r, %r) result_count=%d' % (
+            slug, curso_sel, jornada, len(alumnos_curso)), file=_sys.stderr, flush=True)
+        print('[IMPORT_DIAG_DB_PREVIEW] slug=%s DB_AIDs=%r DB_nombres=%r' % (
+            slug, [a['id'] for a in alumnos_curso[:10]], [a['nombre'] for a in alumnos_curso[:10]]), file=_sys.stderr, flush=True)
         act_cols = []
         eval_col = auto_col = None
         for col_idx, h in enumerate(header_row):
@@ -1533,13 +1507,9 @@ def importar_notas_preview(slug):
                 if aid:
                     _db_al = conn.execute('SELECT id, nombre, curso, activo FROM alumnos WHERE id=?', (aid,)).fetchone()
                     _db_match_aid = dict(_db_al) if _db_al else 'NO_EXISTE'
-                logger.info(
-                    '[IMPORT_DIAG_MISS] slug=%s curso=%s jornada=%s '
-                    'excel_aid=%s excel_nombre="%s" parsed_aid=%s '
-                    'db_by_aid=%s',
-                    slug, curso_sel, jornada,
-                    raw_aid, raw_nombre, aid,
-                    _db_match_aid)
+                print('[IMPORT_DIAG_MISS] slug=%s curso=%r jornada=%r excel_aid=%r excel_nombre=%r parsed_aid=%r db_by_aid=%r' % (
+                    slug, curso_sel, jornada, raw_aid, raw_nombre, aid,
+                    _db_match_aid), file=_sys.stderr, flush=True)
             if alumno and aid:
                 if aid in aid_set:
                     row_errors.append('Estudiante duplicado en el archivo')
@@ -1603,9 +1573,8 @@ def importar_notas_preview(slug):
     _found = sum(1 for r in preview_rows if r.get('alumno'))
     _miss = sum(1 for r in preview_rows if not r.get('alumno'))
     _miss_names = [r['nombre'] for r in preview_rows if not r.get('alumno')][:5]
-    logger.info(
-        '[IMPORT_DIAG_SUMMARY] slug=%s curso=%s total=%d found=%d miss=%d miss_names=%s',
-        slug, curso_sel, len(preview_rows), _found, _miss, _miss_names)
+    print('[IMPORT_DIAG_SUMMARY] slug=%s curso=%r total=%d found=%d miss=%d miss_names=%r' % (
+        slug, curso_sel, len(preview_rows), _found, _miss, _miss_names), file=_sys.stderr, flush=True)
     return jsonify({
         'status': 'ok' if all_ok else 'error',
         'total': len(preview_rows),
