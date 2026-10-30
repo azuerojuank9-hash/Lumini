@@ -1431,7 +1431,7 @@ def importar_notas_preview(slug):
     def _norm_name(v):
         s = _norm(v).lower()
         s = ''.join(c for c in _ud.normalize('NFKD', s) if not _ud.combining(c))
-        return s
+        return ' '.join(sorted(s.split()))
     if not header_row or _norm(header_row[0]) != 'N\u00b0':
         return jsonify({'status':'error','mensaje':'Formato de archivo invalido. La primera columna debe ser N\u00b0'}), 400
     rows_data = list(ws.iter_rows(min_row=2, values_only=False))
@@ -1528,7 +1528,29 @@ def importar_notas_preview(slug):
             cells = [c.value for c in row_cells]
             if not any(c is not None for c in cells):
                 continue
-            raw_nombre = str(cells[_nombre_col]).strip() if (_nombre_col is not None and _nombre_col < len(cells) and cells[_nombre_col] is not None) else ''
+            _parts_nombre = []
+            _aliases_nombre = {
+                'apellido 1', 'apellido1', 'primer apellido',
+                'apellido 2', 'apellido2', 'segundo apellido',
+                'nombre 1', 'nombre1', 'primer nombre',
+                'nombre 2', 'nombre2', 'segundo nombre'
+            }
+            _indices_nombre = [
+                i for i, h in enumerate(header_row)
+                if _norm(h).lower() in _aliases_nombre
+            ]
+            if _indices_nombre:
+                raw_nombre = ' '.join(
+                    str(cells[i]).strip()
+                    for i in _indices_nombre
+                    if i < len(cells) and cells[i] is not None
+                    and str(cells[i]).strip()
+                )
+            else:
+                raw_nombre = str(cells[_nombre_col]).strip() if (
+                    _nombre_col is not None and _nombre_col < len(cells)
+                    and cells[_nombre_col] is not None
+                ) else ''
             raw_aid = cells[_aid_col] if _aid_col is not None and _aid_col < len(cells) else None
             row_errors = []
             aid = None
