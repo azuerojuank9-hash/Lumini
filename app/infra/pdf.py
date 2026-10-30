@@ -93,7 +93,10 @@ def generar_pdf_alumno(alumno, slug, colegio, curso, jornada, periodo, conn):
     story.append(Spacer(1, 0.5*cm))
     from app.infra.database import config_get
     cfg = config_get(slug)
+    escala_max = float(cfg.get('escala_max', 5.0))
     nota_min_aprobar = float(cfg.get('nota_minima_aprobar', 3.0))
+    if escala_max > 5.0:
+        nota_min_aprobar /= 2.0
     estado = 'Pendiente' if prom_general is None else ('Aprobado' if prom_general >= nota_min_aprobar else 'Reprobado')
     bg_color = pri_color if prom_general is not None and prom_general >= nota_min_aprobar else colors.HexColor('#e74c3c') if prom_general is not None else colors.HexColor('#64748B')
     resumen = Table(

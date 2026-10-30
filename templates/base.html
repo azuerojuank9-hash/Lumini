@@ -67,6 +67,15 @@ document.addEventListener('DOMContentLoaded',function(){
   if(window.lucide)lucide.createIcons({attrs:{'aria-hidden':'true'}});
   var alerts=document.querySelectorAll('.alert-auto');
   if(alerts.length)setTimeout(function(){alerts.forEach(function(el){el.style.opacity='0';setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},300)})},5000);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      document.querySelectorAll('.overlay').forEach(function(el){
+        if(el.style.display==='flex'||getComputedStyle(el).display==='flex'){
+          el.style.display='none';
+        }
+      });
+    }
+  });
 });
 {% block extra_scripts %}{% endblock %}
 </script>

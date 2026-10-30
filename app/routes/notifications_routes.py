@@ -78,7 +78,7 @@ def comunicacion_leer(slug, cid):
     try:
         ok = marcar_comunicacion(conn, cid, usuario_tipo, usuario_id, fa.app.logger)
         if not ok:
-            return jsonify({'error': 'Error de migración'}), 500
+            return jsonify({'error': 'No tienes acceso a este comunicado.'}), 403
         conn.commit()
     finally:
         conn.close()

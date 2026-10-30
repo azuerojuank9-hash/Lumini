@@ -1,16 +1,16 @@
 /* LUMINI Design System — Sidebar */
 .sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;overflow:hidden;transition:transform var(--tr)}
 .sidebar-header{padding:18px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
-.sidebar-header .logo{width:34px;height:34px;border-radius:9px;object-fit:cover;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.sidebar-header .logo{width:36px;height:36px;border-radius:10px;object-fit:cover;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .sidebar-header .brand-text{flex:1;min-width:0}
-.sidebar-header .brand-name{font-size:15px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,var(--text-on-accent) 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.sidebar-header .brand-sub{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.sidebar-header .brand-name{font-size:16px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,var(--text-on-accent) 40%,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sidebar-header .brand-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .sidebar-nav{flex:1;padding:10px 8px;overflow-y:auto;overflow-x:hidden}
 .sidebar-nav::-webkit-scrollbar{width:3px}
 .sidebar-nav::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:99px}
-.sidebar-section{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:14px 10px 6px;font-weight:600}
+.sidebar-section{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:14px 10px 6px;font-weight:600}
 .sidebar-section.divider{border-top:1px solid var(--border);margin-top:6px;padding-top:14px}
-.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;color:var(--text);text-decoration:none;cursor:pointer;position:relative;transition:all var(--tr);min-height:38px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;color:var(--text);text-decoration:none;cursor:pointer;position:relative;transition:all var(--tr);min-height:38px}
 .sidebar-item:hover{background:rgba(var(--accent-rgb),.08);color:var(--text)}
 .sidebar-item.active,.sidebar-item.active-page{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--text-on-accent);font-weight:600;box-shadow:0 2px 8px rgba(var(--accent-rgb),.25)}
 .sidebar-item .icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);transition:color var(--tr);font-size:16px}
@@ -20,7 +20,7 @@
 .sidebar-item .badge-count{margin-left:auto;background:var(--danger);color:var(--text-on-accent);border-radius:99px;padding:1px 7px;font-size:9px;font-weight:700;min-width:18px;text-align:center;line-height:1.5}
 .sidebar-item .chevron{margin-left:auto;width:14px;height:14px;color:var(--muted);transition:transform var(--tr);flex-shrink:0}
 .sidebar-user{padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
-.sidebar-user .avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-on-accent);flex-shrink:0;box-shadow:0 2px 4px rgba(0,0,0,.1)}
+.sidebar-user .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-on-accent);flex-shrink:0;box-shadow:0 2px 4px rgba(0,0,0,.1)}
 .sidebar-user .info{flex:1;min-width:0}
 .sidebar-user .name{font-size:13px;font-weight:600}
 .sidebar-user .role{font-size:10px;color:var(--muted);margin-top:1px}

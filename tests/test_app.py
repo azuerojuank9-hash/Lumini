@@ -1953,12 +1953,12 @@ class TestDashboard:
     def test_dashboard_page_profesor(self, client, teacher_session):
         r = client.get('/testcolegio/dashboard')
         assert r.status_code == 200
-        assert b'Dashboard' in r.data
+        assert b'Panel del Docente' in r.data
 
     def test_dashboard_page_rector(self, client, rector_session):
         r = client.get('/testcolegio/dashboard')
         assert r.status_code == 200
-        assert b'Dashboard' in r.data
+        assert b'Panel de Control Institucional' in r.data
 
     def test_dashboard_page_no_auth(self, client):
         r = client.get('/testcolegio/dashboard')
@@ -2342,3 +2342,43 @@ class TestPWA:
         html = r.get_data(as_text=True)
         for pat in ['Ã¡', 'Ã©', 'Ã­', 'Ã³', 'Ãº', 'Ã±']:
             assert pat not in html
+
+
+class TestRegistroProfesorMensajeExito:
+    """Regresión ETAPA B: el mensaje de éxito del registro debe renderizarse
+    como alerta verde (variable `exito`), no como HTML crudo autoescapado
+    dentro de `error`."""
+
+    def test_registro_exitoso_no_muestra_html_escapado(self, client, csrf):
+        import flask_app
+        usuario = 'prof_reg_p9_etapa_b'
+        conn = sqlite3.connect(TEST_DB)
+        conn.execute('DELETE FROM profesores WHERE usuario=?', (usuario,))
+        conn.commit()
+        conn.close()
+        codigo = flask_app.get_codigo_registro('testcolegio', 'profesores') or 'prof_test'
+        try:
+            r = client.post('/testcolegio/login', data={
+                '_csrf_token': csrf,
+                'accion': 'profesor_registro',
+                'nombre': 'Prof Regresion Etapa B',
+                'reg_usuario': usuario,
+                'reg_password': 'secreto123',
+                'confirmar_password': 'secreto123',
+                'email_prof': 'prof_reg@test.com',
+                'pregunta_secreta': 'Color favorito',
+                'respuesta_secreta': 'azul',
+                'codigo_registro': codigo,
+                'materias_sel': ['Matemáticas'],
+                'jornadas_sel': ['Mañana'],
+            })
+            assert r.status_code == 200
+            html = r.get_data(as_text=True)
+            assert 'Registro exitoso. Ya puedes ingresar.' in html
+            assert 'alert-success' in html
+            assert '&lt;i data-lucide="check-circle"&gt;' not in html
+        finally:
+            conn = sqlite3.connect(TEST_DB)
+            conn.execute('DELETE FROM profesores WHERE usuario=?', (usuario,))
+            conn.commit()
+            conn.close()

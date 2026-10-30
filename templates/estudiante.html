@@ -20,6 +20,10 @@
 .est-prom{text-align:right;}
 .est-prom .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
 .est-prom .valor{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;}
+.est-periodos{display:flex;gap:4px;margin-top:6px;}
+.ep-tab{padding:4px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);font-size:11px;font-weight:600;text-decoration:none;transition:all var(--tr);display:inline-flex;align-items:center;}
+.ep-tab:hover{background:rgba(var(--accent-rgb),.06);border-color:var(--accent);color:var(--text);}
+.ep-tab.active{background:var(--accent);color:var(--text-on-accent);border-color:transparent;}
 .ok{color:var(--success);}.warn{color:var(--warning);}.bad{color:var(--danger);}
 .ag-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;gap:8px;}
 .ag-item:last-child{border-bottom:none;}
@@ -218,6 +222,13 @@ td.des-col{background:rgba(var(--accent-rgb),.05);text-align:center;padding:10px
       <div class="est-nombre">{{ alumno.nombre }}</div>
 
       <div class="est-meta">Curso {{ alumno.curso }} · {{ alumno.jornada }} · {{ colegio.nombre if colegio else slug }} · Período {{ periodo }} de {{ num_periodos }}</div>
+      {% if num_periodos and num_periodos > 1 %}
+      <div class="est-periodos">
+        {% for p in range(1, num_periodos + 1) %}
+        <a href="/{{ slug }}/estudiante?periodo={{ p }}" class="ep-tab {% if p == periodo %}active{% endif %}">P{{ p }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
 
     </div>
 

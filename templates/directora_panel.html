@@ -68,6 +68,7 @@
 {% block sidebar %}{% include "components/sidebar_directora.html" %}{% endblock %}
 
 {% block content %}
+{% set tabla_labels = {'alumnos':'Estudiantes','profesores':'Profesores','actividades':'Actividades','notas':'Notas','evaluaciones':'Evaluaciones','comunicaciones':'Comunicaciones','eventos_calendario':'Calendario','solicitudes_modificacion':'Solicitudes','auditoria_notas':'Auditoría de Notas','config_institucion':'Configuración','usuarios':'Usuarios','canales':'Canales','observaciones':'Observaciones','asistencia':'Asistencia'} %}
 <div class="main">
 
 {{ breadcrumbs([('Panel', '/' ~ slug ~ '/directora/panel'), ('Panel de la Directora', None)]) }}
@@ -241,7 +242,7 @@
                 <div class="activity-item">
                     <div class="av purple"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i></div>
                     <div class="act-content">
-                        <div class="act-text"><strong>{{ a.accion | capitalize }}</strong> en {{ a.tabla }}</div>
+                        <div class="act-text"><strong>{{ a.accion | capitalize }}</strong> en {{ tabla_labels.get(a.tabla, a.tabla) }}</div>
                         <div class="act-meta">{{ a.creado[:16] if a.creado else '' }}</div>
                     </div>
                 </div>
@@ -535,6 +536,8 @@
 
     </div>
 
+</div>
+
 <div class="dash-wrap" style="margin-bottom:0;">
 
 <h3 class="section-title" style="margin-top:0;"><i data-lucide="pie-chart"></i> Resumen — Periodo {{ periodo }}</h3>
@@ -624,8 +627,6 @@
       {% endif %}
     </div>
   </div>
-</div>
-
 </div>
 
 </div>

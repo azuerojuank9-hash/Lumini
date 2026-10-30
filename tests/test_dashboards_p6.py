@@ -13,6 +13,7 @@ Asserts the P6 dashboard work:
 """
 
 import os
+import re
 import sqlite3
 import sys
 from datetime import datetime
@@ -251,3 +252,94 @@ class TestDirectoraDashboard:
         assert 'Aprobados' in html
         assert 'Reprobados' in html
         assert 'table-consolidada' in html
+
+
+class TestDirectoraUmbralEscala:
+    """Regresión: directora_panel debe usar el umbral relativo a la escala
+    (escala_max > 5.0 -> nota_minima_aprobar / 2), igual que el dashboard y el
+    panel del rector. Antes dependía de un branch muerto
+    (`tipo_evaluacion == 'mitad'`) y nunca reducía el umbral.
+    """
+
+    def _expected_counts(self, conn, curso, jornada, periodo, umbral):
+        from app.infra.grades import _promedio_ponderado
+        alumnos = conn.execute(
+            'SELECT id FROM alumnos WHERE curso=? AND jornada=? AND activo=1',
+            (curso, jornada)).fetchall()
+        aids = [a['id'] for a in alumnos]
+        lista_materias = [r['materia'] for r in conn.execute(
+            'SELECT DISTINCT materia FROM actividades WHERE curso=? AND jornada=? '
+            'AND COALESCE(periodo,1)=? ORDER BY materia', (curso, jornada, periodo)).fetchall()]
+        notas_by = {}
+        for r in conn.execute(
+            '''SELECT n.aid, ac.materia, n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+               WHERE ac.curso=? AND ac.jornada=? AND COALESCE(ac.periodo,1)=?''',
+            (curso, jornada, periodo)).fetchall():
+            notas_by.setdefault((r['aid'], r['materia']), []).append(r['val'])
+        evals_by = {}
+        if aids:
+            ph = ','.join('?' * len(aids))
+            for r in conn.execute(
+                f'SELECT aid, materia, evaluacion, autoevaluacion FROM evaluaciones '
+                f'WHERE aid IN ({ph}) AND COALESCE(periodo,1)=?', (*aids, periodo)).fetchall():
+                evals_by[(r['aid'], r['materia'])] = r
+        aprobados = reprobados = 0
+        for a in alumnos:
+            finales = []
+            for mat in lista_materias:
+                ev = evals_by.get((a['id'], mat))
+                ev_v = ev['evaluacion'] if ev and ev['evaluacion'] is not None else None
+                au_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
+                f = _promedio_ponderado(notas_by.get((a['id'], mat), []), ev_v, au_v)
+                if f is not None:
+                    finales.append(f)
+            if not finales:
+                continue
+            prom = round(sum(finales) / len(finales), 2)
+            if prom >= umbral:
+                aprobados += 1
+            else:
+                reprobados += 1
+        return aprobados, reprobados
+
+    def test_directora_umbral_relativo_a_escala(self, client, csrf, monkeypatch):
+        import flask_app
+        # Escala 1-10 con aprobación en 6.0 -> la convención la reduce a 3.0.
+        monkeypatch.setattr(flask_app, 'config_get',
+                            lambda slug: {'tipo_evaluacion': 'numerica', 'escala_min': 1.0,
+                                          'escala_max': 10.0, 'nota_minima_aprobar': 6.0})
+        umbral = 3.0
+
+        conn = db()
+        dir_id = conn.execute("SELECT id FROM directoras WHERE usuario='directora'").fetchone()['id']
+        qa = conn.execute(
+            "INSERT INTO alumnos (nombre, curso, jornada, activo) VALUES (?,?,?,1)",
+            ('QA Umbral Directora', 'Primero A', 'Mañana'))
+        qa_id = qa.lastrowid
+        try:
+            conn.execute('INSERT INTO notas (aid, actividad_id, val) VALUES (?,?,?)', (qa_id, 1, 4.0))
+            conn.execute(
+                '''INSERT INTO evaluaciones (aid, profesor_id, materia, jornada, evaluacion, autoevaluacion, periodo)
+                   VALUES (?,?,?,?,?,?,?)''',
+                (qa_id, 1, 'Matemáticas', 'Mañana', 4.0, 4.0, 1))
+            conn.commit()
+            exp_aprob, exp_reprob = self._expected_counts(conn, 'Primero A', 'Mañana', 1, umbral)
+            exp_aprob_viejo, _ = self._expected_counts(conn, 'Primero A', 'Mañana', 1, 6.0)
+            assert exp_aprob > exp_aprob_viejo, 'los datos de prueba no distinguen el umbral'
+            with client.session_transaction() as sess:
+                sess[f'directora_id_{SLUG}'] = dir_id
+                sess['_csrf_token'] = CSRF
+            r = client.get(f'/{SLUG}/directora/panel')
+            assert r.status_code == 200
+            html = r.get_data(as_text=True)
+        finally:
+            conn.execute('DELETE FROM notas WHERE aid=?', (qa_id,))
+            conn.execute('DELETE FROM evaluaciones WHERE aid=?', (qa_id,))
+            conn.execute('DELETE FROM alumnos WHERE id=?', (qa_id,))
+            conn.commit()
+            conn.close()
+
+        scores = re.findall(r'class="info-value" style="color:var\(--(?:danger|success)\);">(\d+)</span>', html)
+        assert len(scores) >= 2, scores
+        assert int(scores[0]) == exp_aprob
+        assert int(scores[1]) == exp_reprob

@@ -191,7 +191,30 @@
 .alert-card{transition:opacity .18s ease,transform .18s ease}
 .alert-card.ac-exit{opacity:0;transform:translateX(8px)}
 .alert-card.dash-alert-in{animation:dashIn .25s ease}
+.ctx-bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-sm);align-items:center}
+.ctx-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.ctx-value{font-size:14px;font-weight:700}
+.ctx-sep{width:1px;height:34px;background:var(--border)}
+.summary-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.summary-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-sm)}
+.summary-item .si-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.summary-item .si-body{min-width:0}
+.summary-item .si-val{font-size:18px;font-weight:800;line-height:1.1}
+.summary-item .si-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.space-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.space-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;color:var(--text)}
+.space-sub{font-size:12px;color:var(--muted)}
+.space-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:8px}
+.space-card{display:flex;align-items:center;gap:14px;padding:18px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-sm);text-decoration:none;color:inherit;transition:all .2s}
+.space-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--accent)}
+.space-card .sc-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.space-card .sc-name{font-size:14px;font-weight:700}
+.space-card .sc-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.space-card .sc-arrow{margin-left:auto;color:var(--muted)}
+.curso-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.curso-chip{padding:8px 14px;border-radius:99px;font-size:13px;font-weight:600;background:var(--bg3);border:1px solid var(--border);color:var(--text)}
 @media(max-width:640px){
+  .ctx-sep{display:none}
   .dash-status{margin-left:0;width:100%;justify-content:flex-start;order:10;font-size:11px;min-height:16px}
   .filter-bar .btn{padding:8px 12px;font-size:12px}
 }
@@ -200,295 +223,453 @@
 {% block sidebar %}{% include "components/sidebar_teacher.html" %}{% endblock %}
 
 {% block content %}
-{{ breadcrumbs([('Panel', '/' ~ slug ~ '/dashboard'), ('Panel del Docente', None)]) }}
+{{ breadcrumbs([('Panel', '/' ~ slug ~ '/dashboard'), ('Panel del Docente' if instance == 'profesor' else 'Panel de Control Institucional', None)]) }}
 <div class="page-header">
+  <div>
+    <h1>{{ 'Panel del Docente' if instance == 'profesor' else 'Panel de Control Institucional' }}</h1>
+    <div class="greeting">Hola, <strong>{{ nombre }}</strong> · {{ hoy_str }}{% if instance == 'profesor' and materia %} · {{ materia }}{% endif %}{% if instance == 'profesor' and jornada %} · {{ jornada }}{% endif %}</div>
+  </div>
+  <div class="export-bar">
+    {% if instance == 'profesor' and mis_cursos %}
+    <label class="quick-action" style="padding:6px 14px;align-items:center;gap:8px">
+      <span class="qa-icon bg-green" style="width:28px;height:28px"><i data-lucide="download" style="width:15px;height:15px"></i></span>
+      <select id="exportCurso" style="border:none;background:transparent;color:var(--text);font-size:13px;font-family:inherit;font-weight:600;cursor:pointer;padding:4px 2px">
+        {% for c in mis_cursos %}
+        <option value="{{ c }}" {{ 'selected' if c == curso_quick else '' }}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <a class="quick-action" href="#" onclick="return exportCursoGo('exportar_notas')"><span class="qa-icon bg-blue"><i data-lucide="file-spreadsheet" style="width:16px;height:16px"></i></span>Exportar Excel</a>
+    <a class="quick-action" href="#" onclick="return exportCursoGo('plantilla_notas')"><span class="qa-icon bg-blue"><i data-lucide="file-text" style="width:16px;height:16px"></i></span>Plantilla</a>
+    {% endif %}
+    <button type="button" onclick="exportPDF()" class="quick-action"><span class="qa-icon bg-blue"><i data-lucide="file-text" style="width:16px;height:16px"></i></span>PDF</button>
+    <button type="button" onclick="exportExcel()" class="quick-action"><span class="qa-icon bg-green"><i data-lucide="file-spreadsheet" style="width:16px;height:16px"></i></span>Excel</button>
+  </div>
+</div>
+
+{% if instance == 'profesor' and panel_summary %}
+<div class="summary-strip">
+  <div class="summary-item">
+    <span class="si-icon bg-blue"><i data-lucide="users" style="width:17px;height:17px"></i></span>
+    <div class="si-body"><div class="si-val">{{ panel_summary.estudiantes }}</div><div class="si-label">Estudiantes</div></div>
+  </div>
+  <div class="summary-item">
+    <span class="si-icon bg-green"><i data-lucide="trending-up" style="width:17px;height:17px"></i></span>
+    <div class="si-body"><div class="si-val">{{ panel_summary.promedio if panel_summary.promedio is not none else '&mdash;' }}</div><div class="si-label">Promedio final</div></div>
+  </div>
+  <div class="summary-item">
+    <span class="si-icon bg-yellow"><i data-lucide="clock" style="width:17px;height:17px"></i></span>
+    <div class="si-body"><div class="si-val">{{ panel_summary.pendientes if panel_summary.pendientes is not none else '&mdash;' }}</div><div class="si-label">Notas pendientes</div></div>
+  </div>
+</div>
+{% endif %}
+
+<div class="ctx-bar">
+  {% if instance == 'profesor' %}
     <div>
-      <h1>{% if instance == 'rector' %}Panel de Control Institucional{% else %}Panel del Docente{% endif %}</h1>
-      <div class="greeting">Bienvenido, <strong>{{ nombre }}</strong> · {{ hoy_str }} {% if materia %} · {{ materia }}{% endif %}{% if jornada %} · {{ jornada }}{% endif %}</div>
+      <div class="ctx-label">Curso(s)</div>
+      <div class="ctx-value">{{ mis_cursos|join(', ') if mis_cursos else 'Sin asignaci&oacute;n' }}</div>
     </div>
-    <div class="export-bar">
-      <button onclick="exportPDF()" class="btn btn-secondary btn-sm"><i data-lucide="file-text"></i> PDF</button>
-      <button onclick="exportExcel()" class="btn btn-secondary btn-sm"><i data-lucide="file-spreadsheet"></i> Excel</button>
+    <div class="ctx-sep"></div>
+    <div>
+      <div class="ctx-label">Jornada</div>
+      <div class="ctx-value">{{ jornada or '&mdash;' }}</div>
     </div>
-  </div>
+    <div class="ctx-sep"></div>
+    <div>
+      <div class="ctx-label">Materia</div>
+      <div class="ctx-value">{{ materia or '&mdash;' }}</div>
+    </div>
+  {% else %}
+    <div>
+      <div class="ctx-label">Cursos activos</div>
+      <div class="ctx-value">{{ mis_cursos|length }}</div>
+    </div>
+    <div class="ctx-sep"></div>
+    <div>
+      <div class="ctx-label">Materias</div>
+      <div class="ctx-value">{{ materias_list|length }}</div>
+    </div>
+    <div class="ctx-sep"></div>
+    <div>
+      <div class="ctx-label">Notificaciones</div>
+      <div class="ctx-value">{{ notif_count }}</div>
+    </div>
+  {% endif %}
+</div>
 
-  <div class="quick-actions">
-    {% if instance == 'profesor' %}
-    <a href="#" class="quick-action" onclick="return qaGo('/','periodo')"><span class="qa-icon bg-blue"><i data-lucide="edit-3" style="width:16px;height:16px"></i></span> Registrar notas</a>
-    <a href="#" class="quick-action" onclick="return qaGo('/?nueva_actividad=1','periodo')"><span class="qa-icon bg-green"><i data-lucide="plus" style="width:16px;height:16px"></i></span> Nueva actividad</a>
-    <a href="#" class="quick-action" onclick="return qaGo('/asistencia','')"><span class="qa-icon bg-orange"><i data-lucide="calendar-check" style="width:16px;height:16px"></i></span> Registrar asistencia</a>
-    <a href="#" class="quick-action" onclick="return qaGo('/','')"><span class="qa-icon bg-purple"><i data-lucide="users" style="width:16px;height:16px"></i></span> Estudiantes</a>
-    <a href="#" class="quick-action" onclick="return qaGo('/?analitica=1','periodo')"><span class="qa-icon bg-teal"><i data-lucide="bar-chart-3" style="width:16px;height:16px"></i></span> Rendimiento</a>
-    <a href="#" class="quick-action" onclick="return qaGo('/exportar_notas','periodo')"><span class="qa-icon bg-yellow"><i data-lucide="file-spreadsheet" style="width:16px;height:16px"></i></span> Exportar</a>
-    <a href="#" class="quick-action" onclick="return qaGo('/importar_notas','periodo')"><span class="qa-icon bg-green"><i data-lucide="upload" style="width:16px;height:16px"></i></span> Importar Excel</a>
-    <a href="#" class="quick-action" onclick="return qaGo('/horarios','')"><span class="qa-icon bg-purple"><i data-lucide="calendar" style="width:16px;height:16px"></i></span> Horario</a>
-    <a href="/{{ slug }}/notificaciones" class="quick-action"><span class="qa-icon bg-pink"><i data-lucide="bell" style="width:16px;height:16px"></i></span> Notificaciones{% if notif_count %} <span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+<div class="quick-actions">
+  {% if instance == 'profesor' %}
+  <a class="quick-action" href="/{{ slug }}/horarios"><span class="qa-icon bg-yellow"><i data-lucide="calendar" style="width:16px;height:16px"></i></span>Horario</a>
+  <a class="quick-action" href="/{{ slug }}/importar_notas"><span class="qa-icon bg-blue"><i data-lucide="upload" style="width:16px;height:16px"></i></span>Importar Notas</a>
+  <a class="quick-action" href="/{{ slug }}/notificaciones"><span class="qa-icon bg-red"><i data-lucide="bell" style="width:16px;height:16px"></i></span>Notificaciones{% if notif_count %} <span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+  <a class="quick-action" href="#" onclick="return qaGo('/', 'periodo')"><span class="qa-icon bg-blue"><i data-lucide="edit-3" style="width:16px;height:16px"></i></span>Registrar notas</a>
+  <a class="quick-action" href="#" onclick="return qaGo('/?nueva_actividad=1', 'periodo')"><span class="qa-icon bg-green"><i data-lucide="plus" style="width:16px;height:16px"></i></span>Nueva actividad</a>
+  <a class="quick-action" href="#" onclick="return qaGo('/asistencia', '')"><span class="qa-icon bg-orange"><i data-lucide="calendar-check" style="width:16px;height:16px"></i></span>Registrar asistencia</a>
+  <a class="quick-action" href="#" onclick="return qaGo('/', '')"><span class="qa-icon bg-purple"><i data-lucide="users" style="width:16px;height:16px"></i></span>Estudiantes</a>
+  <a class="quick-action" href="#" onclick="return qaGo('/?analitica=1', 'periodo')"><span class="qa-icon bg-teal"><i data-lucide="bar-chart-3" style="width:16px;height:16px"></i></span>Rendimiento</a>
+  {% else %}
+  <a class="quick-action" href="/{{ slug }}/notificaciones"><span class="qa-icon bg-red"><i data-lucide="bell" style="width:16px;height:16px"></i></span>Notificaciones{% if notif_count %} <span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+  <a class="quick-action" href="/{{ slug }}/"><span class="qa-icon bg-blue"><i data-lucide="edit-3" style="width:16px;height:16px"></i></span>Ingresar Notas</a>
+  <a class="quick-action" href="/{{ slug }}/importar_notas"><span class="qa-icon bg-green"><i data-lucide="upload" style="width:16px;height:16px"></i></span>Importar Excel</a>
+  <a class="quick-action" href="/{{ slug }}/asistencia"><span class="qa-icon bg-orange"><i data-lucide="calendar-check" style="width:16px;height:16px"></i></span>Asistencia</a>
+  <a class="quick-action" href="/{{ slug }}/horarios"><span class="qa-icon bg-purple"><i data-lucide="calendar" style="width:16px;height:16px"></i></span>Horario</a>
+  {% endif %}
+</div>
+
+<div class="space-head">
+  <div>
+    <div class="space-title"><i data-lucide="layout-grid" style="width:18px;height:18px;color:var(--accent)"></i>Espacio de trabajo</div>
+    <div class="space-sub">Accede a las herramientas del curso</div>
+  </div>
+</div>
+
+{% if instance == 'profesor' %}
+<div class="space-grid">
+  <a class="space-card" href="/{{ slug }}/#notas">
+    <span class="sc-icon bg-blue"><i data-lucide="edit-3" style="width:20px;height:20px"></i></span>
+    <div><div class="sc-name">Notas</div><div class="sc-desc">Calificaciones y actividades</div></div>
+    <i data-lucide="chevron-right" class="sc-arrow" style="width:18px;height:18px"></i>
+  </a>
+  <a class="space-card" href="/{{ slug }}/#asistencia">
+    <span class="sc-icon bg-green"><i data-lucide="calendar-check" style="width:20px;height:20px"></i></span>
+    <div><div class="sc-name">Asistencia</div><div class="sc-desc">Presentes, ausencias y tardanzas</div></div>
+    <i data-lucide="chevron-right" class="sc-arrow" style="width:18px;height:18px"></i>
+  </a>
+  <a class="space-card" href="/{{ slug }}/#observaciones">
+    <span class="sc-icon bg-yellow"><i data-lucide="eye" style="width:20px;height:20px"></i></span>
+    <div><div class="sc-name">Observaciones</div><div class="sc-desc">Historial por estudiante</div></div>
+    <i data-lucide="chevron-right" class="sc-arrow" style="width:18px;height:18px"></i>
+  </a>
+</div>
+
+{% if mis_cursos %}
+<div class="space-head" style="margin-top:10px">
+  <div>
+    <div class="space-title"><i data-lucide="book-open" style="width:18px;height:18px;color:var(--accent)"></i>Tus cursos</div>
+    <div class="space-sub">Acceso directo a la carga de notas de cada curso</div>
+  </div>
+</div>
+<div class="curso-chips">
+  {% for c in mis_cursos %}
+  <a class="curso-chip" href="/{{ slug }}/?curso={{ c }}">{{ c }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% else %}
+
+<div class="space-grid">
+  <a class="space-card" href="/{{ slug }}/notificaciones">
+    <span class="sc-icon bg-blue"><i data-lucide="bell" style="width:20px;height:20px"></i></span>
+    <div><div class="sc-name">Notificaciones</div><div class="sc-desc">Gestionar comunicados</div></div>
+    <i data-lucide="chevron-right" class="sc-arrow" style="width:18px;height:18px"></i>
+  </a>
+</div>
+
+{% if mis_cursos %}
+<div class="space-head" style="margin-top:10px">
+  <div>
+    <div class="space-title"><i data-lucide="book-open" style="width:18px;height:18px;color:var(--accent)"></i>Cursos del establecimiento</div>
+    <div class="space-sub">Cursos con estudiantes activos</div>
+  </div>
+</div>
+<div class="curso-chips">
+  {% for c in mis_cursos %}
+  <span class="curso-chip">{{ c }}</span>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endif %}
+
+{# ────────────────────────────────────────────────────────────────────────
+   Interfaz analítica recuperada (compatible con el contrato existente).
+   El profesor dispone de resumen, centro de alertas y filtros; el rector
+   solo de cards, charts, rankings, alerts y estadísticas (sin resumen,
+   alerts_centro ni filtros), por lo que esos bloques quedan gated.
+   ──────────────────────────────────────────────────────────────────────── #}
+{% if instance == 'profesor' %}
+<div class="resumen-strip" id="resumenStrip">
+  {% for _ in range(5) %}
+  <div class="card"><div class="skeleton skeleton-card"></div></div>
+  {% endfor %}
+</div>
+
+<div class="alert-center">
+  <div class="alert-center-head">
+    <div class="widget-title"><i data-lucide="bell-ring" style="width:16px;height:16px;color:var(--accent)"></i> Centro de Alertas</div>
+    <div class="alert-counter" id="alertCounter">Cargando...</div>
+  </div>
+  <div id="alertList">
+    <div class="empty-msg">Analizando datos...</div>
+  </div>
+</div>
+{% endif %}
+
+<div class="card-grid" id="cardGrid">
+  {% for _ in range(instance == 'rector' and 12 or 10) %}
+  <div class="card"><div class="skeleton skeleton-card"></div></div>
+  {% endfor %}
+</div>
+
+<div class="widget-grid">
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title"><i data-lucide="calendar" style="width:16px;height:16px;color:var(--accent)"></i> Clases de Hoy</div>
+      {% if mis_cursos %}<a href="/{{ slug }}/horarios" class="widget-link">Ver horario completo</a>{% endif %}
+    </div>
+    {% if hoy_schedule %}
+      {% for sc in hoy_schedule %}
+      <div class="schedule-item">
+        <span class="schedule-franja">{{ sc.franja }}</span>
+        <div class="schedule-info">
+          <div class="schedule-materia">{{ sc.materia if sc.materia else '--' }}</div>
+          <div class="schedule-curso">{{ sc.curso }}{% if sc.num %} · {{ sc.num }}{% endif %}</div>
+        </div>
+      </div>
+      {% endfor %}
     {% else %}
-    <a href="/{{ slug }}/" class="quick-action"><span class="qa-icon bg-blue"><i data-lucide="edit-3" style="width:16px;height:16px"></i></span> Ingresar Notas</a>
-    <a href="/{{ slug }}/importar_notas" class="quick-action"><span class="qa-icon bg-green"><i data-lucide="upload" style="width:16px;height:16px"></i></span> Importar Excel</a>
-    <a href="/{{ slug }}/asistencia" class="quick-action"><span class="qa-icon bg-orange"><i data-lucide="calendar-check" style="width:16px;height:16px"></i></span> Asistencia</a>
-    <a href="/{{ slug }}/horarios" class="quick-action"><span class="qa-icon bg-purple"><i data-lucide="calendar" style="width:16px;height:16px"></i></span> Horario</a>
-    <a href="/{{ slug }}/notificaciones" class="quick-action"><span class="qa-icon bg-pink"><i data-lucide="bell" style="width:16px;height:16px"></i></span> Notificaciones{% if notif_count %} <span class="badge-count">{{ notif_count }}</span>{% endif %}</a>
+      <div class="empty-msg">No hay clases programadas para hoy</div>
     {% endif %}
   </div>
 
-  {% if instance == 'profesor' %}
-  <div class="resumen-strip" id="resumenStrip">
-    {% for _ in range(5) %}
-    <div class="card"><div class="skeleton skeleton-card"></div></div>
-    {% endfor %}
-  </div>
-
-  <div class="alert-center">
-    <div class="alert-center-head">
-      <div class="widget-title"><i data-lucide="bell-ring" style="width:16px;height:16px;color:var(--accent)"></i> Centro de Alertas</div>
-      <div class="alert-counter" id="alertCounter">Cargando...</div>
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title"><i data-lucide="edit-3" style="width:16px;height:16px;color:var(--warning)"></i> Calificaciones Pendientes</div>
+      <a href="/{{ slug }}/" class="widget-link">Ir a notas</a>
     </div>
-    <div id="alertList">
-      <div class="empty-msg">Analizando datos...</div>
-    </div>
-  </div>
-  {% endif %}
-
-  <div class="card-grid" id="cardGrid">
-    {% for _ in range(instance == 'rector' and 12 or 10) %}
-    <div class="card"><div class="skeleton skeleton-card"></div></div>
-    {% endfor %}
-  </div>
-
-  <div class="widget-grid">
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title"><i data-lucide="calendar" style="width:16px;height:16px;color:var(--accent)"></i> Clases de Hoy</div>
-        {% if mis_cursos %}<a href="/{{ slug }}/horarios" class="widget-link">Ver horario completo</a>{% endif %}
-      </div>
-      {% if hoy_schedule %}
-        {% for sc in hoy_schedule %}
-        <div class="schedule-item">
-          <span class="schedule-franja">{{ sc.franja }}</span>
-          <div class="schedule-info">
-            <div class="schedule-materia">{{ sc.materia if sc.materia else '--' }}</div>
-            <div class="schedule-curso">{{ sc.curso }}{% if sc.num %} · {{ sc.num }}{% endif %}</div>
-          </div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="empty-msg">No hay clases programadas para hoy</div>
-      {% endif %}
-    </div>
-
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title"><i data-lucide="edit-3" style="width:16px;height:16px;color:var(--warning)"></i> Calificaciones Pendientes</div>
-        <a href="/{{ slug }}/" class="widget-link">Ir a notas</a>
-      </div>
-      {% if instance == 'profesor' %}
-      <div id="pendientesWidget"><div class="empty-msg">Cargando datos...</div></div>
-      {% elif mis_cursos %}
-        {% for c in mis_cursos[:5] %}
-        <div class="pending-item">
-          <div class="pending-info">
-            <div class="pending-curso">{{ c }}</div>
-            <div class="pending-count">Por calificar</div>
-          </div>
-          <span class="pending-badge"><i data-lucide="clock" style="width:12px;height:12px;display:inline"></i> Pendiente</span>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="empty-msg">Sin cursos asignados</div>
-      {% endif %}
-    </div>
-
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title"><i data-lucide="message-square" style="width:16px;height:16px;color:var(--blue)"></i> Últimas Comunicaciones</div>
-        <a href="/{{ slug }}/comunicados" class="widget-link">Ver todas</a>
-      </div>
-      {% if comunicados_recientes %}
-        {% for com in comunicados_recientes %}
-        <div class="comms-item">
-          <div class="comms-icon"><i data-lucide="message-circle" style="width:14px;height:14px;color:var(--muted)"></i></div>
-          <div>
-            <div class="comms-subject">{{ com.titulo }}</div>
-            <div class="comms-date">{{ com.fecha_publicacion }} · {{ com.creado_por }}</div>
-          </div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="empty-msg">Sin comunicaciones recientes</div>
-      {% endif %}
-    </div>
-
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title"><i data-lucide="bell" style="width:16px;height:16px;color:var(--pink)"></i> Notificaciones</div>
-        <a href="/{{ slug }}/notificaciones" class="widget-link">Ver todas</a>
-      </div>
-      <div style="text-align:center;padding:16px 0">
-        {% if notif_count > 0 %}
-        <div class="notif-count-large">{{ notif_count }}</div>
-        <div class="notif-text">notificaciones sin leer</div>
-        {% else %}
-        <div style="font-size:40px;color:var(--muted);margin-bottom:8px"><i data-lucide="bell-off" style="width:40px;height:40px"></i></div>
-        <div class="notif-text">No hay notificaciones pendientes</div>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title"><i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--danger)"></i> Estudiantes con Bajo Rendimiento</div>
-      </div>
-      <div id="lowPerformersWidget">
-        <div class="empty-msg">Cargando datos...</div>
-      </div>
-    </div>
-
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title"><i data-lucide="calendar-check" style="width:16px;height:16px;color:var(--success)"></i> Resumen de Asistencia</div>
-        <a href="/{{ slug }}/asistencia" class="widget-link">Ver detalle</a>
-      </div>
-      {% if asistencia_stats %}
-      <div style="display:flex;flex-direction:column;align-items:center;padding:8px 0">
-        <div class="att-ring">
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            <circle cx="40" cy="40" r="34" fill="none" stroke="var(--bg3)" stroke-width="6"/>
-            <circle cx="40" cy="40" r="34" fill="none" stroke="var(--success)" stroke-width="6"
-              stroke-dasharray="{{ (asistencia_stats.porcentaje_asistencia / 100 * 213.6)|round }} 213.6"/>
-          </svg>
-          <div class="att-ring-text">{{ (asistencia_stats.porcentaje_asistencia)|round }}%</div>
-        </div>
-        <div style="width:100%">
-          <div class="att-stat"><span class="att-stat-label"><i data-lucide="check-circle" style="width:12px;height:12px;color:var(--success)"></i> Presentes</span><span class="att-stat-value green">{{ asistencia_stats.P }}</span></div>
-          <div class="att-stat"><span class="att-stat-label"><i data-lucide="x-circle" style="width:12px;height:12px;color:var(--danger)"></i> Ausencias</span><span class="att-stat-value red">{{ asistencia_stats.A }}</span></div>
-          <div class="att-stat"><span class="att-stat-label"><i data-lucide="clock" style="width:12px;height:12px;color:var(--warning)"></i> Tardanzas</span><span class="att-stat-value yellow">{{ asistencia_stats.T }}</span></div>
-          <div class="att-stat"><span class="att-stat-label">Total registros</span><span class="att-stat-value">{{ asistencia_stats.total }}</span></div>
-        </div>
-      </div>
-      {% else %}
-      <div class="empty-msg">Sin datos de asistencia</div>
-      {% endif %}
-      {% if instance == 'profesor' %}
-      <div id="asistIntelWidget" style="margin-top:12px"><div class="empty-msg">Cargando datos...</div></div>
-      {% endif %}
-    </div>
-
     {% if instance == 'profesor' %}
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title"><i data-lucide="calendar-clock" style="width:16px;height:16px;color:var(--blue)"></i> Próximas Actividades</div>
-        <a href="/{{ slug }}/" class="widget-link">Ir a notas</a>
+    <div id="pendientesWidget"><div class="empty-msg">Cargando datos...</div></div>
+    {% elif mis_cursos %}
+      {% for c in mis_cursos[:5] %}
+      <div class="pending-item">
+        <div class="pending-info">
+          <div class="pending-curso">{{ c }}</div>
+          <div class="pending-count">Por calificar</div>
+        </div>
+        <span class="pending-badge"><i data-lucide="clock" style="width:12px;height:12px;display:inline"></i> Pendiente</span>
       </div>
-      <div id="proximasWidget"><div class="empty-msg">Cargando datos...</div></div>
-    </div>
-
-    <div class="widget">
-      <div class="widget-header">
-        <div class="widget-title"><i data-lucide="trending-up" style="width:16px;height:16px;color:var(--success)"></i> Tendencias</div>
-      </div>
-      <div id="tendenciasWidget"><div class="empty-msg">Cargando datos...</div></div>
-    </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-msg">Sin cursos asignados</div>
     {% endif %}
+  </div>
+
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title"><i data-lucide="message-square" style="width:16px;height:16px;color:var(--blue)"></i> Últimas Comunicaciones</div>
+      <a href="/{{ slug }}/comunicados" class="widget-link">Ver todas</a>
+    </div>
+    {% if comunicados_recientes %}
+      {% for com in comunicados_recientes %}
+      <div class="comms-item">
+        <div class="comms-icon"><i data-lucide="message-circle" style="width:14px;height:14px;color:var(--muted)"></i></div>
+        <div>
+          <div class="comms-subject">{{ com.titulo }}</div>
+          <div class="comms-date">{{ com.fecha_publicacion }} · {{ com.creado_por }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-msg">Sin comunicaciones recientes</div>
+    {% endif %}
+  </div>
+
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title"><i data-lucide="bell" style="width:16px;height:16px;color:var(--pink)"></i> Notificaciones</div>
+      <a href="/{{ slug }}/notificaciones" class="widget-link">Ver todas</a>
+    </div>
+    <div style="text-align:center;padding:16px 0">
+      {% if notif_count > 0 %}
+      <div class="notif-count-large">{{ notif_count }}</div>
+      <div class="notif-text">notificaciones sin leer</div>
+      {% else %}
+      <div style="font-size:40px;color:var(--muted);margin-bottom:8px"><i data-lucide="bell-off" style="width:40px;height:40px"></i></div>
+      <div class="notif-text">No hay notificaciones pendientes</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title"><i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--danger)"></i> Estudiantes con Bajo Rendimiento</div>
+    </div>
+    <div id="lowPerformersWidget">
+      <div class="empty-msg">Cargando datos...</div>
+    </div>
+  </div>
+
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title"><i data-lucide="calendar-check" style="width:16px;height:16px;color:var(--success)"></i> Resumen de Asistencia</div>
+      <a href="/{{ slug }}/asistencia" class="widget-link">Ver detalle</a>
+    </div>
+    {% if asistencia_stats %}
+    <div style="display:flex;flex-direction:column;align-items:center;padding:8px 0">
+      <div class="att-ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="var(--bg3)" stroke-width="6"/>
+          <circle cx="40" cy="40" r="34" fill="none" stroke="var(--success)" stroke-width="6"
+            stroke-dasharray="{{ (asistencia_stats.porcentaje_asistencia / 100 * 213.6)|round }} 213.6"/>
+        </svg>
+        <div class="att-ring-text">{{ (asistencia_stats.porcentaje_asistencia)|round }}%</div>
+      </div>
+      <div style="width:100%">
+        <div class="att-stat"><span class="att-stat-label"><i data-lucide="check-circle" style="width:12px;height:12px;color:var(--success)"></i> Presentes</span><span class="att-stat-value green">{{ asistencia_stats.P }}</span></div>
+        <div class="att-stat"><span class="att-stat-label"><i data-lucide="x-circle" style="width:12px;height:12px;color:var(--danger)"></i> Ausencias</span><span class="att-stat-value red">{{ asistencia_stats.A }}</span></div>
+        <div class="att-stat"><span class="att-stat-label"><i data-lucide="clock" style="width:12px;height:12px;color:var(--warning)"></i> Tardanzas</span><span class="att-stat-value yellow">{{ asistencia_stats.T }}</span></div>
+        <div class="att-stat"><span class="att-stat-label">Total registros</span><span class="att-stat-value">{{ asistencia_stats.total }}</span></div>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-msg">Sin datos de asistencia</div>
+    {% endif %}
+    {% if instance == 'profesor' %}
+    <div id="asistIntelWidget" style="margin-top:12px"><div class="empty-msg">Cargando datos...</div></div>
+    {% endif %}
+  </div>
+
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title"><i data-lucide="bar-chart-3" style="width:16px;height:16px;color:var(--accent)"></i> Estadísticas descriptivas</div>
+    </div>
+    <div id="statsWidget">
+      <div class="empty-msg">Cargando datos...</div>
+    </div>
   </div>
 
   {% if instance == 'profesor' %}
-  <div class="rend-section">
-    <div class="rend-head">
-      <div class="rend-title"><i data-lucide="trending-up" style="width:18px;height:18px;color:var(--accent)"></i> Rendimiento de estudiantes</div>
-      <span class="rend-sub">Promedio actual y variaci&oacute;n frente al per&iacute;odo anterior</span>
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title"><i data-lucide="calendar-clock" style="width:16px;height:16px;color:var(--blue)"></i> Próximas Actividades</div>
+      <a href="/{{ slug }}/" class="widget-link">Ir a notas</a>
     </div>
-    <div class="rend-grid">
-      <div class="widget">
-        <div class="widget-header">
-          <div class="widget-title"><i data-lucide="trending-up" style="width:16px;height:16px;color:var(--success)"></i> Estudiantes que mejoran</div>
-        </div>
-        <div id="rendMejoran"><div class="empty-msg">Cargando datos...</div></div>
-      </div>
-      <div class="widget">
-        <div class="widget-header">
-          <div class="widget-title"><i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--warning)"></i> Requieren atenci&oacute;n</div>
-        </div>
-        <div id="rendAtencion"><div class="empty-msg">Cargando datos...</div></div>
-      </div>
-      <div class="widget">
-        <div class="widget-header">
-          <div class="widget-title"><i data-lucide="trophy" style="width:16px;height:16px;color:var(--success)"></i> Mejor rendimiento</div>
-          <a href="#" class="widget-link" onclick="return qaGo('/','periodo')">Ver todos</a>
-        </div>
-        <div id="rendMejores"><div class="empty-msg">Cargando datos...</div></div>
-      </div>
-      <div class="widget">
-        <div class="widget-header">
-          <div class="widget-title"><i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--danger)"></i> Menor rendimiento</div>
-          <a href="#" class="widget-link" onclick="return qaGo('/','periodo')">Ver todos</a>
-        </div>
-        <div id="rendMenores"><div class="empty-msg">Cargando datos...</div></div>
-      </div>
-      <div class="widget">
-        <div class="widget-header">
-          <div class="widget-title"><i data-lucide="bar-chart-3" style="width:16px;height:16px;color:var(--blue)"></i> Tendencia por curso</div>
-        </div>
-        <div id="rendCursos"><div class="empty-msg">Cargando datos...</div></div>
-      </div>
+    <div id="proximasWidget"><div class="empty-msg">Cargando datos...</div></div>
+  </div>
+
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title"><i data-lucide="trending-up" style="width:16px;height:16px;color:var(--success)"></i> Tendencias</div>
     </div>
+    <div id="tendenciasWidget"><div class="empty-msg">Cargando datos...</div></div>
   </div>
   {% endif %}
+</div>
 
-  <div class="filter-bar" id="filterBar">
-    <select id="filterCurso"><option value="">Todos los cursos</option>{% for c in mis_cursos %}<option value="{{ c }}">{{ c }}</option>{% endfor %}</select>
-    {% if materias_list %}
-    <select id="filterMateria"><option value="">Todas las materias</option>{% for m in materias_list %}<option value="{{ m }}" {{ 'selected' if m == materia else '' }}>{{ m }}</option>{% endfor %}</select>
-    {% endif %}
-    <select id="filterPeriodo">{% for p in range(1, num_periodos + 1) %}<option value="{{ p }}" {{ 'selected' if p == 1 else '' }}>Periodo {{ p }}</option>{% endfor %}</select>
-    <button id="btnActualizar" onclick="loadDashboard()" class="btn btn-primary"><i data-lucide="refresh-cw"></i> <span id="btnActualizarLabel">Actualizar</span></button>
-    <div class="dash-status" id="dashStatus"></div>
+{% if instance == 'profesor' %}
+<div class="rend-section">
+  <div class="rend-head">
+    <div class="rend-title"><i data-lucide="trending-up" style="width:18px;height:18px;color:var(--accent)"></i> Rendimiento de estudiantes</div>
+    <span class="rend-sub">Promedio actual y variaci&oacute;n frente al per&iacute;odo anterior</span>
   </div>
-
-  <div class="dash-tabs" id="dashTabs">
-    <button class="dash-tab active" data-tab="charts">Gráficos</button>
-    <button class="dash-tab" data-tab="alerts">Alertas</button>
-    <button class="dash-tab" data-tab="rankings">Rankings</button>
+  <div class="rend-grid">
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="trending-up" style="width:16px;height:16px;color:var(--success)"></i> Estudiantes que mejoran</div>
+      </div>
+      <div id="rendMejoran"><div class="empty-msg">Cargando datos...</div></div>
+    </div>
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--warning)"></i> Requieren atenci&oacute;n</div>
+      </div>
+      <div id="rendAtencion"><div class="empty-msg">Cargando datos...</div></div>
+    </div>
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="trophy" style="width:16px;height:16px;color:var(--success)"></i> Mejor rendimiento</div>
+        <a href="#" class="widget-link" onclick="return qaGo('/', 'periodo')">Ver todos</a>
+      </div>
+      <div id="rendMejores"><div class="empty-msg">Cargando datos...</div></div>
+    </div>
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="alert-triangle" style="width:16px;height:16px;color:var(--danger)"></i> Menor rendimiento</div>
+        <a href="#" class="widget-link" onclick="return qaGo('/', 'periodo')">Ver todos</a>
+      </div>
+      <div id="rendMenores"><div class="empty-msg">Cargando datos...</div></div>
+    </div>
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title"><i data-lucide="bar-chart-3" style="width:16px;height:16px;color:var(--blue)"></i> Tendencia por curso</div>
+      </div>
+      <div id="rendCursos"><div class="empty-msg">Cargando datos...</div></div>
+    </div>
   </div>
+</div>
+{% endif %}
 
-  <div class="tab-content active" id="tabCharts">
-    <div class="chart-grid" id="chartGrid">
-      {% for _ in range(4) %}
+<div class="filter-bar" id="filterBar">
+  {% if instance == 'profesor' %}
+  <select id="filterCurso"><option value="">Todos los cursos</option>{% for c in mis_cursos %}<option value="{{ c }}">{{ c }}</option>{% endfor %}</select>
+  {% if materias_list %}
+  <select id="filterMateria"><option value="">Todas las materias</option>{% for m in materias_list %}<option value="{{ m }}" {{ 'selected' if m == materia else '' }}>{{ m }}</option>{% endfor %}</select>
+  {% endif %}
+  <select id="filterPeriodo">{% for p in range(1, num_periodos + 1) %}<option value="{{ p }}" {{ 'selected' if p == 1 else '' }}>Periodo {{ p }}</option>{% endfor %}</select>
+  {% endif %}
+  <button id="btnActualizar" onclick="loadDashboard()" class="btn btn-primary"><i data-lucide="refresh-cw"></i> <span id="btnActualizarLabel">Actualizar</span></button>
+  <div class="dash-status" id="dashStatus"></div>
+</div>
+
+<div class="dash-tabs" id="dashTabs">
+  <button class="dash-tab active" data-tab="charts">Gráficos</button>
+  <button class="dash-tab" data-tab="alerts">Alertas</button>
+  <button class="dash-tab" data-tab="rankings">Rankings</button>
+</div>
+
+<div class="tab-content active" id="tabCharts">
+  <div class="chart-grid" id="chartGrid">
+    {% for _ in range(4) %}
+    <div class="chart-card"><div class="skeleton skeleton-chart"></div></div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="tab-content" id="tabAlerts">
+  <div class="alerts-section" id="alertsSection">
+    <div class="skeleton skeleton-row" style="width:60%"></div>
+    <div class="skeleton skeleton-row" style="width:40%"></div>
+  </div>
+</div>
+
+<div class="tab-content" id="tabRankings">
+  <div class="rankings-section" id="rankingsSection">
+    <div class="chart-grid">
+      {% for _ in range(2) %}
       <div class="chart-card"><div class="skeleton skeleton-chart"></div></div>
       {% endfor %}
     </div>
   </div>
-
-  <div class="tab-content" id="tabAlerts">
-    <div class="alerts-section" id="alertsSection">
-      <div class="skeleton skeleton-row" style="width:60%"></div>
-      <div class="skeleton skeleton-row" style="width:40%"></div>
-    </div>
-  </div>
-
-  <div class="tab-content" id="tabRankings">
-    <div class="rankings-section" id="rankingsSection">
-      <div class="chart-grid">
-        {% for _ in range(2) %}
-        <div class="chart-card"><div class="skeleton skeleton-chart"></div></div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
+</div>
 {% endblock %}
+
 {% block extra_scripts %}
+var EXPORT_SLUG='{{ slug }}';
+function exportCursoGo(kind){
+  var sel=document.getElementById('exportCurso');
+  var curso=sel?sel.value:'';
+  if(!curso) return false;
+  var url='/'+EXPORT_SLUG+'/'+kind+'?curso='+encodeURIComponent(curso);
+  if(kind==='exportar_notas') url+='&periodo=1';
+  window.open(url,'_blank');
+  return false;
+}
+
 var SLUG='{{ slug }}';
 var INSTANCE='{{ instance }}';
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+function _val(id){var el=document.getElementById(id);return el?el.value:'';}
 
 function qaBuild(base,incPeriodo){
   var p=new URLSearchParams();
-  var c=document.getElementById('filterCurso');
-  if(c&&c.value)p.set('curso',c.value);
+  var c=_val('filterCurso');
+  if(c)p.set('curso',c);
   if(incPeriodo){
-    var pe=document.getElementById('filterPeriodo');
-    if(pe&&pe.value)p.set('periodo',pe.value);
+    var pe=_val('filterPeriodo');
+    if(pe)p.set('periodo',pe);
   }
   var q=p.toString();
   return '/'+SLUG+base+(q?((base.indexOf('?')>=0?'&':'?')+q):'');
@@ -507,7 +688,7 @@ var dashboardLoading=false;
 var lastDashboardLoad=0;
 var _okTimer=null;
 var _prevCardVals={};
-var _filterWidgets=['cardGrid','chartGrid','alertsSection','rankingsSection','resumenStrip','lowPerformersWidget','pendientesWidget','proximasWidget','tendenciasWidget','rendMejoran','rendAtencion','rendMejores','rendMenores','rendCursos','asistIntelWidget','alertList'];
+var _filterWidgets=['cardGrid','chartGrid','alertsSection','rankingsSection','resumenStrip','lowPerformersWidget','pendientesWidget','proximasWidget','tendenciasWidget','rendMejoran','rendAtencion','rendMejores','rendMenores','rendCursos','asistIntelWidget','alertList','statsWidget'];
 
 function setLoading(on){
   _filterWidgets.forEach(function(id){
@@ -568,9 +749,9 @@ function loadDashboard(){
   }
   setLoading(true);
   statusLoading();
-  var curso=document.getElementById('filterCurso').value;
-  var materia=document.getElementById('filterMateria')?document.getElementById('filterMateria').value:'';
-  var periodo=document.getElementById('filterPeriodo').value;
+  var curso=_val('filterCurso');
+  var materia=_val('filterMateria');
+  var periodo=_val('filterPeriodo');
   var params=new URLSearchParams();
   if(curso)params.set('curso',curso);
   if(materia)params.set('materia',materia);
@@ -583,6 +764,7 @@ function loadDashboard(){
       renderAlerts(d.alerts||{});
       renderRankings(d.rankings||{});
       renderLowPerformers(d.alerts||{});
+      renderEstadisticas(d.estadisticas||null);
       renderResumen(d.resumen||{});
       renderPendientes(d.resumen||{});
       renderProximas(d.resumen||{});
@@ -713,6 +895,24 @@ function renderCharts(ch){
   }
 }
 
+function renderEstadisticas(st){
+  var g=document.getElementById('statsWidget');if(!g)return;
+  if(!st){g.innerHTML='<div class="empty-msg">Sin datos suficientes</div>';return;}
+  var rows=[
+    ['Media',st.media],['Mediana',st.mediana],['Moda',st.moda],
+    ['Desv.',st.desviacion],['M\u00e1x',st.maximo],['M\u00edn',st.minimo],
+    ['Q1',st.q1],['Q3',st.q3],['P10',st.p10],['P90',st.p90]
+  ];
+  var h='<div class="stat-grid">';
+  rows.forEach(function(r){
+    var v=(r[1]==null)?'\u2014':(typeof r[1]==='number'?Math.round(r[1]*100)/100:r[1]);
+    h+='<div class="stat-item"><div class="stat-label">'+escHtml(r[0])+'</div><div class="stat-value">'+escHtml(String(v))+'</div></div>';
+  });
+  h+='</div>';
+  g.innerHTML=h;
+  if(window.lucide)lucide.createIcons();
+}
+
 function renderAlerts(a){
   var g=document.getElementById('alertsSection');if(!g)return;
   var h='<div class="section-title"><i data-lucide="alert-triangle"></i> Alertas</div>';
@@ -720,25 +920,25 @@ function renderAlerts(a){
   if(a.estudiantes_bajo&&a.estudiantes_bajo.length){
     hasAlerts=true;
     a.estudiantes_bajo.forEach(function(s){
-      h+='<div class="alert-item alert-red"><i data-lucide="user-x"></i><strong>'+escHtml(s.nombre)+'</strong> — Promedio: '+escHtml(String(s.promedio))+' ('+escHtml(s.curso)+')</div>';
+      h+='<div class="alert-item alert-red"><i data-lucide="user-x"></i><strong>'+escHtml(s.nombre)+'</strong> \u2014 Promedio: '+escHtml(String(s.promedio))+' ('+escHtml(s.curso)+')</div>';
     });
   }
   if(a.cursos_bajo&&a.cursos_bajo.length){
     hasAlerts=true;
     a.cursos_bajo.forEach(function(c){
-      h+='<div class="alert-item alert-orange"><i data-lucide="alert-circle"></i><strong>'+escHtml(c.curso)+'</strong> — Promedio: '+escHtml(String(c.promedio))+'</div>';
+      h+='<div class="alert-item alert-orange"><i data-lucide="alert-circle"></i><strong>'+escHtml(c.curso)+'</strong> \u2014 Promedio: '+escHtml(String(c.promedio))+'</div>';
     });
   }
   if(a.actividades_bajo&&a.actividades_bajo.length){
     hasAlerts=true;
     a.actividades_bajo.forEach(function(a2){
-      h+='<div class="alert-item alert-yellow"><i data-lucide="alert-triangle"></i><strong>'+escHtml(a2.actividad)+'</strong> — Promedio: '+escHtml(String(a2.promedio))+'</div>';
+      h+='<div class="alert-item alert-yellow"><i data-lucide="alert-triangle"></i><strong>'+escHtml(a2.actividad)+'</strong> \u2014 Promedio: '+escHtml(String(a2.promedio))+'</div>';
     });
   }
   if(a.destacados&&a.destacados.length){
     hasAlerts=true;
     a.destacados.forEach(function(s){
-      h+='<div class="alert-item alert-green"><i data-lucide="award"></i><strong>'+escHtml(s.nombre)+'</strong> — Promedio: '+escHtml(String(s.promedio))+' \u2b50</div>';
+      h+='<div class="alert-item alert-green"><i data-lucide="award"></i><strong>'+escHtml(s.nombre)+'</strong> \u2014 Promedio: '+escHtml(String(s.promedio))+' \u2b50</div>';
     });
   }
   if(!hasAlerts)h+='<div class="empty-msg">Sin alertas en este per\u00edodo</div>';
@@ -1014,9 +1214,9 @@ function getAlertasDescartadas(){
 }
 function alertaDescartada(k){return getAlertasDescartadas().indexOf(k)!==-1;}
 function renderCentroAlertas(ac){
+  var g=document.getElementById('alertList');if(!g)return;
   _alertasActuales=(ac||[]).filter(function(a){return a&&a.dismiss_key&&!alertaDescartada(a.dismiss_key);});
   _alertasMostrarTodas=false;
-  var g=document.getElementById('alertList');
   var cards=g?g.querySelectorAll('.alert-card'):[];
   if(cards.length){
     cards.forEach(function(c){c.classList.add('ac-exit');});
@@ -1091,7 +1291,7 @@ function updateAlertCounter(){
 function exportPDF(){window.print();}
 function exportExcel(){
   if(window.showToast)window.showToast('Preparando datos...','info');
-  fetch('/'+SLUG+'/dashboard_data?'+new URLSearchParams({curso:document.getElementById('filterCurso').value,materia:document.getElementById('filterMateria')?document.getElementById('filterMateria').value:'',periodo:document.getElementById('filterPeriodo').value}).toString())
+  fetch('/'+SLUG+'/dashboard_data?'+new URLSearchParams({curso:_val('filterCurso'),materia:_val('filterMateria'),periodo:_val('filterPeriodo')}).toString())
   .then(function(r){return r.json();})
   .then(function(d){
     var csv='Metrica,Valor\n';

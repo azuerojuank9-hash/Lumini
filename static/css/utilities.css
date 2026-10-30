@@ -129,3 +129,17 @@
 .tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 100px; font-size: var(--font-xs); background: var(--bg3); color: var(--muted); }
 .overflow-hidden { overflow: hidden; }
+/* Modals */
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:9998; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
+.overlay .modal { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px 32px; max-width:600px; width:92%; max-height:85vh; overflow-y:auto; box-shadow:0 16px 48px rgba(0,0,0,.35); }
+.modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.modal-header h3 { margin:0; font-size:var(--font-lg); font-weight:700; }
+.modal-body { margin-bottom:20px; }
+.close-btn { background:none; border:none; cursor:pointer; padding:6px; color:var(--muted); border-radius:8px; transition:background .15s; }
+.close-btn:hover { background:var(--bg3); color:var(--text); }
+/* Progress bar */
+.progress-bar { height:8px; background:var(--bg3); border-radius:100px; overflow:hidden; }
+.progress-bar .fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:100px; transition:width .3s; }
+/* Quick actions */
+.qaction { display:flex; flex-direction:column; align-items:center; gap:6px; padding:16px 12px; border-radius:12px; background:var(--bg2); border:1px solid var(--border); cursor:pointer; transition:all .15s; text-align:center; font-size:var(--font-xs); color:var(--muted); text-decoration:none; }
+.qaction:hover { background:var(--bg3); color:var(--text); border-color:var(--accent); transform:translateY(-1px); }

@@ -57,6 +57,24 @@ def calcular_nota_final_estudiante(conn, slug, aid, curso_sel, materia, jornada,
     return _promedio_ponderado(vals, eval_v, auto_v)
 
 
+def calcular_stats_y_nota_final(conn, slug, aid, curso_sel, materia, jornada, periodo, profesor_id):
+    notas_raw = conn.execute(
+        '''SELECT n.val FROM notas n JOIN actividades ac ON ac.id=n.actividad_id
+           WHERE n.aid=? AND ac.materia=? AND ac.jornada=? AND ac.curso=?
+           AND COALESCE(ac.periodo,1)=? AND ac.profesor_id=?''',
+        (aid, materia, jornada, curso_sel, periodo, profesor_id)).fetchall()
+    vals = [r['val'] for r in notas_raw] if notas_raw else []
+    prom = _promedio_simple(vals)
+    ev = conn.execute(
+        '''SELECT evaluacion, autoevaluacion FROM evaluaciones
+           WHERE aid=? AND materia=? AND jornada=? AND COALESCE(periodo,1)=? AND profesor_id=?''',
+        (aid, materia, jornada, periodo, profesor_id)).fetchone()
+    eval_v = ev['evaluacion']     if ev and ev['evaluacion']     is not None else None
+    auto_v = ev['autoevaluacion'] if ev and ev['autoevaluacion'] is not None else None
+    nf = _promedio_ponderado(vals, eval_v, auto_v)
+    return prom, nf
+
+
 def calcular_stats_curso(conn, slug, curso_sel, materia, jornada, periodo, profesor_id):
     alumnos = conn.execute(
         'SELECT id FROM alumnos WHERE curso=? AND jornada=? AND activo=1',

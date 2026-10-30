@@ -116,7 +116,7 @@ function responderSolicitud(sid,accion){
   fetch('/'+_slug+'/rector/solicitudes/'+sid+'/'+accion,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRF-Token':csrf},body:'_csrf_token='+encodeURIComponent(csrf)})
   .then(function(r){return r.json();})
   .then(function(d){
-    if(d.ok){var row=document.getElementById('sol-'+sid);if(row)row.innerHTML='<td colspan="10" style="text-align:center;padding:16px;color:var(--success);font-weight:600;"><i data-lucide="check-circle"></i> '+(d.mensaje||'Solicitud '+(accion==='aprobar'?'aprobada':'rechazada'))+'</td>';if(typeof lucide!=='undefined')lucide.createIcons();}
+    if(d.status==='ok'){var row=document.getElementById('sol-'+sid);if(row)row.innerHTML='<td colspan="10" style="text-align:center;padding:16px;color:var(--success);font-weight:600;"><i data-lucide="check-circle"></i> '+(d.mensaje||'Solicitud '+(accion==='aprobar'?'aprobada':'rechazada'))+'</td>';if(typeof lucide!=='undefined')lucide.createIcons();}
     else{alert(d.mensaje||'Error');}
   }).catch(function(){alert('Error de red');});
 }

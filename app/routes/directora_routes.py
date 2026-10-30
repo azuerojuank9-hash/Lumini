@@ -96,8 +96,13 @@ def directora_panel(slug):
     notif_count = conn.execute(
         'SELECT COUNT(*) as c FROM notificaciones WHERE usuario_tipo=? AND usuario_id=? AND leida=0',
         ('directora', directora['id'])).fetchone()['c']
-    aprobados = sum(1 for f in tabla if f['promedio'] is not None and f['promedio'] >= 3.0)
-    reprobados = sum(1 for f in tabla if f['promedio'] is not None and f['promedio'] < 3.0)
+    cfg = fa.config_get(slug)
+    escala_max = float(cfg.get('escala_max', 5.0))
+    nota_min_aprobar = float(cfg.get('nota_minima_aprobar', 3.0))
+    if escala_max > 5.0:
+        nota_min_aprobar /= 2.0
+    aprobados = sum(1 for f in tabla if f['promedio'] is not None and f['promedio'] >= nota_min_aprobar)
+    reprobados = sum(1 for f in tabla if f['promedio'] is not None and f['promedio'] < nota_min_aprobar)
     sin_notas = sum(1 for f in tabla if f['promedio'] is None)
     conn.close()
     return render_template('directora_panel.html',

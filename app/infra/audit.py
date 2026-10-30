@@ -6,12 +6,15 @@ from app.infra.database import conectar
 logger = logging.getLogger(__name__)
 
 
-def periodo_cerrado(slug, periodo):
-    conn = conectar(slug)
+def periodo_cerrado(slug, periodo, conn=None):
+    cerrar = conn is None
+    if cerrar:
+        conn = conectar(slug)
     row = conn.execute(
         'SELECT estado FROM periodos_estado WHERE periodo=?',
         (periodo,)).fetchone()
-    conn.close()
+    if cerrar:
+        conn.close()
     return row is not None and row['estado'] == 'cerrado'
 
 

@@ -31,14 +31,14 @@
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
-  --font-xs: 11px;
+  --font-xs: 12px;
   --font-sm: 13px;
   --font-md: 14px;
   --font-lg: 16px;
   --font-xl: 20px;
   --tr: .18s cubic-bezier(.4,0,.2,1);
   --tr-slow: .35s cubic-bezier(.4,0,.2,1);
-  --sidebar-w: 220px;
+  --sidebar-w: 232px;
   --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
   --red: var(--danger); --green: var(--success); --yellow: var(--warning);
   --blue: #2563EB; --blue-rgb: 37, 99, 235; --blue-dark: #1D4ED8;

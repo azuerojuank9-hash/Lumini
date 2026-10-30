@@ -33,7 +33,8 @@ def portal_padre_dashboard(slug):
             return jsonify({'hijos': resultado})
         return render_template('portal_padre.html', slug=slug, colegio=fa.get_colegio(slug),
                                step='dashboard', hijos=resultado,
-                               padre=conn.execute('SELECT * FROM padres WHERE id=?', (pid,)).fetchone())
+                               padre=conn.execute('SELECT * FROM padres WHERE id=?', (pid,)).fetchone(),
+                               nota_min_aprobar=float(fa.config_get(slug).get('nota_minima_aprobar', 3.0)))
     finally:
         conn.close()
 

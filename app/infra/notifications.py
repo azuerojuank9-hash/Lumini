@@ -25,100 +25,320 @@ def notificaciones_no_leidas(slug, usuario_tipo, usuario_id, conn=None):
     return c
 
 
+
 def generar_destinatarios(slug, comunicacion_id):
+    """
+    Sincroniza los destinatarios de un comunicado publicado.
+
+    - Agrega destinatarios nuevos.
+    - Retira destinatarios que ya no corresponden.
+    - Conserva el estado de lectura de quienes siguen asignados.
+    - Aborta ante datos inválidos para evitar borrar asignaciones por error.
+    """
+    conn = None
+
     try:
         conn = conectar(slug)
-    except Exception as e:
-        app_logger.error(f'generar_destinatarios: error conectando DB {slug}: {e}')
-        return
-    try:
-        cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
-        if 'leido' not in cols_cl:
-            conn.execute('ALTER TABLE comunicaciones_leidas ADD COLUMN leido INTEGER DEFAULT 0')
-            conn.commit()
-            cols_cl = [r[1] for r in conn.execute('PRAGMA table_info(comunicaciones_leidas)').fetchall()]
-    except Exception as e:
-        app_logger.error(f'generar_destinatarios: error migrando columna leido: {e}')
-    if 'leido' not in cols_cl:
-        conn.close()
-        app_logger.error('generar_destinatarios: columna leido no disponible en comunicaciones_leidas, abortando')
-        return
-    com = conn.execute('SELECT * FROM comunicaciones WHERE id=?', (comunicacion_id,)).fetchone()
-    if not com:
-        conn.close()
-        app_logger.warning(f'generar_destinatarios: comunicacion {comunicacion_id} no encontrada')
-        return
-    if com['estado'] != 'publicado':
-        conn.close()
-        return
-    dest_tipo = com['destinatario_tipo']
-    try:
-        val_arr = json.loads(com['destinatario_valor']) if com['destinatario_valor'] else []
-    except (json.JSONDecodeError, TypeError) as e:
-        app_logger.warning(f'generar_destinatarios: error parseando destinatario_valor="{com["destinatario_valor"]}": {e}')
-        val_arr = []
-    if not isinstance(val_arr, list):
-        app_logger.warning(f'generar_destinatarios: destinatario_valor no es un array, ignorando: {type(val_arr).__name__}')
-        val_arr = []
-    destinatarios = []
-    if dest_tipo == 'todo_colegio':
-        for r in conn.execute('SELECT id FROM profesores WHERE activo=1').fetchall():
-            destinatarios.append(('profesor', r['id']))
-        for r in conn.execute('SELECT id FROM directoras WHERE activo=1').fetchall():
-            destinatarios.append(('directora', r['id']))
-        for r in conn.execute('SELECT id FROM alumnos WHERE activo=1').fetchall():
-            destinatarios.append(('estudiante', r['id']))
-    elif dest_tipo == 'profesores':
-        if val_arr:
-            for v in val_arr:
-                if isinstance(v, str) and v.startswith('prof_'):
-                    try:
-                        destinatarios.append(('profesor', int(v.split('_')[1])))
-                    except (ValueError, IndexError):
-                        app_logger.warning(f'generar_destinatarios: valor prof_ invalido: {v}')
-        else:
-            for r in conn.execute('SELECT id FROM profesores WHERE activo=1').fetchall():
-                destinatarios.append(('profesor', r['id']))
-    elif dest_tipo == 'directores':
-        if val_arr:
-            for v in val_arr:
-                if isinstance(v, str) and v.startswith('dir_'):
-                    try:
-                        destinatarios.append(('directora', int(v.split('_')[1])))
-                    except (ValueError, IndexError):
-                        app_logger.warning(f'generar_destinatarios: valor dir_ invalido: {v}')
-        else:
-            for r in conn.execute('SELECT id FROM directoras WHERE activo=1').fetchall():
-                destinatarios.append(('directora', r['id']))
-    elif dest_tipo == 'estudiantes':
-        for r in conn.execute('SELECT id FROM alumnos WHERE activo=1').fetchall():
-            destinatarios.append(('estudiante', r['id']))
-    elif dest_tipo == 'grado':
-        if val_arr:
-            cursos_grado = {}
-            for row in conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1').fetchall():
-                c = row['curso']
-                grade_num = ''.join(filter(str.isdigit, c))
-                cursos_grado.setdefault(grade_num, []).append(c)
-            for grado in val_arr:
-                for curso in cursos_grado.get(str(grado), []):
-                    for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():
-                        destinatarios.append(('estudiante', r['id']))
-    elif dest_tipo == 'cursos':
-        if val_arr:
-            for curso in val_arr:
-                for r in conn.execute('SELECT id FROM alumnos WHERE activo=1 AND curso=?', (curso,)).fetchall():
-                    destinatarios.append(('estudiante', r['id']))
-    for tipo, uid in destinatarios:
-        try:
-            conn.execute(
-                'INSERT OR IGNORE INTO comunicaciones_leidas (comunicacion_id,usuario_tipo,usuario_id,leido) VALUES (?,?,?,0)',
-                (comunicacion_id, tipo, uid))
-        except Exception as e_insert:
-            app_logger.error(f'generar_destinatarios: error insertando destinatario tipo={tipo} uid={uid}: {e_insert}')
-    conn.commit()
-    conn.close()
 
+        columnas = [
+            r[1] for r in conn.execute(
+                'PRAGMA table_info(comunicaciones_leidas)'
+            ).fetchall()
+        ]
+
+        if not columnas:
+            raise RuntimeError(
+                'No existe la tabla comunicaciones_leidas.'
+            )
+
+        if 'leido' not in columnas:
+            conn.execute(
+                'ALTER TABLE comunicaciones_leidas '
+                'ADD COLUMN leido INTEGER DEFAULT 0'
+            )
+            conn.commit()
+
+        com = conn.execute(
+            'SELECT * FROM comunicaciones WHERE id=?',
+            (comunicacion_id,)
+        ).fetchone()
+
+        if not com:
+            raise ValueError(
+                f'No existe el comunicado {comunicacion_id}.'
+            )
+
+        if com['estado'] != 'publicado':
+            return {
+                'ok': True,
+                'mensaje': 'El comunicado no está publicado.',
+                'destinatarios': 0
+            }
+
+        dest_tipo = com['destinatario_tipo']
+        valor_original = com['destinatario_valor']
+
+        try:
+            val_arr = (
+                json.loads(valor_original)
+                if valor_original else []
+            )
+        except (json.JSONDecodeError, TypeError) as exc:
+            raise ValueError(
+                'El valor de destinatarios no contiene JSON válido.'
+            ) from exc
+
+        if not isinstance(val_arr, list):
+            raise ValueError(
+                'Los destinatarios deben estar almacenados como una lista.'
+            )
+
+        destinatarios = set()
+
+        def agregar_activos(tabla, tipo, ids=None):
+            if ids is None:
+                filas = conn.execute(
+                    f'SELECT id FROM {tabla} WHERE activo=1'
+                ).fetchall()
+                encontrados = {int(r['id']) for r in filas}
+            else:
+                ids = set(ids)
+                if not ids:
+                    return
+
+                marcadores = ','.join('?' for _ in ids)
+                filas = conn.execute(
+                    f'SELECT id FROM {tabla} '
+                    f'WHERE activo=1 AND id IN ({marcadores})',
+                    tuple(ids)
+                ).fetchall()
+
+                encontrados = {int(r['id']) for r in filas}
+
+                if encontrados != ids:
+                    raise ValueError(
+                        f'Hay destinatarios inexistentes o inactivos '
+                        f'en la tabla {tabla}.'
+                    )
+
+            for uid in encontrados:
+                destinatarios.add((tipo, uid))
+
+        if dest_tipo == 'todo_colegio':
+            agregar_activos('profesores', 'profesor')
+            agregar_activos('directoras', 'directora')
+            agregar_activos('alumnos', 'estudiante')
+
+        elif dest_tipo == 'profesores':
+            if not val_arr:
+                agregar_activos('profesores', 'profesor')
+            else:
+                ids = set()
+                for valor in val_arr:
+                    if not isinstance(valor, str) or not valor.startswith('prof_'):
+                        raise ValueError(
+                            f'Destinatario de profesor inválido: {valor}'
+                        )
+                    try:
+                        uid = int(valor[5:])
+                    except ValueError as exc:
+                        raise ValueError(
+                            f'ID de profesor inválido: {valor}'
+                        ) from exc
+                    if uid <= 0:
+                        raise ValueError('ID de profesor inválido.')
+                    ids.add(uid)
+
+                agregar_activos('profesores', 'profesor', ids)
+
+        elif dest_tipo == 'directores':
+            if not val_arr:
+                agregar_activos('directoras', 'directora')
+            else:
+                ids = set()
+                for valor in val_arr:
+                    if not isinstance(valor, str) or not valor.startswith('dir_'):
+                        raise ValueError(
+                            f'Destinatario de director inválido: {valor}'
+                        )
+                    try:
+                        uid = int(valor[4:])
+                    except ValueError as exc:
+                        raise ValueError(
+                            f'ID de director inválido: {valor}'
+                        ) from exc
+                    if uid <= 0:
+                        raise ValueError('ID de director inválido.')
+                    ids.add(uid)
+
+                agregar_activos('directoras', 'directora', ids)
+
+        elif dest_tipo == 'estudiantes':
+            agregar_activos('alumnos', 'estudiante')
+
+        elif dest_tipo == 'grado':
+            if not val_arr:
+                raise ValueError(
+                    'No se especificaron grados para el comunicado.'
+                )
+
+            grados = set()
+            for grado in val_arr:
+                if not isinstance(grado, (str, int)):
+                    raise ValueError(f'Grado inválido: {grado}')
+                grado_num = ''.join(
+                    filter(str.isdigit, str(grado))
+                )
+                if not grado_num:
+                    raise ValueError(f'Grado inválido: {grado}')
+                grados.add(grado_num)
+
+            cursos = conn.execute(
+                'SELECT DISTINCT curso FROM alumnos WHERE activo=1'
+            ).fetchall()
+
+            cursos_validos = []
+            for fila in cursos:
+                curso = fila['curso'] or ''
+                numero = ''.join(filter(str.isdigit, curso))
+                if numero in grados:
+                    cursos_validos.append(curso)
+
+            if cursos_validos:
+                marcadores = ','.join('?' for _ in cursos_validos)
+                filas = conn.execute(
+                    f'SELECT id FROM alumnos WHERE activo=1 '
+                    f'AND curso IN ({marcadores})',
+                    tuple(cursos_validos)
+                ).fetchall()
+
+                for fila in filas:
+                    destinatarios.add(
+                        ('estudiante', int(fila['id']))
+                    )
+
+        elif dest_tipo == 'cursos':
+            if not val_arr:
+                raise ValueError(
+                    'No se especificaron cursos para el comunicado.'
+                )
+
+            if not all(isinstance(c, str) and c.strip() for c in val_arr):
+                raise ValueError('La lista de cursos contiene valores inválidos.')
+
+            cursos = list(set(c.strip() for c in val_arr))
+            marcadores = ','.join('?' for _ in cursos)
+
+            filas = conn.execute(
+                f'SELECT id FROM alumnos WHERE activo=1 '
+                f'AND curso IN ({marcadores})',
+                tuple(cursos)
+            ).fetchall()
+
+            for fila in filas:
+                destinatarios.add(
+                    ('estudiante', int(fila['id']))
+                )
+
+        elif dest_tipo == 'rector':
+            principal = conn.execute(
+                'SELECT id FROM rectores '
+                'WHERE activo=1 AND es_principal=1 LIMIT 1'
+            ).fetchone()
+
+            if principal:
+                destinatarios.add(
+                    ('rector', int(principal['id']))
+                )
+
+        else:
+            raise ValueError(
+                f'Tipo de destinatario no reconocido: {dest_tipo}'
+            )
+
+        # No modificar asignaciones hasta tener la lista validada.
+        conn.execute('BEGIN')
+
+        actuales = conn.execute(
+            '''
+            SELECT usuario_tipo, usuario_id
+            FROM comunicaciones_leidas
+            WHERE comunicacion_id=?
+            ''',
+            (comunicacion_id,)
+        ).fetchall()
+
+        actuales_set = {
+            (r['usuario_tipo'], int(r['usuario_id']))
+            for r in actuales
+        }
+
+        # Eliminar únicamente los destinatarios que ya no corresponden.
+        obsoletos = actuales_set - destinatarios
+
+        for tipo, uid in obsoletos:
+            conn.execute(
+                '''
+                DELETE FROM comunicaciones_leidas
+                WHERE comunicacion_id=?
+                  AND usuario_tipo=?
+                  AND usuario_id=?
+                ''',
+                (comunicacion_id, tipo, uid)
+            )
+
+        # Insertar los nuevos sin alterar el estado de lectura existente.
+        nuevos = destinatarios - actuales_set
+
+        for tipo, uid in nuevos:
+            conn.execute(
+                '''
+                INSERT OR IGNORE INTO comunicaciones_leidas
+                (comunicacion_id, usuario_tipo, usuario_id, leido)
+                VALUES (?, ?, ?, 0)
+                ''',
+                (comunicacion_id, tipo, uid)
+            )
+
+        conn.commit()
+
+        resultado = {
+            'ok': True,
+            'destinatarios': len(destinatarios),
+            'agregados': len(nuevos),
+            'retirados': len(obsoletos),
+            'mensaje': 'Destinatarios sincronizados correctamente.'
+        }
+
+        app_logger.info(
+            f'generar_destinatarios: comunicado={comunicacion_id}, '
+            f'destinatarios={len(destinatarios)}, '
+            f'agregados={len(nuevos)}, retirados={len(obsoletos)}'
+        )
+
+        return resultado
+
+    except Exception as e:
+        if conn:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+
+        app_logger.exception(
+            f'generar_destinatarios: error en comunicado '
+            f'{comunicacion_id}: {e}'
+        )
+
+        return {
+            'ok': False,
+            'mensaje': str(e),
+            'destinatarios': 0
+        }
+
+    finally:
+        if conn:
+            conn.close()
 
 def comunicaciones_pendientes(slug, usuario_tipo, usuario_id, conn=None):
     cerrar = conn or conectar(slug)

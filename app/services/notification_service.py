@@ -3,6 +3,7 @@ import logging
 from app.repositories.notification_repository import (
     marcar_comunicacion_leida,
     marcar_notificacion_leida,
+    get_comunicacion_leida,
 )
 from app.repositories.notification_repository import (
     get_notificaciones as repo_get_notificaciones,
@@ -50,7 +51,13 @@ def marcar_leida(conn, nid, usuario_tipo, usuario_id):
 
 def marcar_comunicacion(conn, cid, usuario_tipo, usuario_id, logger=None):
     from app.repositories.notification_repository import add_columna_leido, get_columna_leido_exists
+
     if not get_columna_leido_exists(conn):
         add_columna_leido(conn)
+
+    asignacion = get_comunicacion_leida(conn, cid, usuario_tipo, usuario_id)
+    if not asignacion:
+        return False
+
     marcar_comunicacion_leida(conn, cid, usuario_tipo, usuario_id)
     return True

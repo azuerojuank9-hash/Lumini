@@ -406,6 +406,10 @@ tr.selected{background:rgba(var(--accent-rgb),.06)!important;outline:2px solid r
 @media(max-width:500px){.act-form-grid{grid-template-columns:1fr;}}
 .act-field label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
 .act-field label .act-hint{font-weight:400;text-transform:none;letter-spacing:0;color:var(--sub);}
+.act-peso-explain{display:flex;align-items:flex-start;gap:6px;margin-top:6px;padding:8px 10px;background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),.12);border-radius:var(--radius-sm);font-size:11px;color:var(--muted);line-height:1.5;}
+.act-peso-explain strong{color:var(--accent);font-weight:700;}
+.act-field .field-error{font-size:11px;color:var(--danger);margin-top:4px;display:none;}
+.act-field .field-error.visible{display:block;}
 .act-estado-opt{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:6px;border:1.5px solid var(--border);cursor:pointer;font-size:12px;transition:all var(--tr);}
 .act-estado-opt:has(input:checked){border-color:var(--accent);background:rgba(var(--accent-rgb),.06);}
 .act-estado-opt input{display:none;}
@@ -729,9 +733,9 @@ tr.selected{background:rgba(var(--accent-rgb),.06)!important;outline:2px solid r
 @keyframes flashUpdate{0%{background:rgba(var(--accent-rgb),.3);transform:scale(1.08);}100%{background:transparent;transform:scale(1);}}
 .flash-update{animation:flashUpdate .6s ease;}
 /* -- Historial modal ----------------------------------------------------- */
-.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:center;justify-content:center;}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
 .modal-overlay.open{display:flex;}
-.modal-box{background:var(--bg2);border-radius:var(--radius-lg);padding:24px;max-width:640px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow-xl);animation:fadeSlideIn .2s ease;}
+.modal-box{background:var(--bg2);border-radius:var(--radius-lg);padding:28px;max-width:640px;width:92%;max-height:80vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.35);animation:fadeSlideIn .2s ease;border:1px solid var(--border);}
 .modal-box .mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
 .modal-box .mhead h3{margin:0;font-size:17px;}
 .modal-box .mclose{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:var(--radius-sm);}
@@ -1024,6 +1028,20 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 .import-summary .big-num{font-size:3rem;font-weight:800;color:var(--accent);}
 .import-summary .big-label{font-size:12px;color:var(--muted);}
 @media(max-width:768px){.analytics-grid{grid-template-columns:1fr;}}
+/* -- Info bar (resumen del curso) -------------------------------------- */
+.info-bar{display:flex;align-items:center;gap:16px;padding:8px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:8px;flex-wrap:wrap;font-size:12px;}
+.ib-item{display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.ib-label{color:var(--muted);font-weight:500;}
+.ib-val{font-weight:700;color:var(--text);}
+.ib-val.good{color:var(--success);}
+.ib-val.warn{color:var(--warning);}
+.ib-val.bad{color:var(--danger);}
+.ib-sep{width:1px;height:16px;background:var(--border);flex-shrink:0;}
+@media(max-width:768px){.info-bar{gap:10px;padding:6px 10px;}.ib-sep{display:none;}}
+/* -- Grade table full-width -------------------------------------------- */
+#gradeScroll .tw{min-width:0;width:100%;}
+#gradeTable{min-width:100%;}
+.act-th{min-width:120px;}
 {% endblock %}
 
 {% block sidebar %}{% include "components/sidebar_teacher.html" %}{% endblock %}
@@ -1087,7 +1105,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
         <button onclick="abrirCalendario()"><i data-lucide="calendar"></i> Calendario</button>
         <button onclick="abrirComms()"><i data-lucide="megaphone"></i> Comunicados</button>
         <button onclick="abrirPlantillas()"><i data-lucide="file-text"></i> Plantillas</button>
-        <button onclick="abrirBatchEditor()"><i data-lucide="wand-2"></i> Editor masivo</button>
+        <button onclick="abrirBatchEditor()"><i data-lucide="wand-2"></i> Edición para varios estudiantes</button>
         <button onclick="abrirAlertas()"><i data-lucide="bell"></i> Alertas <span class="alert-badge" id="alertBadge" style="display:none;font-size:9px;padding:1px 6px;border-radius:99px;background:var(--accent);color:var(--text-on-accent);margin-left:4px;font-weight:600;"></span></button>
         <button onclick="toggleContraste()" id="contrastBtn"><i data-lucide="contrast"></i> Alto contraste</button>
         <button onclick="toggleModoConcentracion()"><i data-lucide="eye-off"></i> Modo concentración</button>
@@ -1096,6 +1114,34 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
     </div>
   </div>
 </div>
+
+<div class="info-bar" id="infoBar">
+  <div class="ib-item"><span class="ib-label">Estudiantes:</span> <span class="ib-val" id="ibTotal">0</span></div>
+  <div class="ib-sep"></div>
+  <div class="ib-item"><span class="ib-label">Promedio:</span> <span class="ib-val" id="ibProm">—</span></div>
+  <div class="ib-sep"></div>
+  <div class="ib-item"><span class="ib-label">Aprobando:</span> <span class="ib-val good" id="ibAprob">0</span></div>
+  <div class="ib-sep"></div>
+  <div class="ib-item"><span class="ib-label">Sin nota:</span> <span class="ib-val warn" id="ibSinNota">0</span></div>
+  <div class="ib-sep"></div>
+  <div class="ib-item"><span class="ib-label">Riesgo:</span> <span class="ib-val bad" id="ibRiesgo">0</span></div>
+</div>
+<script>
+(function(){
+  var rows=window._estudiantes||[];
+  if(!rows.length) return;
+  var total=rows.length,conNota=0,sinNota=0,aprob=0,riesgo=0,sum=0,cnt=0;
+  rows.forEach(function(r){
+    if(r.promedio!=null){conNota++;sum+=r.promedio;cnt++;if(r.promedio>=3)aprob++;else riesgo++;}
+    else sinNota++;
+  });
+  var el=document.getElementById('ibTotal');if(el)el.textContent=total;
+  el=document.getElementById('ibProm');if(el)el.textContent=cnt?(sum/cnt).toFixed(2):'—';
+  el=document.getElementById('ibAprob');if(el)el.textContent=aprob;
+  el=document.getElementById('ibSinNota');if(el)el.textContent=sinNota;
+  el=document.getElementById('ibRiesgo');if(el)el.textContent=riesgo;
+})();
+</script>
 
 
 
@@ -1189,8 +1235,8 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
                 {% endfor %}
                 <th class="th-eval">Eval.<br><span class="th-pct">25%</span></th>
                 <th class="th-autoev">Autoev.<br><span class="th-pct">10%</span></th>
-                <th class="th-prom tip-wrap">Prom.<span class="tip"><div class="label">Promedio de actividades</div>Promedio simple de todas las actividades calificadas.<br>Las actividades vacías no cuentan.<br><span style="color:var(--muted);font-size:11px;">Ej: (3.0 + 1.8) / 2 = 2.40</span></span></th>
-                <th class="th-nf">N.Final<span class="tip-wrap"><span class="info-icon">i</span><span class="tip"><div class="label">Nota Final del Período</div>Promedio Actividades &times; 65%<br>+ Evaluación &times; 25%<br>+ Autoevaluación &times; 10%</span></span></th>
+                <th class="th-prom tip-wrap">Prom.<span class="tip"><div class="label">Promedio de actividades</div>Promedio <strong>simple</strong> de todas las actividades calificadas de este alumno en esta materia.<br>Las actividades vacías no cuentan.<br><span style="color:var(--muted);font-size:11px;">Nota: El promedio de actividades NO es la nota final.<br>Ej: (3.0 + 1.8) / 2 = 2.40</span></span></th>
+                <th class="th-nf">N.Final<span class="tip-wrap"><span class="info-icon">i</span><span class="tip"><div class="label">Nota Final del Período</div>Prom. Actividades × 65%<br>+ Evaluación × 25%<br>+ Autoevaluación × 10%<br><span style="color:var(--muted);font-size:11px;">Esta es la nota que cuenta para el boletín.</span></span></span></th>
             </tr>
         </thead>
         <tbody>
@@ -1383,7 +1429,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <h3 id="mNombre">Observador</h3>
-        <button onclick="cerrarObs()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;">?</button>
+        <button onclick="cerrarObs()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;"><i data-lucide="x"></i></button>
     </div>
     <p style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;">Historial de asistencia</p>
     <div id="mHistorial" style="margin-bottom:14px;"></div>
@@ -1400,7 +1446,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 <div class="modal">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <h3><i data-lucide="pen" style="color:var(--accent);"></i> Solicitar modificación</h3>
-        <button onclick="cerrarSolicitud()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;">?</button>
+        <button onclick="cerrarSolicitud()" style="background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;"><i data-lucide="x"></i></button>
     </div>
     <p style="font-size:12px;color:var(--sub);margin-bottom:12px;">
         El periodo esta cerrado. Solicite una modificacion al rector.
@@ -1431,7 +1477,7 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 </div>
 </div>
 
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">?</button>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba"><i data-lucide="arrow-up"></i></button>
 <div class="toast" id="toast"><i data-lucide="check-circle"></i> Guardado</div>
 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" id="csrfToken" style="display:none;">
 
@@ -1439,14 +1485,11 @@ body.high-contrast .card,.high-contrast .modal{background:#111!important;border-
 <input type="hidden" name="curso_sel" value="{{ curso_sel }}">
 
 <script>
-function toggleSidebar(){
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
-}
 const slug = "{{ slug }}";
 var COM_DATA = {{ comunicaciones_pendientes | tojson | safe }};
 const cursoSel = "{{ curso_sel }}";
 const periodoSel = {{ periodo_sel }};
+window._estudiantes = {{ estudiantes | tojson | safe }};
 
 function getCsrf(){
     return document.getElementById('csrf-global').value;
@@ -1456,7 +1499,19 @@ function showToast(msg, type, duration){
     msg = msg || '<i data-lucide="check-circle"></i> Guardado';
     var t = document.getElementById('toast');
     if(!t) return;
-    t.innerHTML = msg;
+    t.innerHTML = '';
+    var body = msg == null ? '' : String(msg);
+    var iconTag = body.match(/^<i\s+data-lucide=["']([A-Za-z0-9-]+)["'][^>]*>\s*<\/i>\s*/);
+    if (iconTag) {
+        var ic = document.createElement('i');
+        ic.setAttribute('data-lucide', iconTag[1]);
+        ic.setAttribute('width', '16');
+        ic.setAttribute('height', '16');
+        ic.setAttribute('aria-hidden', 'true');
+        t.appendChild(ic);
+        body = body.slice(iconTag[0].length);
+    }
+    if (body) t.appendChild(document.createTextNode(body));
     t.className='toast toast-'+(type||'success');
     t.classList.add('show');
     clearTimeout(t._t);
@@ -1811,7 +1866,14 @@ function switchPanel(name){
     if(btn) btn.classList.add('active');
     var panel = document.getElementById('panel' + name.charAt(0).toUpperCase() + name.slice(1));
     if(panel) panel.style.display = '';
-    if(name === 'observaciones') cargarObsTab();
+    if(name === 'observaciones'){
+        var sel = document.getElementById('obsStudentSelect');
+        if(sel && !sel.value){
+            var firstOpt = sel.querySelector('option[value]');
+            if(firstOpt && firstOpt.value) sel.value = firstOpt.value;
+        }
+        cargarObsTab();
+    }
 }
 
 function cargarObsTab(){
@@ -2928,7 +2990,8 @@ function cerrarComunicado(){
             <div class="act-form-grid" style="grid-template-columns:1fr 140px 100px;">
                 <div class="act-field">
                     <label>Nombre</label>
-                    <input type="text" id="actNombre" class="form-input" placeholder="Taller de ecuaciones" maxlength="120">
+                    <input type="text" id="actNombre" class="form-input" placeholder="Taller de ecuaciones" maxlength="120" oninput="this.classList.remove('error');var e=document.getElementById('actNombreError');if(e)e.classList.remove('visible');">
+                    <div class="field-error" id="actNombreError"></div>
                 </div>
                 <div class="act-field">
                     <label>Tipo</label>
@@ -2943,9 +3006,12 @@ function cerrarComunicado(){
                     </select>
                 </div>
                 <div class="act-field">
-<label>Peso % <span class="act-peso-tag">(informativo)</span></label>
+<label>Peso %</label>
 <input type="number" id="actPeso" class="form-input" placeholder="Auto" min="0" max="100" step="0.1">
-<small class="form-hint" style="display:block;margin-top:-4px;color:var(--muted);font-size:11px;">No cambia la fórmula de calificación (65% actividades · 25% evaluación · 10% autoevaluación).</small>
+<div class="act-peso-explain">
+  <i data-lucide="info" style="width:12px;height:12px;flex-shrink:0;color:var(--accent);"></i>
+  <span>Las actividades representan el <strong>65%</strong> de la nota final. El peso sirve para ponderar entre actividades (ej: examen vale más que participación). Si lo deja vacío, todas pesan igual.</span>
+</div>
                 </div>
             </div>
             <div class="act-field" style="margin-top:6px;">
@@ -3039,7 +3105,7 @@ function cerrarComunicado(){
 <div class="drawer-overlay" id="batchEditorOverlay" onclick="cerrarBatchEditor()"></div>
 <div class="drawer" id="batchDrawer">
     <div class="drawer-head">
-        <div style="flex:1;min-width:0;"><h3>Editor masivo</h3></div>
+        <div style="flex:1;min-width:0;"><h3>Edición para varios estudiantes</h3></div>
         <button class="drawer-close" onclick="cerrarBatchEditor()"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body batch-panel">
@@ -3159,11 +3225,10 @@ function cerrarComunicado(){
         <input type="text" id="commTitulo" placeholder="Título del comunicado">
         <textarea id="commContenido" placeholder="Contenido del comunicado..."></textarea>
         <select id="commDestinatarios">
-            <option value="todos">Todos</option>
-            <option value="docentes">Docentes</option>
-            <option value="estudiantes">Estudiantes</option>
-            <option value="padres">Padres de familia</option>
-        </select>
+    <option value="rector">Rectoría</option>
+    <option value="profesores">Docentes</option>
+    <option value="estudiantes">Estudiantes</option>
+</select>
         <input type="date" id="commProgramada" placeholder="Programar para (opcional)">
         <div style="display:flex;gap:8px;">
             <button class="btn btn-primary btn-sm" onclick="enviarComunicado()">Enviar</button>
@@ -3545,7 +3610,14 @@ function cerrarModalActividad(){
 }
 function guardarActividad(){
     var nombre=document.getElementById('actNombre').value.trim();
-    if(!nombre) return showToast('<i data-lucide="alert-circle"></i> Escribe un nombre');
+    var nombreErr=document.getElementById('actNombreError');
+    if(!nombre){
+        document.getElementById('actNombre').classList.add('error');
+        if(nombreErr){nombreErr.textContent='Escribe un nombre para la actividad';nombreErr.classList.add('visible');}
+        return showToast('<i data-lucide="alert-circle"></i> Escribe un nombre');
+    }
+    document.getElementById('actNombre').classList.remove('error');
+    if(nombreErr)nombreErr.classList.remove('visible');
     var btn=document.getElementById('actSaveBtn');
     btn.disabled=true; btn.innerHTML='<i data-lucide="loader-circle"></i> Guardando...'; if(lucide)lucide.createIcons();
     var data={nombre:nombre, curso:'{{ curso_sel }}', periodo:{{ periodo_sel }}, tipo:document.getElementById('actTipo').value, peso:document.getElementById('actPeso').value, competencia:document.getElementById('actCompetencia').value, descripcion:document.getElementById('actDescripcion').value, estado:document.querySelector('input[name="actEstado"]:checked').value, entrega_digital:document.getElementById('actEntregaDigital').checked};
@@ -4254,7 +4326,7 @@ function notaFocus(inp){
     // Store original for undo
     if(!inp.dataset.ov) inp.dataset.ov=inp.value;
     // Show keyboard hint
-    if(!inp.dataset.hintShown){showToast('Enter: guardar | Esc: cancelar');inp.dataset.hintShown='1';}
+    if(!inp.dataset.hintShown){showToast('Intro: guardar | Esc: cancelar');inp.dataset.hintShown='1';}
 }
 // ── Drag & Drop ──
 function dragStart(e,id){
@@ -5919,4 +5991,18 @@ function escJsStr(s){
 </div>
 </div>
 
+<script>
+(function(){
+    var t = window.location.hash.replace('#','') || 'notas';
+    if(['notas','asistencia','observaciones'].indexOf(t) > -1 && typeof switchPanel === 'function'){
+        switchPanel(t);
+    }
+    window.addEventListener('hashchange',function(){
+        var h = window.location.hash.replace('#','') || 'notas';
+        if(['notas','asistencia','observaciones'].indexOf(h) > -1 && typeof switchPanel === 'function'){
+            switchPanel(h);
+        }
+    });
+})();
+</script>
 {% endblock %}

@@ -15,12 +15,26 @@ window.showToast = function(message, type, duration) {
   t.className = 'toast toast-' + type + ' toast-enter';
   var iconMap = { success: 'check-circle', error: 'alert-triangle', info: 'info', warning: 'alert-circle' };
   var iconName = iconMap[type] || 'info';
-  var escDiv = document.createElement('div');
-  escDiv.textContent = message;
-  var safeMsg = escDiv.innerHTML;
-  t.innerHTML = '<span class="toast-icon"><i data-lucide="' + iconName + '" width="16" height="16"></i></span>'
-    + '<span class="toast-message">' + safeMsg + '</span>'
-    + '<button class="toast-close btn-icon-sm btn-ghost" onclick="this.closest(\'.toast\').remove()" aria-label="Cerrar"><i data-lucide="x" width="12" height="12"></i></button>';
+  var body = message == null ? '' : String(message);
+  var iconTag = body.match(/^<i\s+data-lucide=["']([A-Za-z0-9-]+)["'][^>]*>\s*<\/i>\s*/);
+  if (iconTag) {
+    iconName = iconTag[1];
+    body = body.slice(iconTag[0].length);
+  }
+  var iconSpan = document.createElement('span');
+  iconSpan.className = 'toast-icon';
+  var iconEl = document.createElement('i');
+  iconEl.setAttribute('data-lucide', iconName);
+  iconEl.setAttribute('width', '16');
+  iconEl.setAttribute('height', '16');
+  iconEl.setAttribute('aria-hidden', 'true');
+  iconSpan.appendChild(iconEl);
+  var msgEl = document.createElement('span');
+  msgEl.className = 'toast-message';
+  msgEl.textContent = body;
+  t.appendChild(iconSpan);
+  t.appendChild(msgEl);
+  t.insertAdjacentHTML('beforeend', '<button class="toast-close btn-icon-sm btn-ghost" onclick="this.closest(\'.toast\').remove()" aria-label="Cerrar"><i data-lucide="x" width="12" height="12"></i></button>');
   c.appendChild(t);
   if (window.lucide) lucide.createIcons({ attrs: { 'aria-hidden': 'true' } }, t);
   setTimeout(function() {

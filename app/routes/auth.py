@@ -19,6 +19,23 @@ def _colegio(slug):
     return fa.get_colegio(slug)
 
 
+def _init_db_controlado(fa, slug):
+    """Inicializa la BD institucional sin romper la pantalla de login.
+
+    Devuelve None si la inicialización terminó bien, o un mensaje apto para el
+    usuario si alguna migración abortó (por ejemplo v24 ante una estructura
+    incompleta). El detalle técnico se registra en el log y nunca se muestra.
+    """
+    try:
+        fa.init_db(slug)
+        return None
+    except Exception:
+        logger.error('init_db fallo para el colegio %s', slug, exc_info=True)
+        return ('La base de datos de esta institucion necesita revision tecnica. '
+                'No se modifico ningun dato existente. Avisa al administrador '
+                'del sistema.')
+
+
 @auth_bp.route('/admin', methods=['GET', 'POST'])
 def admin():
     fa = _import_flask_app()
@@ -98,15 +115,38 @@ def admin():
                                 logo_filename = ''
                 if not error:
                     from app.repositories.user_repository import create_colegio
+                    db_previo = os.path.exists(db_path(slug))
                     try:
                         create_colegio(slug, nombre, logo_filename, num_p, venc, codigo, pri_col, sec_col)
                     except Exception:
                         logger.warning('register_colegio: slug duplicado %s', slug)
                         error = f'El slug "{slug}" ya existe.'
                     if not error:
-                        init_db(slug)
-                        exito = f'Colegio "{nombre}" creado. URL: /{slug}/login · Codigo: {codigo}'
-                        logger.info(f'Colegio creado: {slug}')
+                        try:
+                            init_db(slug)
+                        except Exception:
+                            logger.error('crear_colegio: init_db fallo para %s', slug, exc_info=True)
+                            # La institucion quedaria creada al 50 % (fila maestra sin
+                            # base usable). Si la BD no existia antes, se revierte solo
+                            # lo que acaba de crear esta peticion; nunca se toca una BD
+                            # preexistente.
+                            if not db_previo:
+                                try:
+                                    delete_colegio(slug)
+                                    if os.path.exists(db_path(slug)):
+                                        os.remove(db_path(slug))
+                                except Exception:
+                                    logger.error('crear_colegio: no se pudo revertir %s', slug, exc_info=True)
+                                error = (f'No se pudo crear "{nombre}": fallo la inicializacion '
+                                         f'de su base de datos. No quedo ningun registro parcial; '
+                                         f'revisa los logs e intenta de nuevo.')
+                            else:
+                                error = (f'El colegio "{slug}" ya tenia una base de datos y esta no '
+                                         f'pudo inicializarse. No se borro nada. Revisa los logs '
+                                         f'antes de volver a intentarlo.')
+                        else:
+                            exito = f'Colegio "{nombre}" creado. URL: /{slug}/login · Codigo: {codigo}'
+                            logger.info(f'Colegio creado: {slug}')
 
         elif accion == 'toggle_colegio':
             slug_t = request.form.get('slug')
@@ -223,13 +263,13 @@ def recuperar_password(slug):
                 pregunta = prof['pregunta_secreta']; paso = 2
                 fa.registrar_fallo(ip, prefijo=f'recup_{slug}')
             elif nueva != confirmar:
-                error = 'Las contrasenas no coinciden.'
+                error = 'Las contraseñas no coinciden.'
                 pregunta = prof['pregunta_secreta']; paso = 2
                 fa.registrar_fallo(ip, prefijo=f'recup_{slug}')
             else:
                 from app.utils.security import hash_pw
                 update_profesor_password(slug, prof['id'], hash_pw(nueva))
-                exito = 'Contrasena actualizada. Ya puedes ingresar.'
+                exito = 'Contraseña actualizada. Ya puedes ingresar.'
                 fa.limpiar_intentos(ip, prefijo=f'recup_{slug}')
 
     return render_template('recuperar.html',
@@ -290,16 +330,20 @@ def directora_cambiar_password_recuperar(slug):
     from app.utils.security import hash_pw
     update_directora_password(slug, d['id'], hash_pw(nueva))
     fa.limpiar_intentos(ip, prefijo=f'recup_directora_{slug}')
-    return jsonify({'ok': True, 'mensaje': 'Contrasena actualizada. Ya puedes ingresar.'})
+    return jsonify({'ok': True, 'mensaje': 'Contraseña actualizada. Ya puedes ingresar.'})
 
 
 @auth_bp.route('/<slug>/login', methods=['GET', 'POST'], endpoint='login')
 def login(slug):
     fa = _import_flask_app()
     fa.require_colegio(slug)
-    fa.init_db(slug)
+    error_bd = _init_db_controlado(fa, slug)
     colegio = fa.get_colegio(slug)
-    error = None
+    if error_bd:
+        return render_template('login_v2.html', error=error_bd, materias=fa.MATERIAS,
+                               jornadas=fa.JORNADAS, preguntas=fa.PREGUNTAS_SECRETAS,
+                               slug=slug, colegio=colegio), 503
+    error = exito = None
     ip = request.remote_addr
 
     if request.method == 'POST':
@@ -346,7 +390,7 @@ def login(slug):
             confirmar = request.form.get('confirmar_password', '').strip()
             codigo_colegio = fa.get_codigo_registro(slug, 'profesores')
             if pw != confirmar:
-                error = 'Las contrasenas no coinciden.'
+                error = 'Las contraseñas no coinciden.'
             elif codigo_colegio and codigo != codigo_colegio:
                 error = 'Codigo de invitacion incorrecto.'
             elif not nombre or not usuario or not email_p:
@@ -375,7 +419,7 @@ def login(slug):
                             except Exception as e:
                                 logger.warning(f'Error al asignar materia={mat} jornada={jor} a profesor={pid} en {slug}: {e}')
                     conn.commit(); conn.close()
-                    error = 'Registro exitoso. Ya puedes ingresar.'
+                    exito = 'Registro exitoso. Ya puedes ingresar.'
 
         elif accion == 'estudiante':
             ip = request.remote_addr or '0.0.0.0'
@@ -436,7 +480,7 @@ def login(slug):
                 fa.limpiar_intentos(ip, prefijo=f'rec_{slug}')
                 return redirect(url_for('rector.rector_panel', slug=slug))
 
-    return render_template('login_v2.html', error=error, materias=fa.MATERIAS,
+    return render_template('login_v2.html', error=error, exito=exito, materias=fa.MATERIAS,
                            jornadas=fa.JORNADAS, preguntas=fa.PREGUNTAS_SECRETAS,
                            slug=slug, colegio=colegio)
 
@@ -471,7 +515,7 @@ def cambiar_password(slug):
                 from app.repositories.user_repository import update_profesor_password
                 from app.utils.security import hash_pw
                 update_profesor_password(slug, prof['id'], hash_pw(nueva))
-                exito = 'Contrasena cambiada!'
+                exito = 'Contraseña cambiada!'
     mis_cursos = fa.get_cursos_profesor(slug, prof['id'], materia, jornada)
     materias_jornadas = fa.get_materias_profesor(slug, prof['id'])
     colegio = fa.get_colegio(slug)
@@ -525,8 +569,11 @@ def portal_padre_login(slug):
 def rector_login(slug):
     fa = _import_flask_app()
     fa.require_colegio(slug)
-    fa.init_db(slug)
+    error_bd = _init_db_controlado(fa, slug)
     colegio = fa.get_colegio(slug)
+    if error_bd:
+        return render_template('rector_login.html', slug=slug, colegio=colegio,
+                               error=error_bd, exito=None), 503
     error = exito = None
     ip = request.remote_addr
     if request.method == 'POST':
@@ -559,8 +606,11 @@ def rector_registrar(slug):
     if not fa.validar_csrf():
         return 'Error de seguridad', 400
     fa.require_colegio(slug)
-    fa.init_db(slug)
+    error_bd = _init_db_controlado(fa, slug)
     colegio = fa.get_colegio(slug)
+    if error_bd:
+        return render_template('rector_login.html', slug=slug, colegio=colegio,
+                               error=error_bd, exito=None), 503
     error = exito = None
     nombre = request.form.get('nombre', '').strip()
     usuario = request.form.get('usuario', '').strip()
@@ -575,7 +625,7 @@ def rector_registrar(slug):
     if codigo_colegio and codigo != codigo_colegio:
         error = 'Codigo de invitacion incorrecto.'
     elif pw != confirm:
-        error = 'Las contrasenas no coinciden.'
+        error = 'Las contraseñas no coinciden.'
     elif not nombre or not usuario or not pw or not jornada:
         error = 'Completa todos los campos obligatorios.'
     elif len(pw) < 6:
@@ -644,7 +694,7 @@ def rector_cambiar_password_recuperar(slug):
     from app.utils.security import hash_pw
     update_rector_password(slug, r['id'], hash_pw(nueva))
     fa.limpiar_intentos(ip, prefijo=f'recup_rector_{slug}')
-    return jsonify({'ok': True, 'mensaje': 'Contrasena actualizada. Ya puedes ingresar.'})
+    return jsonify({'ok': True, 'mensaje': 'Contraseña actualizada. Ya puedes ingresar.'})
 
 
 @auth_bp.route('/<slug>/rector/logout')
@@ -692,8 +742,11 @@ def directora_registrar_directo(slug):
     if not fa.validar_csrf():
         return 'Error de seguridad', 400
     fa.require_colegio(slug)
-    fa.init_db(slug)
+    error_bd = _init_db_controlado(fa, slug)
     colegio = fa.get_colegio(slug)
+    if error_bd:
+        return render_template('directora_login.html', slug=slug, colegio=colegio,
+                               error=error_bd, exito=None), 503
     error = exito = None
     nombre = request.form.get('nombre', '').strip()
     usuario = request.form.get('usuario', '').strip()
@@ -709,7 +762,7 @@ def directora_registrar_directo(slug):
     if codigo_colegio and codigo != codigo_colegio:
         error = 'Codigo de invitacion incorrecto.'
     elif pw != confirmar:
-        error = 'Las contrasenas no coinciden.'
+        error = 'Las contraseñas no coinciden.'
     elif not nombre or not usuario or not pw or not curso or not jornada:
         error = 'Completa todos los campos obligatorios.'
     elif len(pw) < 6:

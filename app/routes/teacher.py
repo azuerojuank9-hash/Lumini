@@ -2,6 +2,7 @@
 
 import json
 import logging
+import math
 import sqlite3
 from datetime import datetime
 from io import BytesIO
@@ -430,10 +431,11 @@ def actividades_crear(slug):
                                   descripcion, observaciones, estado_act, competencia, entrega_digital)
         f.audit_log(slug, prof['id'], 'actividad_creada', 'actividades',
                     registro_id=act_id,
-                    valor_nuevo={'nombre': nombre, 'tipo': tipo, 'curso': curso_sel, 'materia': materia})
+                    valor_nuevo={'nombre': nombre, 'tipo': tipo, 'curso': curso_sel, 'materia': materia},
+                    conn=conn)
         f.auditar_nota(slug, prof['id'], 'profesor', 'creacion', 'actividades', None,
                        curso_sel, materia, periodo, actividad_id=act_id,
-                       valor_nuevo=nombre, motivo='Actividad creada via API')
+                       valor_nuevo=nombre, motivo='Actividad creada via API', conn=conn)
         from app.services.activity_service import create_calendar_event
         create_calendar_event(slug, conn, nombre, tipo, descripcion, fecha_limite, hora_limite,
                               curso_sel, prof['id'])
@@ -479,7 +481,7 @@ def actividades_editar(slug, act_id):
                 changes.append(field + '=?')
                 conn.execute(f'UPDATE actividades SET {field}=? WHERE id=?', (new_val, act_id))
                 f.audit_log(slug, prof['id'], 'actividad_' + field, 'actividades', registro_id=act_id,
-                            valor_anterior={field: old_val}, valor_nuevo={field: new_val})
+                            valor_anterior={field: old_val}, valor_nuevo={field: new_val}, conn=conn)
     if not changes:
         conn.close()
         act_dict = dict(act)
@@ -562,7 +564,7 @@ def actividades_duplicar(slug, act_id):
     from app.services.activity_service import duplicar_actividad_logic
     new_id, nuevo_nombre = duplicar_actividad_logic(slug, act, prof['id'], conn)
     f.audit_log(slug, prof['id'], 'actividad_duplicada', 'actividades', registro_id=new_id,
-                valor_nuevo={'desde': act_id, 'nombre': nuevo_nombre})
+                valor_nuevo={'desde': act_id, 'nombre': nuevo_nombre}, conn=conn)
     nueva = dict(conn.execute('SELECT * FROM actividades WHERE id=?', (new_id,)).fetchone())
     conn.close()
     nueva.pop('profesor_id', None)
@@ -1147,12 +1149,12 @@ def guardar_evaluacion_batch(slug):
                 tipo_ev = 'creacion' if old_eval is None else 'modificacion'
                 f.auditar_nota(slug, prof['id'], 'profesor', tipo_ev, 'evaluaciones', aid,
                              curso, materia, periodo, campo='evaluacion',
-                             valor_anterior=old_eval, valor_nuevo=ev_final)
+                             valor_anterior=old_eval, valor_nuevo=ev_final, conn=conn)
             if au is not None:
                 tipo_au = 'creacion' if old_auto is None else 'modificacion'
                 f.auditar_nota(slug, prof['id'], 'profesor', tipo_au, 'evaluaciones', aid,
                              curso, materia, periodo, campo='autoevaluacion',
-                             valor_anterior=old_auto, valor_nuevo=au_final)
+                             valor_anterior=old_auto, valor_nuevo=au_final, conn=conn)
         conn.commit()
         aids = set(item.get('aid') for item in items if item.get('aid'))
         for aid in aids:
@@ -1346,7 +1348,41 @@ def importar_notas(slug):
                            materia=materia, jornada=jornada, actividades=actividades)
 
 
+def _analisis_json_seguro(fn):
+    """Garantiza que el análisis de Excel SIEMPRE devuelva JSON con 'mensaje',
+    para que la UI muestre la causa concreta y nunca un fallo de conexión/500.
+    Los errores de auth/autorización se re-lanzan intactos."""
+    from functools import wraps
+
+    from werkzeug.exceptions import HTTPException
+
+    from app.exceptions import (
+        BusinessError,
+        DatabaseError,
+        ForbiddenError,
+        NotFoundError,
+        PermissionError,
+        UnauthorizedError,
+        ValidationError,
+    )
+    _errores_no_ocultar = (HTTPException, BusinessError, DatabaseError, ForbiddenError,
+                           NotFoundError, PermissionError, UnauthorizedError, ValidationError)
+
+    @wraps(fn)
+    def _inner(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except _errores_no_ocultar:
+            raise
+        except Exception as e:
+            logger.exception('Excepción no controlada al analizar el archivo de notas: %s', e)
+            return jsonify({'status': 'error', 'mensaje': 'No se pudo analizar el archivo. Verifica el formato.'}), 400
+
+    return _inner
+
+
 @teacher_bp.route('/<slug>/importar_notas/preview', methods=['POST'])
+@_analisis_json_seguro
 def importar_notas_preview(slug):
     f = _fa()
     f.require_colegio(slug)
@@ -1447,12 +1483,26 @@ def importar_notas_preview(slug):
             slug, curso_sel, jornada, len(alumnos_curso)), file=_sys.stderr, flush=True)
         print('[IMPORT_DIAG_DB_PREVIEW] slug=%s DB_AIDs=%r DB_nombres=%r' % (
             slug, [a['id'] for a in alumnos_curso[:10]], [a['nombre'] for a in alumnos_curso[:10]]), file=_sys.stderr, flush=True)
+        _aid_col = None
+        _nombre_col = None
+        _header_norm_list = [_norm(h) for h in header_row]
+        for _ci, _hn in enumerate(_header_norm_list):
+            if _hn in ('AID', 'ID'):
+                _aid_col = _ci
+            elif _hn == 'Estudiante':
+                _nombre_col = _ci
+        if _nombre_col is None and len(header_row) > 1:
+            _nombre_col = 1
         act_cols = []
         eval_col = auto_col = None
         for col_idx, h in enumerate(header_row):
-            if col_idx <= 2:
-                continue
             h_str = _norm(h)
+            if col_idx == 0:
+                continue
+            if h_str == 'Estudiante':
+                continue
+            if _aid_col is not None and col_idx == _aid_col:
+                continue
             if h_str == 'Evaluaci\u00f3n':
                 eval_col = col_idx
             elif h_str == 'Autoevaluaci\u00f3n':
@@ -1478,8 +1528,8 @@ def importar_notas_preview(slug):
             cells = [c.value for c in row_cells]
             if not any(c is not None for c in cells):
                 continue
-            raw_nombre = str(cells[1]).strip() if cells[1] is not None else ''
-            raw_aid = cells[2]
+            raw_nombre = str(cells[_nombre_col]).strip() if (_nombre_col is not None and _nombre_col < len(cells) and cells[_nombre_col] is not None) else ''
+            raw_aid = cells[_aid_col] if _aid_col is not None and _aid_col < len(cells) else None
             row_errors = []
             aid = None
             if raw_aid is not None:
@@ -1522,6 +1572,10 @@ def importar_notas_preview(slug):
                 if raw_val is not None:
                     try:
                         val = float(str(raw_val).replace(',', '.'))
+                        if not math.isfinite(val):
+                            row_errors.append(f'{cinfo["nombre"]}: valor no numerico')
+                            all_ok = False
+                            continue
                         if val < escala_min or val > escala_max:
                             row_errors.append(f'{cinfo["nombre"]}: nota fuera de rango ({escala_min}-{escala_max})')
                             all_ok = False
@@ -1538,7 +1592,10 @@ def importar_notas_preview(slug):
                     if raw_val is not None:
                         try:
                             val = float(str(raw_val).replace(',', '.'))
-                            if val < escala_min or val > escala_max:
+                            if not math.isfinite(val):
+                                row_errors.append('Evaluaci\u00f3n invalida')
+                                all_ok = False
+                            elif val < escala_min or val > escala_max:
                                 row_errors.append('Evaluaci\u00f3n fuera de rango')
                                 all_ok = False
                             else:
@@ -1551,7 +1608,10 @@ def importar_notas_preview(slug):
                     if raw_val is not None:
                         try:
                             val = float(str(raw_val).replace(',', '.'))
-                            if val < escala_min or val > escala_max:
+                            if not math.isfinite(val):
+                                row_errors.append('Autoevaluaci\u00f3n invalida')
+                                all_ok = False
+                            elif val < escala_min or val > escala_max:
                                 row_errors.append('Autoevaluaci\u00f3n fuera de rango')
                                 all_ok = False
                             else:
@@ -1663,7 +1723,7 @@ def importar_notas_confirmar(slug):
                                      curso_sel, materia, periodo,
                                      campo='nota', actividad_id=act_id,
                                      valor_anterior=old_val, valor_nuevo=ch['valor'],
-                                     motivo='Importacion masiva Excel')
+                                     motivo='Importacion masiva Excel', conn=conn)
                         updated += 1
                 elif ch['tipo'] == 'evaluacion':
                     existing = conn.execute(
@@ -1685,7 +1745,7 @@ def importar_notas_confirmar(slug):
                         f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'evaluaciones', aid,
                                      curso_sel, materia, periodo, campo='evaluacion',
                                      valor_anterior=old_val, valor_nuevo=ch['valor'],
-                                     motivo='Importacion masiva Excel')
+                                     motivo='Importacion masiva Excel', conn=conn)
                         updated += 1
                 elif ch['tipo'] == 'autoevaluacion':
                     existing = conn.execute(
@@ -1707,7 +1767,7 @@ def importar_notas_confirmar(slug):
                         f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'evaluaciones', aid,
                                      curso_sel, materia, periodo, campo='autoevaluacion',
                                      valor_anterior=old_val, valor_nuevo=ch['valor'],
-                                     motivo='Importacion masiva Excel')
+                                     motivo='Importacion masiva Excel', conn=conn)
                         updated += 1
         conn.commit()
     except Exception as e:
@@ -1960,7 +2020,7 @@ def migrar_excel_confirmar(slug):
                                      curso_sel, materia, periodo,
                                      campo='nota', actividad_id=act_id,
                                      valor_anterior=old_val, valor_nuevo=val_num,
-                                     motivo='Migracion desde Excel')
+                                     motivo='Migracion desde Excel', conn=conn)
                         updated += 1
                 elif col.get('campo') in ('evaluacion',):
                     existing = conn.execute(
@@ -1977,7 +2037,7 @@ def migrar_excel_confirmar(slug):
                         f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'evaluaciones', aid,
                                      curso_sel, materia, periodo, campo='evaluacion',
                                      valor_anterior=old_val, valor_nuevo=val_num,
-                                     motivo='Migracion desde Excel')
+                                     motivo='Migracion desde Excel', conn=conn)
                         updated += 1
                 elif col.get('campo') in ('autoevaluacion',):
                     existing = conn.execute(
@@ -1999,7 +2059,7 @@ def migrar_excel_confirmar(slug):
                         f.auditar_nota(slug, prof['id'], 'profesor', 'modificacion', 'evaluaciones', aid,
                                      curso_sel, materia, periodo, campo='autoevaluacion',
                                      valor_anterior=old_val, valor_nuevo=val_num,
-                                     motivo='Migracion desde Excel')
+                                     motivo='Migracion desde Excel', conn=conn)
                         updated += 1
         conn.commit()
     except Exception as e:
@@ -2859,6 +2919,7 @@ def dashboard(slug):
     comunicados_recientes = []
     notif_count = 0
     asistencia_stats = None
+    panel_summary = None
     if prof:
         jornada, materia = f.get_sesion_jornada_materia(slug)
         mis_cursos = f.get_cursos_profesor(slug, prof['id'], materia or '', jornada or '')
@@ -2879,6 +2940,18 @@ def dashboard(slug):
         notif_count = get_notificaciones_no_leidas_count(conn, 'profesor', prof['id'])
         if mis_cursos:
             asistencia_stats = _asistencia_stats(conn, curso=mis_cursos[0], jornada=jornada)
+        try:
+            d_res = f._dashboard_profesor_data(conn, slug, prof, curso=None, materia=materia or '', jornada=jornada or '', periodo=None)
+            cards = (d_res or {}).get('cards', {}) or {}
+            resumen = (d_res or {}).get('resumen', {}) or {}
+            panel_summary = {
+                'estudiantes': cards.get('total_estudiantes') or 0,
+                'promedio': cards.get('promedio_materia') if cards.get('promedio_materia') is not None else cards.get('promedio_curso'),
+                'pendientes': resumen.get('notas_pendientes_total'),
+                'cursos': [c['curso'] for c in resumen.get('notas_pendientes_por_curso', [])],
+            }
+        except Exception:
+            logger.warning('dashboard: no se pudo construir el resumen del panel', exc_info=True)
     elif rector:
         jornada = ''
         materia = ''
@@ -2889,7 +2962,14 @@ def dashboard(slug):
         instance = 'rector'
         nombre = rector['nombre']
         notif_count = get_notificaciones_no_leidas_count(conn, 'rector', rector['id'])
+        panel_summary = {
+            'estudiantes': conn.execute('SELECT COUNT(*) FROM alumnos WHERE activo=1').fetchone()[0],
+            'cursos': mis_cursos,
+        }
     conn.close()
+    curso_quick = request.args.get('curso', '') or ''
+    if instance == 'profesor' and curso_quick not in mis_cursos:
+        curso_quick = ''
     colegio_dash = f.get_colegio(slug)
     dias_es = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
     meses_es = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
@@ -2901,6 +2981,8 @@ def dashboard(slug):
                            jornada=jornada, materia=materia,
                            hoy_schedule=hoy_schedule, comunicados_recientes=comunicados_recientes,
                            notif_count=notif_count, asistencia_stats=asistencia_stats,
+                           panel_summary=panel_summary,
+                           curso_quick=curso_quick,
                            hoy_str=hoy_str)
 
 
@@ -3012,7 +3094,7 @@ def archivar_alumno(slug, id):
         return ('No autorizado', 403)
     from app.services.student_service import archive_student_action
     archive_student_action(conn, id)
-    f.audit_log(slug, prof['id'], 'archivar', 'alumnos', id)
+    f.audit_log(slug, prof['id'], 'archivar', 'alumnos', id, conn=conn)
     conn.commit()
     conn.close()
     return redirect(url_for('teacher.home', slug=slug, curso=curso_sel))
@@ -3038,7 +3120,7 @@ def reactivar_alumno(slug, id):
         return ('No autorizado', 403)
     from app.services.student_service import reactivate_student_action
     reactivate_student_action(conn, id)
-    f.audit_log(slug, prof['id'], 'reactivar', 'alumnos', id)
+    f.audit_log(slug, prof['id'], 'reactivar', 'alumnos', id, conn=conn)
     conn.commit()
     conn.close()
     return redirect(url_for('teacher.archivados', slug=slug, curso=curso_sel))
@@ -3064,7 +3146,7 @@ def eliminar_alumno(slug, id):
         return ('No autorizado', 403)
     from app.services.student_service import delete_student_action
     delete_student_action(conn, id)
-    f.audit_log(slug, prof['id'], 'eliminar', 'alumnos', id)
+    f.audit_log(slug, prof['id'], 'eliminar', 'alumnos', id, conn=conn)
     conn.commit()
     conn.close()
     return redirect(url_for('teacher.archivados', slug=slug, curso=curso_sel))
@@ -3197,20 +3279,41 @@ def comunicados_list(slug):
     prof = f.get_profesor(slug)
     if not prof:
         return jsonify({'error': 'No autorizado'}), 403
+
     conn = f.conectar(slug)
     try:
+        columnas = [r['name'] for r in conn.execute(
+            "PRAGMA table_info(comunicaciones)"
+        ).fetchall()]
+        if not {'autor_tipo', 'autor_id'}.issubset(columnas):
+            return jsonify({'error': 'Se requiere aplicar la migración 25.'}), 409
+
         comms = conn.execute(
-            'SELECT id, titulo, contenido, destinatario_tipo, destinatario_valor, fecha_programada, fecha_creacion, estado FROM comunicaciones ORDER BY fecha_creacion DESC LIMIT 50',
-            ()).fetchall()
-        result = []
-        for c in comms:
-            result.append({
-                'id': c['id'], 'titulo': c['titulo'], 'contenido': c['contenido'],
-                'destinatario_tipo': c['destinatario_tipo'], 'destinatario_valor': c['destinatario_valor'],
-                'fecha_programada': c['fecha_programada'], 'creado': c['fecha_creacion'],
-                'estado': c['estado']
-            })
-        return jsonify({'comunicados': result})
+            """
+            SELECT DISTINCT c.id, c.titulo, c.contenido,
+                   c.destinatario_tipo, c.destinatario_valor,
+                   c.fecha_programada, c.fecha_creacion, c.fecha_creacion AS creado,
+                   c.fecha_publicacion, c.estado,
+                   COALESCE(cl.leido, 0) AS leido,
+                   CASE WHEN c.autor_tipo='profesor' AND c.autor_id=?
+                        THEN 1 ELSE 0 END AS es_autor
+            FROM comunicaciones c
+            LEFT JOIN comunicaciones_leidas cl
+              ON cl.comunicacion_id=c.id
+             AND cl.usuario_tipo='profesor'
+             AND cl.usuario_id=?
+            WHERE c.activo=1
+              AND (
+                (c.autor_tipo='profesor' AND c.autor_id=?)
+                OR (cl.usuario_id IS NOT NULL AND c.estado='publicado')
+              )
+            ORDER BY c.fecha_creacion DESC
+            LIMIT 50
+            """,
+            (prof['id'], prof['id'], prof['id'])
+        ).fetchall()
+
+        return jsonify({'comunicados': [dict(c) for c in comms]})
     finally:
         conn.close()
 
@@ -3224,23 +3327,107 @@ def comunicados_crear(slug):
         return jsonify({'error': 'No autorizado'}), 403
     if not validar_csrf():
         return jsonify({'error': 'CSRF inválido'}), 403
+
     data = request.get_json(silent=True) or {}
-    titulo = data.get('titulo', '')
-    contenido = data.get('contenido', '')
-    destinatario_tipo = data.get('destinatario_tipo', 'todos')
-    destinatario_valor = data.get('destinatario_valor', '')
+    titulo = str(data.get('titulo', '')).strip()
+    contenido = str(data.get('contenido', '')).strip()
+    destinatario_tipo = data.get('destinatario_tipo', '')
+    destinatario_valor = data.get('destinatario_valor', [])
     programada = data.get('programada')
-    if not titulo:
-        return jsonify({'error': 'Titulo requerido'}), 400
+
+    if not titulo or not contenido:
+        return jsonify({'error': 'Título y contenido son obligatorios.'}), 400
+
+    if destinatario_tipo not in ('rector', 'profesores', 'estudiantes'):
+        return jsonify({'error': 'Destinatario no válido.'}), 400
+
+    if isinstance(destinatario_valor, str):
+        try:
+            import json
+            destinatario_valor = json.loads(destinatario_valor) if destinatario_valor else []
+        except (ValueError, TypeError):
+            destinatario_valor = []
+
+    if not isinstance(destinatario_valor, list):
+        return jsonify({'error': 'La lista de destinatarios no es válida.'}), 400
+
+    if programada:
+        try:
+            fecha = datetime.strptime(str(programada), '%Y-%m-%d').date()
+            if fecha <= datetime.now().date():
+                return jsonify({'error': 'La fecha programada debe ser futura.'}), 400
+        except ValueError:
+            return jsonify({'error': 'La fecha debe tener formato AAAA-MM-DD.'}), 400
+
     conn = f.conectar(slug)
     try:
-        conn.execute(
-            "INSERT INTO comunicaciones (rector_id, titulo, contenido, destinatario_tipo, destinatario_valor, fecha_programada, estado, fecha_creacion) VALUES (?,?,?,?,?,?,'publicado',datetime('now'))",
-            (prof['id'], titulo, contenido, destinatario_tipo, destinatario_valor, programada))
+        columnas = [r['name'] for r in conn.execute(
+            "PRAGMA table_info(comunicaciones)"
+        ).fetchall()]
+        if not {'autor_tipo', 'autor_id'}.issubset(columnas):
+            return jsonify({'error': 'Se requiere aplicar la migración 25.'}), 409
+
+        rector = conn.execute(
+            'SELECT id FROM rectores WHERE activo=1 AND es_principal=1 LIMIT 1'
+        ).fetchone()
+        if not rector:
+            return jsonify({'error': 'No se encontró un rector principal activo.'}), 409
+
+        import json
+        estado = 'programado' if programada else 'publicado'
+        fecha_publicacion = None if programada else datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        cursor = conn.execute(
+            """
+            INSERT INTO comunicaciones
+            (rector_id, titulo, contenido, destinatario_tipo,
+             destinatario_valor, fecha_programada, fecha_publicacion,
+             estado, fecha_creacion, autor_tipo, autor_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now','localtime'), 'profesor', ?)
+            """,
+            (
+                rector['id'], titulo, contenido, destinatario_tipo,
+                json.dumps(destinatario_valor), programada,
+                fecha_publicacion, estado, prof['id']
+            )
+        )
+        comunicacion_id = cursor.lastrowid
         conn.commit()
-        return jsonify({'status': 'ok'})
     finally:
         conn.close()
+
+    if not programada:
+        resultado = f.generar_destinatarios(slug, comunicacion_id)
+
+        if not isinstance(resultado, dict) or not resultado.get('ok'):
+            conn = f.conectar(slug)
+            try:
+                conn.execute(
+                    "UPDATE comunicaciones SET estado='borrador' WHERE id=?",
+                    (comunicacion_id,)
+                )
+                conn.commit()
+            finally:
+                conn.close()
+
+            mensaje = (
+                resultado.get('mensaje', 'Error desconocido.')
+                if isinstance(resultado, dict)
+                else 'No se pudo confirmar la asignación de destinatarios.'
+            )
+            return jsonify({
+                'status': 'error',
+                'id': comunicacion_id,
+                'estado': 'borrador',
+                'error': 'El comunicado se guardó como borrador: ' + str(mensaje)
+            }), 409
+
+    return jsonify({
+        'status': 'ok',
+        'id': comunicacion_id,
+        'estado': estado,
+        'mensaje': 'Comunicación guardada correctamente.'
+    })
 
 
 @teacher_bp.route('/<slug>/comunicados/<int:cid>/leer', methods=['POST'])
@@ -3252,9 +3439,31 @@ def comunicados_leer(slug, cid):
         return jsonify({'error': 'No autorizado'}), 403
     if not validar_csrf():
         return jsonify({'error': 'Error CSRF'}), 403
+
     conn = f.conectar(slug)
     try:
-        conn.execute("UPDATE comunicaciones SET estado='leido' WHERE id=?", (cid,))
+        asignada = conn.execute(
+            """
+            SELECT 1
+            FROM comunicaciones c
+            JOIN comunicaciones_leidas cl ON cl.comunicacion_id=c.id
+            WHERE c.id=? AND c.activo=1 AND c.estado='publicado'
+              AND cl.usuario_tipo='profesor' AND cl.usuario_id=?
+            """,
+            (cid, prof['id'])
+        ).fetchone()
+
+        if not asignada:
+            return jsonify({'error': 'No tienes acceso a esta comunicación.'}), 403
+
+        conn.execute(
+            """
+            UPDATE comunicaciones_leidas
+            SET leido=1, fecha_lectura=datetime('now','localtime')
+            WHERE comunicacion_id=? AND usuario_tipo='profesor' AND usuario_id=?
+            """,
+            (cid, prof['id'])
+        )
         conn.commit()
         return jsonify({'status': 'ok'})
     finally:
@@ -3677,31 +3886,25 @@ def ai_ask(slug):
             respuesta['respuesta'] = f"Materias con menor promedio: {rows[0]['materia']} ({rows[0]['prom']})" if rows else 'No hay datos suficientes.'
             respuesta['datos'] = [{'materia': r['materia'], 'promedio': r['prom']} for r in rows]
         elif any(p in pregunta for p in ['docente sin', 'profesor sin', 'sin registrar', 'días sin', 'no ha registrado']):
-            from datetime import datetime, timedelta
-            days = 10
-            for w in pregunta.split():
-                if w.isdigit():
-                    days = int(w)
-                    break
-            cutoff = (datetime.now() - timedelta(days=days)).isoformat()
-            rows = conn.execute('''SELECT p.id, p.nombre, MAX(n.created_at) as ultima_nota
+            rows = conn.execute('''SELECT p.id, p.nombre, MAX(n.id) as ultima_nota
                 FROM profesores p JOIN actividades a ON a.profesor_id=p.id
                 LEFT JOIN notas n ON n.actividad_id=a.id
-                GROUP BY p.id HAVING ultima_nota IS NULL OR ultima_nota < ?''', (cutoff,)).fetchall()
-            respuesta['respuesta'] = f'{len(rows)} docentes no han registrado notas en los últimos {days} días.'
-            respuesta['datos'] = [{'nombre': r['nombre'], 'ultima_nota': r['ultima_nota'] or 'Nunca'} for r in rows]
+                GROUP BY p.id HAVING ultima_nota IS NULL''').fetchall()
+            if rows:
+                respuesta['respuesta'] = (f'{len(rows)} docentes no han registrado notas. '
+                                          'El sistema no registra fecha de notas, por lo que no puede determinarse '
+                                          'cuántos días llevan sin registrar.')
+            else:
+                respuesta['respuesta'] = 'Todos los docentes con actividades registradas tienen al menos una nota.'
+            respuesta['datos'] = [{'nombre': r['nombre'], 'ultima_nota': 'Nunca'} for r in rows]
         elif any(p in pregunta for p in ['inasistencia', 'ausencia', 'falta', 'asistencia baja', 'no asiste']):
-            rows = conn.execute('SELECT a.nombre, a.curso, COUNT(*) as faltas FROM asistencia_v2 av JOIN alumnos a ON a.id=av.alumno_id WHERE av.estado IN ("X","E") AND a.activo=1 GROUP BY av.alumno_id HAVING faltas > 3 ORDER BY faltas DESC LIMIT 20').fetchall()
+            rows = conn.execute('SELECT a.nombre, a.curso, COUNT(*) as faltas FROM asistencia av JOIN alumnos a ON a.id=av.aid WHERE av.estado IN ("X","E") AND a.activo=1 GROUP BY av.aid HAVING faltas > 3 ORDER BY faltas DESC LIMIT 20').fetchall()
             respuesta['respuesta'] = f'{len(rows)} estudiantes tienen más de 3 inasistencias.'
             respuesta['datos'] = [{'nombre': r['nombre'], 'curso': r['curso'], 'faltas': r['faltas']} for r in rows]
         elif any(p in pregunta for p in ['mejorado', 'mejora', 'progreso', 'subió', 'aumentó']):
-            rows = conn.execute('''SELECT a.nombre, a.curso, ROUND(AVG(CASE WHEN n.created_at < date("now","-15 days") THEN n.val END),2) as antes,
-                ROUND(AVG(CASE WHEN n.created_at >= date("now","-15 days") THEN n.val END),2) as despues
-                FROM notas n JOIN actividades ac ON ac.id=n.actividad_id JOIN alumnos a ON a.id=n.aid
-                WHERE n.val IS NOT NULL GROUP BY n.aid HAVING despues > antes AND antes > 0
-                ORDER BY (despues-antes) DESC LIMIT 15''').fetchall()
-            respuesta['respuesta'] = f'{len(rows)} estudiantes han mejorado su rendimiento recientemente.'
-            respuesta['datos'] = [{'nombre': r['nombre'], 'curso': r['curso'], 'antes': r['antes'], 'despues': r['despues']} for r in rows]
+            respuesta['respuesta'] = ('No se puede calcular el progreso reciente: el sistema no registra la fecha '
+                                      'de las notas, por lo que no es posible comparar periodos de tiempo.')
+            respuesta['datos'] = []
         elif any(p in pregunta for p in ['curso crítico', 'curso necesita', 'intervención', 'peor curso', 'curso bajo']):
             rows = conn.execute('SELECT a.curso, ROUND(AVG(n.val),2) as prom, COUNT(DISTINCT n.aid) as estudiantes FROM notas n JOIN actividades a ON a.id=n.actividad_id WHERE n.val IS NOT NULL GROUP BY a.curso ORDER BY prom ASC LIMIT 10').fetchall()
             respuesta['respuesta'] = f"Curso con menor rendimiento: {rows[0]['curso']} ({rows[0]['prom']})" if rows else 'No hay datos.'

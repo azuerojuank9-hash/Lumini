@@ -141,6 +141,11 @@ from app.infra.database import (  # noqa: F401
     _migrar_v18,
     _migrar_v19,
     _migrar_v20,
+    _migrar_v21,
+    _migrar_v22,
+    _migrar_v23,
+    _migrar_v24,
+    _sincronizar_estudiantes,
     _recrear_si_unique_incorrecto,
     conectar,
     conectar_master,
@@ -159,6 +164,7 @@ from app.infra.grades import (  # noqa: F401
     calcular_nota_final_estudiante,
     calcular_stats_curso,
     calcular_stats_estudiante,
+    calcular_stats_y_nota_final,
 )
 from app.infra.helpers import (  # noqa: F401
     get_cursos_cache,

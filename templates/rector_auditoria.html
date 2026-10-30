@@ -27,6 +27,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
 .pagination .info{font-size:11px;color:var(--sub);}
 .val-diff{font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .val-diff code{background:var(--bg3);padding:1px 4px;border-radius:3px;font-size:10px;}
+@media(max-width:768px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;padding:16px;}
@@ -41,14 +42,16 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
   {{ breadcrumbs([('Panel','/'~slug~'/rector'),('Auditoría',None)]) }}
 </div>
 
+{% set tabla_labels = {'alumnos':'Estudiantes','profesores':'Profesores','actividades':'Actividades','notas':'Notas','evaluaciones':'Evaluaciones','comunicaciones':'Comunicaciones','eventos_calendario':'Calendario','solicitudes_modificacion':'Solicitudes','auditoria_notas':'Auditoría de Notas','config_institucion':'Configuración','usuarios':'Usuarios','canales':'Canales','observaciones':'Observaciones','asistencia':'Asistencia'} %}
+
   <div class="card" style="padding:0;overflow:hidden;">
   <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
     <div class="table-top">
       <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <select name="tabla" onchange="this.form.submit()" class="form-select" style="width:auto;font-size:11px;padding:6px 10px;">
-          <option value="">Todas las tablas</option>
+          <option value="">Todas las secciones</option>
           {% for t in tablas %}
-          <option value="{{ t }}" {% if tabla == t %}selected{% endif %}>{{ t }}</option>
+          <option value="{{ t }}" {% if tabla == t %}selected{% endif %}>{{ tabla_labels.get(t, t) }}</option>
           {% endfor %}
         </select>
         <span style="font-size:11px;color:var(--sub);">{{ total }} registro(s)</span>
@@ -67,10 +70,8 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
         <th>Fecha</th>
         <th>Usuario</th>
         <th>Acción</th>
-        <th>Tabla</th>
-        <th>ID</th>
+        <th>Sección</th>
         <th>Cambio</th>
-        <th>IP</th>
       </tr>
     </thead>
     <tbody>
@@ -82,8 +83,7 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
           {% set cls = {'create':'badge-create','update':'badge-update','delete':'badge-delete','login':'badge-login'} %}
           <span class="badge {{ cls.get(r.accion, 'badge-login') }}">{{ r.accion }}</span>
         </td>
-        <td style="font-family:monospace;font-size:11px;">{{ r.tabla }}</td>
-        <td style="font-family:monospace;font-size:11px;color:var(--sub);">{{ r.registro_id or '-' }}</td>
+        <td style="font-size:11px;">{{ tabla_labels.get(r.tabla, r.tabla) }}</td>
         <td>
           {% if r.valor_anterior and r.valor_nuevo %}
           <div class="val-diff">
@@ -97,7 +97,6 @@ tr:hover td{background:rgba(var(--accent-rgb),.02);}
           <span style="color:var(--sub);">—</span>
           {% endif %}
         </td>
-        <td style="font-family:monospace;font-size:11px;color:var(--sub);">{{ r.ip or '-' }}</td>
       </tr>
       {% endfor %}
     </tbody>

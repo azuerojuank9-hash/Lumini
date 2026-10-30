@@ -1,18 +1,18 @@
 /* LUMINI Design System — Tables */
 .table-wrap{overflow-x:auto;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--bg2);width:100%}
-table{width:100%;border-collapse:collapse;font-size:var(--font-sm);table-layout:auto}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:var(--font-sm);table-layout:auto}
 thead{background:var(--bg3)}
-th{text-align:left;padding:10px 14px;font-weight:600;color:var(--muted);font-size:var(--font-xs);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;border-bottom:1px solid var(--border);cursor:default;user-select:none}
+th{text-align:left;padding:11px 16px;font-weight:600;color:var(--muted);font-size:var(--font-xs);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;border-bottom:2px solid var(--border);cursor:default;user-select:none;position:sticky;top:0;z-index:2}
 th.sortable{cursor:pointer}
 th.sortable:hover{color:var(--accent)}
 th.sort-asc::after{content:' \25B2';opacity:1;color:var(--accent);font-size:9px}
 th.sort-desc::after{content:' \25BC';opacity:1;color:var(--accent);font-size:9px}
-td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;line-height:1.4}
+td{padding:10px 16px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;line-height:1.4}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(var(--accent-rgb),.04)}
 tr.selected td{background:rgba(var(--accent-rgb),.1)}
-.table-sticky th{position:sticky;top:0;z-index:2;box-shadow:inset 0 1px 0 var(--border)}
-.table-compact td,.table-compact th{padding:6px 10px;font-size:var(--font-xs)}
+.table-sticky th{position:sticky;top:0;z-index:2;box-shadow:inset 0 -2px 0 var(--border)}
+.table-compact td,.table-compact th{padding:7px 12px;font-size:var(--font-xs)}
 .table-striped tbody tr:nth-child(even) td{background:rgba(var(--accent-rgb),.02)}
 .table-card{border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
 .table-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--spacing-sm);padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border)}

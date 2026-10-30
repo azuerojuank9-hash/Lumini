@@ -622,6 +622,66 @@ class TestImportarNotasRobustez:
         assert not any('duplicado' in e.lower() for e in data['filas'][0]['errors'])
         assert not any('duplicado' in e.lower() for e in data['filas'][1]['errors'])
 
+    def test_importa_sin_columna_aid(self, client, teacher, csrf):
+        """Excel oficial tiene columnas: N°, Estudiante, Actividades..., Evaluación, Autoevaluación (sin AID).
+        Debe matchear por nombre y no interpretar la 1ra actividad como AID."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'Actividad 1', 'Evaluaci\u00f3n', 'Autoevaluaci\u00f3n'],
+                         [1, alumno['nombre'], 4.5, 4.6, 4.7]])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'sin_aid.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+        assert data['filas'][0]['aid'] == alumno['id']
+        assert any(c.get('tipo') == 'actividad' for c in data['filas'][0]['changes'].values())
+
+    def test_importa_sin_columna_aid_actividad_valor_actividad(self, client, teacher, csrf):
+        """Con columna sinon AID, la 1ra actividad conserva su valor de nota (no se devora como AID)."""
+        activ = primera_actividad()
+        assert activ
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', activ['nombre'], 'Promedio'],
+                         [1, alumno['nombre'], 4.5, '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'sin_aid2.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        fila = data['filas'][0]
+        assert fila['ok'] is True
+        act_changes = [c for c in fila['changes'].values() if c['tipo'] == 'actividad' and c['actividad_id'] == activ['id']]
+        assert act_changes and act_changes[0]['valor'] == 4.5
+
+    def test_importa_con_aid_sigue_funcionando(self, client, teacher, csrf):
+        """La plantilla oficial con columna AID sigue funcionando (no regression)."""
+        alumno = primer_alumno_primero_a()
+        assert alumno
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'AID', 'Promedio'],
+                         [1, alumno['nombre'], alumno['id'], '']])
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'con_aid.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is True
+        assert data['filas'][0]['aid'] == alumno['id']
+
+    def test_importa_sin_columna_aid_rechaza_curso_ajeno(self, client, teacher, csrf):
+        """Sin AID, un alumno de otro curso no debe encontrar match (por nombre con filtro de curso)."""
+        bio = make_xlsx([['N\u00b0', 'Estudiante', 'Actividad 1', 'Promedio'],
+                         [1, 'Alumno Tres', 4.0, '']])  # Alumno Tres es de Segundo A
+        r = client.post(f'/{SLUG}/importar_notas/preview', data={
+            '_csrf_token': CSRF, 'curso': 'Primero A', 'periodo': '1',
+            'archivo': (bio, 'ajeno.xlsx')})
+        assert r.status_code == 200
+        data = json.loads(r.get_data(as_text=True))
+        assert data['filas'][0]['ok'] is False
+        assert any('no encontrado' in e.lower() for e in data['filas'][0]['errors'])
+
     def test_export_roundtrip(self, client, teacher, csrf):
         """Exported notas Excel can be re-imported."""
         r = client.get(f'/{SLUG}/exportar_notas?curso=Primero A&periodo=1')

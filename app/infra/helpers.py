@@ -105,6 +105,12 @@ def get_cursos_profesor(slug, pid, materia, jornada):
     return [r['curso'] for r in rows]
 
 
+def _normalizar(valor):
+    if not valor:
+        return valor
+    return valor.replace('Manana', 'Mañana').replace('Matematicas', 'Matemáticas')
+
+
 def get_cursos_cache(slug, jornada=None):
     from app.infra.database import _cache_get, _cache_set, conectar
     key = f'cursos_{slug}_{jornada or "all"}'
@@ -117,7 +123,7 @@ def get_cursos_cache(slug, jornada=None):
     else:
         rows = conn.execute('SELECT DISTINCT curso FROM alumnos WHERE activo=1 ORDER BY curso').fetchall()
     conn.close()
-    val = [r['curso'] for r in rows]
+    val = [_normalizar(r['curso']) for r in rows]
     _cache_set(key, val, ttl=60)
     return val
 
@@ -134,7 +140,7 @@ def get_materias_cache(slug, jornada=None):
     else:
         rows = conn.execute('SELECT DISTINCT materia FROM asignaciones_materia ORDER BY materia').fetchall()
     conn.close()
-    val = [r['materia'] for r in rows]
+    val = [_normalizar(r['materia']) for r in rows]
     _cache_set(key, val, ttl=60)
     return val
 
@@ -148,7 +154,7 @@ def get_jornadas_cache(slug):
     conn = conectar(slug)
     rows = conn.execute('SELECT DISTINCT jornada FROM alumnos WHERE activo=1 ORDER BY jornada').fetchall()
     conn.close()
-    val = [r['jornada'] for r in rows]
+    val = [_normalizar(r['jornada']) for r in rows]
     _cache_set(key, val, ttl=60)
     return val
 

@@ -1,10 +1,11 @@
 /* LUMINI Design System — Layout */
-.main{flex:1;margin-left:var(--sidebar-w);max-width:calc(100% - var(--sidebar-w));padding:20px 24px;min-height:100vh;transition:margin var(--tr),max-width var(--tr),padding var(--tr)}
+.main{flex:1;margin-left:var(--sidebar-w);max-width:calc(100% - var(--sidebar-w));padding:24px 32px;min-height:100vh;transition:margin var(--tr),max-width var(--tr),padding var(--tr)}
 .main-full{margin-left:0;max-width:100%}
-.container{max-width:1400px;margin:0 auto;width:100%;padding:0 var(--spacing-sm)}
+.container{max-width:1520px;margin:0 auto;width:100%;padding:0 var(--spacing-sm)}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing-lg)}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--spacing-lg)}
-.grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--spacing-md)}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--spacing-lg)}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--spacing-md)}
 .flex{display:flex}
 .flex-wrap{flex-wrap:wrap}
 .flex-center{align-items:center;justify-content:center}
@@ -37,15 +38,15 @@
 .container{max-width:1600px}
 }
 @media(max-width:1440px){
-.main{padding:18px 22px}
-.container{max-width:1300px}
+.main{padding:22px 28px}
+.container{max-width:1380px}
 }
 @media(max-width:1280px){
-.main{padding:16px 20px}
-.container{max-width:1200px}
+.main{padding:20px 24px}
+.container{max-width:1240px}
 }
 @media(max-width:1024px){
-.main{padding:14px 18px}
+.main{padding:18px 20px}
 .grid-4{grid-template-columns:1fr 1fr}
 .grid-3{grid-template-columns:1fr 1fr}
 .topbar-left h1{font-size:20px}

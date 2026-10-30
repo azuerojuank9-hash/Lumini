@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import re as _re
@@ -487,11 +488,324 @@ def _migrar_v20(conn, slug=None):
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )''')
 
+def _migrar_v23(conn, slug=None):
+    """F2.1 — Tabla `estudiantes` (identidad/persona estable).
+
+    Reglas F2.1:
+    - estudiantes.id = alumnos.id (mismo ID, sin IDs artificiales).
+    - Solo campos de identidad/credencial legacy: id, slug, nombre, pin_legacy.
+    - NO copia curso, jornada, num_curso, activo ni email_acudiente
+      (esos pertenecen a matrícula / legacy, no a la identidad).
+    - Migra alumnos activos e inactivos (identidad histórica; no se elimina nada).
+    - NO crea estudiantes para aid huérfanos (no tienen origen en alumnos).
+    - No modifica ninguna fila de alumnos.
+    - Idempotente: CREATE TABLE IF NOT EXISTS + INSERT OR IGNORE.
+    """
+    conn.execute('''CREATE TABLE IF NOT EXISTS estudiantes (
+        id INTEGER PRIMARY KEY,
+        slug TEXT NOT NULL,
+        nombre TEXT NOT NULL,
+        pin_legacy TEXT NULL
+    )''')
+    _sincronizar_estudiantes(conn, slug)
+
+
+def _sincronizar_estudiantes(conn, slug=None):
+    """F2.1 — Mantiene la correspondencia alumnos.id → estudiantes.id.
+
+    Solo INSERTS (INSERT OR IGNORE) desde alumnos; nunca toca alumnos,
+    nunca crea estudiantes para aid huérfanos de otras tablas.
+    Idempotente y seguro de correr en cada init_db.
+    """
+    if conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='alumnos'").fetchone():
+        cols_alumnos = [r[1] for r in conn.execute('PRAGMA table_info(alumnos)').fetchall()]
+        pin_expr = "NULLIF(TRIM(pin), '')" if 'pin' in cols_alumnos else 'NULL'
+        conn.execute(
+            f'''INSERT OR IGNORE INTO estudiantes (id, slug, nombre, pin_legacy)
+               SELECT id, ?, nombre, {pin_expr} FROM alumnos''',
+            (slug or '',))
+
+
 def _migrar_v21(conn, slug=None):
     conn.execute('CREATE INDEX IF NOT EXISTS idx_alumno_padre_padre ON alumno_padre(padre_id)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_alumno_padre_alumno ON alumno_padre(alumno_id)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_observador_registros_aid ON observador_registros(aid)')
     conn.execute('CREATE INDEX IF NOT EXISTS idx_eventos_curso ON eventos_calendario(curso)')
+
+
+def _migrar_v24(conn, slug=None):
+    """F2.4 — Estructura física de año lectivo y matrícula académica.
+
+    - Agrega anio_lectivo.estado (planificado | activo | cerrado, DEFAULT 'planificado').
+    - Crea matricula_academica (modelo aprobado F2.3A/F2.3B; sin jornada_id ni sede_id).
+    - Crea los 6 índices aprobados (incluye candidato único por estudiante).
+    - NO migra candidatos, NO inserta años, NO toca tablas legacy.
+
+    Defensivo (F2.4 §1 / F2.3B §4): si la estructura todavía necesita cambios y
+    anio_lectivo ya contiene filas, aborta la migración de esa BD en lugar de
+    decidir automáticamente su estado. Si la estructura ya está completa, es
+    idempotente y no revisa filas existentes (tampoco las modifica).
+    Atómica: todo el DDL se ejecuta en una transacción; ante error, rollback.
+    Idempotente: CREATE IF NOT EXISTS / ALTER si columna ausente.
+    """
+    for t in ('anio_lectivo', 'estudiantes', 'cursos', 'jornadas'):
+        if not conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+                            (t,)).fetchone():
+            raise RuntimeError(f'[{slug}] _migrar_v24 abortada: falta la tabla previa {t}.')
+    cols_anio = [r[1] for r in conn.execute('PRAGMA table_info(anio_lectivo)').fetchall()]
+    has_estado = 'estado' in cols_anio
+    has_ma = bool(conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='matricula_academica'"
+    ).fetchone())
+    if has_estado and has_ma:
+        return
+    row = conn.execute('SELECT COUNT(*) AS c FROM anio_lectivo').fetchone()
+    if row and row['c']:
+        raise RuntimeError(
+            f'[{slug}] _migrar_v24 abortada: anio_lectivo contiene {row["c"]} fila(s) '
+            'sin declaración institucional verificada. Requiere intervención explícita '
+            'antes de migrar a v24.')
+    _iso = conn.isolation_level
+    conn.isolation_level = None
+    try:
+        conn.execute('BEGIN IMMEDIATE')
+        if not has_estado:
+            conn.execute('''ALTER TABLE anio_lectivo ADD COLUMN
+                estado TEXT NOT NULL DEFAULT 'planificado'
+                CHECK (estado IN ('planificado','activo','cerrado'))''')
+        if not has_ma:
+            conn.execute('''CREATE TABLE matricula_academica (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                slug TEXT NOT NULL,
+                estudiante_id INTEGER NOT NULL,
+                anio_lectivo_id INTEGER,
+                curso_id INTEGER NOT NULL,
+                num_curso INTEGER,
+                estado TEXT NOT NULL DEFAULT 'aspirante'
+                    CHECK (estado IN ('aspirante','activo','retirado','promovido')),
+                fecha_inicio TEXT,
+                fecha_fin TEXT,
+                motivo_retiro TEXT,
+                observaciones TEXT,
+                created_at TEXT DEFAULT (datetime('now','localtime')),
+                updated_at TEXT DEFAULT (datetime('now','localtime')),
+                CHECK (
+                    (estado = 'aspirante' AND anio_lectivo_id IS NULL)
+                    OR
+                    (estado IN ('activo','retirado','promovido')
+                     AND anio_lectivo_id IS NOT NULL)
+                ),
+                CHECK (
+                    fecha_fin IS NULL
+                    OR fecha_inicio IS NULL
+                    OR fecha_fin >= fecha_inicio
+                ),
+                CHECK (estado <> 'retirado' OR motivo_retiro IS NOT NULL),
+                CHECK (estado = 'retirado' OR motivo_retiro IS NULL),
+                FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id) ON DELETE RESTRICT,
+                FOREIGN KEY (anio_lectivo_id) REFERENCES anio_lectivo(id) ON DELETE RESTRICT,
+                FOREIGN KEY (curso_id) REFERENCES cursos(id) ON DELETE RESTRICT
+            )''')
+            conn.execute('CREATE INDEX idx_ma_estudiante_anio '
+                         'ON matricula_academica(estudiante_id, anio_lectivo_id)')
+            conn.execute('CREATE UNIQUE INDEX uq_ma_una_activa_por_anio '
+                         'ON matricula_academica(estudiante_id, anio_lectivo_id) '
+                         "WHERE estado = 'activo'")
+            conn.execute('CREATE INDEX idx_ma_anio_estado '
+                         'ON matricula_academica(anio_lectivo_id, estado)')
+            conn.execute('CREATE INDEX idx_ma_curso_activo '
+                         'ON matricula_academica(curso_id, num_curso) '
+                         "WHERE estado = 'activo'")
+            conn.execute('CREATE INDEX idx_ma_curso_num '
+                         'ON matricula_academica(curso_id, num_curso)')
+            conn.execute('CREATE UNIQUE INDEX uq_ma_un_candidato_por_estudiante '
+                         'ON matricula_academica(estudiante_id) '
+                         "WHERE estado = 'aspirante' AND anio_lectivo_id IS NULL")
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.isolation_level = _iso
+
+
+def _f1_normalizar(valor):
+    if not valor:
+        return valor
+    return valor.replace('Manana', 'Mañana').replace('Matematicas', 'Matemáticas')
+
+
+def _migrar_v22(conn, slug=None):
+    """F1 — Catálogos estructurales (anio_lectivo, sedes, jornadas, grados, cursos, materias).
+
+    Reglas F1:
+    - Las tablas legacy NO se modifican (sin DROP, sin UPDATE masivo de columnas).
+    - Solo se pueblan catálogos con datos de alta certeza; lo ambiguo queda PENDIENTE
+      (identificable, no se inventa ni se fusiona: '5A' != 'Quinto A').
+    - No se reemplazan las consultas legacy (WHERE curso=?), ni los períodos, ni las rutas.
+    """
+    slug = slug or ''
+
+    # anio_lectivo — estructura de catálogo. No se puebla: no existe dato institucional
+    # de año lectivo vigente; no se convierte un período existente en un año (F1).
+    conn.execute('''CREATE TABLE IF NOT EXISTS anio_lectivo (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        nombre TEXT NOT NULL,
+        inicio TEXT,
+        fin TEXT,
+        vigente INTEGER DEFAULT 0,
+        activo INTEGER DEFAULT 1,
+        UNIQUE(slug, nombre)
+    )''')
+
+    # sedes — sede técnica implícita (1 por institución): representación técnica,
+    # invisible para la UI/reportes (tecnica=1 / jerarquia_activa sigue controlando lo visible).
+    conn.execute('''CREATE TABLE IF NOT EXISTS sedes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        nombre TEXT NOT NULL,
+        tecnica INTEGER DEFAULT 0,
+        activo INTEGER DEFAULT 1,
+        UNIQUE(slug, nombre)
+    )''')
+    if slug:
+        conn.execute(
+            'INSERT OR IGNORE INTO sedes (slug, nombre, tecnica, activo) VALUES (?, ?, 1, 1)',
+            (slug, 'Sede Técnica Implícita'))
+
+    # jornadas — catálogo canónico. Manana normaliza a Mañana; Tarde/Nocturna se mantienen.
+    # Los valores almacenados en tablas legacy NO se modifican.
+    conn.execute('''CREATE TABLE IF NOT EXISTS jornadas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        nombre TEXT NOT NULL,
+        orden INTEGER DEFAULT 0,
+        activo INTEGER DEFAULT 1,
+        UNIQUE(slug, nombre)
+    )''')
+    if slug:
+        nombres = []
+        cfg = conn.execute('SELECT jornadas_json FROM config_institucion WHERE slug=?',
+                           (slug,)).fetchone()
+        if cfg and cfg['jornadas_json']:
+            try:
+                nombres = json.loads(cfg['jornadas_json'])
+            except Exception:
+                nombres = []
+        for tabla, col in [('alumnos', 'jornada'), ('actividades', 'jornada'),
+                           ('asignaciones_curso', 'jornada'), ('asignaciones_materia', 'jornada')]:
+            try:
+                rows = conn.execute(f'SELECT DISTINCT {col} AS j FROM {tabla} WHERE {col} IS NOT NULL').fetchall()
+            except Exception:
+                continue
+            for r in rows:
+                j = _f1_normalizar(r['j'])
+                if j and j not in nombres:
+                    nombres.append(j)
+        for i, nombre in enumerate(nombres):
+            canon = _f1_normalizar(nombre)
+            if canon:
+                conn.execute('INSERT OR IGNORE INTO jornadas (slug, nombre, orden, activo) VALUES (?, ?, ?, 1)',
+                             (slug, canon, i))
+
+    # grados — catálogo vacío: no se infieren grados desde los nombres de cursos.
+    conn.execute('''CREATE TABLE IF NOT EXISTS grados (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        nombre TEXT NOT NULL,
+        nivel INTEGER DEFAULT NULL,
+        activo INTEGER DEFAULT 1,
+        UNIQUE(slug, nombre)
+    )''')
+
+    # cursos — identidad (sede_id, jornada_id, nombre_canonizado) con UNIQUE.
+    # sede_id = sede técnica implícita; grado_id es NULL (pendiente asignación humana, no inferido).
+    conn.execute('''CREATE TABLE IF NOT EXISTS cursos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        sede_id INTEGER NOT NULL,
+        jornada_id INTEGER NOT NULL,
+        grado_id INTEGER,
+        nombre TEXT NOT NULL,
+        activo INTEGER DEFAULT 1,
+        UNIQUE(sede_id, jornada_id, nombre)
+    )''')
+    if slug:
+        sede = conn.execute('SELECT id FROM sedes WHERE slug=? AND tecnica=1', (slug,)).fetchone()
+        if sede:
+            try:
+                filas_alumnos = conn.execute(
+                    'SELECT DISTINCT curso, jornada FROM alumnos WHERE activo=1 AND curso IS NOT NULL'
+                ).fetchall()
+            except Exception:
+                # Una BD muy antigua puede no tener aún alumnos.jornada.
+                # migrar_db la agrega; si se llama v22 aislada, no se rompe.
+                filas_alumnos = []
+            for r in filas_alumnos:
+                nombre = r['curso']
+                jorn = _f1_normalizar(r['jornada']) or 'Mañana'
+                jrow = conn.execute('SELECT id FROM jornadas WHERE slug=? AND nombre=?',
+                                    (slug, jorn)).fetchone()
+                if jrow:
+                    conn.execute(
+                        'INSERT OR IGNORE INTO cursos (slug, sede_id, jornada_id, grado_id, nombre, activo) VALUES (?, ?, ?, NULL, ?, 1)',
+                        (slug, sede['id'], jrow['id'], nombre))
+
+    # materias — la tabla existente (v11) pasa a ser catálogo real con nombres canónicos.
+    # Sin tocar las columnas TEXT de actividades/asignaciones_curso/asignaciones_materia (F4).
+    if slug:
+        vistos = []
+        for tabla, col in [('asignaciones_materia', 'materia'), ('asignaciones_curso', 'materia'),
+                           ('actividades', 'materia')]:
+            try:
+                rows = conn.execute(f'SELECT DISTINCT {col} AS m FROM {tabla} WHERE {col} IS NOT NULL').fetchall()
+            except Exception:
+                continue
+            for r in rows:
+                canon = _f1_normalizar(r['m'])
+                if canon and canon not in vistos:
+                    vistos.append(canon)
+        for nombre in vistos:
+            conn.execute('INSERT OR IGNORE INTO materias (slug, nombre, activo) VALUES (?, ?, 1)',
+                         (slug, nombre))
+
+def _migrar_v25(conn, slug=None):
+    """V25: separar el autor del comunicado de la propiedad rector_id."""
+    tabla = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='comunicaciones'"
+    ).fetchone()
+    if not tabla:
+        raise RuntimeError(f'[{slug}] V25 abortada: falta la tabla comunicaciones.')
+
+    columnas = {
+        row[1] for row in conn.execute(
+            "PRAGMA table_info(comunicaciones)"
+        ).fetchall()
+    }
+
+    if 'autor_tipo' not in columnas:
+        conn.execute(
+            "ALTER TABLE comunicaciones "
+            "ADD COLUMN autor_tipo TEXT NOT NULL DEFAULT 'rector'"
+        )
+
+    if 'autor_id' not in columnas:
+        conn.execute(
+            "ALTER TABLE comunicaciones ADD COLUMN autor_id INTEGER"
+        )
+
+    # Los comunicados históricos conservan su autoría de rector.
+    conn.execute(
+        "UPDATE comunicaciones SET autor_tipo='rector', autor_id=rector_id "
+        "WHERE autor_id IS NULL"
+    )
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_comunicaciones_autor "
+        "ON comunicaciones(autor_tipo, autor_id)"
+    )
+
 
 MIGRACIONES = {
     6:  _migrar_v6,
@@ -510,6 +824,10 @@ MIGRACIONES = {
     19: _migrar_v19,
     20: _migrar_v20,
     21: _migrar_v21,
+    22: _migrar_v22,
+    23: _migrar_v23,
+    24: _migrar_v24,
+    25: _migrar_v25,
 }
 
 
@@ -600,8 +918,10 @@ def init_master_db():
     conn.close()
 
 
-def migrar_db(slug):
-    conn = conectar(slug)
+def migrar_db(slug, conn=None):
+    own_conn = conn is None
+    if own_conn:
+        conn = conectar(slug)
     try:
         cols_prof = [r[1] for r in conn.execute('PRAGMA table_info(profesores)').fetchall()]
         if 'materia' in cols_prof:
@@ -749,7 +1069,8 @@ def migrar_db(slug):
         logger.error(f'[{slug}] Error en migración legacy: {e}', exc_info=True)
         raise
     finally:
-        conn.close()
+        if own_conn:
+            conn.close()
 
 
 def init_db(slug):
@@ -977,6 +1298,12 @@ def init_db(slug):
         except sqlite3.OperationalError as e:
             logger.warning(f'init_db index: {e}')
     conn.commit()
-    _ejecutar_migraciones(slug, conn)
-    conn.close()
-    migrar_db(slug)
+    try:
+        # La migración legacy agrega columnas que v22/v23 consultan
+        # (p. ej. alumnos.jornada y alumnos.pin); debe ejecutarse antes.
+        migrar_db(slug, conn)
+        _ejecutar_migraciones(slug, conn)
+        _sincronizar_estudiantes(conn, slug)
+        conn.commit()
+    finally:
+        conn.close()

@@ -295,11 +295,14 @@ def rector_estudiantes(slug):
     total = conn.execute('SELECT COUNT(*) as c FROM alumnos').fetchone()['c']
     estudiantes = [dict(r) for r in conn.execute('''SELECT id, nombre, curso, jornada, activo FROM alumnos ORDER BY curso, nombre LIMIT ? OFFSET ?''',
                                                   (per_page, (page - 1) * per_page)).fetchall()]
+    cursos_unicos = [r[0] for r in conn.execute('SELECT DISTINCT curso FROM alumnos WHERE curso != "" ORDER BY curso').fetchall()]
+    jornadas_unicas = [r[0] for r in conn.execute('SELECT DISTINCT jornada FROM alumnos WHERE jornada != "" ORDER BY jornada').fetchall()]
     conn.close()
     return fa.render_template('rector_estudiantes.html',
                            slug=slug, colegio=colegio, rector=rector,
                            estudiantes=estudiantes, page=page, per_page=per_page,
                            total=total, total_pages=(total + per_page - 1) // per_page,
+                           cursos_unicos=cursos_unicos, jornadas_unicas=jornadas_unicas,
                            notif_count=fa.notificaciones_no_leidas(slug, 'rector', rector['id']))
 
 
@@ -729,11 +732,26 @@ def rector_comunicacion_nueva(slug):
             conn.commit()
             conn.close()
             if publicar_ahora == '1':
-                try:
-                    fa.generar_destinatarios(slug, new_id)
-                except Exception as e:
-                    fa.app.logger.error(f'Error en generar_destinatarios (nueva): {e}')
-            exito = 'Comunicación creada correctamente.'
+                resultado = fa.generar_destinatarios(slug, new_id)
+                if not isinstance(resultado, dict) or not resultado.get('ok'):
+                    conn = fa.conectar(slug)
+                    conn.execute(
+                        "UPDATE comunicaciones SET estado='borrador' WHERE id=?",
+                        (new_id,)
+                    )
+                    conn.commit()
+                    conn.close()
+                    error = (
+                        'El comunicado se guardó como borrador porque '
+                        'no se pudieron asignar los destinatarios: '
+                        + str(resultado.get('mensaje', 'Error desconocido.'))
+                        if isinstance(resultado, dict)
+                        else 'No se pudo confirmar la asignación de destinatarios.'
+                    )
+                else:
+                    exito = 'Comunicación creada y publicada correctamente.'
+            else:
+                exito = 'Comunicación creada correctamente.'
     return fa.render_template('rector_comunicacion_form.html',
                            slug=slug, colegio=colegio, rector=rector,
                            error=error, exito=exito, comunicacion=None,
@@ -786,12 +804,26 @@ def rector_comunicacion_editar(slug, cid):
             conn.commit()
             if publicar_ahora == '1':
                 conn.close()
-                try:
-                    fa.generar_destinatarios(slug, cid)
-                except Exception as e:
-                    fa.app.logger.error(f'Error en generar_destinatarios: {e}')
-                conn = fa.conectar(slug)
-            exito = 'Comunicación actualizada correctamente.'
+                resultado = fa.generar_destinatarios(slug, cid)
+                if not isinstance(resultado, dict) or not resultado.get('ok'):
+                    conn = fa.conectar(slug)
+                    conn.execute(
+                        "UPDATE comunicaciones SET estado='borrador' WHERE id=?",
+                        (cid,)
+                    )
+                    conn.commit()
+                    error = (
+                        'Los cambios se guardaron como borrador porque '
+                        'falló la asignación de destinatarios: '
+                        + str(resultado.get('mensaje', 'Error desconocido.'))
+                        if isinstance(resultado, dict)
+                        else 'No se pudo confirmar la asignación de destinatarios.'
+                    )
+                else:
+                    exito = 'Comunicación actualizada y publicada correctamente.'
+                    conn = fa.conectar(slug)
+            else:
+                exito = 'Comunicación actualizada correctamente.'
             com = conn.execute('SELECT * FROM comunicaciones WHERE id=? AND activo=1', (cid,)).fetchone()
     conn.close()
     return fa.render_template('rector_comunicacion_form.html',
@@ -836,14 +868,36 @@ def rector_comunicacion_publicar(slug, cid):
     if not fa.validar_csrf():
         return 'Error de seguridad', 400
     conn = fa.conectar(slug)
-    conn.execute('''UPDATE comunicaciones SET estado='publicado',fecha_publicacion=datetime('now','localtime')
-                    WHERE id=? AND rector_id=? AND activo=1''', (cid, rector['id']))
+    cursor = conn.execute(
+        '''UPDATE comunicaciones
+           SET estado='publicado',
+               fecha_publicacion=datetime('now','localtime')
+           WHERE id=? AND rector_id=? AND activo=1''',
+        (cid, rector['id'])
+    )
     conn.commit()
     conn.close()
-    try:
-        fa.generar_destinatarios(slug, cid)
-    except Exception as e:
-        fa.app.logger.error(f'Error en generar_destinatarios (publicar): {e}')
+
+    if cursor.rowcount == 0:
+        return 'Comunicación no encontrada.', 404
+
+    resultado = fa.generar_destinatarios(slug, cid)
+
+    if not isinstance(resultado, dict) or not resultado.get('ok'):
+        conn = fa.conectar(slug)
+        conn.execute(
+            "UPDATE comunicaciones SET estado='borrador' WHERE id=?",
+            (cid,)
+        )
+        conn.commit()
+        conn.close()
+        mensaje = (
+            resultado.get('mensaje', 'Error desconocido.')
+            if isinstance(resultado, dict)
+            else 'No se pudo confirmar la asignación de destinatarios.'
+        )
+        return 'No se pudo publicar el comunicado: ' + str(mensaje), 409
+
     return fa.redirect(fa.url_for('rector.rector_comunicaciones', slug=slug))
 
 
@@ -1584,7 +1638,7 @@ def rector_tesoreria_crear(slug):
         return fa.jsonify({'status': 'error', 'error': 'No autorizado'}), 403
     if not fa.validar_csrf():
         return fa.jsonify({'status': 'error', 'error': 'CSRF'}), 400
-    return fa.jsonify({'status': 'ok', 'mensaje': 'Funcionalidad en desarrollo'})
+    return fa.jsonify({'status': 'proximamente', 'mensaje': 'Módulo de tesorería próximamente'}), 501
 
 
 @rector_bp.route('/<slug>/tesoreria/facturas/<int:fid>/pagar', methods=['POST'])
@@ -1595,7 +1649,7 @@ def rector_tesoreria_pagar(slug, fid):
         return fa.jsonify({'status': 'error', 'error': 'No autorizado'}), 403
     if not fa.validar_csrf():
         return fa.jsonify({'status': 'error', 'error': 'CSRF'}), 400
-    return fa.jsonify({'status': 'ok', 'mensaje': 'Funcionalidad en desarrollo'})
+    return fa.jsonify({'status': 'proximamente', 'mensaje': 'Módulo de tesorería próximamente'}), 501
 
 
 @rector_bp.route('/<slug>/reportes/tablas')

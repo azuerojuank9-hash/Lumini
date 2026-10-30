@@ -27,11 +27,15 @@ def reactivate_student(conn, aid):
 
 
 def delete_student(conn, aid):
-    conn.execute('DELETE FROM alumnos WHERE id=?', (aid,))
-    conn.execute('DELETE FROM notas WHERE aid=?', (aid,))
-    conn.execute('DELETE FROM evaluaciones WHERE aid=?', (aid,))
-    conn.execute('DELETE FROM asistencia WHERE aid=?', (aid,))
-    conn.execute('DELETE FROM observaciones WHERE aid=?', (aid,))
+    """Baja/retiro lógico: marca la matrícula como inactiva sin destruir histórico.
+
+    La identidad del estudiante y todo su histórico académico (notas,
+    evaluaciones, asistencia, observaciones, compromisos, observador_registros,
+    solicitudes_modificacion, auditoria_notas y relaciones) se conservan.
+    La eliminacion fisica permanece restringida: solo como excepcion para datos
+    sin historico y con auditoria, y no se implementa aun (requiere decision).
+    """
+    conn.execute('UPDATE alumnos SET activo=0 WHERE id=?', (aid,))
 
 
 def get_archived_students(conn, curso, jornada):

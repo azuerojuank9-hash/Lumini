@@ -23,6 +23,8 @@
 .empty-state h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;}
 .buscar-input{width:100%;max-width:300px;padding:8px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;}
 .buscar-input:focus{outline:none;border-color:var(--accent);}
+@media(max-width:768px){.est-table th:nth-child(3),.est-table td:nth-child(3){display:none;}.est-table th,.est-table td{padding:8px 6px;font-size:11px;}}
+@media(max-width:768px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;padding:16px;}
@@ -47,6 +49,15 @@
       </div>
       <button class="btn btn-primary" onclick="abrirModalEstudiante()" style="font-size:12px;padding:6px 12px;"><i data-lucide="user-plus" style="width:14px;height:14px;"></i> Agregar estudiante</button>
     </div>
+  </div>
+  <div style="padding:8px 16px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);" id="filterBar">
+    <span style="font-size:11px;color:var(--muted);line-height:24px;margin-right:4px;">Filtrar:</span>
+    {% for c in cursos_unicos %}<button class="filter-chip" data-filter="curso" data-val="{{ c }}" onclick="toggleFilter(this)" style="padding:3px 10px;border-radius:99px;font-size:11px;border:1px solid var(--border);background:none;color:var(--sub);cursor:pointer;transition:all .15s;">{{ c }}</button>{% endfor %}
+    <span style="width:1px;height:18px;background:var(--border);margin:0 4px;align-self:center;"></span>
+    {% for j in jornadas_unicas %}<button class="filter-chip" data-filter="jornada" data-val="{{ j }}" onclick="toggleFilter(this)" style="padding:3px 10px;border-radius:99px;font-size:11px;border:1px solid var(--border);background:none;color:var(--sub);cursor:pointer;transition:all .15s;">{{ j }}</button>{% endfor %}
+    <span style="width:1px;height:18px;background:var(--border);margin:0 4px;align-self:center;"></span>
+    <button class="filter-chip" data-filter="estado" data-val="activo" onclick="toggleFilter(this)" style="padding:3px 10px;border-radius:99px;font-size:11px;border:1px solid var(--border);background:none;color:var(--sub);cursor:pointer;transition:all .15s;">Activos</button>
+    <button class="filter-chip" data-filter="estado" data-val="inactivo" onclick="toggleFilter(this)" style="padding:3px 10px;border-radius:99px;font-size:11px;border:1px solid var(--border);background:none;color:var(--sub);cursor:pointer;transition:all .15s;">Inactivos</button>
   </div>
   <div style="overflow-x:auto;">
   {% if estudiantes %}
@@ -165,14 +176,47 @@ function toggleEstudiante(id,estado){
 }
 function filtrar(){
     var q=document.getElementById('buscarInput').value.toLowerCase().trim();
+    var activeCurso=document.querySelectorAll('.filter-chip[data-filter="curso"].active');
+    var activeJornada=document.querySelectorAll('.filter-chip[data-filter="jornada"].active');
+    var activeEstado=document.querySelectorAll('.filter-chip[data-filter="estado"].active');
+    var filterCursos=Array.from(activeCurso).map(function(b){return b.dataset.val.toLowerCase();});
+    var filterJornadas=Array.from(activeJornada).map(function(b){return b.dataset.val.toLowerCase();});
+    var filterEstados=Array.from(activeEstado).map(function(b){return b.dataset.val;});
     var rows=document.querySelectorAll('#estTable tbody tr');
     var vis=0;
     rows.forEach(function(r){
         var text=r.textContent.toLowerCase();
-        var show=!q||text.includes(q);
+        var show=true;
+        if(q && !text.includes(q)) show=false;
+        if(filterCursos.length){
+            var cellCurso=r.children[1]?r.children[1].textContent.toLowerCase().trim():'';
+            if(!filterCursos.some(function(f){return cellCurso.includes(f);})) show=false;
+        }
+        if(filterJornadas.length){
+            var cellJornada=r.children[2]?r.children[2].textContent.toLowerCase().trim():'';
+            if(!filterJornadas.some(function(f){return cellJornada.includes(f);})) show=false;
+        }
+        if(filterEstados.length){
+            var isActivo=text.includes('activo') && !text.includes('inactivo');
+            if(filterEstados[0]==='activo' && !isActivo) show=false;
+            if(filterEstados[0]==='inactivo' && isActivo) show=false;
+        }
         r.style.display=show?'':'none';
         if(show)vis++;
     });
+}
+function toggleFilter(btn){
+    btn.classList.toggle('active');
+    if(btn.classList.contains('active')){
+        btn.style.background='rgba(var(--accent-rgb),.15)';
+        btn.style.borderColor='var(--accent)';
+        btn.style.color='var(--accent)';
+    }else{
+        btn.style.background='none';
+        btn.style.borderColor='var(--border)';
+        btn.style.color='var(--sub)';
+    }
+    filtrar();
 }
 </script>
 {% endblock %}

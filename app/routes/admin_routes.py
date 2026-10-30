@@ -71,7 +71,11 @@ def admin_ver_profesores(slug):
         return jsonify({'error': 'No autorizado'}), 403
     if not fa.get_colegio(slug):
         return jsonify({'error': 'Colegio no encontrado'}), 404
-    fa.init_db(slug)
+    try:
+        fa.init_db(slug)
+    except Exception:
+        logger.error('admin_ver_profesores: init_db fallo para %s', slug, exc_info=True)
+        return jsonify({'error': 'La base de datos de la institucion necesita revision tecnica'}), 503
     conn = fa.conectar(slug)
     try:
         profs = conn.execute(
