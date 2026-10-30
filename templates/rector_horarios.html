@@ -70,28 +70,65 @@ function cargarHorario(){
     var curso=document.getElementById('cursoSelect').value;
     var jornada=document.getElementById('jornadaSelect').value;
     var c=document.getElementById('horarioContainer');
-    if(!curso){c.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);">Selecciona un curso para ver su horario.</div>';return;}
-    c.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);">Cargando horario...</div>';
+    if(!curso){c.innerHTML='Selecciona un curso';return;}
+    c.innerHTML='Cargando horario...';
+
     fetch('/'+SLUG+'/rector/horarios/datos?curso='+encodeURIComponent(curso)+'&jornada='+encodeURIComponent(jornada))
-    .then(function(r){return r.json();}).then(function(d){
+    .then(function(r){if(!r.ok)throw new Error('Error al consultar');return r.json();})
+    .then(function(d){
         var h='<div class="horario-grid">';
         h+='<div class="horario-cell header"></div>';
         dias.forEach(function(di){h+='<div class="horario-cell header">'+di+'</div>';});
         franjas.forEach(function(f){
             h+='<div class="horario-cell franja">F'+f+'</div>';
             dias.forEach(function(di){
-                var key=di+'_'+f;
-                var cell=d[key];
+                var key=di+'_'+f, cell=d[key]||{};
                 h+='<div class="horario-cell">';
-                if(cell&&cell.materia){h+='<div class="mat">'+escHtml(cell.materia)+'</div><div class="prof">'+escHtml(cell.profesor||'')+'</div>';}
-                else{h+='<div style="color:var(--muted);font-size:10px;">—</div>';}
+                h+='<input class="horario-materia" placeholder="Materia" value="'+escHtml(cell.materia||'')+'" data-dia="'+di+'" data-franja="'+f+'">';
+                h+='<input class="horario-profesor" placeholder="Profesor" value="'+escHtml(cell.profesor||'')+'" data-dia="'+di+'" data-franja="'+f+'">';
                 h+='</div>';
             });
         });
-        h+='</div>';
+        h+='</div><button type="button" onclick="guardarHorario()">Guardar horario</button>';
         c.innerHTML=h;
-    }).catch(function(){c.innerHTML='<div style="text-align:center;padding:20px;color:var(--danger);">Error al cargar horario</div>';});
+    }).catch(function(){c.innerHTML='No se pudo cargar el horario.';});
 }
+
+function guardarHorario(){
+    var curso=document.getElementById('cursoSelect').value;
+    var jornada=document.getElementById('jornadaSelect').value;
+    var csrf=document.querySelector('input[name="_csrf_token"]');
+    if(!csrf){alert('No se encontró el token de seguridad.');return;}
+
+    var celdas=document.querySelectorAll('#horarioContainer .horario-materia');
+    var tareas=[];
+    celdas.forEach(function(input){
+        var dia=input.dataset.dia, franja=input.dataset.franja;
+        var profesor=document.querySelector('.horario-profesor[data-dia="'+dia+'"][data-franja="'+franja+'"]');
+        var body=new URLSearchParams({
+            _csrf_token:csrf.value, curso:curso, jornada:jornada,
+            dia:dia, franja:franja, num:franja,
+            materia:input.value.trim(),
+            profesor:profesor ? profesor.value.trim() : ''
+        });
+        tareas.push(fetch('/'+SLUG+'/rector/horarios/guardar',{
+            method:'POST', credentials:'same-origin',
+            headers:{'Content-Type':'application/x-www-form-urlencoded'},
+            body:body.toString()
+        }).then(function(r){
+            if(!r.ok)throw new Error('No se pudo guardar '+dia+' F'+franja);
+            return r.json();
+        }).then(function(r){
+            if(!r.ok)throw new Error(r.error||'Error al guardar');
+        }));
+    });
+
+    Promise.all(tareas).then(function(){
+        alert('Horario guardado correctamente.');
+        cargarHorario();
+    }).catch(function(e){alert(e.message||'Error al guardar el horario.');});
+}
+
 function escHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 {% endblock %}

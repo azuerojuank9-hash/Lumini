@@ -257,6 +257,58 @@ def rector_horarios_datos(slug):
     return fa.jsonify(mapa)
 
 
+
+@rector_bp.route('/<slug>/rector/horarios/guardar', methods=['POST'])
+def rector_guardar_horario(slug):
+    fa = _fa()
+    fa.require_colegio(slug)
+    rector = fa.get_rector(slug)
+    if not rector:
+        return fa.jsonify({'ok': False, 'error': 'No autorizado'}), 403
+    if not fa.validar_csrf():
+        return fa.jsonify({'ok': False, 'error': 'CSRF inválido'}), 400
+
+    datos = fa.request.form
+    curso = datos.get('curso', '').strip()
+    jornada = datos.get('jornada', '').strip()
+    dia = datos.get('dia', '').strip()
+    franja = datos.get('franja', '').strip()
+    num = datos.get('num', '').strip()
+    materia = datos.get('materia', '').strip()
+    profesor = datos.get('profesor', '').strip()
+
+    if not curso or not jornada or dia not in (
+        'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'
+    ) or franja not in ('1', '2', '3', '4', '5', '6'):
+        return fa.jsonify({'ok': False, 'error': 'Datos del horario inválidos'}), 400
+
+    conn = fa.conectar(slug)
+    try:
+        if materia or profesor:
+            conn.execute(
+                """INSERT INTO horarios_curso
+                   (curso, jornada, dia, franja, num, materia, profesor)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)
+                   ON CONFLICT(curso, jornada, dia, franja) DO UPDATE SET
+                   num=excluded.num, materia=excluded.materia,
+                   profesor=excluded.profesor""",
+                (curso, jornada, dia, franja, num, materia, profesor)
+            )
+        else:
+            conn.execute(
+                """DELETE FROM horarios_curso
+                   WHERE curso=? AND jornada=? AND dia=? AND franja=?""",
+                (curso, jornada, dia, franja)
+            )
+        conn.commit()
+        return fa.jsonify({'ok': True})
+    except Exception:
+        conn.rollback()
+        return fa.jsonify({'ok': False, 'error': 'No se pudo guardar el horario'}), 500
+    finally:
+        conn.close()
+
+
 @rector_bp.route('/<slug>/rector/profesores')
 def rector_profesores(slug):
     fa = _fa()
